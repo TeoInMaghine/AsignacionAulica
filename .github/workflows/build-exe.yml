@@ -1,0 +1,41 @@
+name: Build Windows Executable
+
+on: workflow_dispatch
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Extract version from pyproject.toml
+        id: get_version
+        shell: pwsh
+        run: |
+          $version = Select-String -Path pyproject.toml -Pattern 'version\s*=\s*"(.*)"' | ForEach-Object {
+            ($_ -match 'version\s*=\s*"(.*)"') | Out-Null
+            $matches[1]
+          }
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+
+      - name: Install project and dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install . pyinstaller
+
+      - name: Build executable with PyInstaller
+        run: |
+          pyinstaller --name asignacion-aulica-${{ env.VERSION }} --onefile src/asignacion-aulica/__main__.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: asignacion-aulica-${{ env.VERSION }}-exe
+          path: dist/asignacion-aulica-${{ env.VERSION }}.exe

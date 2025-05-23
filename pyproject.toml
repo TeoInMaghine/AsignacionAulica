@@ -1,0 +1,19 @@
+[project]
+name = "asignacion-aulica"
+description = "Software de asignación de aulas para la UNRN Sede Andina"
+version = "0.0.1"
+
+authors = [
+  {name = "Cristian Gustavo Mogensen"},
+  {name = "Juan Manuel Valenzuela"},
+  {name = "Teo Pirato Guthmann"},
+  {name = "Joaquín Rodríguez"}
+]
+
+requires-python = ">=3.11"
+dependencies = [
+  "pandas == 2.2.1"
+]
+
+[project.scripts] #[project.gui-scripts] cuando haya gui
+"asignacion-aulica" = "asignacion_aulica.__main__:main"

@@ -10,10 +10,15 @@ authors = [
   {name = "Joaquín Rodríguez"}
 ]
 
-requires-python = ">=3.11"
+requires-python = "~= 3.11"
 dependencies = [
-  "pandas == 2.2.1"
+  "pandas == 2.2.*",
+  "ortools == 9.12.*"
 ]
 
 [project.scripts] #[project.gui-scripts] cuando haya gui
-"asignacion-aulica" = "asignacion_aulica.__main__:main"
+asignacion-aulica = "asignacion_aulica.__main__:main"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"

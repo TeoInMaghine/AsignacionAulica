@@ -1,0 +1,4 @@
+nombre,"cantidad de alumnos","equipamiento necesario","edificio preferido","modalidad lunes","horario inicio lunes","horario fin lunes","modalidad martes","horario inicio martes","horario fin martes","modalidad miércoles","horario inicio miércoles","horario fin miércoles","modalidad jueves","horario inicio jueves","horario fin jueves","modalidad viernes","horario inicio viernes","horario fin viernes","modalidad sábado","horario inicio sábado","horario fin sábado"
+"Álgebra",30,"","Anasagasti 2","presencial",9,11,"no",0,0,"presencial",18,20,"no",0,0,"no",0,0,"no",0,0
+"Programación",40,"computadoras","Anasagasti 2","presencial",10,13,"presencial",15,17,"no",0,0,"no",0,0,"no",0,0,"no",0,0
+"Física",25,"","Anasagasti 2","no",0,0,"virtual",9,13,"presencial",12,14,"no",0,0,"no",0,0,"no",0,0

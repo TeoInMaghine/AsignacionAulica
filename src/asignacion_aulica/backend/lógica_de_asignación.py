@@ -9,10 +9,10 @@ Se define un modelo con los siguientes componentes:
   El número de aula 0 significa que no tiene asignada un aula.
 
 - Restricciones: Cada restricción es una condición booleana que se tiene que
-  cumplir para que la asignación de aulas no sea incorrecta.
+  cumplir para que la asignación de aulas sea correcta.
 
-- Penalizaciones: Son un puntaje que se asigna a las situaciones que no generan
-  una asignación de aulas incorrecta, pero que preferimos evitar si es posible.
+- Penalizaciones: Son un puntaje que se asigna a las situaciones que preferimos
+  evitar si es posible, aunque no generen una asignación de aulas incorrecta.
 
 Luego se usa el solver para encontrar una combinación de variables que cumpla
 con todas las restricciones y que tenga la menor penalización posible.
@@ -22,73 +22,43 @@ from pandas import DataFrame
 
 from .impossible_assignment_exception import ImposibleAssignmentException
 from .restricciones import todas_las_restricciones
-from .constantes import DÍAS_DE_LA_SEMANA
 
-def asignar(aulas: DataFrame, materias: DataFrame) -> DataFrame:
+def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
     '''
     Resolver el problema de asignación.
 
     :param aulas: Tabla con los datos de todas las aulas disponibles.
-        Un aula por fila, con la numeración de las filas empezando en 1.
         Columnas:
         - edificio
         - nombre
         - capacidad
         - equipamiento
     
-    :param materias: Tabla con los datos de todas las materias.
-        Una materia por fila.
-        Los horarios de inicio y fin se ignoran cuando la modalidad es no.
+    :param clases: Tabla con los datos de todas las clases.
+        Una clase por fila.
         Columnas:
-        - nombre (incluye comisión)
+        - nombre (materia y comisión)
+        - día (de la semana)
+        - horario inicio
+        - horario fin
         - cantidad de alumnos
         - equipamiento necesario
         - edificio preferido
-        - modalidad lunes (presencial, virtual, o no)
-        - horario inicio lunes
-        - horario fin lunes
-        - modalidad martes (presencial, virtual, o no)
-        - horario inicio martes
-        - horario fin martes
-        - modalidad miércoles (presencial, virtual, o no)
-        - horario inicio miércoles
-        - horario fin miércoles
-        - modalidad jueves (presencial, virtual, o no)
-        - horario inicio jueves
-        - horario fin jueves
-        - modalidad viernes (presencial, virtual, o no)
-        - horario inicio viernes
-        - horario fin viernes
-        - modalidad sábado (presencial, virtual, o no)
-        - horario inicio sábado
-        - horario fin sábado
     
-    :return: Tabla con las aulas asignadas.
-        Cada fila es una materia, cada columna es un día, y cada celda tiene el
-        número de aula que se le asignó a esa materia para la clase de ese día.
-        El número 0 significa que no hay un aula asignada.
-    
+    :return: Lista con el número de aula asignada a cada clase
     :raise ImposibleAssignmentException: Si no es posible hacer la asignación.
     '''
     # Modelo que contiene las variables, restricciones, y penalizaciones
     modelo = cp_model.CpModel()
     
-    # Agregar al modelo una variable por cada materia y por cada día, que
-    # representa el número de aula que tiene asignada esa materia ese día.
-    #
-    # Guardar las variables en una tabla con una fila por materia y una columna
-    # por día. Cada celda de la tabla contiene una variable que corresponde al
-    # número de aula que tiene esa materia ese día.
-    n_aulas = len(aulas)
-    asignaciones = DataFrame(index=materias.index, columns=DÍAS_DE_LA_SEMANA)
-    for i in materias.index:
-        for día in DÍAS_DE_LA_SEMANA:
-            asignaciones.loc[i, día] = modelo.NewIntVar(0, n_aulas, f'aula_materia_{i}_{día}')
+    # Agregar al modelo una variable por cada clase, que representa el
+    # número de aula que tiene asignada esa clase.
+    max_aula = len(aulas) - 1
+    variables = [modelo.new_int_var(0, max_aula, f'aula_clase_{i}') for i in clases.index]
     
     # Agregar al modelo las restricciones
-    for restricción in todas_las_restricciones:
-        for predicado in restricción(materias=materias, aulas=aulas, asignaciones=asignaciones):
-            modelo.Add(predicado)
+    for predicado in todas_las_restricciones(clases, aulas, variables):
+        modelo.add(predicado)
 
     # Resolver
     solver = cp_model.CpSolver()
@@ -97,8 +67,8 @@ def asignar(aulas: DataFrame, materias: DataFrame) -> DataFrame:
     if status_name != 'OPTIMAL':
         raise ImposibleAssignmentException(f'El solucionador de restricciones terminó con status {status_name}.')
 
-    # Armar tabla con las asignaciones
-    resultados = asignaciones.map(lambda x: solver.Value(x))
+    # Armar lista con las asignaciones
+    aulas_asignadas = list(map(solver.value, variables))
     
-    return resultados
+    return aulas_asignadas
   

@@ -1,57 +1,50 @@
 '''
 En este módulo se definen las restricciones del sistema de asignación.
 
-Cada restricción es una función que devuelve un iterable de predicados que se
-pueden agregar al modelo.
-Estas funciones toman los siguientes kwargs:
-- materias: DataFrame, la tabla de materias
-- aulas: DataFrame, la tabla de aulas
-- asignaciones: DataFrame, la tabla de asignaciones de aulas
+Las restricciones son predicados que se pueden agregar al modelo. La función
+`todas_las_restricciones` devuelve un iterable con todos los predicados que hay
+que agregar al modelo.
 
-La constante `todas_las_restricciones` tiene un iterable con todas las
-restricciones.
+Internamente, cada restricción se define con una función que devuelve un
+iterable de predicados.
+Estas funciones toman los siguientes kwargs:
+- clases: DataFrame, tabla con los datos de las clases
+- aulas: DataFrame, tabla con los datos de las aulas
+- asignaciones: lista con las variable de asignaciones de aulas
+
+Esto se omite de los docstrings para no tener que repetirlo en todos lados.
 '''
 from ortools.sat.python import cp_model
 from itertools import combinations
 from pandas import DataFrame
+from typing import Iterable
 
-from .constantes import DÍAS_DE_LA_SEMANA
-
-def solo_asignar_aula_a_las_materias_presenciales(materias, aulas, asignaciones):
-    '''
-    Las materias presenciales tienen asignada algún aula (!= 0).
-    Las materias virtuales y las que no tienen clase no tienen aula (==0).
-    '''
-    for i in materias.index:
-        for día in DÍAS_DE_LA_SEMANA:
-            if materias.loc[i, f'modalidad {día}'] == 'presencial':
-                yield asignaciones.loc[i, día] > 0
-            else:
-                yield asignaciones.loc[i, día] == 0
-
-def no_superponer_materias(materias, aulas, asignaciones):
+def no_superponer_clases(clases, aulas, asignaciones):
     '''
     Las materias con horarios superpuestos no pueden estar en el mismo aula.
     '''
-    for día in DÍAS_DE_LA_SEMANA:
-        modalidad = f'modalidad {día}'
-        inicio = f'horario inicio {día}'
-        fin = f'horario fin {día}'
+    for clase1, clase2 in combinations(clases.index, 2):
+        if clases.loc[clase1, 'día'] == clases.loc[clase2, 'día']:
+            inicio_1 = clases.loc[clase1, 'horario inicio']
+            fin_1 = clases.loc[clase1, 'horario fin']
+            inicio_2 = clases.loc[clase2, 'horario inicio']
+            fin_2 = clases.loc[clase2, 'horario fin']
 
-        for materia_1, materia_2 in combinations(materias.index, 2):
-            modalidad1 = materias.loc[materia_1, modalidad]
-            modalidad2 = materias.loc[materia_2, modalidad]
+            if inicio_1 < fin_2 and inicio_2 < fin_1:
+                    yield asignaciones[clase1] != asignaciones[clase2]
 
-            if modalidad1 == 'presencial' and modalidad2 == 'presencial':
-                inicio_1 = materias.loc[materia_1, inicio]
-                fin_1 = materias.loc[materia_1, fin]
-                inicio_2 = materias.loc[materia_2, inicio]
-                fin_2 = materias.loc[materia_2, fin]
-
-                if inicio_1 < fin_2 and inicio_2 < fin_1:
-                        yield asignaciones.loc[materia_1, día] != asignaciones.loc[materia_2, día]
-
-todas_las_restricciones = (
-    solo_asignar_aula_a_las_materias_presenciales,
-    no_superponer_materias
+todas_las_funciones_de_restricciones = (
+    no_superponer_clases,
 )
+
+def todas_las_restricciones(clases: DataFrame, aulas: DataFrame, asignaciones: list) -> Iterable:
+    '''
+    :param clases: Tabla con los datos de las clases.
+    :param aulas: Tabla con los datos de las aulas.
+    :param asignaciones: Lista con las variables de asignación.
+        asignaciones[i] es el número de aula asignada a la clase i.
+    :return: Iterable de predicados que deben ser agregados al modelo.
+    '''
+    for restricción in todas_las_funciones_de_restricciones:
+        for predicado in restricción(clases=clases, aulas=aulas, asignaciones=asignaciones):
+            yield predicado

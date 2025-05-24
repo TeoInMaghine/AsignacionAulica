@@ -1,1 +1,2 @@
+from .impossible_assignment_exception import ImposibleAssignmentException
 from .lógica_de_asignación import asignar

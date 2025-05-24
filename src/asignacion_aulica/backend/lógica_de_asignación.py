@@ -20,6 +20,7 @@ con todas las restricciones y que tenga la menor penalización posible.
 from ortools.sat.python import cp_model
 from pandas import DataFrame
 
+from .impossible_assignment_exception import ImposibleAssignmentException
 from .restricciones import todas_las_restricciones
 from .constantes import DÍAS_DE_LA_SEMANA
 
@@ -61,6 +62,13 @@ def asignar(aulas: DataFrame, materias: DataFrame) -> DataFrame:
         - modalidad sábado (presencial, virtual, o no)
         - horario inicio sábado
         - horario fin sábado
+    
+    :return: Tabla con las aulas asignadas.
+        Cada fila es una materia, cada columna es un día, y cada celda tiene el
+        número de aula que se le asignó a esa materia para la clase de ese día.
+        El número 0 significa que no hay un aula asignada.
+    
+    :raise ImposibleAssignmentException: Si no es posible hacer la asignación.
     '''
     # Modelo que contiene las variables, restricciones, y penalizaciones
     modelo = cp_model.CpModel()
@@ -74,11 +82,11 @@ def asignar(aulas: DataFrame, materias: DataFrame) -> DataFrame:
     # El resolvedor que resuelve
     solver = cp_model.CpSolver()
     status = solver.solve(modelo)
-    print(solver.response_stats())
+    status_name = solver.status_name(status)
+    if status_name != 'OPTIMAL':
+        raise ImposibleAssignmentException(f'El solucionador de restricciones terminó con status {status_name}.')
 
-    # Tabla con los resultados:
-    # Cada fila es una materia, cada columna es un día,
-    # cada celda tiene el número de aula que se le asignó.
+    # Armar tabla con las asignaciones
     resultados = asignaciones.map(lambda x: solver.Value(x))
     
     return resultados

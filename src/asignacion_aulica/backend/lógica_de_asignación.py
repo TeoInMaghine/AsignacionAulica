@@ -29,7 +29,7 @@ def asignar(aulas: DataFrame, materias: DataFrame) -> DataFrame:
     Resolver el problema de asignación.
 
     :param aulas: Tabla con los datos de todas las aulas disponibles.
-        Un aula por fila, con la numeración empezando en 1.
+        Un aula por fila, con la numeración de las filas empezando en 1.
         Columnas:
         - edificio
         - nombre
@@ -72,14 +72,25 @@ def asignar(aulas: DataFrame, materias: DataFrame) -> DataFrame:
     '''
     # Modelo que contiene las variables, restricciones, y penalizaciones
     modelo = cp_model.CpModel()
-    asignaciones = crear_tabla_de_asignaciones(modelo, materias, len(aulas))
     
-    # Agregar al modelo las restricciones:
+    # Agregar al modelo una variable por cada materia y por cada día, que
+    # representa el número de aula que tiene asignada esa materia ese día.
+    #
+    # Guardar las variables en una tabla con una fila por materia y una columna
+    # por día. Cada celda de la tabla contiene una variable que corresponde al
+    # número de aula que tiene esa materia ese día.
+    n_aulas = len(aulas)
+    asignaciones = DataFrame(index=materias.index, columns=DÍAS_DE_LA_SEMANA)
+    for i in materias.index:
+        for día in DÍAS_DE_LA_SEMANA:
+            asignaciones.loc[i, día] = modelo.NewIntVar(0, n_aulas, f'aula_materia_{i}_{día}')
+    
+    # Agregar al modelo las restricciones
     for restricción in todas_las_restricciones:
         for predicado in restricción(materias=materias, aulas=aulas, asignaciones=asignaciones):
             modelo.Add(predicado)
 
-    # El resolvedor que resuelve
+    # Resolver
     solver = cp_model.CpSolver()
     status = solver.solve(modelo)
     status_name = solver.status_name(status)
@@ -90,25 +101,4 @@ def asignar(aulas: DataFrame, materias: DataFrame) -> DataFrame:
     resultados = asignaciones.map(lambda x: solver.Value(x))
     
     return resultados
-    
-def crear_tabla_de_asignaciones(
-    modelo: cp_model.CpModel,
-    materias: DataFrame,
-    n_aulas: int
-    ) -> DataFrame:
-    '''
-    Agrega al modelo una variable por cada materia y por cada día, que
-    representa el número de aula que tiene asignada esa materia ese día.
-
-    :return: Una tabla con una fila por materia y una columna por día.
-        Cada celda de la tabla es una variable del modelo que corresponde al
-        número de aula que tiene esa materia ese día.
-    '''
-    asignaciones = DataFrame(index=materias.index, columns=DÍAS_DE_LA_SEMANA)
-
-    for i in materias.index:
-        for día in DÍAS_DE_LA_SEMANA:
-            asignaciones.loc[i, día] = modelo.NewIntVar(0, n_aulas, f'aula_materia_{i}_{día}')
-    
-    return asignaciones
   

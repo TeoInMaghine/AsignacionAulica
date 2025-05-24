@@ -1,5 +1,4 @@
 import pandas as pd
-
 from asignacion_aulica import backend
 
 materias = pd.read_csv('materias.csv')
@@ -10,3 +9,4 @@ asignaciones = backend.asignar(aulas, materias)
 
 resultados_lindos = asignaciones.map(lambda x: '-' if x == 0 else f"{aulas.loc[x, 'edificio']} - {aulas.loc[x, 'nombre']}")
 resultados_lindos.insert(0, 'Materia', materias['nombre'])
+print(resultados_lindos)

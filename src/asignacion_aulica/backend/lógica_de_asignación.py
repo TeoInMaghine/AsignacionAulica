@@ -33,18 +33,18 @@ def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
         - nombre
         - capacidad
         - equipamiento
-    
+        - horario apertura
+        - horario cierre
     :param clases: Tabla con los datos de todas las clases.
         Una clase por fila.
         Columnas:
         - nombre (materia y comisión)
         - día (de la semana)
-        - horario inicio
+        - horario inicio #TODO: Decidir cómo representar los horarios en números enteros
         - horario fin
         - cantidad de alumnos
         - equipamiento necesario
         - edificio preferido
-    
     :return: Lista con el número de aula asignada a cada clase
     :raise ImposibleAssignmentException: Si no es posible hacer la asignación.
     '''

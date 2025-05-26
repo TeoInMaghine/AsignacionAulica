@@ -64,8 +64,10 @@ def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
     solver = cp_model.CpSolver()
     status = solver.solve(modelo)
     status_name = solver.status_name(status)
-    if status_name != 'OPTIMAL':
+    if status_name not in 'OPTIMAL':
         raise ImposibleAssignmentException(f'El solucionador de restricciones terminó con status {status_name}.')
+    
+    #TODO: ¿qué hacer si da FEASIBLE?¿en qué condiciones ocurre?¿aceptamos la solución suboptima o tiramos excepción?
 
     # Armar lista con las asignaciones
     aulas_asignadas = list(map(solver.value, variables))

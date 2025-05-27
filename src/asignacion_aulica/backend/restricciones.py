@@ -32,9 +32,9 @@ def no_asignar_en_aula_cerrada(clases: DataFrame, aulas: DataFrame):
     '''
     La clase no puede estar en un aula que no esté abierta en ese horario.
     '''
-    for clase, aula in product(clases.itertuples(), aulas.itertuples()):
-        if aula.horario_inicio > clase.horario_inicio or \
-           clase.horario_fin > aula.horario_fin:
+    for aula, clase in product(aulas.itertuples(), clases.itertuples()):
+        if aula.horario_apertura > clase.horario_inicio or \
+           aula.horario_cierre < clase.horario_fin:
                yield clase.aula_asignada != aula.Index
 
 def asignar_aulas_con_capacidad_suficiente(clases: DataFrame, aulas: DataFrame):

@@ -1,4 +1,4 @@
-nombre,día,"horario inicio","horario fin","cantidad de alumnos","equipamiento necesario","edificio preferido"
+nombre,día,"horario_inicio","horario_fin","cantidad_de_alumnos","equipamiento_necesario","edificio_preferido"
 Álgebra,lunes,9,11,30,"","Anasagasi 2"
 Álgebra,miércoles,18,20,30,"","Anasagasi 2"
 Programación,lunes,10,13,40,"computadoras","Anasagasi 2"

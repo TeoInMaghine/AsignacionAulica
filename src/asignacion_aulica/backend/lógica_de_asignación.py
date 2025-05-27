@@ -29,22 +29,22 @@ def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
 
     :param aulas: Tabla con los datos de todas las aulas disponibles.
         Columnas:
-        - edificio
-        - nombre
-        - capacidad
-        - equipamiento
-        - horario apertura
-        - horario cierre
+        - edificio: str
+        - nombre: str
+        - capacidad: int
+        - equipamiento: set[str]
+        - horario_apertura: int #TODO: Decidir cómo representar los horarios en números enteros
+        - horario_cierre: int
     :param clases: Tabla con los datos de todas las clases.
         Una clase por fila.
         Columnas:
-        - nombre (materia y comisión)
-        - día (de la semana)
-        - horario inicio #TODO: Decidir cómo representar los horarios en números enteros
-        - horario fin
-        - cantidad de alumnos
-        - equipamiento necesario
-        - edificio preferido
+        - nombre: str (materia y comisión)
+        - día: str (de la semana)
+        - horario_inicio: int
+        - horario_fin: int
+        - cantidad_de_alumnos: int
+        - equipamiento_necesario: set[str]
+        - edificio_preferido: str
     :return: Lista con el número de aula asignada a cada clase
     :raise ImposibleAssignmentException: Si no es posible hacer la asignación.
     '''
@@ -54,10 +54,11 @@ def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
     # Agregar al modelo una variable por cada clase, que representa el
     # número de aula que tiene asignada esa clase.
     max_aula = len(aulas) - 1
-    variables = [modelo.new_int_var(0, max_aula, f'aula_clase_{i}') for i in clases.index]
+    clases = clases.copy()
+    clases['aula_asignada'] = [modelo.new_int_var(0, max_aula, f'aula_clase_{i}') for i in clases.index]
     
     # Agregar al modelo las restricciones
-    for predicado in todas_las_restricciones(clases, aulas, variables):
+    for predicado in todas_las_restricciones(clases, aulas):
         modelo.add(predicado)
 
     # Resolver
@@ -70,7 +71,7 @@ def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
     #TODO: ¿qué hacer si da FEASIBLE?¿en qué condiciones ocurre?¿aceptamos la solución suboptima o tiramos excepción?
 
     # Armar lista con las asignaciones
-    aulas_asignadas = list(map(solver.value, variables))
+    aulas_asignadas = list(map(solver.value, clases['aula_asignada']))
     
     return aulas_asignadas
   

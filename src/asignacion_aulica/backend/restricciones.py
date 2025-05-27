@@ -10,15 +10,11 @@ iterable de predicados.
 Estas funciones toman los siguientes argumentos:
 - clases: DataFrame, tabla con los datos de las clases
 - aulas: DataFrame, tabla con los datos de las aulas
-- aulas_asignadas: lista con las variables del modelo, donde cada índice
-  representa una clase, y el valor de cada variable es el número de aula que
-  tiene asignada esa clase.
 
 Esto se omite de los docstrings para no tener que repetirlo en todos lados.
 '''
+from itertools import combinations, product
 from ortools.sat.python import cp_model
-from itertools import combinations
-from itertools import product
 from pandas import DataFrame
 from typing import Iterable
 
@@ -32,7 +28,7 @@ def no_superponer_clases(clases: DataFrame, aulas: DataFrame):
            clase2.horario_inicio < clase1.horario_fin:
             yield clase1.aula_asignada != clase2.aula_asignada
 
-def en_aula_abierta(clases: DataFrame, aulas: DataFrame):
+def no_asignar_en_aula_cerrada(clases: DataFrame, aulas: DataFrame):
     '''
     La clase no puede estar en un aula que no esté abierta en ese horario.
     '''
@@ -41,19 +37,35 @@ def en_aula_abierta(clases: DataFrame, aulas: DataFrame):
            clase.horario_fin > aula.horario_fin:
                yield clase.aula_asignada != aula.Index
 
+def asignar_aulas_con_capacidad_suficiente(clases: DataFrame, aulas: DataFrame):
+    '''
+    Una clase no puede ser asignada a un aula que tenga una capacidad menor a la cantidad de alumnos.
+    '''
+    for clase, aula in product(clases.itertuples(), aulas.itertuples()):
+        if clase.cantidad_de_alumnos > aula.capacidad:
+            yield clase.aula_asignada != aula.Index
+
+def asignar_aulas_con_el_equipamiento_requerido(clases: DataFrame, aulas: DataFrame):
+    '''
+    Una clase no puede ser asignada a un aula que no tenga todo el equipamiento requerido.
+    '''
+    for clase, aula in product(clases.itertuples(), aulas.itertuples()):
+        if not clase.equipamiento_necesario.issubset(aula.equipamiento):
+            yield clase.aula_asignada != aula.Index
+
 todas_las_funciones_de_restricciones = (
     no_superponer_clases,
-    en_aula_abierta,
+    no_asignar_en_aula_cerrada,
+    asignar_aulas_con_capacidad_suficiente,
+    asignar_aulas_con_el_equipamiento_requerido
 )
 
-def todas_las_restricciones(clases: DataFrame, aulas: DataFrame, aulas_asignadas: list) -> Iterable:
+def todas_las_restricciones(clases: DataFrame, aulas: DataFrame) -> Iterable:
     '''
     :param clases: Tabla con los datos de las clases.
     :param aulas: Tabla con los datos de las aulas.
-    :param aulas_asignadas: Lista con las variables de asignación.
-        aulas_asignadas[i] es el número de aula asignada a la clase i.
     :return: Iterable de predicados que deben ser agregados al modelo.
     '''
     for restricción in todas_las_funciones_de_restricciones:
-        for predicado in restricción(clases, aulas, aulas_asignadas):
+        for predicado in restricción(clases, aulas):
             yield predicado

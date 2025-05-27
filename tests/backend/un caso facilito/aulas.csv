@@ -1,3 +1,3 @@
-edificio,nombre,capacidad,equipamiento,"horario apertura","horario cierre"
+edificio,nombre,capacidad,equipamiento,"horario_apertura","horario_cierre"
 "Anasagasti 2","B202",40,"proyector",0,24
 "Anasagasti 2","B101",25,"proyector, computadoras",0,24

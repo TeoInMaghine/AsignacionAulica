@@ -7,7 +7,7 @@ que agregar al modelo.
 
 Internamente, cada restricción se define con una función que devuelve un
 iterable de predicados.
-Estas funciones toman los siguientes kwargs:
+Estas funciones toman los siguientes argumentos:
 - clases: DataFrame, tabla con los datos de las clases
 - aulas: DataFrame, tabla con los datos de las aulas
 - aulas_asignadas: lista con las variables del modelo, donde cada índice
@@ -21,19 +21,21 @@ from itertools import combinations
 from pandas import DataFrame
 from typing import Iterable
 
-def no_superponer_clases(clases, aulas, aulas_asignadas):
+def no_superponer_clases(clases: DataFrame, aulas: DataFrame, aulas_asignadas: list):
     '''
     Las materias con horarios superpuestos no pueden estar en el mismo aula.
     '''
     for index_clase1, index_clase2 in combinations(clases.index, 2):
-        if clases.loc[index_clase1, 'día'] == clases.loc[index_clase2, 'día']:
-            inicio_1 = clases.loc[index_clase1, 'horario inicio']
-            fin_1 = clases.loc[index_clase1, 'horario fin']
-            inicio_2 = clases.loc[index_clase2, 'horario inicio']
-            fin_2 = clases.loc[index_clase2, 'horario fin']
+        clase1 = clases.loc[index_clase1]
+        clase2 = clases.loc[index_clase2]
+        if clase1['día'] == clase2['día']:
+            inicio_1 = clase1['horario inicio']
+            fin_1 = clase1['horario fin']
+            inicio_2 = clase2['horario inicio']
+            fin_2 = clase2['horario fin']
 
             if inicio_1 < fin_2 and inicio_2 < fin_1:
-                    yield aulas_asignadas[index_clase1] != aulas_asignadas[index_clase2]
+                yield aulas_asignadas[index_clase1] != aulas_asignadas[index_clase2]
 
 todas_las_funciones_de_restricciones = (
     no_superponer_clases,
@@ -48,5 +50,5 @@ def todas_las_restricciones(clases: DataFrame, aulas: DataFrame, aulas_asignadas
     :return: Iterable de predicados que deben ser agregados al modelo.
     '''
     for restricción in todas_las_funciones_de_restricciones:
-        for predicado in restricción(clases=clases, aulas=aulas, aulas_asignadas=aulas_asignadas):
+        for predicado in restricción(clases, aulas, aulas_asignadas):
             yield predicado

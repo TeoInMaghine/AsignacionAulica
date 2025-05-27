@@ -18,27 +18,32 @@ Esto se omite de los docstrings para no tener que repetirlo en todos lados.
 '''
 from ortools.sat.python import cp_model
 from itertools import combinations
+from itertools import product
 from pandas import DataFrame
 from typing import Iterable
 
-def no_superponer_clases(clases: DataFrame, aulas: DataFrame, aulas_asignadas: list):
+def no_superponer_clases(clases: DataFrame, aulas: DataFrame):
     '''
     Las materias con horarios superpuestos no pueden estar en el mismo aula.
     '''
-    for index_clase1, index_clase2 in combinations(clases.index, 2):
-        clase1 = clases.loc[index_clase1]
-        clase2 = clases.loc[index_clase2]
-        if clase1['día'] == clase2['día']:
-            inicio_1 = clase1['horario inicio']
-            fin_1 = clase1['horario fin']
-            inicio_2 = clase2['horario inicio']
-            fin_2 = clase2['horario fin']
+    for clase1, clase2 in combinations(clases.itertuples(), 2):
+        if clase1.día == clase2.día and \
+           clase1.horario_inicio < clase2.horario_fin and \
+           clase2.horario_inicio < clase1.horario_fin:
+            yield clase1.aula_asignada != clase2.aula_asignada
 
-            if inicio_1 < fin_2 and inicio_2 < fin_1:
-                yield aulas_asignadas[index_clase1] != aulas_asignadas[index_clase2]
+def en_aula_abierta(clases: DataFrame, aulas: DataFrame):
+    '''
+    La clase no puede estar en un aula que no esté abierta en ese horario.
+    '''
+    for clase, aula in product(clases.itertuples(), aulas.itertuples()):
+        if aula.horario_inicio > clase.horario_inicio or \
+           clase.horario_fin > aula.horario_fin:
+               yield clase.aula_asignada != aula.Index
 
 todas_las_funciones_de_restricciones = (
     no_superponer_clases,
+    en_aula_abierta,
 )
 
 def todas_las_restricciones(clases: DataFrame, aulas: DataFrame, aulas_asignadas: list) -> Iterable:

@@ -26,7 +26,7 @@ def test_aulas_cerradas():
         dict(horario_apertura=11, horario_cierre=13), # Abre tarde
         dict(horario_apertura=9,  horario_cierre=14), # Sobra
         dict(horario_apertura=11, horario_cierre=12), # Abre tarde y cierra temprano
-        )
+    )
     clases, modelo = make_clases(
         len(aulas),
         dict(horario_inicio=10, horario_fin=13)
@@ -43,8 +43,9 @@ def test_aulas_cerradas():
 def test_capacidad_suficiente():
     aulas = make_aulas(
         dict(capacidad = 100),
+        dict(capacidad = 50),
         dict(capacidad = 10)
-        )
+    )
     clases, modelo = make_clases(
         len(aulas),
         dict(cantidad_de_alumnos = 50)

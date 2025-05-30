@@ -52,6 +52,23 @@ def test_capacidad_suficiente():
 
     predicados = list(restricciones.asignar_aulas_con_capacidad_suficiente(clases, aulas))
 
-    # Debería generar una sola restricción con el aula 1
+    # Debería generar una sola restricción con el aula 2
     assert len(predicados) == 1
-    assert predicado_es_not_equals_entre_variable_y_constante(predicados[0], 1)
+    assert predicado_es_not_equals_entre_variable_y_constante(predicados[0], 2)
+
+def test_equipamiento():
+    aulas = make_aulas(
+        dict(equipamiento = set(('proyector',))),
+        dict(equipamiento = set(('proyector', 'otra cosa'))),
+        dict(equipamiento = set())
+    )
+    clases, modelo = make_clases(
+        len(aulas),
+        dict(equipamiento_necesario = set(('proyector',)))
+    )
+
+    predicados = list(restricciones.asignar_aulas_con_el_equipamiento_requerido(clases, aulas))
+
+    # Debería generar una sola restricción con el aula 2
+    assert len(predicados) == 1
+    assert predicado_es_not_equals_entre_variable_y_constante(predicados[0], 2)

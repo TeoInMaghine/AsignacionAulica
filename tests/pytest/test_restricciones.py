@@ -1,62 +1,41 @@
-from ortools.sat.python import cp_model
-import pandas as pd
-
+from helper_functions import *
 from asignacion_aulica.backend import restricciones
-
-def make_aulas(*data):
-    '''
-    Recibe una lista de diccionarios con datos (posiblemente incompletos) de
-    aulas.
-
-    Rellena esos datos con valores por defecto y los devuelve en un DataFrame.
-    '''
-    default_values = {
-        'edificio': 'edificio',
-        'nombre': 'aula',
-        'capacidad': 1,
-        'equipamiento': set(),
-        'horario_apertura': 0,
-        'horario_cierre': 24
-    }
-
-    return pd.DataFrame.from_records(default_values | explicit_values for explicit_values in data)
-
-def make_clases(n_aulas, *data):
-    '''
-    Recibe el número de aulas y una lista de diccionarios con datos
-    (posiblemente incompletos) de clases.
-
-    Rellena esos datos con valores por defecto y los devuelve en un DataFrame.
-    También devuelve el modelo que se usó para generar las variables.
-    '''
-    default_values = {
-        'nombre': 'materia',
-        'día': 'lunes',
-        'horario_inicio': 10,
-        'horario_fin': 11,
-        'cantidad_de_alumnos': 1,
-        'equipamiento_necesario': set(),
-        'edificio_preferido': 'edificio'
-    }
-
-    modelo = cp_model.CpModel()
-    clases = pd.DataFrame.from_records(default_values | explicit_values for explicit_values in data)
-    clases['aula_asignada'] = [modelo.new_int_var(0, n_aulas-1, f'aula_clase_{i}') for i in clases.index]
-
-    return clases
 
 def test_superposición():
     aulas = make_aulas({})
-    clases = make_clases(
-        1,
-        {'horario_inicio': 1, 'horario_fin': 3},
-        {'horario_inicio': 2, 'horario_fin': 4},
-        {'horario_inicio': 5, 'horario_fin': 6}
+    clases, modelo = make_clases(
+        len(aulas),
+        dict(horario_inicio=1, horario_fin=3),
+        dict(horario_inicio=2, horario_fin=4),
+        dict(horario_inicio=5, horario_fin=6)
     )
 
     predicados = list(restricciones.no_superponer_clases(clases, aulas))
 
     # Debería generar solamente un predicado entre las primeras dos clases
     assert len(predicados) == 1
-    assert clases.loc[0, 'aula_asignada'] in predicados[0].vars
-    assert clases.loc[1, 'aula_asignada'] in predicados[0].vars
+    predicado = predicados[0]
+    assert predicado_es_not_equals_entre__dos_variables(predicado)
+    assert clases.loc[0, 'aula_asignada'] in predicado.vars
+    assert clases.loc[1, 'aula_asignada'] in predicado.vars
+
+def test_aulas_cerradas():
+    aulas = make_aulas(
+        dict(horario_apertura=10, horario_cierre=13), # Igual que la clase
+        dict(horario_apertura=10, horario_cierre=11), # Cierra temprano
+        dict(horario_apertura=11, horario_cierre=13), # Abre tarde
+        dict(horario_apertura=9,  horario_cierre=14), # Sobra
+        dict(horario_apertura=11, horario_cierre=12), # Abre tarde y cierra temprano
+        )
+    clases, modelo = make_clases(
+        len(aulas),
+        dict(horario_inicio=10, horario_fin=13)
+    )
+
+    predicados = list(restricciones.no_asignar_en_aula_cerrada(clases, aulas))
+
+    # Debería generar restricciones con las aulas 1, 2, y 4
+    assert len(predicados) == 3
+    assert any(predicado_es_not_equals_entre_variable_y_constante(p, 1) for p in predicados)
+    assert any(predicado_es_not_equals_entre_variable_y_constante(p, 2) for p in predicados)
+    assert any(predicado_es_not_equals_entre_variable_y_constante(p, 4) for p in predicados)

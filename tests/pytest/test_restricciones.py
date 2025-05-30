@@ -39,3 +39,19 @@ def test_aulas_cerradas():
     assert any(predicado_es_not_equals_entre_variable_y_constante(p, 1) for p in predicados)
     assert any(predicado_es_not_equals_entre_variable_y_constante(p, 2) for p in predicados)
     assert any(predicado_es_not_equals_entre_variable_y_constante(p, 4) for p in predicados)
+
+def test_capacidad_suficiente():
+    aulas = make_aulas(
+        dict(capacidad = 100),
+        dict(capacidad = 10)
+        )
+    clases, modelo = make_clases(
+        len(aulas),
+        dict(cantidad_de_alumnos = 50)
+    )
+
+    predicados = list(restricciones.asignar_aulas_con_capacidad_suficiente(clases, aulas))
+
+    # Debería generar una sola restricción con el aula 1
+    assert len(predicados) == 1
+    assert predicado_es_not_equals_entre_variable_y_constante(predicados[0], 1)

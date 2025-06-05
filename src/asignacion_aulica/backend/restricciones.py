@@ -56,7 +56,7 @@ def asignar_aulas_con_el_equipamiento_requerido(clases: DataFrame, aulas: DataFr
 todas_las_funciones_de_restricciones = (
     no_superponer_clases,
     no_asignar_en_aula_cerrada,
-    asignar_aulas_con_capacidad_suficiente,
+    # asignar_aulas_con_capacidad_suficiente,
     asignar_aulas_con_el_equipamiento_requerido
 )
 

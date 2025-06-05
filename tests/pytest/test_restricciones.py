@@ -15,7 +15,7 @@ def test_superposición():
     # Debería generar solamente un predicado entre las primeras dos clases
     assert len(predicados) == 1
     predicado = predicados[0]
-    assert predicado_es_not_equals_entre__dos_variables(predicado)
+    assert predicado_es_not_equals_entre_dos_variables(predicado)
     assert clases.loc[0, 'aula_asignada'] in predicado.vars
     assert clases.loc[1, 'aula_asignada'] in predicado.vars
 

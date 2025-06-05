@@ -19,9 +19,11 @@ con todas las restricciones y que tenga la menor penalización posible.
 '''
 from ortools.sat.python import cp_model
 from pandas import DataFrame
+from typing import Iterable
 
 from .impossible_assignment_exception import ImposibleAssignmentException
 from .restricciones import todas_las_restricciones
+from .preferencias import obtener_penalizaciones
 
 def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
     '''
@@ -45,7 +47,7 @@ def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
         - cantidad_de_alumnos: int
         - equipamiento_necesario: set[str]
         - edificio_preferido: str
-    :return: Lista con el número de aula asignada a cada clase
+    :return: Una lista con el número de aula asignada a cada clase.
     :raise ImposibleAssignmentException: Si no es posible hacer la asignación.
     '''
     # Modelo que contiene las variables, restricciones, y penalizaciones
@@ -61,6 +63,10 @@ def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
     for predicado in todas_las_restricciones(clases, aulas):
         modelo.add(predicado)
 
+    # Agregar al modelo las penalizaciones
+    penalización = obtener_penalizaciones(modelo, clases, aulas)
+    modelo.minimize(penalización)
+
     # Resolver
     solver = cp_model.CpSolver()
     status = solver.solve(modelo)
@@ -72,6 +78,6 @@ def asignar(aulas: DataFrame, clases: DataFrame) -> list[int]:
 
     # Armar lista con las asignaciones
     aulas_asignadas = list(map(solver.value, clases['aula_asignada']))
-    
+        
     return aulas_asignadas
   

@@ -20,15 +20,13 @@ def make_aulas(*data):
 
     return pd.DataFrame.from_records(default_values | explicit_values for explicit_values in data)
 
-def make_clases(n_aulas, *data):
+def make_clases(*data):
     '''
-    Recibe el número de aulas y una lista de diccionarios con datos
-    (posiblemente incompletos) de clases.
+    Recibe una lista de diccionarios con datos (posiblemente incompletos) de
+    clases.
 
     Rellena esos datos con valores por defecto y los devuelve en un DataFrame
     con el formato esperado por las funciones de backend.
-
-    También devuelve el modelo que se usó para generar las variables.
     '''
     default_values = {
         'nombre': 'materia',
@@ -40,11 +38,9 @@ def make_clases(n_aulas, *data):
         'edificio_preferido': 'edificio'
     }
 
-    modelo = cp_model.CpModel()
     clases = pd.DataFrame.from_records(default_values | explicit_values for explicit_values in data)
-    clases['aula_asignada'] = [modelo.new_int_var(0, n_aulas-1, f'aula_clase_{i}') for i in clases.index]
 
-    return clases, modelo
+    return clases
 
 def predicado_es_not_equals_entre_variable_y_constante(predicado, constante):
     '''
@@ -68,3 +64,14 @@ def predicado_es_not_equals_entre_dos_variables(predicado):
         and predicado.offset == 0 \
         and predicado.bounds.complement().flattened_intervals() == [0, 0]
 
+def predicado_es_nand_entre_dos_variables_bool(predicado):
+    '''
+    Devuelve `True` si `predicado` es una expresión de la forma
+    `variable1 + variable2 <= 1`, donde `variable1` y `variable2` son variables
+    booleanas de un `CpModel`.
+    '''
+    return isinstance(predicado, cp_model.BoundedLinearExpression) \
+        and len(predicado.vars) == 2 \
+        and predicado.coeffs == [1, 1] \
+        and predicado.offset == 0 \
+        and predicado.bounds.max() == 1

@@ -11,7 +11,7 @@ aulas = pd.read_csv('aulas.csv', keep_default_na=False)
 clases['equipamiento_necesario'] = list(map(parsear_equipamiento, clases['equipamiento_necesario']))
 aulas['equipamiento'] = list(map(parsear_equipamiento, aulas['equipamiento']))
 
-asignaciones = backend.asignar(aulas, clases)
+asignaciones = backend.asignar(clases, aulas)
 
 tabla_asignaciones = clases[['nombre', 'día', 'horario_inicio', 'horario_fin']].copy()
 tabla_asignaciones['edificio'] = [aulas.loc[x, 'edificio'] for x in asignaciones]

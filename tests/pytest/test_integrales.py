@@ -14,15 +14,14 @@ def test_restricciones_y_preferencias():
         dict(capacidad=40, equipamiento={"proyector"}),
     )
 
-    clases, _ = make_clases(
-        len(aulas),
+    clases = make_clases(
         dict(día="lunes", cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
         dict(día="lunes", cantidad_de_alumnos=50),
         dict(día="miércoles", cantidad_de_alumnos=56),
         dict(día="miércoles", cantidad_de_alumnos=55),
     )
 
-    asignaciones = backend.asignar(aulas, clases)
+    asignaciones = backend.asignar(clases, aulas)
     asignaciones_esperadas = [1, 0, 0, 1]
 
     for asignación, asignación_esperada in zip(asignaciones, asignaciones_esperadas):
@@ -34,11 +33,10 @@ def test_asignación_imposible_por_equipamiento():
         dict(capacidad=60),
     )
 
-    clases, _ = make_clases(
-        len(aulas),
+    clases = make_clases(
         dict(día="lunes", cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):
-        asignaciones = backend.asignar(aulas, clases)
+        asignaciones = backend.asignar(clases, aulas)
 

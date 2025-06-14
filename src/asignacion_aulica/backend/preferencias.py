@@ -82,10 +82,32 @@ def obtener_cantidad_de_alumnos_fuera_del_aula(clases: DataFrame, aulas: DataFra
     
     return cantidad_de_alumnos_fuera_del_aula
 
+def obtener_capacidad_sobrante(clases: DataFrame, aulas: DataFrame, modelo: cp_model.CpModel, asignaciones: np.ndarray):
+    '''
+    Devuelve una expresión que representa la cantidad de asientos que sobran en
+    el aula asignada a cada clase.
+    '''
+    capacidad_sobrante_total = 0
+
+    for clase in clases.itertuples():
+        capacidad_sobrante = modelo.new_int_var(0, clase.cantidad_de_alumnos, f"capacidad_sobrante_{clase.nombre}")
+        for aula in aulas.itertuples():
+            asignada_a_este_aula = asignaciones[clase.Index, aula.Index]
+
+            if clase.cantidad_de_alumnos < aula.capacidad:
+                modelo.add(capacidad_sobrante == aula.capacidad - clase.cantidad_de_alumnos).only_enforce_if(asignada_a_este_aula)
+            else:
+                modelo.add(capacidad_sobrante == 0).only_enforce_if(asignada_a_este_aula)
+        
+        capacidad_sobrante_total += capacidad_sobrante
+
+    return capacidad_sobrante_total
+
 # Iterable de tuplas (peso, función)
 todas_las_penalizaciones = (
-    (10,  obtener_cantidad_de_clases_fuera_del_edificio_preferido),
-    (100, obtener_cantidad_de_alumnos_fuera_del_aula),
+    (100,  obtener_cantidad_de_clases_fuera_del_edificio_preferido),
+    (1000, obtener_cantidad_de_alumnos_fuera_del_aula),
+    (1, obtener_capacidad_sobrante),
 )
 
 def obtener_penalización(clases: DataFrame, aulas: DataFrame, modelo: cp_model.CpModel, asignaciones: np.ndarray):

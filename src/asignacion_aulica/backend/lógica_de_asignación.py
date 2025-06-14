@@ -32,7 +32,7 @@ from .impossible_assignment_exception import ImposibleAssignmentException
 from asignacion_aulica.backend import restricciones
 from .preferencias import obtener_penalización
 
-def asignar(clases: DataFrame, aulas: DataFrame) -> list[int]:
+def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[int,int] ] = {}) -> list[int]:
     '''
     Resolver el problema de asignación.
 
@@ -54,6 +54,9 @@ def asignar(clases: DataFrame, aulas: DataFrame) -> list[int]:
         - equipamiento: set[str]
         - horario_apertura: int #TODO: Decidir cómo representar los horarios en números enteros
         - horario_cierre: int
+    :param aulas_dobles: Diccionario donde las keys son los índices de las
+        aulas dobles y los values son tuplas con las aulas individuales que
+        conforman el aula doble.
     :return: Una lista con el número de aula asignada a cada clase.
     :raise ImposibleAssignmentException: Si no es posible hacer la asignación.
     '''
@@ -61,7 +64,7 @@ def asignar(clases: DataFrame, aulas: DataFrame) -> list[int]:
     modelo = cp_model.CpModel()
     asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
 
-    for predicado in restricciones.restricciones_con_variables(clases, aulas, asignaciones):
+    for predicado in restricciones.restricciones_con_variables(clases, aulas, aulas_dobles, asignaciones):
         modelo.add(predicado)
     
     penalización = obtener_penalización(clases, aulas, modelo, asignaciones)
@@ -117,3 +120,4 @@ def crear_matriz_de_asignaciones(clases: DataFrame, aulas: DataFrame, modelo: cp
         modelo.add_exactly_one(asignaciones[clase,:])
     
     return asignaciones
+

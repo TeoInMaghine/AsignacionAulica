@@ -2,7 +2,6 @@ from ortools.sat.python import cp_model
 import numpy as np
 import pytest
 
-from asignacion_aulica.backend.lógica_de_asignación import crear_matriz_de_asignaciones
 from asignacion_aulica.backend.restricciones import no_superponer_clases
 from asignacion_aulica.backend import preferencias
 from helper_functions import *
@@ -80,10 +79,10 @@ def test_entran_justito():
     )
     modelo = cp_model.CpModel()
 
-    asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
+    asignaciones = make_asignaciones(clases, aulas, modelo)
 
     # Restricciones para que no estén en el mismo aula
-    for predicado in no_superponer_clases(clases, aulas, asignaciones):
+    for predicado in no_superponer_clases(clases, aulas, {}, asignaciones):
         modelo.add(predicado)
 
     # Minizar capacidad excedida
@@ -124,10 +123,10 @@ def test_minimiza_capacidad_excedida():
     )
     modelo = cp_model.CpModel()
 
-    asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
+    asignaciones = make_asignaciones(clases, aulas, modelo)
 
     # Restricciones para que no estén en el mismo aula
-    for predicado in no_superponer_clases(clases, aulas, asignaciones):
+    for predicado in no_superponer_clases(clases, aulas, {}, asignaciones):
         modelo.add(predicado)
 
     # Minizar capacidad excedida

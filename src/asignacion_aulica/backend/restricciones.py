@@ -14,8 +14,9 @@ aulas, y la matriz de asignaciones, y devuelven predicados que se deben agregar
 al modelo.
 
 Estas funciones toman los siguientes argumentos:
-- clases: DataFrame, tabla con los datos de las clases
-- aulas: DataFrame, tabla con los datos de las aulas
+- clases: DataFrame, tabla con los datos de las clases.
+- aulas: DataFrame, tabla con los datos de las aulas.
+- aulas_dobles: Diccionario con los datos de aulas dobles.
 - asignaciones: Matriz con los datos de asignaciones, donde las filas son
   clases y las columnas son aulas.
 
@@ -27,16 +28,37 @@ from pandas import DataFrame
 from typing import Iterable
 import numpy as np
 
-def no_superponer_clases(clases: DataFrame, aulas: DataFrame, asignaciones: np.ndarray):
+def clases_se_superponen(clase1, clase2) -> bool:
+    '''
+    Evalúa si las clases están en el mismo día y tienen horarios que se superponen.
+    :return: Booleano, verdadero si se superponen, falso si no.
+    '''
+    return clase1.día == clase2.día and \
+           clase1.horario_inicio < clase2.horario_fin and \
+           clase2.horario_inicio < clase1.horario_fin
+
+def no_superponer_clases(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[int, int] ], asignaciones: np.ndarray):
     '''
     Las materias con horarios superpuestos no pueden estar en el mismo aula.
     '''
     for clase1, clase2 in combinations(clases.itertuples(), 2):
-        if clase1.día == clase2.día and \
-           clase1.horario_inicio < clase2.horario_fin and \
-           clase2.horario_inicio < clase1.horario_fin:
+        if clases_se_superponen(clase1, clase2):
             for aula in aulas.index:
                 yield asignaciones[clase1.Index, aula] + asignaciones[clase2.Index, aula] <= 1
+
+def no_asignar_aula_doble_y_sus_hijas_al_mismo_tiempo(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[int, int] ], asignaciones: np.ndarray):
+    '''
+    Si se asigna un aula doble en cierto horario, no pueden asignarse las aulas
+    individuales que lo conforman a clases que se superpongan en ese horario.
+    '''
+    for clase1, clase2 in combinations(clases.itertuples(), 2):
+        if clases_se_superponen(clase1, clase2):
+            for aula_doble, aulas_hijas in aulas_dobles.items():
+                # Se asigna una clase al aula doble => No se asigna ninguna clase a las aulas hijas 
+                # Se asigna alguna clase a una de las aulas hijas => No se asigna una clase al aula doble
+                for aula_hija in aulas_hijas:
+                    yield asignaciones[clase1.Index, aula_doble] + asignaciones[clase2.Index, aula_hija] <= 1
+                    yield asignaciones[clase2.Index, aula_doble] + asignaciones[clase1.Index, aula_hija] <= 1
 
 def no_asignar_en_aula_cerrada(clases: DataFrame, aulas: DataFrame):
     '''
@@ -71,6 +93,7 @@ funciones_de_restricciones_de_aulas_prohibidas = (
 
 funciones_de_restricciones_con_variables = (
     no_superponer_clases,
+    no_asignar_aula_doble_y_sus_hijas_al_mismo_tiempo
 )
 
 def aulas_prohibidas(clases: DataFrame, aulas: DataFrame) -> Iterable[ tuple[int, int] ]:
@@ -86,14 +109,15 @@ def aulas_prohibidas(clases: DataFrame, aulas: DataFrame) -> Iterable[ tuple[int
         for índices in restricción(clases, aulas):
             yield índices
 
-def restricciones_con_variables(clases: DataFrame, aulas: DataFrame, asignaciones: np.ndarray) -> Iterable:
+def restricciones_con_variables(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[int, int] ], asignaciones: np.ndarray) -> Iterable:
     '''
     :param clases: Tabla con los datos de las clases.
     :param aulas: Tabla con los datos de las aulas.
+    :param aulas_dobles: Diccionario con los datos de aulas dobles.
     :param asignaciones: Matriz con los datos de asignaciones.
     :return: Iterable de predicados que deben ser agregados al modelo.
     '''
     for restricción in funciones_de_restricciones_con_variables:
-        for predicado in restricción(clases, aulas, asignaciones):
+        for predicado in restricción(clases, aulas, aulas_dobles, asignaciones):
             yield predicado
 

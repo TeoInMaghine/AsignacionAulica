@@ -1,5 +1,6 @@
 from ortools.sat.python import cp_model
-import pandas as pd
+from pandas import DataFrame
+import numpy as np
 
 def make_aulas(*data):
     '''
@@ -18,7 +19,7 @@ def make_aulas(*data):
         'horario_cierre': 24
     }
 
-    return pd.DataFrame.from_records(default_values | explicit_values for explicit_values in data)
+    return DataFrame.from_records(default_values | explicit_values for explicit_values in data)
 
 def make_clases(*data):
     '''
@@ -38,9 +39,33 @@ def make_clases(*data):
         'edificio_preferido': 'edificio'
     }
 
-    clases = pd.DataFrame.from_records(default_values | explicit_values for explicit_values in data)
+    clases = DataFrame.from_records(default_values | explicit_values for explicit_values in data)
 
     return clases
+
+def make_asignaciones(clases: DataFrame, aulas: DataFrame, modelo: cp_model.CpModel) -> np.ndarray:
+    '''
+    Genera una matriz con las variables de asignación. No hay constantes, todas
+    son variables que se agregan al modelo.
+
+    También se agregan restricciones para que cada clase se asigne exactamente a
+    un aula.
+
+    :param clases: Tabla con los datos de las clases.
+    :param aulas: Tabla con los datos de las aulas.
+    :param modelo: El CpModel al que agregar variables.
+    :return: La expresión de penalización total.
+    '''
+    asignaciones = np.empty(shape=(len(clases), len(aulas)), dtype=object)
+    
+    for clase, aula in np.ndindex(asignaciones.shape):
+        asignaciones[clase, aula] = modelo.new_bool_var(f'clase_{clase}_asignada_al_aula_{aula}')
+    
+    # Asegurar que cada clase se asigna a exactamente un aula
+    for clase in clases.index:
+        modelo.add_exactly_one(asignaciones[clase,:])
+    
+    return asignaciones
 
 def predicado_es_not_equals_entre_variable_y_constante(predicado, constante):
     '''

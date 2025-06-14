@@ -2,7 +2,6 @@ from ortools.sat.python import cp_model
 import numpy as np
 import pytest
 
-from asignacion_aulica.backend.lógica_de_asignación import crear_matriz_de_asignaciones
 from asignacion_aulica.backend import preferencias
 from helper_functions import *
 
@@ -92,8 +91,7 @@ def test_elije_aula_en_edificio_preferido():
     )
     modelo = cp_model.CpModel()
 
-    asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
-    print(asignaciones)
+    asignaciones = make_asignaciones(clases, aulas, modelo)
 
     clases_fuera_del_edificio_preferido = preferencias.obtener_cantidad_de_clases_fuera_del_edificio_preferido(clases, aulas, modelo, asignaciones)
 

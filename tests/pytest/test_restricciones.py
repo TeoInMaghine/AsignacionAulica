@@ -1,12 +1,6 @@
 from helper_functions import *
 
-from asignacion_aulica.backend.lógica_de_asignación import crear_matriz_de_asignaciones
 from asignacion_aulica.backend import restricciones
-
-# TODO: Arreglar los assert de estos tests. O no lol.
-# Para el que prueba no_superponer_clases sería el único que "haría falta" ver
-# los predicados (o borrar el test xd). Para el resto se podría verificar que
-# se seteen constantes en la matriz de asignaciones.
 
 def test_superposición():
     aulas = make_aulas({})
@@ -17,16 +11,16 @@ def test_superposición():
     )
     modelo = cp_model.CpModel()
 
-    asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
+    asignaciones = make_asignaciones(clases, aulas, modelo)
 
-    predicados = list(restricciones.no_superponer_clases(clases, aulas, asignaciones))
+    predicados = list(restricciones.no_superponer_clases(clases, aulas, {}, asignaciones))
 
     # Debería generar solamente un predicado entre las primeras dos clases
     assert len(predicados) == 1
     predicado = predicados[0]
     assert predicado_es_nand_entre_dos_variables_bool(predicado)
     assert asignaciones[0,0] in predicado.vars
-    assert asignaciones[0,0] in predicado.vars
+    assert asignaciones[1,0] in predicado.vars
 
 def test_aulas_cerradas():
     aulas = make_aulas(
@@ -40,7 +34,7 @@ def test_aulas_cerradas():
         dict(horario_inicio=10, horario_fin=13)
     )
     modelo = cp_model.CpModel()
-    asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
+    asignaciones = make_asignaciones(clases, aulas, modelo)
 
     prohibidas = list(restricciones.no_asignar_en_aula_cerrada(clases, aulas))
 
@@ -60,7 +54,7 @@ def test_capacidad_suficiente():
         dict(cantidad_de_alumnos = 50)
     )
     modelo = cp_model.CpModel()
-    asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
+    asignaciones = make_asignaciones(clases, aulas, modelo)
 
     prohibidas = list(restricciones.asignar_aulas_con_capacidad_suficiente(clases, aulas))
 
@@ -78,11 +72,36 @@ def test_equipamiento():
         dict(equipamiento_necesario = set(('proyector',)))
     )
     modelo = cp_model.CpModel()
-    asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
+    asignaciones = make_asignaciones(clases, aulas, modelo)
 
     prohibidas = list(restricciones.asignar_aulas_con_el_equipamiento_requerido(clases, aulas))
 
     # Debería generar una sola restricción con el aula 2
     assert len(prohibidas) == 1
     assert (0, 2) in prohibidas
+
+def test_aulas_dobles(): 
+    aulas = make_aulas(
+        dict(nombre = '102A'),
+        dict(nombre = '102B'),
+        dict(nombre = '102')
+    )
+    # 102 es un aula doble conformada por 102A y 102B
+    aulas_dobles = { 2: (0, 1) }
+    clases = make_clases(
+        dict(nombre = 'Clase 1'),
+        dict(nombre = 'Clase 2')
+    )
+    modelo = cp_model.CpModel()
+    asignaciones = make_asignaciones(clases, aulas, modelo)
+
+    predicados = list(restricciones.no_asignar_aula_doble_y_sus_hijas_al_mismo_tiempo(clases, aulas, aulas_dobles, asignaciones))
+
+    assert len(predicados) == 4
+    for predicado in predicados:
+        assert predicado_es_nand_entre_dos_variables_bool(predicado)
+    assert any(asignaciones[0, 2] in predicado.vars and asignaciones[1, 0] in predicado.vars  for predicado in predicados)
+    assert any(asignaciones[0, 2] in predicado.vars and asignaciones[1, 1] in predicado.vars  for predicado in predicados)
+    assert any(asignaciones[1, 2] in predicado.vars and asignaciones[0, 0] in predicado.vars  for predicado in predicados)
+    assert any(asignaciones[1, 2] in predicado.vars and asignaciones[0, 1] in predicado.vars  for predicado in predicados)
 

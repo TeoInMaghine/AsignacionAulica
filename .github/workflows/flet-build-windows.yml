@@ -1,0 +1,50 @@
+name: flet build windows
+
+on: workflow_dispatch
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Extract version numbers from pyproject.toml
+        id: get_version
+        shell: pwsh
+        run: |
+          $regex_search = Select-String -Path pyproject.toml -Pattern 'requires-python\s*=\s*"~=\s*(\d+\.\d+)"'
+          $PYTHON_VERSION = $regex_search.Matches.Groups[1].Value
+          echo "PYTHON_VERSION=$PYTHON_VERSION"
+          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $env:GITHUB_ENV
+
+          $regex_search = Select-String -Path pyproject.toml -Pattern 'version\s*=\s*"(.*)"'
+          $PROJECT_VERSION = $regex_search.Matches.Groups[1].Value
+          echo "PROJECT_VERSION=$PROJECT_VERSION"
+          echo "PROJECT_VERSION=$PROJECT_VERSION" >> $env:GITHUB_ENV
+
+          $regex_search = Select-String -Path pyproject.toml -Pattern '"flet\s*==\s*(.*)"'
+          $FLET_VERSION = $regex_search.Matches.Groups[1].Value
+          echo "FLET_VERSION=$FLET_VERSION"
+          echo "FLET_VERSION=$FLET_VERSION" >> $env:GITHUB_ENV
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install flet-cli
+        run: |
+          python -m pip install --upgrade pip
+          pip install flet-cli==$env:FLET_VERSION
+      
+      - name: Flet Build Windows
+        run: |
+          flet build windows --verbose --no-rich-output
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: asignacion-aulica-${{ env.PROJECT_VERSION }}-windows
+          path: build/windows

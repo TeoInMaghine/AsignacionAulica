@@ -64,12 +64,12 @@ def test_horarios_no_solapan():
     están superponiendo.
     '''
     aulas = make_aulas(
-        dict(horario_apertura=8, horario_cierre=10)
+        dict(horarios={'lunes': (8, 10)})
     )
 
     clases = make_clases(
-        dict(horario_inicio=8, horario_fin=9),
-        dict(horario_inicio=9, horario_fin=10)
+        dict(horario_inicio=8, horario_fin=9, día='lunes'),
+        dict(horario_inicio=9, horario_fin=10, día='lunes')
     )
 
     asignaciones = backend.asignar(clases, aulas)
@@ -80,12 +80,12 @@ def test_horarios_no_solapan():
 
 def test_asignación_imposible_por_solapamiento_inevitable():
     aulas = make_aulas(
-        dict(horario_apertura=8, horario_cierre=10)
+        dict(horarios={'lunes': (8, 10)})
     )
 
     clases = make_clases(
-        dict(horario_inicio=8, horario_fin=10),
-        dict(horario_inicio=9, horario_fin=11)
+        dict(horario_inicio=8, horario_fin=10, día='lunes'),
+        dict(horario_inicio=9, horario_fin=11, día='lunes')
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):
@@ -93,11 +93,11 @@ def test_asignación_imposible_por_solapamiento_inevitable():
 
 def test_asignación_imposible_por_aula_cerrada():
     aulas = make_aulas(
-        dict(horario_apertura=8, horario_cierre=23)
+        dict(horarios={'lunes': (8, 23)})
     )
 
     clases = make_clases(
-        dict(horario_inicio=7, horario_fin=9),
+        dict(horario_inicio=7, horario_fin=9, día='lunes'),
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):

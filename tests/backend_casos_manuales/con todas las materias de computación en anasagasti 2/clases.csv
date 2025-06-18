@@ -1,25 +1,25 @@
 "nombre","día","horario_inicio","horario_fin","cantidad_de_alumnos","equipamiento_necesario","edificio_preferido"
-"B6000 - Matematica I - Teórica C1","jueves",11,15,65,,"Anasagasti 2"
-"B6000 - Matematica I- Práctica C1","miércoles",15,19,65,,
-"B6000 - Matematica I - Teórica C2","martes",13,17,65,,
-"B6000 - Matematica I- Práctica C2","lunes",15,19,65,,
-"B6000 - Matematica I - Teórica C3","jueves",17,21,65,,
-"B6000 - Matematica I- Práctica C3","viernes",9,13,65,,
-"B6001 - Introducción a la Ing. En Computación - C2","jueves",17,21,65,,
+"B6000 - Matematica I - Teórica C1","jueves",11,15,65,proyector,"Anasagasti 2"
+"B6000 - Matematica I- Práctica C1","miércoles",15,19,65,,"Anasagasti 2"
+"B6000 - Matematica I - Teórica C2","martes",13,17,65,proyector,"Anasagasti 2"
+"B6000 - Matematica I- Práctica C2","lunes",15,19,65,,"Anasagasti 2"
+"B6000 - Matematica I - Teórica C3","jueves",17,21,65,proyector,"Anasagasti 2"
+"B6000 - Matematica I- Práctica C3","viernes",9,13,65,,"Anasagasti 2"
+"B6001 - Introducción a la Ing. En Computación - C2","jueves",17,21,65,,"Anasagasti 2"
 "T0002 - ILEA - C1","miércoles",15,17,50,,
 "T0002 - ILEA - C1","viernes",15,17,50,,
 "T0002 - ILEA - C2","miércoles",19,21,50,,
 "T0002 - ILEA - C2","viernes",19,21,50,,
-"B6006 - Matematica II - Teórica","martes",11,15,70,,
-"B6006 - Matematica II - Práctica","jueves",11,15,70,,
-"B6008 - Programación II","miércoles",17,20,75,,
-"B6008 - Programación II","viernes",18,21,75,,
-"B6009 - Arquitectura de Computadoras I","miércoles",20,23,80,,
-"B6011 - Física General II","viernes",9,13,50,,
-"B6013 - Bases de Datos","miércoles",18,21,40,,
-"B6016 - Laboratorio de Sistemas Embebidos","viernes",17,21,45,,
+"B6006 - Matematica II - Teórica","martes",11,15,70,proyector,"Anasagasti 2"
+"B6006 - Matematica II - Práctica","jueves",11,15,70,,"Anasagasti 2"
+"B6008 - Programación II","miércoles",17,20,75,"proyector, computadoras","Anasagasti 2"
+"B6008 - Programación II","viernes",18,21,75,computadoras,"Anasagasti 2"
+"B6009 - Arquitectura de Computadoras I","miércoles",20,23,80,proyector,"Anasagasti 2"
+"B6011 - Física General II","viernes",9,13,50,,"Anasagasti 2"
+"B6013 - Bases de Datos","miércoles",18,21,40,proyector,"Anasagasti 2"
+"B6016 - Laboratorio de Sistemas Embebidos","viernes",17,21,45,,"Anasagasti 2"
 "B6017 - Seguridad Ambiental","viernes",13,17,40,,
-"B6022 - PEPA","martes",19,22,30,,
-"B5672 - Comunicaciones Analógicas y Digitales","martes",13,16,30,,
-"B5672 - Comunicaciones Analógicas y Digitales","jueves",13,16,30,,
+"B6022 - PEPA","martes",19,22,30,proyector,"Anasagasti 2"
+"B5672 - Comunicaciones Analógicas y Digitales","martes",13,16,30,proyector,"Anasagasti 2"
+"B5672 - Comunicaciones Analógicas y Digitales","jueves",13,16,30,,"Anasagasti 2"
 "B6038 - Economía y Organización Industrial","sábado",8,12,30,,

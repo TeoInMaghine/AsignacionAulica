@@ -24,25 +24,27 @@ def test_superposición():
 
 def test_aulas_cerradas():
     aulas = make_aulas(
-        dict(horario_apertura=10, horario_cierre=13), # Igual que la clase
-        dict(horario_apertura=10, horario_cierre=11), # Cierra temprano
-        dict(horario_apertura=11, horario_cierre=13), # Abre tarde
-        dict(horario_apertura=9,  horario_cierre=14), # Sobra
-        dict(horario_apertura=11, horario_cierre=12), # Abre tarde y cierra temprano
+        dict(horarios={'lunes': (10, 13)}), # Igual que la clase
+        dict(horarios={'lunes': (10, 11)}), # Cierra temprano
+        dict(horarios={'lunes': (11, 13)}), # Abre tarde
+        dict(horarios={'lunes': (9, 14)}), # Sobra
+        dict(horarios={'lunes': (11, 12)}), # Abre tarde y cierra temprano
+        dict(horarios={'martes': (9, 14)}), # No abre los lunes
     )
     clases = make_clases(
-        dict(horario_inicio=10, horario_fin=13)
+        dict(horario_inicio=10, horario_fin=13, día='lunes')
     )
     modelo = cp_model.CpModel()
     asignaciones = make_asignaciones(clases, aulas, modelo)
 
     prohibidas = list(restricciones.no_asignar_en_aula_cerrada(clases, aulas))
 
-    # Debería generar restricciones con las aulas 1, 2, y 4
-    assert len(prohibidas) == 3
+    # Debería generar restricciones con las aulas 1, 2, 4 y 5
+    assert len(prohibidas) == 4
     assert (0, 1) in prohibidas
     assert (0, 2) in prohibidas
     assert (0, 4) in prohibidas
+    assert (0, 5) in prohibidas
 
 def test_capacidad_suficiente():
     aulas = make_aulas(

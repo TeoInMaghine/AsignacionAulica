@@ -15,8 +15,15 @@ def make_aulas(*data):
         'nombre': 'aula',
         'capacidad': 1,
         'equipamiento': set(),
-        'horario_apertura': 0,
-        'horario_cierre': 24
+        'horarios': {
+            'lunes':     (0, 24),
+            'martes':    (0, 24),
+            'miércoles': (0, 24),
+            'jueves':    (0, 24),
+            'viernes':   (0, 24),
+            'sábado':    (0, 24),
+            'domingo':   (0, 24)
+        }
     }
 
     return DataFrame.from_records(default_values | explicit_values for explicit_values in data)

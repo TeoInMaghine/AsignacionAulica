@@ -25,7 +25,6 @@ con todas las restricciones y que tenga la menor penalización posible.
 '''
 from ortools.sat.python import cp_model
 from pandas import DataFrame
-from typing import Iterable
 import numpy as np
 
 from .impossible_assignment_exception import ImposibleAssignmentException
@@ -52,10 +51,11 @@ def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[
         - nombre: str
         - capacidad: int
         - equipamiento: set[str]
-        - horario_apertura: int #TODO: Decidir cómo representar los horarios en números enteros
-        - horario_cierre: int
+        - horarios: dict[str (día), tuple[int, int]] # TODO: Decidir cómo representar los horarios en números enteros
+          Mapea días de la semana a tuplas (apertura, cierre). Los días que no
+          están en el diccionario se considera que el aula está cerrada.
     :param aulas_dobles: Diccionario donde las keys son los índices de las
-        aulas dobles y los values son tuplas con las aulas individuales que
+        aulas dobles y los valores son tuplas con las aulas individuales que
         conforman el aula doble.
     :return: Una lista con el número de aula asignada a cada clase.
     :raise ImposibleAssignmentException: Si no es posible hacer la asignación.
@@ -73,7 +73,7 @@ def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[
     # Resolver
     solver = cp_model.CpSolver()
     status = solver.solve(modelo)
-    #TODO: ¿qué hacer si da FEASIBLE?¿en qué condiciones ocurre?¿aceptamos la solución suboptima o tiramos excepción?
+    # TODO: ¿qué hacer si da FEASIBLE?¿en qué condiciones ocurre?¿aceptamos la solución suboptima o tiramos excepción?
     if status != cp_model.OPTIMAL:
         raise ImposibleAssignmentException(f'El solucionador de restricciones terminó con status {solver.status_name(status)}.')
     

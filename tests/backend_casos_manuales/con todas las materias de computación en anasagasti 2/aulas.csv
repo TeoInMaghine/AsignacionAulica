@@ -1,11 +1,11 @@
-"edificio","nombre","capacidad","equipamiento","horario_apertura","horario_cierre"
-"Anasagasti 2","B102-B",40,"proyector",7,23
-"Anasagasti 2","B102-A",40,"proyector",7,23
-"Anasagasti 2","B101",35,"proyector, híbrido",7,23
-"Anasagasti 2","B103",35,"proyector",7,23
-"Anasagasti 2","B202-B",40,"proyector",7,23
-"Anasagasti 2","B202-A",40,"proyector",7,23
-"Anasagasti 2","B203",20,"proyector, computadoras",7,23
-"Anasagasti 2","Pecera",8,,7,23
-"Anasagasti 2","B102",73,"proyector",7,23
-"Anasagasti 2","B202",75,"proyector",7,23
+"edificio","nombre","capacidad","equipamiento","horarios_lunes","horarios_martes","horarios_miércoles","horarios_jueves","horarios_viernes","horarios_sábado"
+"Anasagasti 2","B102-B",40,"proyector","7,23","7,23","7,23","7,23","7,23","7,23"
+"Anasagasti 2","B102-A",40,"proyector","7,23","7,23","7,23","7,23","7,23","7,23"
+"Anasagasti 2","B101",35,"proyector, híbrido","7,23","7,23","7,23","7,23","7,23","7,23"
+"Anasagasti 2","B103",35,"proyector","7,23","7,23","7,23","7,23","7,23","7,23"
+"Anasagasti 2","B202-B",40,"proyector","7,23","7,23","7,23","7,23","7,23","7,23"
+"Anasagasti 2","B202-A",40,"proyector","7,23","7,23","7,23","7,23","7,23","7,23"
+"Anasagasti 2","B203",20,"proyector, computadoras","7,23","7,23","7,23","7,23","7,23","7,23"
+"Anasagasti 2","Pecera",8,,"7,23","7,23","7,23",,"7,23","7,23"
+"Anasagasti 2","B102",73,"proyector","7,23","7,23","7,23","7,23","7,23","7,23"
+"Anasagasti 2","B202",75,"proyector","7,23","7,23","7,23","7,23","7,23","7,23"

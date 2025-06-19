@@ -2,6 +2,11 @@ name: flet build windows
 
 on: workflow_dispatch
 
+env:
+  # Disables rich text formatting in Flet CLI output
+  FLET_CLI_NO_RICH_OUTPUT: 1
+  PYTHONUTF8: 1
+
 jobs:
   build-windows:
     runs-on: windows-latest

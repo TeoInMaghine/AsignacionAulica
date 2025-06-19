@@ -14,21 +14,24 @@ requires-python = "~= 3.11"
 dependencies = [
   "pandas == 2.2.*",
   "numpy == 2.2.*",
-  "ortools == 9.12.*"
+  "ortools == 9.12.*",
+  "flet == 0.28.3"
 ]
 
 [project.optional-dependencies]
-tests = [
+test = [
   "pytest ~= 8.3"
 ]
-
-[project.scripts] #[project.gui-scripts] cuando haya gui
-asignacion-aulica = "asignacion_aulica.__main__:main"
-
-[build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 testpaths = ["tests/pytest"]
 minversion = "8.3"
+
+[tool.flet]
+company = "UNRN"
+org = "ar.edu.unrn"
+product = "Asignacion Aulica"
+
+[tool.flet.app]
+path = "src"
+

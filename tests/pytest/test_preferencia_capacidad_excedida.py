@@ -4,7 +4,7 @@ import pytest
 
 from asignacion_aulica.backend.restricciones import no_superponer_clases
 from asignacion_aulica.backend import preferencias
-from helper_functions import *
+from helper_functions import make_aulas, make_clases, make_asignaciones
 
 def test_algunas_clases_exceden_capacidad():
     aulas = make_aulas(
@@ -20,13 +20,10 @@ def test_algunas_clases_exceden_capacidad():
     modelo = cp_model.CpModel()
 
     # Forzar asignaciones arbitrarias (clase i con aula i)
-    asignaciones = np.array([
-        [1, 0, 0],
-        [0, 1, 0],
-        [0, 0, 1],
-    ])
+    asignaciones = make_asignaciones(clases, aulas, modelo, asignaciones_forzadas={ 0: 0, 1: 1, 2: 2 })
 
-    cantidad_excedida = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
+    cantidad_excedida, cota_superior = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
+    assert cota_superior == (31 - 30 + 50 - 40 + 100 - 25)
 
     # Resolver
     solver = cp_model.CpSolver()
@@ -34,7 +31,8 @@ def test_algunas_clases_exceden_capacidad():
     if status != cp_model.OPTIMAL:
         pytest.fail(f'El solver terminó con status {solver.status_name(status)}. Alguien escribió mal la prueba.')
     
-    assert solver.value(cantidad_excedida) == (31 - 30 + 50 - 40 + 100 - 25)
+    # Como está forzado, la cantidad excedida es igual a su cota superior
+    assert solver.value(cantidad_excedida) == cota_superior
 
 def test_ninguna_clase_excede_capacidad():
     aulas = make_aulas(
@@ -50,13 +48,12 @@ def test_ninguna_clase_excede_capacidad():
     modelo = cp_model.CpModel()
 
     # Forzar asignaciones arbitrarias (clase i con aula i)
-    asignaciones = np.array([
-        [1, 0, 0],
-        [0, 1, 0],
-        [0, 0, 1],
-    ])
+    asignaciones = make_asignaciones(clases, aulas, modelo)
 
-    cantidad_excedida = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
+    cantidad_excedida, cota_superior = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
+    # La cota superior sería 0, pero en cambio se devuelve 1 porque si no
+    # fallaría al normalizar, siendo que debe dividir por la cota superior
+    assert cota_superior == 1
 
     # Resolver
     solver = cp_model.CpSolver()
@@ -85,21 +82,22 @@ def test_entran_justito():
     for predicado in no_superponer_clases(clases, aulas, {}, asignaciones):
         modelo.add(predicado)
 
-    # Minizar capacidad excedida
-    cantidad_excedida = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
-    modelo.minimize(cantidad_excedida)
+    # Minimizar capacidad excedida
+    cantidad_excedida, cota_superior = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
+    assert cota_superior == (10 - 10 + 20 - 10 + 30 - 10)
 
     # Resolver
+    modelo.minimize((1 / cota_superior) * cantidad_excedida)
     solver = cp_model.CpSolver()
     status = solver.solve(modelo)
     if status != cp_model.OPTIMAL:
         pytest.fail(f'El solver terminó con status {solver.status_name(status)}. Alguien escribió mal la prueba.')
     asignaciones_finales = np.vectorize(solver.value)(asignaciones)
     
-    assert solver.value(cantidad_excedida) == 0
     assert sum(asignaciones_finales[0,:]) == 1 and asignaciones_finales[0, 0] == 1
     assert sum(asignaciones_finales[1,:]) == 1 and asignaciones_finales[1, 1] == 1
     assert sum(asignaciones_finales[2,:]) == 1 and asignaciones_finales[2, 2] == 1
+    assert solver.value(cantidad_excedida) == 0
 
 def test_minimiza_capacidad_excedida():
     '''
@@ -129,11 +127,12 @@ def test_minimiza_capacidad_excedida():
     for predicado in no_superponer_clases(clases, aulas, {}, asignaciones):
         modelo.add(predicado)
 
-    # Minizar capacidad excedida
-    cantidad_excedida = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
-    modelo.minimize(cantidad_excedida)
+    # Minimizar capacidad excedida
+    cantidad_excedida, cota_superior = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
+    assert cota_superior == (31 - 10 + 21 - 10 + 11 - 10)
 
     # Resolver
+    modelo.minimize((1 / cota_superior) * cantidad_excedida)
     solver = cp_model.CpSolver()
     status = solver.solve(modelo)
     if status != cp_model.OPTIMAL:

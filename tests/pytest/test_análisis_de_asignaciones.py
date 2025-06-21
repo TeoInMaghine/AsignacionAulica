@@ -1,5 +1,5 @@
 from asignacion_aulica import backend
-from helper_functions import *
+from helper_functions import make_aulas, make_clases
 
 def test_ningún_aula_chica():
     aulas = make_aulas(

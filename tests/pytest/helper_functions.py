@@ -50,10 +50,17 @@ def make_clases(*data):
 
     return clases
 
-def make_asignaciones(clases: DataFrame, aulas: DataFrame, modelo: cp_model.CpModel) -> np.ndarray:
+def make_asignaciones(
+        clases: DataFrame,
+        aulas: DataFrame,
+        modelo: cp_model.CpModel,
+        asignaciones_forzadas: dict[int, int] = dict()
+    ) -> np.ndarray:
     '''
     Genera una matriz con las variables de asignación. No hay constantes, todas
-    son variables que se agregan al modelo.
+    son variables que se agregan al modelo, a menos que se especifiquen
+    asignaciones forzadas, en cuyo caso se colocan los ceros donde corresponda
+    (no unos, para simular como ocurriría en la asignación real).
 
     También se agregan restricciones para que cada clase se asigne exactamente a
     un aula.
@@ -61,12 +68,17 @@ def make_asignaciones(clases: DataFrame, aulas: DataFrame, modelo: cp_model.CpMo
     :param clases: Tabla con los datos de las clases.
     :param aulas: Tabla con los datos de las aulas.
     :param modelo: El CpModel al que agregar variables.
-    :return: La expresión de penalización total.
+    :param asignaciones_forzadas: Diccionario con índices de clases como keys e
+    índices de aulas como valores.
+    :return: Matriz con los datos de asignaciones.
     '''
     asignaciones = np.empty(shape=(len(clases), len(aulas)), dtype=object)
     
     for clase, aula in np.ndindex(asignaciones.shape):
-        asignaciones[clase, aula] = modelo.new_bool_var(f'clase_{clase}_asignada_al_aula_{aula}')
+        if clase not in asignaciones_forzadas or asignaciones_forzadas[clase] == aula:
+            asignaciones[clase, aula] = modelo.new_bool_var(f'clase_{clase}_asignada_al_aula_{aula}')
+        else:
+            asignaciones[clase, aula] = 0
     
     # Asegurar que cada clase se asigna a exactamente un aula
     for clase in clases.index:

@@ -1,7 +1,7 @@
 import pytest
 
 from asignacion_aulica import backend
-from helper_functions import *
+from helper_functions import make_aulas, make_clases
 
 def test_restricciones_y_preferencias():
     '''
@@ -89,7 +89,7 @@ def test_asignación_imposible_por_solapamiento_inevitable():
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):
-        asignaciones = backend.asignar(clases, aulas)
+        backend.asignar(clases, aulas)
 
 def test_asignación_imposible_por_aula_cerrada():
     aulas = make_aulas(
@@ -101,7 +101,7 @@ def test_asignación_imposible_por_aula_cerrada():
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):
-        asignaciones = backend.asignar(clases, aulas)
+        backend.asignar(clases, aulas)
 
 def test_asignación_imposible_por_equipamiento():
 
@@ -114,5 +114,5 @@ def test_asignación_imposible_por_equipamiento():
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):
-        asignaciones = backend.asignar(clases, aulas)
+        backend.asignar(clases, aulas)
 

@@ -2,6 +2,8 @@ from ortools.sat.python import cp_model
 from pandas import DataFrame
 import numpy as np
 
+from asignacion_aulica.frontend.clases import Día
+
 def make_aulas(*data):
     '''
     Recibe una lista de diccionarios con datos (posiblemente incompletos) de
@@ -16,19 +18,19 @@ def make_aulas(*data):
         'capacidad': 1,
         'equipamiento': set(),
         'horarios': {
-            'lunes':     (0, 24),
-            'martes':    (0, 24),
-            'miércoles': (0, 24),
-            'jueves':    (0, 24),
-            'viernes':   (0, 24),
-            'sábado':    (0, 24),
-            'domingo':   (0, 24)
+            Día.LUNES:     (0, 24),
+            Día.MARTES:    (0, 24),
+            Día.MIÉRCOLES: (0, 24),
+            Día.JUEVES:    (0, 24),
+            Día.VIERNES:   (0, 24),
+            Día.SÁBADO:    (0, 24),
+            Día.DOMINGO:   (0, 24)
         }
     }
 
     return DataFrame.from_records(default_values | explicit_values for explicit_values in data)
 
-def make_clases(*data):
+def make_clases(*clases: dict):
     '''
     Recibe una lista de diccionarios con datos (posiblemente incompletos) de
     clases.
@@ -38,17 +40,20 @@ def make_clases(*data):
     '''
     default_values = {
         'nombre': 'materia',
-        'día': 'lunes',
+        'día': Día.LUNES,
         'horario_inicio': 10,
         'horario_fin': 11,
         'cantidad_de_alumnos': 1,
         'equipamiento_necesario': set(),
-        'edificio_preferido': 'edificio'
+        'edificio_preferido': 'edificio',
+        'aula_asignada': None
+    }
+    data = {
+        columna: [clase.get(columna, default) for clase in clases]
+        for columna, default in default_values.items()
     }
 
-    clases = DataFrame.from_records(default_values | explicit_values for explicit_values in data)
-
-    return clases
+    return DataFrame(data, dtype=object)
 
 def make_asignaciones(
         clases: DataFrame,

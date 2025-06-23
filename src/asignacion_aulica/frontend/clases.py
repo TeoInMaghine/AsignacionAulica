@@ -16,13 +16,13 @@ class Modalidad(Enum):
     INDEFINIDO = auto()
 
 
-class Dia(Enum):
+class Día(Enum):
     LUNES = auto()
     MARTES = auto()
-    MIERCOLES = auto()
+    MIÉRCOLES = auto()
     JUEVES = auto()
     VIERNES = auto()
-    SABADO = auto()
+    SÁBADO = auto()
     DOMINGO = auto()
     INDEFINIDO = auto()
 
@@ -44,12 +44,12 @@ class Horario:
     
     def __init__(
             self,
-            dia: Dia, # Día de la semana (lunes, martes, ...)
+            dia: Día, # Día de la semana (lunes, martes, ...)
             hora_inicio: datetime.time, # Hora de inicio, por ejemplo: 18 (hs)
             hora_fin: datetime.time, # Hora de fin o cierre, por ejemplo: 19 (hs)
             modalidad: Optional[Modalidad] = Modalidad.INDEFINIDO # Modalidad virtual, presencial, o indefinido
             ):
-        self.dia: Dia = dia
+        self.dia: Día = dia
         self.hora_inicio: datetime.time = hora_inicio
         self.hora_fin: datetime.time = hora_fin
         self.modalidad: Modalidad = modalidad

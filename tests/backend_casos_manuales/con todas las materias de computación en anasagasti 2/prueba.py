@@ -23,6 +23,7 @@ def construir_horarios(aulas):
 
 clases = pd.read_csv('clases.csv', keep_default_na=False)
 clases['equipamiento_necesario'] = list(map(parsear_equipamiento, clases['equipamiento_necesario']))
+clases['aula_asignada'] = None
 
 aulas = pd.read_csv('aulas.csv', keep_default_na=False)
 aulas['equipamiento'] = list(map(parsear_equipamiento, aulas['equipamiento']))
@@ -31,11 +32,11 @@ aulas['horarios'] = construir_horarios(aulas)
 with open('aulas_dobles.json') as f:
     aulas_dobles = { int(aula_doble): tuple(aulas_hijas) for aula_doble, aulas_hijas in json.load(f).items() }
 
-asignaciones = backend.asignar(clases, aulas, aulas_dobles)
+backend.asignar(clases, aulas, aulas_dobles)
 
 tabla_asignaciones = clases.copy()
-tabla_asignaciones['edificio'] = [aulas.loc[x, 'edificio'] for x in asignaciones]
-tabla_asignaciones['aula'] = [aulas.loc[x, 'nombre'] for x in asignaciones]
+tabla_asignaciones['edificio'] = clases['aula_asignada'].map(aulas['edificio'])
+tabla_asignaciones['aula'] = clases['aula_asignada'].map(aulas['nombre'])
 tabla_asignaciones.sort_values(['día', 'horario_inicio'], inplace=True)
 
 print(tabla_asignaciones)

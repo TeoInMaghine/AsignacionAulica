@@ -28,11 +28,11 @@ aulas = pd.read_csv('aulas.csv', keep_default_na=False)
 aulas['equipamiento'] = list(map(parsear_equipamiento, aulas['equipamiento']))
 aulas['horarios'] = construir_horarios(aulas)
 
-asignaciones = backend.asignar(clases, aulas)
+backend.asignar(clases, aulas)
 
 tabla_asignaciones = clases.copy()
-tabla_asignaciones['edificio'] = [aulas.loc[x, 'edificio'] for x in asignaciones]
-tabla_asignaciones['aula'] = [aulas.loc[x, 'nombre'] for x in asignaciones]
+tabla_asignaciones['edificio'] = clases['aula_asignada'].map(aulas['edificio'])
+tabla_asignaciones['aula'] = clases['aula_asignada'].map(aulas['nombre'])
 tabla_asignaciones.sort_values(['día', 'horario_inicio'], inplace=True)
 
 print(tabla_asignaciones)

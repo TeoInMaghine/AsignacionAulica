@@ -1,7 +1,7 @@
 import pytest
 
 from asignacion_aulica import backend
-from helper_functions import make_aulas, make_clases
+from helper_functions import make_aulas, make_clases, Día
 
 def test_restricciones_y_preferencias():
     '''
@@ -15,17 +15,16 @@ def test_restricciones_y_preferencias():
     )
 
     clases = make_clases(
-        dict(día="lunes", cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
-        dict(día="lunes", cantidad_de_alumnos=50),
-        dict(día="miércoles", cantidad_de_alumnos=56),
-        dict(día="miércoles", cantidad_de_alumnos=55),
+        dict(día=Día.LUNES, cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
+        dict(día=Día.LUNES, cantidad_de_alumnos=50),
+        dict(día=Día.MIÉRCOLES, cantidad_de_alumnos=56),
+        dict(día=Día.MIÉRCOLES, cantidad_de_alumnos=55),
     )
 
-    asignaciones = backend.asignar(clases, aulas)
+    backend.asignar(clases, aulas)
     asignaciones_esperadas = [1, 0, 0, 1]
 
-    for asignación, asignación_esperada in zip(asignaciones, asignaciones_esperadas):
-        assert asignación == asignación_esperada
+    assert all(clases['aula_asignada'] == asignaciones_esperadas)
 
 def test_aulas_dobles():
     '''
@@ -51,11 +50,10 @@ def test_aulas_dobles():
 
     aulas_dobles = { 3: (1, 2) }
 
-    asignaciones = backend.asignar(clases, aulas, aulas_dobles)
+    backend.asignar(clases, aulas, aulas_dobles)
     asignaciones_esperadas = [2, 1, 0]
 
-    for asignación, asignación_esperada in zip(asignaciones, asignaciones_esperadas):
-        assert asignación == asignación_esperada
+    assert all(clases['aula_asignada'] == asignaciones_esperadas)
 
 def test_horarios_no_solapan():
     '''
@@ -64,28 +62,27 @@ def test_horarios_no_solapan():
     están superponiendo.
     '''
     aulas = make_aulas(
-        dict(horarios={'lunes': (8, 10)})
+        dict(horarios={Día.LUNES: (8, 10)})
     )
 
     clases = make_clases(
-        dict(horario_inicio=8, horario_fin=9, día='lunes'),
-        dict(horario_inicio=9, horario_fin=10, día='lunes')
+        dict(horario_inicio=8, horario_fin=9, día=Día.LUNES),
+        dict(horario_inicio=9, horario_fin=10, día=Día.LUNES)
     )
 
-    asignaciones = backend.asignar(clases, aulas)
+    backend.asignar(clases, aulas)
     asignaciones_esperadas = [0, 0]
 
-    for asignación, asignación_esperada in zip(asignaciones, asignaciones_esperadas):
-        assert asignación == asignación_esperada
+    assert all(clases['aula_asignada'] == asignaciones_esperadas)
 
 def test_asignación_imposible_por_solapamiento_inevitable():
     aulas = make_aulas(
-        dict(horarios={'lunes': (8, 10)})
+        dict(horarios={Día.LUNES: (8, 10)})
     )
 
     clases = make_clases(
-        dict(horario_inicio=8, horario_fin=10, día='lunes'),
-        dict(horario_inicio=9, horario_fin=11, día='lunes')
+        dict(horario_inicio=8, horario_fin=10, día=Día.LUNES),
+        dict(horario_inicio=9, horario_fin=11, día=Día.LUNES)
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):
@@ -93,11 +90,11 @@ def test_asignación_imposible_por_solapamiento_inevitable():
 
 def test_asignación_imposible_por_aula_cerrada():
     aulas = make_aulas(
-        dict(horarios={'lunes': (8, 23)})
+        dict(horarios={Día.LUNES: (8, 23)})
     )
 
     clases = make_clases(
-        dict(horario_inicio=7, horario_fin=9, día='lunes'),
+        dict(horario_inicio=7, horario_fin=9, día=Día.LUNES),
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):
@@ -110,7 +107,7 @@ def test_asignación_imposible_por_equipamiento():
     )
 
     clases = make_clases(
-        dict(día="lunes", cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
+        dict(día=Día.LUNES, cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
     )
 
     with pytest.raises(backend.ImposibleAssignmentException):

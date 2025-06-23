@@ -2,7 +2,8 @@ from helper_functions import (
     make_aulas,
     make_clases,
     make_asignaciones,
-    predicado_es_nand_entre_dos_variables_bool
+    predicado_es_nand_entre_dos_variables_bool,
+    Día
 )
 from asignacion_aulica.backend import restricciones
 from ortools.sat.python import cp_model
@@ -29,15 +30,15 @@ def test_superposición():
 
 def test_aulas_cerradas():
     aulas = make_aulas(
-        dict(horarios={'lunes': (10, 13)}), # Igual que la clase
-        dict(horarios={'lunes': (10, 11)}), # Cierra temprano
-        dict(horarios={'lunes': (11, 13)}), # Abre tarde
-        dict(horarios={'lunes': (9, 14)}), # Sobra
-        dict(horarios={'lunes': (11, 12)}), # Abre tarde y cierra temprano
-        dict(horarios={'martes': (9, 14)}), # No abre los lunes
+        dict(horarios={Día.LUNES: (10, 13)}), # Igual que la clase
+        dict(horarios={Día.LUNES: (10, 11)}), # Cierra temprano
+        dict(horarios={Día.LUNES: (11, 13)}), # Abre tarde
+        dict(horarios={Día.LUNES: (9, 14)}), # Sobra
+        dict(horarios={Día.LUNES: (11, 12)}), # Abre tarde y cierra temprano
+        dict(horarios={Día.MARTES: (9, 14)}), # No abre los lunes
     )
     clases = make_clases(
-        dict(horario_inicio=10, horario_fin=13, día='lunes')
+        dict(horario_inicio=10, horario_fin=13, día=Día.LUNES)
     )
     prohibidas = list(restricciones.no_asignar_en_aula_cerrada(clases, aulas))
 

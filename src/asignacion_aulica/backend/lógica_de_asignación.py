@@ -29,7 +29,7 @@ import numpy as np
 
 from .impossible_assignment_exception import ImposibleAssignmentException
 from asignacion_aulica.backend import restricciones
-from asignacion_aulica.frontend.clases import Día
+from .dia import Día
 from .preferencias import obtener_penalización
 
 def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[int,int] ] = {}):

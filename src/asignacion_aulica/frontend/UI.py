@@ -11,6 +11,7 @@ import flet as ft
 from .colores import COLOR
 from .menu import UI_Menu
 from .config import UI_Config
+from .universidad import Universidad
 
 
 def main(page: ft.Page):
@@ -56,9 +57,9 @@ def main(page: ft.Page):
     }
     page.theme = ft.Theme(font_family="Karla")  # Font de la App por default
     
-    universidad = None #Universidad()
-    menu = UI_Menu(universidad) # Menú de archivo...
-    config = UI_Config(universidad) # Menú de configuración (edificios, aulas, ...)
+    universidad = Universidad()
+    menu = UI_Menu(universidad, page) # Menú de archivo...
+    config = UI_Config(universidad, page) # Menú de configuración (edificios, aulas, ...)
     
     UI_interfaz = ft.Row(
         controls=[

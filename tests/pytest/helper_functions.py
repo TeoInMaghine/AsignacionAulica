@@ -2,7 +2,7 @@ from ortools.sat.python import cp_model
 from pandas import DataFrame
 import numpy as np
 
-from asignacion_aulica.frontend.clases import Día
+from asignacion_aulica.backend.dia import Día
 
 def make_aulas(*data):
     '''

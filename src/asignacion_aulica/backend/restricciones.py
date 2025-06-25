@@ -27,7 +27,7 @@ from pandas import DataFrame
 from typing import Iterable
 import numpy as np
 
-from asignacion_aulica.frontend.clases import Día
+from .dia import Día
 
 def clases_se_superponen(clase1, clase2) -> bool:
     '''

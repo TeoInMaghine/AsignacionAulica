@@ -15,12 +15,6 @@ from .datos import limpiar_texto, generar_tabla
 from .alertas import VentanaAlerta
 
 
-class TABLA():
-    # Luego ver si se necesita alguna más...
-    ACTIVIDADES = "actividades"
-    EQUIPAMIENTO = "equipamiento"
-
-
 class UI_Config_Actividades():
     """
     Apartado de Actividades/Materias de la universidad.
@@ -65,7 +59,6 @@ class UI_Config_Actividades():
         nombre_actividad: str = limpiar_texto(str(self.campo_nombre_actividad))
         comision_actividad: str = limpiar_texto(str(self.campo_comision_actividad))
         año_seleccionado: str = str(self.lista_año or "")
-        cant_alumnos: str = str(self.lista_cant_alumnos or "")
         
         try:
             # Se agrega la actividad a la "base de datos".
@@ -84,7 +77,6 @@ class UI_Config_Actividades():
             self.lista_nombre_actividad.value = ""
             self.lista_comision_actividad.value = ""
             self.lista_año.value = ""
-            self.lista_cant_alumnos.value = ""
             
             # Limpia los campos.
             self.campo_identificador_actividad.value = ""
@@ -124,7 +116,6 @@ class UI_Config_Actividades():
         nombre_actividad: str = limpiar_texto(str(self.campo_nombre_actividad))
         comision_actividad: str = limpiar_texto(str(self.campo_comision_actividad))
         año_seleccionado: str = str(self.lista_año or "")
-        cant_alumnos: str = str(self.lista_cant_alumnos or "")
         
         try:
             # Se modifica la actividad en la "base de datos".
@@ -146,7 +137,6 @@ class UI_Config_Actividades():
             self.lista_nombre_actividad.value = ""
             self.lista_comision_actividad.value = ""
             self.lista_año.value = ""
-            self.lista_cant_alumnos.value = ""
             
             # Limpia los campos.
             self.campo_identificador_actividad.value = ""
@@ -196,7 +186,6 @@ class UI_Config_Actividades():
             self.lista_nombre_actividad.value = ""
             self.lista_comision_actividad.value = ""
             self.lista_año.value = ""
-            self.lista_cant_alumnos.value = ""
             
             # Limpia los campos.
             self.campo_identificador_actividad.value = ""
@@ -209,147 +198,6 @@ class UI_Config_Actividades():
             mensaje_error: str = str(exc)
             self.alertar(mensaje_error)
     
-    def agregar_equipamiento(self, e):
-        """
-        Función "handler" para el click del botón "Agregar equipamiento".
-        
-        Agrega el equipamiento del campo de texto a la actividad seleccionada
-        dentro de la "base de datos".
-        
-        Al hacer click, limpia la selección y todos los campos.
-        
-        Nota: limpia el input del usuario de símbolos como '@', '!' y espacios
-        innecesarios.
-    
-        Returns
-        -------
-        None.
-    
-        """
-        # TODO
-        carrera_seleccionada: str = str(self.lista_carreras.value or "")
-        identificador_seleccionado: str = str(self.lista_identificador_actividad.value or "")
-        nombre_actividad_seleccionado: str = str(self.lista_nombre_actividad.value or "")
-        nombre_comision_seleccionado: str = str(self.lista_comision_actividad.value or "")
-        nombre_equipamiento: str = str(self.campo_equipamiento.value or "")
-        
-        try:
-            # Se agrega el equipamiento a la actividad de la "base de datos".
-            # self.ui_config.universidad.agregar_equipamiento(
-            #     carrera_seleccionada,
-            #     identificador_seleccionado,
-            #     nombre_actividad_seleccionado,
-            #     nombre_comision_seleccionado,
-            # )
-            
-            # Si es que no hay ningún problema:
-            # Limpia las selecciones.
-            self.lista_equipamiento.value = ""
-            
-            # Limpia los campos.
-            self.campo_equipamiento.value = ""
-            
-            # Se actualizan los elementos de la interfaz.
-            self.actualizar_todo()
-        except Exception as exc:
-            mensaje_error: str = str(exc)
-            self.alertar(mensaje_error)
-    
-    def eliminar_equipamiento(self, e):
-        """
-        Función "handler" para el click del botón "Eliminar equipamiento".
-        
-        Elimina el equipamiento seleccionado de la lista, a la actividad
-        seleccionada dentro de la "base de datos".
-        
-        Al hacer click, limpia la selección y todos los campos.
-        
-        Nota: limpia el input del usuario de símbolos como '@', '!' y espacios
-        innecesarios.
-    
-        Returns
-        -------
-        None.
-    
-        """
-        # TODO
-        carrera_seleccionada: str = str(self.lista_carreras.value or "")
-        identificador_seleccionado: str = str(self.lista_identificador_actividad.value or "")
-        nombre_actividad_seleccionado: str = str(self.lista_nombre_actividad.value or "")
-        nombre_comision_seleccionado: str = str(self.lista_comision_actividad.value or "")
-        nombre_equipamiento: str = str(self.campo_equipamiento.value or "")
-        
-        try:
-            # Se agrega el equipamiento a la actividad de la "base de datos".
-            # self.ui_config.universidad.agregar_equipamiento(
-            #     carrera_seleccionada,
-            #     identificador_seleccionado,
-            #     nombre_actividad_seleccionado,
-            #     nombre_comision_seleccionado,
-            # )
-            
-            # Si es que no hay ningún problema:
-            # Limpia las selecciones.
-            self.lista_equipamiento.value = ""
-            
-            # Limpia los campos.
-            self.campo_equipamiento.value = ""
-            
-            # Se actualizan los elementos de la interfaz.
-            self.actualizar_todo()
-        except Exception as exc:
-            mensaje_error: str = str(exc)
-            self.alertar(mensaje_error)
-    
-    def mostrar_actividades(self, e):
-        """
-        Función "handler" para el click del botón "Mostrar actividades".
-        
-        Muestra en la tabla todas las actividades de la "base de datos".
-        
-        Nota: limpia el input del usuario de símbolos como '@', '!' y espacios
-        innecesarios.
-    
-        Returns
-        -------
-        None.
-    
-        """
-        self.tabla_actual = TABLA.ACTIVIDADES
-        
-        self.actualizar_tabla()
-    
-    def mostrar_equipamiento(self, e):
-        """
-        Función "handler" para el click del botón "Mostrar equipamiento".
-        
-        Muestra en la tabla todos los equipamientos de la actividad
-        seleccionada de la "base de datos".
-        
-        Nota: limpia el input del usuario de símbolos como '@', '!' y espacios
-        innecesarios.
-    
-        Returns
-        -------
-        None.
-    
-        """
-        # TODO
-        carrera_seleccionada: str = str(self.lista_carreras.value or "")
-        identificador_seleccionado: str = str(self.lista_identificador_actividad.value or "")
-        nombre_actividad_seleccionado: str = str(self.lista_nombre_actividad.value or "")
-        nombre_comision_seleccionado: str = str(self.lista_comision_actividad.value or "")
-        
-        # LA IMPLEMENTACION ES CHARLABLE, LO PODES MODIFICAR COMO TE PAREZCA MEJOR
-        # if self.ui_config.universidad.existe_actividad(
-        #         carrera_seleccionada,
-        #         identificador_seleccionado,
-        #         nombre_actividad_seleccionado,
-        #         nombre_comision_seleccionado
-        #     ):
-        #     self.tabla_actual = TABLA.EQUIPAMIENTO
-        
-        self.actualizar_tabla()
     
     def seleccionar_lista(self, e):
         """
@@ -377,11 +225,8 @@ class UI_Config_Actividades():
         1) Dropdown carrera
         2) Drop. identificador - Drop. nombre actividad - Drop. comisión
         3) Campo identificador - Campo nombre - Campo comisión
-        4) Drop. año - Drop. Cantidad de alumnos
+        4) Drop. año
         5) Botón agregar actividad - Btn. modificar actividad - Btn. eliminar actividad
-        6) ----- (linea divisora) -----
-        7) Título: "Equipamiento necesario para la actividad:"
-        8) Drop. Equipamiento - Campo equipamiento - Btn. Agregar equipamiento - Btn. Eliminar equipamiento
         9) ----- (linea divisora) -----
         10) Btn. Mostrar actividades - Btn. Mostrar equipamiento
         11) Tabla con datos de las actividades
@@ -392,7 +237,6 @@ class UI_Config_Actividades():
 
         """
         self.ui_config = ui_config
-        self.tabla_actual: str = TABLA.ACTIVIDADES
         
         # Fila 0:
         # 0) Título: "Configuración de Actividades/Materias de la Universidad"
@@ -421,7 +265,6 @@ class UI_Config_Actividades():
         # Fila 4:
         # 4) Drop. año - Drop. Cantidad de alumnos
         self.lista_año = self.crear_lista_año()
-        self.lista_cant_alumnos = self.crear_lista_cant_alumnos()
         
         # Fila 5:
         # 5) Botón agregar actividad - Btn. modificar actividad - Btn.
@@ -437,42 +280,10 @@ class UI_Config_Actividades():
         
         # Fila 6:
         # 6) ----- (linea divisora) -----
-        self.linea_0 = self.crear_linea()
+        self.linea = self.crear_linea()
         
         # Fila 7:
-        # 7) Título: "Equipamiento necesario para la actividad:"
-        self.titulo_equipamiento = ft.Text(
-            "Equipamiento necesario para la actividad",
-            size=20,
-            selectable=False
-        )
-        
-        # Fila 8:
-        # 8) Drop. Equipamiento - Campo equipamiento - Btn. Agregar equipamiento - Btn. Eliminar equipamiento
-        self.lista_equipamiento = self.crear_lista_equipamiento()
-        self.campo_equipamiento = self.crear_campo_equipamiento()
-        self.boton_agregar_equipamiento = ft.Button(
-            text="Agregar equipamiento",
-        )
-        self.boton_eliminar_equipamiento = ft.Button(
-            text="Eliminar equipamiento",
-        )
-        
-        # Fila 9:
-        # 9) ----- (linea divisora) -----
-        self.linea_1 = self.crear_linea()
-        
-        # Fila 10:
-        # 10) Btn. Mostrar actividades - Btn. Mostrar equipamiento
-        self.boton_mostrar_actividades = ft.Button(
-            text="Mostrar actividades",
-        )
-        self.boton_mostrar_equipamiento = ft.Button(
-            text="Mostrar equipamiento",
-        )
-        
-        # Fila 11:
-        # 11) Tabla con datos de las actividades
+        # 7) Tabla con datos de las actividades
         self.tabla = self.crear_tabla()
         
         # Carga inicial de todos los datos:
@@ -480,7 +291,7 @@ class UI_Config_Actividades():
         
         # Se actualizan los handlers para los botones y se agregan las filas
         # para la interfaz.
-        # self.actualizar_handlers()
+        self.actualizar_handlers()
         self.actualizar_filas()
     
     def cargar_datos_carreras(self):
@@ -587,31 +398,6 @@ class UI_Config_Actividades():
         self.lista_comision_actividad = self.crear_lista_comision_actividad()
         self.lista_comision_actividad.options = opciones_comisiones_actividades
     
-    def cargar_datos_equipamiento(self):
-        """
-        Carga los datos para la lista de selección de equipamiento para un
-        aula ya seleccionada.
-        NOTA: NO actualiza los elementos. Simplemente carga los datos. Para
-        eso, existen las funciones actualizar_*.
-
-        Returns
-        -------
-        None.
-
-        """
-        # TODO juan
-        # Se toman los valores seleccionados por el usuario para cargar la
-        # lista de equipamiento disponible en esa aula.
-        carrera_seleccionada: str = str(self.lista_carreras.value or "")
-        identificador_seleccionado: str = str(self.lista_identificador_actividad.value or "")
-        nombre_actividad_seleccionado: str = str(self.lista_nombre_actividad.value or "")
-        nombre_comision_seleccionado: str = str(self.lista_comision_actividad.value or "")
-        
-        opciones_equipamiento: List[ft.dropdown.Option] = []
-        # for equipamiento in self.ui_config.universidad.funcion():
-        #     opciones_equipamiento.append(ft.dropdown.Option(str(equipamiento)))
-        self.lista_equipamiento.options = opciones_equipamiento
-    
     def cargar_datos_tabla(self):
         """
         Carga los datos para la tabla, dependiendo de que tabla actual esté
@@ -643,6 +429,7 @@ class UI_Config_Actividades():
         #         )
         #     case _:
         #         self.tabla = generar_tabla(self.ui_config.universidad.mostrar_actividades())
+        self.tabla = generar_tabla(self.ui_config.universidad.mostrar_materias())
     
     def cargar_datos_inicio(self):
         """
@@ -660,7 +447,6 @@ class UI_Config_Actividades():
         self.cargar_datos_identificador_actividad()
         self.cargar_datos_nombre_actividad()
         self.cargar_datos_comision_actividad()
-        self.cargar_datos_equipamiento()
         self.cargar_datos_tabla()
     
     def crear_lista_carreras(self) -> ft.Dropdown:
@@ -677,6 +463,8 @@ class UI_Config_Actividades():
             label="Carrera",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=300,
         )
         return dropdown
     
@@ -694,6 +482,8 @@ class UI_Config_Actividades():
             label="Identificador",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=300,
         )
         return dropdown
     
@@ -711,6 +501,8 @@ class UI_Config_Actividades():
             label="Nombre",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=300,
         )
         return dropdown
     
@@ -728,6 +520,8 @@ class UI_Config_Actividades():
             label="Comisión",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=200,
         )
         return dropdown
     
@@ -747,43 +541,7 @@ class UI_Config_Actividades():
                 ft.dropdown.Option(f"{i}") for i in range(1, 7, 1)
             ],
             enable_filter=True,
-        )
-        return dropdown
-    
-    def crear_lista_cant_alumnos(self) -> ft.Dropdown:
-        """
-        Crea una lista para el ingreso de la cantidad de alumnos de la
-        actividad.
-
-        Returns
-        -------
-        dropdown : ft.Dropdown
-            Lista de selección de la cantidad de alumnos de la actividad.
-
-        """
-        dropdown = ft.Dropdown(
-            label="Cantidad de alumnos",
-            options=[
-                ft.dropdown.Option(f"{i}") for i in range(10, 130, 10)
-            ],
-            enable_filter=True,
-        )
-        return dropdown
-    
-    def crear_lista_equipamiento (self) -> ft.Dropdown:
-        """
-        Crea una lista para el ingreso de el equipamiento de la actividad.
-
-        Returns
-        -------
-        dropdown : ft.Dropdown
-            Lista de selección del equipamiento de la actividad.
-
-        """
-        dropdown = ft.Dropdown(
-            label="Equipamiento",
-            options=[],
-            enable_filter=True,
+            editable=True,
         )
         return dropdown
     
@@ -835,22 +593,6 @@ class UI_Config_Actividades():
         )
         return textfield
     
-    def crear_campo_equipamiento(self) -> ft.TextField:
-        """
-        Crea el elemento de campo de texto para ingreso del equipamiento de la
-        actividad a crear/agregar.
-
-        Returns
-        -------
-        textfield : ft.TextField
-            Campo de texto para el input del equipamiento de la actividad.
-
-        """
-        textfield = ft.TextField(
-            label="Equipamiento",
-        )
-        return textfield
-    
     def crear_linea(self) -> ft.Divider:
         """
         Crea un elemento línea separadora para la interfaz.
@@ -878,30 +620,13 @@ class UI_Config_Actividades():
             Tabla del apartado actual.
 
         """
-        data = {}
-        match self.tabla_actual:
-            case TABLA.ACTIVIDADES:
-                data = {
-                    "Carrera": [],
-                    "Identificador": [],
-                    "Nombre": [],
-                    "Comisión": [],
-                    "Año": [],
-                    "Cant. de Alumnos": [],
-                }
-            case TABLA.EQUIPAMIENTO:
-                data = {
-                    "Equipamiento": [],
-                }
-            case _:
-                data = {
-                    "Carrera": [],
-                    "Identificador": [],
-                    "Nombre": [],
-                    "Comisión": [],
-                    "Año": [],
-                    "Cant. de Alumnos": [],
-                }
+        data = {
+            "Carrera": [],
+            "Identificador": [],
+            "Nombre": [],
+            "Comisión": [],
+            "Año": [],
+        }
         df = DataFrame(data)
         return generar_tabla(df)
     
@@ -916,19 +641,17 @@ class UI_Config_Actividades():
 
         """
         # Define el comportamiento "on_click" de cada elemento (botones).
-        self.boton_agregar_actividad.on_click = self.agregar_actividad
-        self.boton_modificar_actividad.on_click = self.modificar_actividad
-        self.boton_eliminar_actividad.on_click = self.eliminar_actividad
-        self.boton_agregar_equipamiento.on_click = self.agregar_equipamiento
-        self.boton_eliminar_equipamiento.on_click = self.eliminar_equipamiento
-        self.boton_mostrar_actividades.on_click = self.mostrar_actividades
-        self.boton_mostrar_equipamiento.on_click = self.mostrar_equipamiento
+        # self.boton_agregar_actividad.on_click = self.agregar_actividad
+        # self.boton_modificar_actividad.on_click = self.modificar_actividad
+        # self.boton_eliminar_actividad.on_click = self.eliminar_actividad
+        # self.boton_mostrar_actividades.on_click = self.mostrar_actividades
+        # self.boton_mostrar_equipamiento.on_click = self.mostrar_equipamiento
         
         # Define el comportamiento "on_change" de cada elemento (listas).
-        self.lista_carreras.on_change = self.seleccionar_lista
-        self.lista_identificador_actividad.on_change = self.seleccionar_lista
-        self.lista_nombre_actividad.on_change = self.seleccionar_lista
-        self.lista_comision_actividad.on_change = self.seleccionar_lista
+        # self.lista_carreras.on_change = self.seleccionar_lista
+        # self.lista_identificador_actividad.on_change = self.seleccionar_lista
+        # self.lista_nombre_actividad.on_change = self.seleccionar_lista
+        # self.lista_comision_actividad.on_change = self.seleccionar_lista
     
     def actualizar_filas(self):
         """
@@ -946,13 +669,9 @@ class UI_Config_Actividades():
         self.fila.append(ft.Row([self.lista_carreras]))
         self.fila.append(ft.Row([self.lista_identificador_actividad, self.lista_nombre_actividad, self.lista_comision_actividad]))
         self.fila.append(ft.Row([self.campo_identificador_actividad, self.campo_nombre_actividad, self.campo_comision_actividad]))
-        self.fila.append(ft.Row([self.lista_año, self.lista_cant_alumnos]))
+        self.fila.append(ft.Row([self.lista_año]))
         self.fila.append(ft.Row([self.boton_agregar_actividad, self.boton_modificar_actividad, self.boton_eliminar_actividad]))
-        self.fila.append(ft.Row([self.linea_0]))
-        self.fila.append(ft.Row([self.titulo_equipamiento]))
-        self.fila.append(ft.Row([self.lista_equipamiento, self.campo_equipamiento, self.boton_agregar_equipamiento, self.boton_eliminar_equipamiento]))
-        self.fila.append(ft.Row([self.linea_1]))
-        self.fila.append(ft.Row([self.boton_mostrar_actividades, self.boton_mostrar_equipamiento]))
+        self.fila.append(ft.Row([self.linea]))
         self.fila.append(ft.Row([self.tabla]))
         
         # Columna final con todas las filas creadas.

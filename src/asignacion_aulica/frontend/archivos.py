@@ -9,10 +9,23 @@ También importación y exportación.
 import flet as ft
 
 from .alertas import VentanaAlerta
-#from universidad import Universidad TODO
+from asignacion_aulica.frontend.universidad import Universidad 
 
 
-def nuevo_archivo(page: ft.Page, file_picker: ft.FilePicker):
+# Función que se llama cuando se selecciona una ruta.
+def resultado_nuevo(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
+    if file_picker.result != None and file_picker.result.path != None:
+        ruta = file_picker.result.path
+        
+        # TODO
+        # IMPLEMENTAR CREACION DE ARCHIVO NUEVO
+        # universidad.tu_funcion()...
+        
+        # Se crea un archivo vacío.
+        with open(ruta, "w") as f:
+            f.write("")
+    
+def nuevo_archivo(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
     """
     Funcion ejecutada al hacer click en el botón de Nuevo.
     Abre una ventana del sistema operativo para elegir la ruta y nombre de
@@ -32,22 +45,8 @@ def nuevo_archivo(page: ft.Page, file_picker: ft.FilePicker):
     None.
 
     """
-    # Se instancia la "ventana de archivo".
-    # file_picker = ft.FilePicker()
-    
-    # Función que se llama cuando se selecciona una ruta.
-    def resultado_nuevo(e):
-        if file_picker.result != None and file_picker.result.path != None:
-            ruta = file_picker.result.path
-            
-            # TODO
-            # IMPLEMENTAR CREACION DE ARCHIVO NUEVO
-            # Se crea un archivo vacío.
-            with open(ruta, "w") as f:
-                f.write("")
-    
     # Función que se llama cuando se clickeó en el botón "Guardar".
-    file_picker.on_result = resultado_nuevo
+    file_picker.on_result = lambda e: resultado_nuevo(page, file_picker, universidad)
     
     # Se ejecuta la función para abrir la ventana de archivo.
     file_picker.save_file(
@@ -56,7 +55,26 @@ def nuevo_archivo(page: ft.Page, file_picker: ft.FilePicker):
         allowed_extensions=["unrn"],
     )
 
-def abrir_archivo(page: ft.Page, file_picker: ft.FilePicker):
+# Función que se llama cuando se selecciona una ruta.
+def resultado_apertura(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
+    if (file_picker.result != None) and file_picker.result.files:
+        ruta = file_picker.result.files[0].path
+        
+        print("Archivo seleccionado:", ruta)
+        
+        # TODO
+        # Acá podés abrirlo, leerlo o procesarlo
+        try:
+            with open(ruta, "r", encoding="utf-8") as f:
+                contenido = f.read()
+        except Exception as exc:
+            mensaje_de_alerta: str = "Error al abrir el archivo:\n"
+            mensaje_de_alerta += str(exc)
+            VentanaAlerta(page, mensaje_de_alerta)
+            
+        page.update()
+
+def abrir_archivo(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
     """
     Funcion ejecutada al hacer click en el botón de Abrir.
     Abre una ventana del sistema operativo para elegir la ruta y nombre de
@@ -76,27 +94,8 @@ def abrir_archivo(page: ft.Page, file_picker: ft.FilePicker):
     None.
 
     """
-    # Función que se llama cuando se selecciona una ruta.
-    def resultado_apertura(e):
-        if (file_picker.result != None) and file_picker.result.files:
-            ruta = file_picker.result.files[0].path
-            
-            print("Archivo seleccionado:", ruta)
-            
-            # TODO
-            # Acá podés abrirlo, leerlo o procesarlo
-            try:
-                with open(ruta, "r", encoding="utf-8") as f:
-                    contenido = f.read()
-            except Exception as exc:
-                mensaje_de_alerta: str = "Error al abrir el archivo:\n"
-                mensaje_de_alerta += str(exc)
-                VentanaAlerta(page, mensaje_de_alerta)
-                
-            page.update()
-    
     # Función que se llama cuando se clickeó en el botón "Guardar".
-    file_picker.on_result = resultado_apertura
+    file_picker.on_result = lambda e: resultado_apertura(page, file_picker, universidad)
     
     # Se ejecuta la función para abrir la ventana de archivo.
     file_picker.pick_files(
@@ -105,7 +104,18 @@ def abrir_archivo(page: ft.Page, file_picker: ft.FilePicker):
         allowed_extensions=["unrn"],
     )
 
-def guardar_archivo(page: ft.Page, file_picker: ft.FilePicker):
+# Función que se llama cuando se selecciona una ruta.
+def resultado_guardado(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
+    if file_picker.result != None and file_picker.result.path != None:
+        ruta = file_picker.result.path
+        
+        # TODO
+        # IMPLEMENTAR GUARDADO DE ARCHIVO
+        # Se crea un archivo vacío.
+        with open(ruta, "w") as f:
+            f.write("")
+
+def guardar_archivo(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
     """
     Funcion ejecutada al hacer click en el botón de Guardar.
     Abre una ventana del sistema operativo para elegir la ruta y nombre de
@@ -125,19 +135,8 @@ def guardar_archivo(page: ft.Page, file_picker: ft.FilePicker):
     None.
 
     """
-    # Función que se llama cuando se selecciona una ruta.
-    def resultado_guardado(e):
-        if file_picker.result != None and file_picker.result.path != None:
-            ruta = file_picker.result.path
-            
-            # TODO
-            # IMPLEMENTAR GUARDADO DE ARCHIVO
-            # Se crea un archivo vacío.
-            with open(ruta, "w") as f:
-                f.write("")
-    
     # Función que se llama cuando se clickeó en el botón "Guardar".
-    file_picker.on_result = resultado_guardado
+    file_picker.on_result = lambda e: resultado_guardado(page, file_picker, universidad)
     
     # Se ejecuta la función para abrir la ventana de archivo.
     file_picker.save_file(
@@ -146,7 +145,26 @@ def guardar_archivo(page: ft.Page, file_picker: ft.FilePicker):
         allowed_extensions=["unrn"],
     )
 
-def importar_archivo(page: ft.Page, file_picker: ft.FilePicker):
+# Función que se llama cuando se selecciona una ruta.
+def resultado_importacion(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
+    if (file_picker.result != None) and file_picker.result.files:
+        ruta = file_picker.result.files[0].path
+        
+        print("Archivo seleccionado:", ruta)
+        
+        # TODO
+        # Acá podés abrirlo, leerlo o procesarlo
+        try:
+            with open(ruta, "r", encoding="utf-8") as f:
+                contenido = f.read()
+        except Exception as exc:
+            mensaje_de_alerta: str = "Error al abrir el archivo:\n"
+            mensaje_de_alerta += str(exc)
+            VentanaAlerta(page, mensaje_de_alerta)
+            
+        page.update()
+
+def importar_archivo(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
     """
     Funcion ejecutada al hacer click en el botón de Importar.
     Abre una ventana del sistema operativo para elegir la ruta y nombre de
@@ -166,27 +184,8 @@ def importar_archivo(page: ft.Page, file_picker: ft.FilePicker):
     None.
 
     """
-    # Función que se llama cuando se selecciona una ruta.
-    def resultado_importacion(e):
-        if (file_picker.result != None) and file_picker.result.files:
-            ruta = file_picker.result.files[0].path
-            
-            print("Archivo seleccionado:", ruta)
-            
-            # TODO
-            # Acá podés abrirlo, leerlo o procesarlo
-            try:
-                with open(ruta, "r", encoding="utf-8") as f:
-                    contenido = f.read()
-            except Exception as exc:
-                mensaje_de_alerta: str = "Error al abrir el archivo:\n"
-                mensaje_de_alerta += str(exc)
-                VentanaAlerta(page, mensaje_de_alerta)
-                
-            page.update()
-    
     # Función que se llama cuando se clickeó en el botón "Guardar".
-    file_picker.on_result = resultado_importacion
+    file_picker.on_result = lambda e: resultado_importacion(page, file_picker, universidad)
     
     # Se ejecuta la función para abrir la ventana de archivo.
     file_picker.pick_files(
@@ -195,7 +194,20 @@ def importar_archivo(page: ft.Page, file_picker: ft.FilePicker):
         allowed_extensions=["csv", "xlsx"],
     )
 
-def exportar_archivo(page: ft.Page, file_picker: ft.FilePicker):
+
+# Función que se llama cuando se selecciona una ruta.
+def resultado_exportacion(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
+    if file_picker.result != None and file_picker.result.path != None:
+        ruta = file_picker.result.path
+
+        if not ruta.endswith(".xlsx"):
+            ruta+=".xlsx"
+        
+        universidad.exportar_horarios(ruta)
+    else:
+        VentanaAlerta("La ruta de exportación es inválida.")
+
+def exportar_archivo(page: ft.Page, file_picker: ft.FilePicker, universidad: Universidad):
     """
     Funcion ejecutada al hacer click en el botón de Exportar.
     Abre una ventana del sistema operativo para elegir la ruta y nombre de
@@ -215,20 +227,8 @@ def exportar_archivo(page: ft.Page, file_picker: ft.FilePicker):
     None.
 
     """
-    # TODO
-    # Función que se llama cuando se selecciona una ruta.
-    def resultado_exportacion(e):
-        if file_picker.result != None and file_picker.result.path != None:
-            ruta = file_picker.result.path
-            
-            # TODO
-            # IMPLEMENTAR EXPORTACION DE ARCHIVO
-            # Se crea un archivo vacío.
-            # with open(ruta, "w") as f:
-            #     f.write("")
-    
     # Función que se llama cuando se clickeó en el botón "Guardar".
-    file_picker.on_result = resultado_exportacion
+    file_picker.on_result = lambda e: resultado_exportacion(page, file_picker, universidad)
     
     # Se ejecuta la función para abrir la ventana de archivo.
     file_picker.save_file(

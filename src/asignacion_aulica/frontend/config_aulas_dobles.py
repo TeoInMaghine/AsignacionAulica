@@ -356,6 +356,8 @@ class UI_Config_Aulas_Dobles():
             label="Edificio",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=400,
         )
         return dropdown
     
@@ -373,6 +375,8 @@ class UI_Config_Aulas_Dobles():
             label="Aula",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=400,
         )
         return dropdown
     

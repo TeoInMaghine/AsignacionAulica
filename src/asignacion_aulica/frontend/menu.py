@@ -121,19 +121,19 @@ class UI_Menu:
     """
 
     def archivo_nuevo(self, e):
-        nuevo_archivo(self.page, self.file_picker)
+        nuevo_archivo(self.page, self.file_picker, self.universidad)
     
     def archivo_abrir(self, e):
-        abrir_archivo(self.page, self.file_picker)
+        abrir_archivo(self.page, self.file_picker, self.universidad)
     
     def archivo_guardar(self, e):
-        guardar_archivo(self.page, self.file_picker)
+        guardar_archivo(self.page, self.file_picker, self.universidad)
         
     def archivo_importar(self, e):
-        importar_archivo(self.page, self.file_picker)
+        importar_archivo(self.page, self.file_picker, self.universidad)
     
     def archivo_exportar(self, e):
-        exportar_archivo(self.page, self.file_picker)
+        exportar_archivo(self.page, self.file_picker, self.universidad)
     
     def __init__(self, universidad: Universidad, page: ft.Page):
         self.page = page

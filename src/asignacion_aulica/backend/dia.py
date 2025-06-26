@@ -9,3 +9,4 @@ class Día(Enum):
     VIERNES = auto()
     SÁBADO = auto()
     DOMINGO = auto()
+    INDEFINIDO = auto()

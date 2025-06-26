@@ -952,6 +952,8 @@ class UI_Config_Aulas():
             label="Edificio",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=500,
         )
         return dropdown
         
@@ -969,6 +971,8 @@ class UI_Config_Aulas():
             label="Aula",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=500,
         )
         return dropdown
         
@@ -1033,6 +1037,8 @@ class UI_Config_Aulas():
             label="Equipamiento",
             options=[],
             enable_filter=True,
+            editable=True,
+            menu_height=300,
         )
         return dropdown
         
@@ -1074,6 +1080,7 @@ class UI_Config_Aulas():
                 ft.dropdown.Option("Domingo")
             ],
             enable_filter=True,
+            editable=True,
         )
         return dropdown
         
@@ -1093,6 +1100,8 @@ class UI_Config_Aulas():
                 ft.dropdown.Option(f"{i:02}") for i in range(24)
             ],
             enable_filter=True,
+            editable=True,
+            menu_height=300,
         )
         return dropdown
         
@@ -1112,6 +1121,8 @@ class UI_Config_Aulas():
                 ft.dropdown.Option(f"{i:02}") for i in range(0, 60, 15)
             ],
             enable_filter=True,
+            editable=True,
+            menu_height=300,
         )
         return dropdown
         

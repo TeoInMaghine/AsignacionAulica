@@ -400,10 +400,10 @@ class UI_Config_Carreras():
         None.
 
         """
-        # TODO
+        
         opciones_carreras: List[ft.dropdown.Option] = []
-        # for carrera in self.ui_config.universidad.nombres_carreras():
-        #     opciones_carreras.append(ft.dropdown.Option(str(carrera)))
+        for carrera in self.ui_config.universidad.nombres_carreras():
+            opciones_carreras.append(ft.dropdown.Option(str(carrera)))
         self.lista_carreras = self.crear_lista_carreras()
         self.lista_carreras.options = opciones_carreras
         
@@ -472,6 +472,8 @@ class UI_Config_Carreras():
                 # ft.dropdown.Option("Ingeniería en Computación"),
             ],
             enable_filter=True,
+            editable=True,
+            menu_height=400,
         )
         return dropdown
     
@@ -491,6 +493,8 @@ class UI_Config_Carreras():
                 # ft.dropdown.Option("Anasagasti 2"),
             ],
             enable_filter=True,
+            editable=True,
+            menu_height=400,
         )
         return dropdown
     

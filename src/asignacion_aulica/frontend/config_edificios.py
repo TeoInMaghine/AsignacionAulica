@@ -622,6 +622,8 @@ class UI_Config_Edificios():
                 # ft.dropdown.Option("Mitre"),
             ],
             enable_filter=True,
+            editable=True,
+            menu_height=500,
         )
         return dropdown
     
@@ -663,6 +665,7 @@ class UI_Config_Edificios():
                 ft.dropdown.Option("Domingo")
             ],
             enable_filter=True,
+            editable=True,
         )
         return dropdown
     
@@ -682,6 +685,8 @@ class UI_Config_Edificios():
                 ft.dropdown.Option(f"{i:02}") for i in range(24)
             ],
             enable_filter=True,
+            editable=True,
+            menu_height=300,
         )
         return dropdown
     
@@ -701,6 +706,8 @@ class UI_Config_Edificios():
                 ft.dropdown.Option(f"{i:02}") for i in range(0, 60, 15)
             ],
             enable_filter=True,
+            editable=True,
+            menu_height=300,
         )
         return dropdown
     

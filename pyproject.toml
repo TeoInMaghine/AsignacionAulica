@@ -35,4 +35,3 @@ product = "Asignacion Aulica"
 
 [tool.flet.app]
 path = "src"
-

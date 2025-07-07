@@ -1,6 +1,9 @@
-from os import environ, path
+from os import environ, getcwd, path
 
-assets_path = environ['FLET_ASSETS_DIR']
+# Si no existe la variable de ambiente FLET_ASSETS_DIR significa que estamos en
+# el ejecutable, asignar assets_path usando getcwd(). Ver
+# https://github.com/flet-dev/flet/discussions/4658 para más información.
+assets_path = environ.get('FLET_ASSETS_DIR', path.join(getcwd(), "assets"))
 
 def get_asset_path(path_relativo: str) -> str:
     '''

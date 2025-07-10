@@ -4,24 +4,19 @@ import pytest
 
 from asignacion_aulica.lógica_de_asignación.restricciones import no_superponer_clases
 from asignacion_aulica.lógica_de_asignación import preferencias
-from helper_functions import make_aulas, make_clases, make_asignaciones
 
-def test_algunas_clases_exceden_capacidad():
-    aulas = make_aulas(
-        dict(capacidad=30),
-        dict(capacidad=40),
-        dict(capacidad=25)
-    )
-    clases = make_clases(
-        dict(cantidad_de_alumnos=31),
-        dict(cantidad_de_alumnos=50),
-        dict(cantidad_de_alumnos=100),
-    )
-    modelo = cp_model.CpModel()
-
-    # Forzar asignaciones arbitrarias (clase i con aula i)
-    asignaciones = make_asignaciones(clases, aulas, modelo, asignaciones_forzadas={ 0: 0, 1: 1, 2: 2 })
-
+@pytest.mark.aulas(
+    dict(capacidad=30),
+    dict(capacidad=40),
+    dict(capacidad=25)
+)
+@pytest.mark.clases(
+    dict(cantidad_de_alumnos=31),
+    dict(cantidad_de_alumnos=50),
+    dict(cantidad_de_alumnos=100),
+)
+@pytest.mark.asignaciones_forzadas({ 0: 0, 1: 1, 2: 2 }) # Asignaciones arbitrarias (clase i con aula i)
+def test_algunas_clases_exceden_capacidad(aulas, clases, modelo, asignaciones):
     cantidad_excedida, cota_superior = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
     assert cota_superior == (31 - 30 + 50 - 40 + 100 - 25)
 
@@ -34,22 +29,17 @@ def test_algunas_clases_exceden_capacidad():
     # Como está forzado, la cantidad excedida es igual a su cota superior
     assert solver.value(cantidad_excedida) == cota_superior
 
-def test_ninguna_clase_excede_capacidad():
-    aulas = make_aulas(
-        dict(capacidad=250),
-        dict(capacidad=400),
-        dict(capacidad=100)
-    )
-    clases = make_clases(
-        dict(cantidad_de_alumnos=31),
-        dict(cantidad_de_alumnos=50),
-        dict(cantidad_de_alumnos=100),
-    )
-    modelo = cp_model.CpModel()
-
-    # Forzar asignaciones arbitrarias (clase i con aula i)
-    asignaciones = make_asignaciones(clases, aulas, modelo)
-
+@pytest.mark.aulas(
+    dict(capacidad=250),
+    dict(capacidad=400),
+    dict(capacidad=100)
+)
+@pytest.mark.clases(
+    dict(cantidad_de_alumnos=31),
+    dict(cantidad_de_alumnos=50),
+    dict(cantidad_de_alumnos=100),
+)
+def test_ninguna_clase_excede_capacidad(aulas, clases, modelo, asignaciones):
     cantidad_excedida, cota_superior = preferencias.obtener_cantidad_de_alumnos_fuera_del_aula(clases, aulas, modelo, asignaciones)
     # La cota superior sería 0, pero en cambio se devuelve 1 porque si no
     # fallaría al normalizar, siendo que debe dividir por la cota superior
@@ -63,21 +53,17 @@ def test_ninguna_clase_excede_capacidad():
     
     assert solver.value(cantidad_excedida) == 0
 
-def test_entran_justito():
-    aulas = make_aulas(
-        dict(capacidad=10),
-        dict(capacidad=20),
-        dict(capacidad=30)
-    )
-    clases = make_clases(
-        dict(cantidad_de_alumnos=10),
-        dict(cantidad_de_alumnos=20),
-        dict(cantidad_de_alumnos=30),
-    )
-    modelo = cp_model.CpModel()
-
-    asignaciones = make_asignaciones(clases, aulas, modelo)
-
+@pytest.mark.aulas(
+    dict(capacidad=10),
+    dict(capacidad=20),
+    dict(capacidad=30)
+)
+@pytest.mark.clases(
+    dict(cantidad_de_alumnos=10),
+    dict(cantidad_de_alumnos=20),
+    dict(cantidad_de_alumnos=30),
+)
+def test_entran_justito(aulas, clases, modelo, asignaciones):
     # Restricciones para que no estén en el mismo aula
     for predicado in no_superponer_clases(clases, aulas, {}, asignaciones):
         modelo.add(predicado)
@@ -99,7 +85,17 @@ def test_entran_justito():
     assert sum(asignaciones_finales[2,:]) == 1 and asignaciones_finales[2, 2] == 1
     assert solver.value(cantidad_excedida) == 0
 
-def test_minimiza_capacidad_excedida():
+@pytest.mark.aulas(
+    dict(capacidad=10),
+    dict(capacidad=20),
+    dict(capacidad=30)
+)
+@pytest.mark.clases(
+    dict(cantidad_de_alumnos=11),
+    dict(cantidad_de_alumnos=21),
+    dict(cantidad_de_alumnos=31),
+)
+def test_minimiza_capacidad_excedida(aulas, clases, modelo, asignaciones):
     '''
     Esta prueba es para verificar que minimiza la capacidad excedida en total, y
     no el número de aulas con capacidad excedida.
@@ -108,21 +104,6 @@ def test_minimiza_capacidad_excedida():
     grande en el aula más chica y quedaría mucha gente afuera. En cambio si
     minimiza la gente que queda afuera, queda menos gente afuera.
     '''
-    aulas = make_aulas(
-        dict(capacidad=10),
-        dict(capacidad=20),
-        dict(capacidad=30)
-    )
-
-    clases = make_clases(
-        dict(cantidad_de_alumnos=11),
-        dict(cantidad_de_alumnos=21),
-        dict(cantidad_de_alumnos=31),
-    )
-    modelo = cp_model.CpModel()
-
-    asignaciones = make_asignaciones(clases, aulas, modelo)
-
     # Restricciones para que no estén en el mismo aula
     for predicado in no_superponer_clases(clases, aulas, {}, asignaciones):
         modelo.add(predicado)
@@ -143,4 +124,3 @@ def test_minimiza_capacidad_excedida():
     assert sum(asignaciones_finales[1,:]) == 1 and asignaciones_finales[1, 1] == 1
     assert sum(asignaciones_finales[2,:]) == 1 and asignaciones_finales[2, 2] == 1
     assert solver.value(cantidad_excedida) == 3
-

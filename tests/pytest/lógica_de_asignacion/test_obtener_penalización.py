@@ -3,26 +3,18 @@ import numpy as np
 import pytest
 
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
-from helper_functions import make_aulas, make_clases, make_asignaciones
 
-def test_minimiza_capacidad_sobrante_y_excedida():
+@pytest.mark.aulas(
+    dict(capacidad=34, nombre="peor: sobrante=0, excedente=1"),
+    # Importante el orden, esta tiene que ser el de índice 1
+    dict(capacidad=40, nombre="óptima: sobrante=5, excedente=0"),
+    dict(capacidad=50, nombre="subótima: sobrante=15, excedente=0")
+)
+@pytest.mark.clases( dict(cantidad_de_alumnos=35) )
+def test_minimiza_capacidad_sobrante_y_excedida(clases, aulas, modelo, asignaciones):
     '''
     Verifica que minimiza la capacidad sobrante y excedida, dando prioridad a la excedida.
     '''
-    aulas = make_aulas(
-        dict(capacidad=34, nombre="peor: sobrante=0, excedente=1"),
-        # Importante el orden, esta tiene que ser el de índice 1
-        dict(capacidad=40, nombre="óptima: sobrante=5, excedente=0"),
-        dict(capacidad=50, nombre="subótima: sobrante=15, excedente=0")
-    )
-
-    clases = make_clases(
-        dict(cantidad_de_alumnos=35),
-    )
-    modelo = cp_model.CpModel()
-
-    asignaciones = make_asignaciones(clases, aulas, modelo)
-
     # Minimizar penalización, principalmente capacidad sobrante y excedida
     penalización = obtener_penalización(clases, aulas, modelo, asignaciones)
     modelo.minimize(penalización)

@@ -3,23 +3,18 @@ import numpy as np
 import pytest
 
 from asignacion_aulica.lógica_de_asignación import preferencias
-from helper_functions import make_aulas, make_clases, make_asignaciones
 
-def test_todas_las_aulas_en_el_edificio_preferido():
-    aulas = make_aulas(
-        dict(edificio='preferido'),
-        dict(edificio='preferido'),
-        dict(edificio='preferido')
-    )
-    clases = make_clases(
-        dict(edificio_preferido='preferido'),
-        dict(edificio_preferido='preferido')
-    )
-    modelo = cp_model.CpModel()
-
-    # Forzar asignaciones arbitrarias
-    asignaciones = make_asignaciones(clases, aulas, modelo, asignaciones_forzadas={ 0: 1, 1: 2 })
-
+@pytest.mark.aulas(
+    dict(edificio='preferido'),
+    dict(edificio='preferido'),
+    dict(edificio='preferido')
+)
+@pytest.mark.clases(
+    dict(edificio_preferido='preferido'),
+    dict(edificio_preferido='preferido')
+)
+@pytest.mark.asignaciones_forzadas({ 0: 1, 1: 2 })
+def test_todas_las_aulas_en_el_edificio_preferido(aulas, clases, modelo, asignaciones):
     clases_fuera_del_edificio_preferido, cota_superior = preferencias.obtener_cantidad_de_clases_fuera_del_edificio_preferido(clases, aulas, modelo, asignaciones)
     assert cota_superior == 2
 
@@ -31,26 +26,22 @@ def test_todas_las_aulas_en_el_edificio_preferido():
     
     assert solver.value(clases_fuera_del_edificio_preferido) == 0
 
-def test_algunas_aulas_en_el_edificio_preferido():
-    aulas = make_aulas(
-        dict(edificio='preferido'),
-        dict(edificio='no preferido'),
-        dict(edificio='preferido'),
-        dict(edificio='preferido 2')
-    )
-    clases = make_clases(
-        dict(edificio_preferido='preferido'),
-        dict(edificio_preferido='preferido'),
-        dict(edificio_preferido='preferido 2'),
-        dict(edificio_preferido='preferido'),
-        dict(edificio_preferido='preferido 2'),
-        dict(edificio_preferido=None)
-    )
-    modelo = cp_model.CpModel()
-
-    # Forzar asignaciones arbitrarias
-    asignaciones = make_asignaciones(clases, aulas, modelo, asignaciones_forzadas={ 0: 3, 1: 2, 2: 1, 3: 1, 4: 2, 5: 0 })
-
+@pytest.mark.aulas(
+    dict(edificio='preferido'),
+    dict(edificio='no preferido'),
+    dict(edificio='preferido'),
+    dict(edificio='preferido 2')
+)
+@pytest.mark.clases(
+    dict(edificio_preferido='preferido'),
+    dict(edificio_preferido='preferido'),
+    dict(edificio_preferido='preferido 2'),
+    dict(edificio_preferido='preferido'),
+    dict(edificio_preferido='preferido 2'),
+    dict(edificio_preferido=None)
+)
+@pytest.mark.asignaciones_forzadas({ 0: 3, 1: 2, 2: 1, 3: 1, 4: 2, 5: 0 })
+def test_algunas_aulas_en_el_edificio_preferido(aulas, clases, modelo, asignaciones):
     clases_fuera_del_edificio_preferido, cota_superior = preferencias.obtener_cantidad_de_clases_fuera_del_edificio_preferido(clases, aulas, modelo, asignaciones)
     # La clase que no tiene edificio preferido no puede estar fuera de su
     # edificio preferido, y la cota máxima refleja este hecho
@@ -64,21 +55,15 @@ def test_algunas_aulas_en_el_edificio_preferido():
     
     assert solver.value(clases_fuera_del_edificio_preferido) == 4
 
-def test_elije_aula_en_edificio_preferido():
-    aulas = make_aulas(
-        dict(edificio='no preferido 1'),
-        dict(edificio='no preferido 2'),
-        dict(edificio='preferido'), # Importante el orden, tiene que ser el índice 2
-        dict(edificio='no preferido 3'),
-        dict(edificio='no preferido 4')
-    )
-    clases = make_clases(
-        dict(edificio_preferido='preferido'),
-    )
-    modelo = cp_model.CpModel()
-
-    asignaciones = make_asignaciones(clases, aulas, modelo)
-
+@pytest.mark.aulas(
+    dict(edificio='no preferido 1'),
+    dict(edificio='no preferido 2'),
+    dict(edificio='preferido'), # Importante el orden, tiene que ser el índice 2
+    dict(edificio='no preferido 3'),
+    dict(edificio='no preferido 4')
+)
+@pytest.mark.clases( dict(edificio_preferido='preferido') )
+def test_elije_aula_en_edificio_preferido(aulas, clases, modelo, asignaciones):
     clases_fuera_del_edificio_preferido, cota_superior = preferencias.obtener_cantidad_de_clases_fuera_del_edificio_preferido(clases, aulas, modelo, asignaciones)
     assert cota_superior == 1
 

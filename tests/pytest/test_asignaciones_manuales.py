@@ -2,9 +2,9 @@ import pytest
 
 from helper_functions import make_clases, make_aulas, Día
 
-from asignacion_aulica.backend.lógica_de_asignación import separar_asignaciones_manuales, asignar
-from asignacion_aulica.backend.restricciones import no_asignar_aulas_ocupadas
-from asignacion_aulica.backend import ImposibleAssignmentException
+from asignacion_aulica.lógica_de_asignación.asignar import separar_asignaciones_manuales, asignar
+from asignacion_aulica.lógica_de_asignación.restricciones import no_asignar_aulas_ocupadas
+from asignacion_aulica.lógica_de_asignación import ImposibleAssignmentException
 
 def test_separar_asignaciones_manuales():
     clases = make_clases(
@@ -173,8 +173,8 @@ def test_asignaciones_manuales_que_inclumplen_restricciones():
         dict(día=Día.MARTES, horario_inicio=19, horario_fin=23, aula_asignada=1), # Asignadas a un aula cerrada
         dict(día=Día.VIERNES, aula_asignada=1),
 
-        dict(día=Día.INDEFINIDO, cantidad_de_alumnos=30, aula_asignada=3), # Capacidad insuficiente
-        dict(día=Día.INDEFINIDO, equipamiento_necesario={'pizarrón', 'proyector'}, aula_asignada=3), # Equipamiento insuficiente
+        dict(día=Día.JUEVES, cantidad_de_alumnos=30, aula_asignada=3), # Capacidad insuficiente
+        dict(día=Día.JUEVES, equipamiento_necesario={'pizarrón', 'proyector'}, aula_asignada=3), # Equipamiento insuficiente
     )
     
     asignar(clases, aulas, aulas_dobles)

@@ -5,7 +5,7 @@ import re
 from asignacion_aulica.frontend.excepciones_universidad import *
 from asignacion_aulica.get_asset_path import get_asset_path
 from asignacion_aulica.frontend import funciones_de_traduccion
-from asignacion_aulica.backend.lógica_de_asignación   import asignar
+from asignacion_aulica.lógica_de_asignación.lógica_de_asignación import asignar
 
 from openpyxl.utils import get_column_letter
 from openpyxl import load_workbook

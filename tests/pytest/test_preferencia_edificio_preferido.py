@@ -2,7 +2,7 @@ from ortools.sat.python import cp_model
 import numpy as np
 import pytest
 
-from asignacion_aulica.backend import preferencias
+from asignacion_aulica.lógica_de_asignación import preferencias
 from helper_functions import make_aulas, make_clases, make_asignaciones
 
 def test_todas_las_aulas_en_el_edificio_preferido():

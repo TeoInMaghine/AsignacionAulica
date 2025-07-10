@@ -1,4 +1,4 @@
-from asignacion_aulica import backend
+from asignacion_aulica import análisis_de_asignaciones
 from helper_functions import make_aulas, make_clases
 
 def test_ningún_aula_chica():
@@ -14,7 +14,7 @@ def test_ningún_aula_chica():
     )
     asignaciones = [2, 0, 1]
 
-    clases_excedidas = backend.clases_con_aula_chica(clases, aulas, asignaciones)
+    clases_excedidas = análisis_de_asignaciones.clases_con_aula_chica(clases, aulas, asignaciones)
     assert len(clases_excedidas) == 0
 
 def test_algún_aula_chica():
@@ -29,7 +29,7 @@ def test_algún_aula_chica():
     )
     asignaciones = [1, 0, 0]
 
-    clases_excedidas = backend.clases_con_aula_chica(clases, aulas, asignaciones)
+    clases_excedidas = análisis_de_asignaciones.clases_con_aula_chica(clases, aulas, asignaciones)
     assert clases_excedidas == {2: 80-30}
 
 def test_todas_las_clases_excedidas():
@@ -44,7 +44,7 @@ def test_todas_las_clases_excedidas():
     )
     asignaciones = [0, 0, 1]
 
-    clases_excedidas = backend.clases_con_aula_chica(clases, aulas, asignaciones)
+    clases_excedidas = análisis_de_asignaciones.clases_con_aula_chica(clases, aulas, asignaciones)
     assert clases_excedidas == {0: 50-24, 1: 25-24, 2: 80-10}
 
 def test_todas_fuera_del_edificio_preferido():
@@ -65,7 +65,7 @@ def test_todas_fuera_del_edificio_preferido():
     )
     asignaciones = [0, 1, 4, 3]
 
-    clases_tristes = backend.clases_fuera_del_edificio_preferido(clases, aulas, asignaciones)
+    clases_tristes = análisis_de_asignaciones.clases_fuera_del_edificio_preferido(clases, aulas, asignaciones)
     assert clases_tristes == {0, 1, 2, 3}
 
 def test_una_sola_en_el_edificio_preferido():
@@ -86,5 +86,5 @@ def test_una_sola_en_el_edificio_preferido():
     )
     asignaciones = [0, 1, 2, 3]
 
-    clases_tristes = backend.clases_fuera_del_edificio_preferido(clases, aulas, asignaciones)
+    clases_tristes = análisis_de_asignaciones.clases_fuera_del_edificio_preferido(clases, aulas, asignaciones)
     assert clases_tristes == {0, 1, 3}

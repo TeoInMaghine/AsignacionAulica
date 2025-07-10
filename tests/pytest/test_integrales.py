@@ -1,6 +1,6 @@
 import pytest
 
-from asignacion_aulica import backend
+from asignacion_aulica import lógica_de_asignación
 from helper_functions import make_aulas, make_clases, Día
 
 def test_restricciones_y_preferencias():
@@ -21,7 +21,7 @@ def test_restricciones_y_preferencias():
         dict(día=Día.MIÉRCOLES, cantidad_de_alumnos=55),
     )
 
-    backend.asignar(clases, aulas)
+    lógica_de_asignación.asignar(clases, aulas)
     asignaciones_esperadas = [1, 0, 0, 1]
 
     assert all(clases['aula_asignada'] == asignaciones_esperadas)
@@ -50,7 +50,7 @@ def test_aulas_dobles():
 
     aulas_dobles = { 3: (1, 2) }
 
-    backend.asignar(clases, aulas, aulas_dobles)
+    lógica_de_asignación.asignar(clases, aulas, aulas_dobles)
     asignaciones_esperadas = [2, 1, 0]
 
     assert all(clases['aula_asignada'] == asignaciones_esperadas)
@@ -70,7 +70,7 @@ def test_horarios_no_solapan():
         dict(horario_inicio=9, horario_fin=10, día=Día.LUNES)
     )
 
-    backend.asignar(clases, aulas)
+    lógica_de_asignación.asignar(clases, aulas)
     asignaciones_esperadas = [0, 0]
 
     assert all(clases['aula_asignada'] == asignaciones_esperadas)
@@ -85,8 +85,8 @@ def test_asignación_imposible_por_solapamiento_inevitable():
         dict(horario_inicio=9, horario_fin=11, día=Día.LUNES)
     )
 
-    with pytest.raises(backend.ImposibleAssignmentException):
-        backend.asignar(clases, aulas)
+    with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
+        lógica_de_asignación.asignar(clases, aulas)
 
 def test_asignación_imposible_por_aula_cerrada():
     aulas = make_aulas(
@@ -97,8 +97,8 @@ def test_asignación_imposible_por_aula_cerrada():
         dict(horario_inicio=7, horario_fin=9, día=Día.LUNES),
     )
 
-    with pytest.raises(backend.ImposibleAssignmentException):
-        backend.asignar(clases, aulas)
+    with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
+        lógica_de_asignación.asignar(clases, aulas)
 
 def test_asignación_imposible_por_equipamiento():
 
@@ -110,6 +110,6 @@ def test_asignación_imposible_por_equipamiento():
         dict(día=Día.LUNES, cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
     )
 
-    with pytest.raises(backend.ImposibleAssignmentException):
-        backend.asignar(clases, aulas)
+    with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
+        lógica_de_asignación.asignar(clases, aulas)
 

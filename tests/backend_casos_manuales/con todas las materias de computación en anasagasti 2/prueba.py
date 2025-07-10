@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-from asignacion_aulica import backend
+from asignacion_aulica import lógica_de_asignación
 
 días = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
 
@@ -32,7 +32,7 @@ aulas['horarios'] = construir_horarios(aulas)
 with open('aulas_dobles.json') as f:
     aulas_dobles = { int(aula_doble): tuple(aulas_hijas) for aula_doble, aulas_hijas in json.load(f).items() }
 
-backend.asignar(clases, aulas, aulas_dobles)
+lógica_de_asignación.asignar(clases, aulas, aulas_dobles)
 
 tabla_asignaciones = clases.copy()
 tabla_asignaciones['edificio'] = clases['aula_asignada'].map(aulas['edificio'])

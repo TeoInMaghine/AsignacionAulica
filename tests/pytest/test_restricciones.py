@@ -5,7 +5,7 @@ from helper_functions import (
     predicado_es_nand_entre_dos_variables_bool,
     Día
 )
-from asignacion_aulica.backend import restricciones
+from asignacion_aulica.lógica_de_asignación import restricciones
 from ortools.sat.python import cp_model
 
 def test_superposición():

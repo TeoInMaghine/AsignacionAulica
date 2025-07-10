@@ -28,7 +28,7 @@ from pandas import DataFrame
 import numpy as np
 
 from .impossible_assignment_exception import ImposibleAssignmentException
-from asignacion_aulica.backend import restricciones
+from asignacion_aulica.lógica_de_asignación import restricciones
 from .dia import Día
 from .preferencias import obtener_penalización
 

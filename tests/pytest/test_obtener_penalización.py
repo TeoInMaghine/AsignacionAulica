@@ -2,7 +2,7 @@ from ortools.sat.python import cp_model
 import numpy as np
 import pytest
 
-from asignacion_aulica.backend.preferencias import obtener_penalización
+from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
 from helper_functions import make_aulas, make_clases, make_asignaciones
 
 def test_minimiza_capacidad_sobrante_y_excedida():

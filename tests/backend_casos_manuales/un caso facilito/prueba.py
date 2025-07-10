@@ -1,6 +1,6 @@
 import pandas as pd
 import json
-from asignacion_aulica import backend
+from asignacion_aulica import lógica_de_asignación
 
 días = ['lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado', 'domingo']
 
@@ -28,7 +28,7 @@ aulas = pd.read_csv('aulas.csv', keep_default_na=False)
 aulas['equipamiento'] = list(map(parsear_equipamiento, aulas['equipamiento']))
 aulas['horarios'] = construir_horarios(aulas)
 
-backend.asignar(clases, aulas)
+lógica_de_asignación.asignar(clases, aulas)
 
 tabla_asignaciones = clases.copy()
 tabla_asignaciones['edificio'] = clases['aula_asignada'].map(aulas['edificio'])

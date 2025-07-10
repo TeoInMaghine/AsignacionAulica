@@ -1,6 +1,6 @@
 from pandas import DataFrame
 import re
-from asignacion_aulica.backend.dia import Día
+from asignacion_aulica.lógica_de_asignación.dia import Día
 import datetime
 
 def parsear_equipamiento(literal):

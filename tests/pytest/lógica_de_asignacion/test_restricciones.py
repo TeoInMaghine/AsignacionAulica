@@ -1,8 +1,8 @@
 import pytest
 from helper_functions import predicado_es_nand_entre_dos_variables_bool
 
-from asignacion_aulica.backend import restricciones
-from asignacion_aulica.backend.dia import Día
+from asignacion_aulica.lógica_de_asignación import restricciones
+from asignacion_aulica.lógica_de_asignación.dia import Día
 
 @pytest.mark.aulas({})
 @pytest.mark.clases(

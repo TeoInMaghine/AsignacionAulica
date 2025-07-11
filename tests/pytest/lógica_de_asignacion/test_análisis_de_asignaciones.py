@@ -1,5 +1,5 @@
 import pytest
-from asignacion_aulica import backend
+from asignacion_aulica import análisis_de_asignaciones
 
 @pytest.mark.aulas(
     dict(capacidad = 30),
@@ -13,7 +13,7 @@ from asignacion_aulica import backend
 )
 def test_ningún_aula_chica(aulas, clases):
     asignaciones = [2, 0, 1]
-    clases_excedidas = backend.clases_con_aula_chica(clases, aulas, asignaciones)
+    clases_excedidas = análisis_de_asignaciones.clases_con_aula_chica(clases, aulas, asignaciones)
     assert len(clases_excedidas) == 0
 
 @pytest.mark.aulas(
@@ -28,7 +28,7 @@ def test_ningún_aula_chica(aulas, clases):
 def test_algún_aula_chica(aulas, clases):
     asignaciones = [1, 0, 0]
 
-    clases_excedidas = backend.clases_con_aula_chica(clases, aulas, asignaciones)
+    clases_excedidas = análisis_de_asignaciones.clases_con_aula_chica(clases, aulas, asignaciones)
     assert clases_excedidas == {2: 80-30}
 
 @pytest.mark.aulas(
@@ -43,7 +43,7 @@ def test_algún_aula_chica(aulas, clases):
 def test_todas_las_clases_excedidas(aulas, clases):
     asignaciones = [0, 0, 1]
 
-    clases_excedidas = backend.clases_con_aula_chica(clases, aulas, asignaciones)
+    clases_excedidas = análisis_de_asignaciones.clases_con_aula_chica(clases, aulas, asignaciones)
     assert clases_excedidas == {0: 50-24, 1: 25-24, 2: 80-10}
 
 @pytest.mark.aulas(
@@ -64,7 +64,7 @@ def test_todas_las_clases_excedidas(aulas, clases):
 def test_todas_fuera_del_edificio_preferido(aulas, clases):
     asignaciones = [0, 1, 4, 3]
 
-    clases_tristes = backend.clases_fuera_del_edificio_preferido(clases, aulas, asignaciones)
+    clases_tristes = análisis_de_asignaciones.clases_fuera_del_edificio_preferido(clases, aulas, asignaciones)
     assert clases_tristes == {0, 1, 2, 3}
 
 @pytest.mark.aulas(
@@ -85,5 +85,5 @@ def test_todas_fuera_del_edificio_preferido(aulas, clases):
 def test_una_sola_en_el_edificio_preferido(aulas, clases):
     asignaciones = [0, 1, 2, 3]
 
-    clases_tristes = backend.clases_fuera_del_edificio_preferido(clases, aulas, asignaciones)
+    clases_tristes = análisis_de_asignaciones.clases_fuera_del_edificio_preferido(clases, aulas, asignaciones)
     assert clases_tristes == {0, 1, 3}

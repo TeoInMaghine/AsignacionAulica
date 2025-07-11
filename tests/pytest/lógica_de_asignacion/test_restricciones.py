@@ -1,5 +1,5 @@
 import pytest
-from helper_functions import predicado_es_nand_entre_dos_variables_bool
+from verificación_de_predicados import predicado_es_nand_entre_dos_variables_bool
 
 from asignacion_aulica.lógica_de_asignación import restricciones
 from asignacion_aulica.lógica_de_asignación.dia import Día

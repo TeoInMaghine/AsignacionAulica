@@ -8,7 +8,7 @@ Ver https://docs.pytest.org/en/stable/how-to/fixtures.html
 '''
 import pytest
 
-from ortools.sat.python import cp_model
+from ortools.sat.python.cp_model import CpModel
 from pandas import DataFrame
 import numpy as np
 
@@ -21,7 +21,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "asignaciones_forzadas")
 
 @pytest.fixture
-def aulas(request):
+def aulas(request) -> DataFrame:
     '''
     Recibe en el marker "aulas" una tupla de diccionarios con datos
     (posiblemente incompletos) de aulas.
@@ -51,7 +51,7 @@ def aulas(request):
     return DataFrame.from_records(default_values | explicit_values for explicit_values in data)
 
 @pytest.fixture
-def clases(request):
+def clases(request) -> DataFrame:
     '''
     Recibe en el marker "clases" una tupla de diccionarios con datos
     (posiblemente incompletos) de clases.
@@ -80,16 +80,16 @@ def clases(request):
     return DataFrame(data, dtype=object)
 
 @pytest.fixture
-def modelo():
+def modelo() -> CpModel:
     ':return: Un CpModel para este caso de prueba.'
-    return cp_model.CpModel()
+    return CpModel()
 
 @pytest.fixture
 def asignaciones(
         request,
-        clases,
-        aulas,
-        modelo
+        clases: DataFrame,
+        aulas: DataFrame,
+        modelo: CpModel
     ) -> np.ndarray:
     '''
     Genera una matriz con las variables de asignación. No hay constantes, todas

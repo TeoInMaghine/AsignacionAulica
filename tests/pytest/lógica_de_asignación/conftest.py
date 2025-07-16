@@ -16,9 +16,9 @@ from asignacion_aulica.lógica_de_asignación.dia import Día
 
 def pytest_configure(config):
     # Registrar los markers usados por las fixtures
-    config.addinivalue_line("markers", "aulas")
-    config.addinivalue_line("markers", "clases")
-    config.addinivalue_line("markers", "asignaciones_forzadas")
+    config.addinivalue_line("markers", "aulas: marca para pasar parametros al fixture aulas")
+    config.addinivalue_line("markers", "clases: marca para pasar parametros al fixture clases")
+    config.addinivalue_line("markers", "asignaciones_forzadas: marca para pasar parametros al fixture asignaciones")
 
 @pytest.fixture
 def aulas(request) -> DataFrame:

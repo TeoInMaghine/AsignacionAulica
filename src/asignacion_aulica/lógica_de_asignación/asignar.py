@@ -124,6 +124,10 @@ def resolver_problema_de_asignación(
         otra cosa, en tuplas (aula, día, inicio, fin).
     :return: Una lista con el número de aula asignada a cada clase.
     '''
+
+    if clases.empty:
+        return []
+
     # Crear modelo, variables, restricciones, y penalizaciones
     modelo = cp_model.CpModel()
     asignaciones = crear_matriz_de_asignaciones(clases, aulas, aulas_dobles, aulas_ocupadas, modelo)

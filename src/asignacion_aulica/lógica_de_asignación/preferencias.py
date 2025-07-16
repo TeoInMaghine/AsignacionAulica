@@ -77,6 +77,10 @@ def obtener_cantidad_de_clases_fuera_del_edificio_preferido(
             cantidad_de_clases_fuera_del_edificio_preferido -= 1
             cota_superior -= 1
 
+    # Evitamos que la cota superior sea 0 porque luego se usa para dividir
+    if cota_superior == 0:
+        cota_superior = 1
+
     return cantidad_de_clases_fuera_del_edificio_preferido, cota_superior
 
 def obtener_cantidad_de_alumnos_fuera_del_aula(

@@ -5,7 +5,7 @@ import re
 from asignacion_aulica.frontend.excepciones_universidad import *
 from asignacion_aulica.get_asset_path import get_asset_path
 from asignacion_aulica.frontend import funciones_de_traduccion
-from asignacion_aulica.lógica_de_asignación.lógica_de_asignación import asignar
+from asignacion_aulica.lógica_de_asignación import asignar
 
 from openpyxl.utils import get_column_letter
 from openpyxl import load_workbook
@@ -22,7 +22,19 @@ class Universidad:
         self.carreras = df_list['Carreras']
         self.materias = df_list['Materias']
         self.horarios = df_list['Clases'].fillna("")
-        #self.horarios = self.horarios.head(2)  
+        '''
+        Tener una columna aparte para guardar índices de las aulas asignadas,
+        para que no se reasignen aulas al rehacer la asignación automática.
+        
+        Una vez que se haga la refactorización no debería haber necesidad de
+        tener esta columna redundante, por ahora queda así porque si no habría
+        que transformar nombres y edificios de aulas de vuelta a índices de
+        aulas, y el esfuerzo invertido en eso probablemente no sea fructuoso.
+
+        (Lo que sí esto tiene el problema de que si cambia el orden de las
+        aulas, la asignación automática re-asigna a aulas distintas después).
+        '''
+        self.horarios['Aula asignada (índices)'] = None
 
 
 
@@ -422,15 +434,16 @@ class Universidad:
 
 
         aulas_backend = funciones_de_traduccion.traducir_aulas(self.aulas)
-        horarios_backend = funciones_de_traduccion.traducir_clases(self.horarios)        
-        asignar(horarios_backend, aulas_backend)
+        clases_backend = funciones_de_traduccion.traducir_clases(self.horarios)        
+        asignar(clases_backend, aulas_backend)
 
 
         # Sintaxis para el mapeo
         index_to_aula = self.aulas['Aula']
         index_to_edificio = self.aulas['Edificio']
-        self.horarios['Aula asignada'] = horarios_backend['aula_asignada'].map(index_to_aula)
-        self.horarios['Edificio asignado'] = horarios_backend['aula_asignada'].map(index_to_edificio)
+        self.horarios['Aula asignada (índices)'] = clases_backend['aula_asignada']
+        self.horarios['Aula asignada'] = clases_backend['aula_asignada'].map(index_to_aula)
+        self.horarios['Edificio asignado'] = clases_backend['aula_asignada'].map(index_to_edificio)
 
 
     def exportar_horarios(self, path):

@@ -6,6 +6,7 @@ las Actividades/Materias de la Universidad.
 @author: Cristian
 """
 
+import traceback
 import flet as ft
 from pandas import DataFrame
 
@@ -295,6 +296,7 @@ class UI_Config_Horarios():
             # Se actualizan los elementos de la interfaz.
             self.actualizar_tabla()
         except Exception as exc:
+            print(traceback.format_exc())
             mensaje_error: str = str(exc)
             self.alertar(mensaje_error)
     

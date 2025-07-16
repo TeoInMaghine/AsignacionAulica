@@ -173,3 +173,30 @@ def test_asignaciones_manuales_que_inclumplen_restricciones(aulas, clases):
     assert clases.at[6, 'aula_asignada'] == 1
     assert clases.at[7, 'aula_asignada'] == 3
     assert clases.at[8, 'aula_asignada'] == 3
+
+@pytest.mark.aulas(*[{}]*5) # Re críptico pero esto significa 5 aulas con valores deafut
+@pytest.mark.clases(
+    dict(aula_asignada=1),
+    dict(aula_asignada=3),
+    dict(aula_asignada=0),
+    dict(aula_asignada=2),
+    dict(aula_asignada=4),
+    dict(aula_asignada=1),
+    dict(aula_asignada=1),
+)
+def test_todas_las_aulas_asignadas_manuales(aulas, clases):
+    '''
+    Verificar que cuando todas las asignaciones son manuales, se maneja
+    correctamente (no saltan excepciones ni se cambian las asignaciones).
+    '''
+
+    asignar(clases, aulas)
+
+    assert clases.at[0, 'aula_asignada'] == 1
+    assert clases.at[1, 'aula_asignada'] == 3
+    assert clases.at[2, 'aula_asignada'] == 0
+    assert clases.at[3, 'aula_asignada'] == 2
+    assert clases.at[4, 'aula_asignada'] == 4
+    assert clases.at[5, 'aula_asignada'] == 1
+    assert clases.at[6, 'aula_asignada'] == 1
+

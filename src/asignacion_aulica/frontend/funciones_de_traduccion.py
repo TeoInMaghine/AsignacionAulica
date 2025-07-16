@@ -74,11 +74,9 @@ def traducir_clases(clases_frontend:DataFrame):
     clases_backend['día'] = clases_frontend['Día'].map(mapeador_de_dias)
     clases_backend['horario_inicio'] = clases_frontend['Horario de inicio'].apply(horario_simple_a_minutos)
     clases_backend['horario_fin'] = clases_frontend['Horario de fin'].apply(horario_simple_a_minutos)
-    clases_backend['cantidad_de_alumnos']   =   clases_frontend['Cantidad de alumnos']
-
+    clases_backend['cantidad_de_alumnos'] = clases_frontend['Cantidad de alumnos']
     clases_backend['equipamiento_necesario'] = clases_frontend['Equipamiento necesario'].astype(str).map(parsear_equipamiento)
-    #clases_backend['equipamiento_necesario']=   list(map(parsear_equipamiento, clases_frontend['Equipamiento necesario']))
-    clases_backend['edificio_preferido']    =   clases_frontend['Edificio preferencial']
-    clases_backend['aula_asignada']         =   None
+    clases_backend['edificio_preferido'] = clases_frontend['Edificio preferencial']
+    clases_backend['aula_asignada'] = clases_frontend['Aula asignada (índices)']
 
     return clases_backend

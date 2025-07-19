@@ -189,3 +189,11 @@ cython_debug/
 
 # Flet
 storage/
+
+# Ignorar archivos temporales de MicrosoftOffice/LibreOffice
+# (creados por ejemplo cuando abrís un excel)
+.$*
+.~$*
+.~lock.*
+*.tmp
+

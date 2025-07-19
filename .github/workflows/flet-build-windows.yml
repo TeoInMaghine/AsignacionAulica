@@ -16,7 +16,6 @@ jobs:
         uses: actions/checkout@v4
       
       - name: Extract version numbers from pyproject.toml
-        id: get_version
         shell: pwsh
         run: |
           $regex_search = Select-String -Path pyproject.toml -Pattern 'requires-python\s*=\s*"~=\s*(\d+\.\d+)"'
@@ -29,24 +28,14 @@ jobs:
           echo "PROJECT_VERSION=$PROJECT_VERSION"
           echo "PROJECT_VERSION=$PROJECT_VERSION" >> $env:GITHUB_ENV
 
-          $regex_search = Select-String -Path pyproject.toml -Pattern '"flet\s*==\s*(.*)"'
-          $FLET_VERSION = $regex_search.Matches.Groups[1].Value
-          echo "FLET_VERSION=$FLET_VERSION"
-          echo "FLET_VERSION=$FLET_VERSION" >> $env:GITHUB_ENV
-
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
 
-      - name: Install flet-cli ${{ env.FLET_CLI_VERSION }}
-        run: |
-          python -m pip install --upgrade pip
-          pip install flet-cli==$env:FLET_VERSION
-      
-      - name: Flet Build Windows
-        run: |
-          flet build windows --verbose --no-rich-output
+      - name: Build Windows App
+        shell: pwsh
+        run: .\build.ps1
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4.3.4

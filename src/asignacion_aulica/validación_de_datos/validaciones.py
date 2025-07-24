@@ -4,6 +4,20 @@ from typing import Any
 from asignacion_aulica.lógica_de_asignación.día import Día
 from .excepciones import DatoInválidoException
 
+def _validar_no_None(valor: Any, mensaje: str) -> Any:
+    '''
+    Validar que `valor` no sea `None`.
+
+    :param valor: El valor a validar.
+    :param mensaje: Se usa como prefijo en el mensaje de la excepción.
+    :return: El mismo valor.
+    :raise DatoInválidoException: Si `valor` es `None`.
+    '''
+    if valor is None:
+        raise DatoInválidoException(mensaje + 'no debe estar vacío.')
+    else:
+        return valor
+
 def str_posiblemente_vacío(valor: str|Any) -> str:
     '''
     Convertir `valor` a string, excepto que sea `None`.
@@ -45,6 +59,8 @@ def validar_año(valor: int|str|Any, mensaje: str) -> int:
     :return: El mismo valor, convertido a int.
     :raise DatoInválidoException: Si `valor` no es un número entero mayor a 1999.
     '''
+    _validar_no_None(valor, mensaje)
+
     es_número_entero = isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
     if not es_número_entero:
         raise DatoInválidoException(mensaje + 'no se reconoce como un número de año (debe ser un número entero).')
@@ -66,6 +82,8 @@ def validar_año_del_plan_de_estudios(valor: int|str|Any, mensaje) -> int:
     :return: El mismo valor, convertido a int.
     :raise DatoInválidoException: Si `valor` no es un número entero entre 1 y 9.
     '''
+    _validar_no_None(valor, mensaje)
+
     es_número_entero = isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
     if not es_número_entero:
         raise DatoInválidoException(mensaje + f'"{valor} No se reconoce como un año del plan de estudios (debe ser un número entero).')
@@ -115,6 +133,8 @@ def validar_int_positivo(valor: int|str|Any, mensaje: str) -> int:
     :return: El valor, convertido a int.
     :raise DatoInválidoException: Si `valor` no es un entero positivo.
     '''
+    _validar_no_None(valor, mensaje)
+
     es_número_entero = isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
     if not es_número_entero:
         raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un número entero.')
@@ -133,6 +153,8 @@ def debería_ser_time(valor: time|Any, mensaje: str) -> time:
     :param mensaje: Se usa como prefijo en el mensaje de la excepción.
     :raise DatoInválidoException: Si `valor` no es de tipo `time`.
     '''
+    _validar_no_None(valor, mensaje)
+
     if not isinstance(valor, time):
         raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un horario.')
     else:

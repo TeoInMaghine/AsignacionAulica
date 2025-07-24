@@ -7,8 +7,10 @@ prueba que lo necesita.
 
 Ver https://docs.pytest.org/en/stable/how-to/fixtures.html
 '''
-import pytest
+from openpyxl.worksheet.worksheet import Worksheet
+from openpyxl import load_workbook
 from pathlib import Path
+import pytest
 
 archivos_de_prueba = Path(__file__).parent.resolve() / 'archivos_de_prueba'
 
@@ -26,3 +28,15 @@ def archivo(request) -> Path:
     '''
     nombre = request.node.get_closest_marker('archivo').args[0]
     return archivos_de_prueba / nombre
+
+@pytest.fixture
+def primera_hoja_del_archivo(archivo) -> Worksheet:
+    '''
+    Recibe en el marker "archivo" el nombre de un archivo excel del directorio
+    "archivos_de_prueba".
+
+    :return: La primera hoja del archivo.
+    '''
+    libro = load_workbook(archivo)
+    hoja = libro.active
+    return hoja

@@ -35,12 +35,11 @@ def test_str_posiblemente_vacío():
     assert str_posiblemente_vacío(None) == ''
     assert str_posiblemente_vacío([1,23]) == '[1, 23]'
 
-def test_años_válidos():
+def test_validar_año():
     assert validar_año(2000, 'un mensaje') == 2000
     assert validar_año(2025, 'un mensaje') == 2025
     assert validar_año('2032', 'un mensaje') == 2032
 
-def test_año_float():
     with pytest.raises(DatoInválidoException) as exc_info:
         validar_año(2025.0, 'msg') # No es int
 
@@ -48,7 +47,6 @@ def test_año_float():
     assert mensaje.startswith('msg')
     assert 'debe ser un número entero' in mensaje
 
-def test_año_menor_a_2000():
     with pytest.raises(DatoInválidoException) as exc_info:
         validar_año(32, 'msg') # Es muy chico
     
@@ -56,13 +54,19 @@ def test_año_menor_a_2000():
     assert mensaje.startswith('msg')
     assert 'a partir del 2000' in mensaje
 
-def test_año_no_número():
     with pytest.raises(DatoInválidoException) as exc_info:
         validar_año('123hola5', 'msg') # No es un número
 
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'debe ser un número entero' in mensaje
+    
+    with pytest.raises(DatoInválidoException) as exc_info:
+        validar_año(None, 'msg') # Celda vacía
+
+    mensaje = str(exc_info.value)
+    assert mensaje.startswith('msg')
+    assert 'no debe estar vacío' in mensaje
 
 def test_validar_año_del_plan_de_estudios():
     assert validar_año_del_plan_de_estudios(4, 'msg') == 4
@@ -74,14 +78,20 @@ def test_validar_año_del_plan_de_estudios():
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'debe estar entre 1 y 9' in mensaje
-
-
-    with pytest.raises(DatoInválidoException) as exc_info:
-        validar_año_del_plan_de_estudios(None, 'msg')
     
+    with pytest.raises(DatoInválidoException) as exc_info:
+        validar_año_del_plan_de_estudios('123hola5', 'msg') # No es un número
+
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'debe ser un número entero' in mensaje
+    
+    with pytest.raises(DatoInválidoException) as exc_info:
+        validar_año_del_plan_de_estudios(None, 'msg') # Celda vacía
+
+    mensaje = str(exc_info.value)
+    assert mensaje.startswith('msg')
+    assert 'no debe estar vacío' in mensaje
 
 def test_validar_día():
     assert validar_día('lunes', 'msg') == Día.LUNES
@@ -109,7 +119,7 @@ def test_validar_int_positivo():
     assert validar_int_positivo('1560', 'msg') == 1560
 
     with pytest.raises(DatoInválidoException) as exc_info:
-        validar_int_positivo(None, 'msg')
+        validar_int_positivo('wegggg', 'msg')
     
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
@@ -121,6 +131,13 @@ def test_validar_int_positivo():
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'debe ser un número entero positivo' in mensaje
+    
+    with pytest.raises(DatoInválidoException) as exc_info:
+        validar_int_positivo(None, 'msg')
+    
+    mensaje = str(exc_info.value)
+    assert mensaje.startswith('msg')
+    assert 'no debe estar vacío' in mensaje
 
 def test_debería_ser_time():
     assert debería_ser_time(time(15, 30), 'msg') == time(15, 30)
@@ -131,3 +148,10 @@ def test_debería_ser_time():
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'no se reconoce como un horario' in mensaje
+
+    with pytest.raises(DatoInválidoException) as exc_info:
+        debería_ser_time(None, 'msg')
+    
+    mensaje = str(exc_info.value)
+    assert mensaje.startswith('msg')
+    assert 'no debe estar vacío' in mensaje

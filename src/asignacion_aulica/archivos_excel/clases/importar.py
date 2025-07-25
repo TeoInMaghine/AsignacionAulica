@@ -1,6 +1,8 @@
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils import get_column_letter
 from openpyxl.cell.cell import Cell
+from pathlib import Path
+import openpyxl
 
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException
 from asignacion_aulica.validación_de_datos.validaciones import *
@@ -23,7 +25,10 @@ COLUMNAS = (
     'Aula'
 )
 
-def leer_preámbulo(hoja: Worksheet) -> tuple[str, int, str|int]:
+def _cell_coordinates(cell: Cell) -> str:
+    return cell.column_letter+str(cell.row)
+
+def leer_preámbulo(hoja: Worksheet) -> tuple[str, int, str]:
     '''
     Verifica que el preámbulo de una hoja del archivo sea válido y extrae sus
     datos.
@@ -87,5 +92,33 @@ def leer_tabla(hoja: Worksheet) -> list[Clase]:
     
     return clases
 
-def _cell_coordinates(cell: Cell) -> str:
-    return cell.column_letter+str(cell.row)
+def importar(filename: str|Path) -> list[ tuple[str, int, str, list[Clase]] ]:
+    '''
+    Leer datos de un archivo excel con el formato de la plantilla de clases.
+
+    :param filename: El path absoluto del archivo.
+
+    :return: Una lista de tuplas (carrera, año, cuatrimestre, clases). Cada
+        elemento de la lista contiene los datos de una página del archivo.
+
+    :raise FileNotFoundError: Si el archivo no existe.
+    :raise openpyxl.utils.exceptions.InvalidFileException: Si el archivo no es un archivo excel.
+    :raise ExcelInválidoException: Si el formato del archivo no es correcto.
+    :raise DatoInválidoException: Si el archivo contiene un dato inválido.
+    '''
+    archivo = openpyxl.load_workbook(filename)
+    nombres_de_las_hojas = archivo.sheetnames
+
+    data = []
+
+    for nombre in nombres_de_las_hojas:
+        hoja = archivo[nombre]
+        try:
+            carrera, año, cuatrimestre = leer_preámbulo(hoja)
+            clases = leer_tabla(hoja)
+            data.append((carrera, año, cuatrimestre, clases))
+        except (ExcelInválidoException, DatoInválidoException) as e:
+            # Tirar la misma excepción, pero agregando el nombre de la hoja al mensaje
+            raise type(e)(f'En la hoja {nombre}: ' + str(e))
+
+    return data

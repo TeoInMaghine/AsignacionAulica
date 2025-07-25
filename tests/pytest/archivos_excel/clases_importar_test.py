@@ -1,4 +1,4 @@
-from datetime import time
+from datetime import time, date, datetime
 import openpyxl
 import pytest
 
@@ -72,3 +72,81 @@ def test_tabla_nominal(primera_hoja_del_archivo):
 def test_tabla_vacía(primera_hoja_del_archivo):
     clases = leer_tabla(primera_hoja_del_archivo)
     assert len(clases) == 0, 'TODO: Decidir si esto tiene que tirar excepción o no.'
+
+@pytest.mark.parametrize(
+    ('celda_con_error', 'valor', 'mensaje_esperado'),
+    [
+        # Casos de error para la columna Año
+        ('A4', 2026, 'no se reconoce como un año del plan de estudios'),
+        ('A6', 'esto no es un número xd123', 'debe ser un número'),
+        ('A28', 4.0, 'debe ser un número entero'),
+        ('A5', None, 'no debe estar vacío'),
+
+        # Casos de error para la columna Materia
+        ('B5', None, 'no debe estar vacío'),
+
+        # Casos de error para la columna Día
+        ('F5', None, 'no debe estar vacío'),
+        ('F5', '', 'no debe estar vacío'),
+        ('F4', 'mañana', 'no se reconoce como un día de la semana'),
+        ('F4', 55, 'no se reconoce como un día de la semana'),
+        ('F4', time(15, 30), 'no se reconoce como un día de la semana'),
+
+        # Casos de error para las columnas Horario de inicio y Horario de fin
+        ('G5', None, 'no debe estar vacío'),
+        ('G4', 55, 'no se reconoce como un horario'),
+        ('G4', '20hs', 'no se reconoce como un horario'),
+        ('G4', date(2025,7,25), 'no se reconoce como un horario'),
+        ('H4', None, 'no debe estar vacío'),
+        ('H5', 16, 'no se reconoce como un horario'),
+        ('H5', '8AM', 'no se reconoce como un horario'),
+        ('H5', datetime(2025,7,25,10,45), 'no se reconoce como un horario'),
+        
+        # Casos de error para la columna Cupo
+        ('I4', None, 'no debe estar vacío'),
+        ('I4', '', 'no debe estar vacío'),
+        ('I4', 'abc', 'no se reconoce como un número entero'),
+        ('I4', 10.7, 'no se reconoce como un número entero'),
+        ('I4', -1, 'positivo')
+    ]
+)
+@pytest.mark.archivo('clases_nominal.xlsx')
+def test_valores_inválidos_en_la_tabla(primera_hoja_del_archivo, celda_con_error, valor, mensaje_esperado):
+    '''
+    Verificar que si hay valores inválidos en la tabla se tira una excepción
+    del tipo correcto, y que el mensaje incluye la celda y la razón del error.
+    '''
+    # Insertar el error
+    primera_hoja_del_archivo[celda_con_error].value = valor
+
+    # Intentar leer la tabla
+    with pytest.raises(DatoInválidoException) as exc_info:
+        leer_tabla(primera_hoja_del_archivo)
+
+    # Verificar el error
+    mensaje = str(exc_info.value)
+    assert celda_con_error in mensaje
+    assert mensaje_esperado in mensaje
+
+@pytest.mark.archivo('clases_nominal.xlsx')
+def test_columna_faltante(primera_hoja_del_archivo):
+    # Borrar una columna cualquiera
+    primera_hoja_del_archivo.delete_cols(5)
+
+    with pytest.raises(ExcelInválidoException) as exc_info:
+        leer_tabla(primera_hoja_del_archivo)
+    
+    mensaje = str(exc_info.value)
+    assert 'Se quitaron columnas de la tabla' in mensaje
+
+@pytest.mark.archivo('clases_nominal.xlsx')
+def test_columna_cambiada(primera_hoja_del_archivo):
+    # Cambiar el nombre de una columna cualquiera
+    primera_hoja_del_archivo['E3'].value = 'hola amiga'
+
+    with pytest.raises(ExcelInválidoException) as exc_info:
+        leer_tabla(primera_hoja_del_archivo)
+    
+    mensaje = str(exc_info.value)
+    assert 'Se cambió una columna' in mensaje
+    assert 'E3' in mensaje

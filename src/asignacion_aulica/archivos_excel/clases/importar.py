@@ -65,7 +65,7 @@ def leer_tabla(hoja: Worksheet) -> list[Clase]:
         fila_no_vacía = any(map(lambda cell: cell.value, fila))
         if fila_no_vacía:
             año =         validar_año_del_plan_de_estudios(fila[ 0].value, f'En la celda {_cell_coordinates(fila[0])}: ')
-            materia =                 validar_str_no_vacío(fila[ 1].value, f'En la celda {_cell_coordinates(fila[1])}: el nombre de la materia no puede estar vacío.')
+            materia =                 validar_str_no_vacío(fila[ 1].value, f'En la celda {_cell_coordinates(fila[1])}: el nombre de la materia no debe estar vacío.')
             cuatrimestral_o_anual = str_posiblemente_vacío(fila[ 2].value)
             comisión =              str_posiblemente_vacío(fila[ 3].value)
             teórica_o_práctica =    str_posiblemente_vacío(fila[ 4].value)

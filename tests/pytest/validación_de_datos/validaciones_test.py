@@ -105,7 +105,7 @@ def test_validar_día():
     
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
-    assert 'no puede estar vacío' in mensaje
+    assert 'no debe estar vacío' in mensaje
 
     with pytest.raises(DatoInválidoException) as exc_info:
         validar_día('hola', 'msg')

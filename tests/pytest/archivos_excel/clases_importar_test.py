@@ -193,3 +193,56 @@ def test_importar_nominal(archivo):
         edificio = '',
         aula = ''
     )
+
+@pytest.mark.archivo('clases_nominal_dos_hojas.xlsx')
+def test_importar_nominal_con_dos_hojas(archivo):
+    data = importar(archivo)
+    assert len(data) == 2
+
+    carrera, año, cuatrimestre, clases = data[0]
+    assert carrera == 'Acá va el nombre de la carrera'
+    assert año == 2025
+    assert cuatrimestre == 'Primero'
+    assert len(clases) == 2
+    assert clases[0] == Clase(
+        año = 1,
+        materia = 'Introducción a cosas',
+        cuatrimestral_o_anual = 'Cuatrimestral',
+        comisión = 'COM1B',
+        teórica_o_práctica = 'Las dos cosas',
+        día = Día.LUNES,
+        horario_inicio = time(15, 30),
+        horario_fin = time(18),
+        cantidad_de_alumnos = 100,
+        docente = 'Charly García',
+        auxiliar = 'Nadie',
+        promocionable = 'Si (8)',
+        edificio = 'Anasagasti 7',
+        aula = ''
+    )
+    assert clases[1] == Clase(
+        año = 5,
+        materia = 'Hormigón Armado 3',
+        cuatrimestral_o_anual = 'Anual',
+        comisión = '',
+        teórica_o_práctica = '',
+        día = Día.SÁBADO,
+        horario_inicio = time(22),
+        horario_fin = time(23, 30),
+        cantidad_de_alumnos = 3,
+        docente = '',
+        auxiliar = '',
+        promocionable = '',
+        edificio = '',
+        aula = ''
+    )
+    assert data[0] == data[1]
+
+@pytest.mark.archivo('clases_error_en_la_segunda_hoja.xlsx')
+def test_importar_con_error_en_una_hoja(archivo):
+    '''Verificar que se incluye el nombre de la hoja en los mensajes de error.'''
+    with pytest.raises(DatoInválidoException) as exc_info:
+        importar(archivo)
+    
+    mensaje = str(exc_info.value)
+    assert 'Hoja 2' in mensaje

@@ -24,5 +24,6 @@ class Clase:
     docente: str
     auxiliar: str
     promocionable: str
+    virtual: bool
     edificio: str
     aula: str

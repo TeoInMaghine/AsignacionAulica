@@ -114,31 +114,26 @@ def test_validar_día():
     assert mensaje.startswith('msg')
     assert 'no se reconoce como un día de la semana' in mensaje
 
-def test_validar_int_positivo():
-    assert validar_int_positivo(15, 'msg') == 15
-    assert validar_int_positivo('1560', 'msg') == 1560
+def test_validar_int_positivo_opcional():
+    assert validar_int_positivo_opcional(15, 'msg') == 15
+    assert validar_int_positivo_opcional('1560', 'msg') == 1560
+    assert validar_int_positivo_opcional(None, 'msg') == None
+    assert validar_int_positivo_opcional('', 'msg') == None
 
     with pytest.raises(DatoInválidoException) as exc_info:
-        validar_int_positivo('wegggg', 'msg')
+        validar_int_positivo_opcional('wegggg', 'msg')
     
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'no se reconoce como un número entero' in mensaje
 
     with pytest.raises(DatoInválidoException) as exc_info:
-        validar_int_positivo(0, 'msg')
+        validar_int_positivo_opcional(0, 'msg')
     
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'debe ser un número entero positivo' in mensaje
     
-    with pytest.raises(DatoInválidoException) as exc_info:
-        validar_int_positivo(None, 'msg')
-    
-    mensaje = str(exc_info.value)
-    assert mensaje.startswith('msg')
-    assert 'no debe estar vacío' in mensaje
-
 def test_debería_ser_time():
     assert debería_ser_time(time(15, 30), 'msg') == time(15, 30)
     

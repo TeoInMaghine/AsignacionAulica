@@ -34,7 +34,7 @@ def test_carrera_vacía(primera_hoja_del_archivo):
 def test_tabla_nominal(primera_hoja_del_archivo):
     clases = leer_tabla(primera_hoja_del_archivo)
     
-    assert len(clases) == 2
+    assert len(clases) == 3
     assert clases[0] == Clase(
         año = 1,
         materia = 'Introducción a cosas',
@@ -49,7 +49,8 @@ def test_tabla_nominal(primera_hoja_del_archivo):
         auxiliar = 'Nadie',
         promocionable = 'Si (8)',
         edificio = 'Anasagasti 7',
-        aula = ''
+        aula = '',
+        virtual = False
     )
     assert clases[1] == Clase(
         año = 5,
@@ -65,7 +66,25 @@ def test_tabla_nominal(primera_hoja_del_archivo):
         auxiliar = '',
         promocionable = '',
         edificio = '',
-        aula = ''
+        aula = '',
+        virtual = False
+    )
+    assert clases[2] == Clase( # Esta clase tiene celdas mergeadas
+        año = 5,
+        materia = 'Hormigón Armado 3',
+        cuatrimestral_o_anual = 'Anual',
+        comisión = '',
+        teórica_o_práctica = '',
+        día = Día.MIÉRCOLES,
+        horario_inicio = time(7),
+        horario_fin = time(10),
+        cantidad_de_alumnos = None, # El cupo puede estar vacío para las clases virtuales
+        docente = '',
+        auxiliar = '',
+        promocionable = '',
+        edificio = '',
+        aula = '',
+        virtual = True
     )
 
 @pytest.mark.archivo('clases_carrera_vacía.xlsx')
@@ -78,7 +97,7 @@ def test_tabla_vacía(primera_hoja_del_archivo):
     [
         # Casos de error para la columna Año
         ('A4', 2026, 'no se reconoce como un año del plan de estudios'),
-        ('A6', 'esto no es un número xd123', 'debe ser un número'),
+        ('A7', 'esto no es un número xd123', 'debe ser un número'),
         ('A28', 4.0, 'debe ser un número entero'),
         ('A5', None, 'no debe estar vacío'),
 
@@ -160,39 +179,7 @@ def test_importar_nominal(archivo):
     assert carrera == 'Acá va el nombre de la carrera'
     assert año == 2025
     assert cuatrimestre == 'Primero'
-    assert len(clases) == 2
-    assert clases[0] == Clase(
-        año = 1,
-        materia = 'Introducción a cosas',
-        cuatrimestral_o_anual = 'Cuatrimestral',
-        comisión = 'COM1B',
-        teórica_o_práctica = 'Las dos cosas',
-        día = Día.LUNES,
-        horario_inicio = time(15, 30),
-        horario_fin = time(18),
-        cantidad_de_alumnos = 100,
-        docente = 'Charly García',
-        auxiliar = 'Nadie',
-        promocionable = 'Si (8)',
-        edificio = 'Anasagasti 7',
-        aula = ''
-    )
-    assert clases[1] == Clase(
-        año = 5,
-        materia = 'Hormigón Armado 3',
-        cuatrimestral_o_anual = 'Anual',
-        comisión = '',
-        teórica_o_práctica = '',
-        día = Día.SÁBADO,
-        horario_inicio = time(22),
-        horario_fin = time(23, 30),
-        cantidad_de_alumnos = 3,
-        docente = '',
-        auxiliar = '',
-        promocionable = '',
-        edificio = '',
-        aula = ''
-    )
+    assert len(clases) == 3 # El contenido de las clases se verifica en otro caso de prueba.
 
 @pytest.mark.archivo('clases_nominal_dos_hojas.xlsx')
 def test_importar_nominal_con_dos_hojas(archivo):
@@ -218,7 +205,8 @@ def test_importar_nominal_con_dos_hojas(archivo):
         auxiliar = 'Nadie',
         promocionable = 'Si (8)',
         edificio = 'Anasagasti 7',
-        aula = ''
+        aula = '',
+        virtual = False
     )
     assert clases[1] == Clase(
         año = 5,
@@ -234,7 +222,8 @@ def test_importar_nominal_con_dos_hojas(archivo):
         auxiliar = '',
         promocionable = '',
         edificio = '',
-        aula = ''
+        aula = '',
+        virtual = False
     )
     assert data[0] == data[1]
 

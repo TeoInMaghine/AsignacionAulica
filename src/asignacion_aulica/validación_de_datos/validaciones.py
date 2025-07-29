@@ -122,28 +122,31 @@ def validar_día(valor: str|Any, mensaje: str) -> Día:
     
     return Día[valor_mayus]
 
-def validar_int_positivo(valor: int|str|Any, mensaje: str) -> int:
+def validar_int_positivo_opcional(valor: int|str|None|Any, mensaje: str) -> int|None:
     '''
-    Validar que `valor` sea un número entero positivo.
+    Validar que `valor` sea un número entero positivo, un string vacío, o
+    `None`.
 
-    Se aceptan valores de tipo int y str.
+    Se aceptan como números valores de tipo int y str.
 
     :param valor: El valor a validar.
     :param mensaje: Se usa como prefijo para el mensaje de la excepción.
-    :return: El valor, convertido a int.
-    :raise DatoInválidoException: Si `valor` no es un entero positivo.
+    :return: Si `valor` es un número, el mismo valor convertido a int. Si
+        `valor` es el string vacío o `None`, `None`.
+    :raise DatoInválidoException: Si `valor` no es `None` ni un entero positivo.
     '''
-    _validar_no_vacío(valor, mensaje)
-
-    es_número_entero = isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
-    if not es_número_entero:
-        raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un número entero.')
-    
-    valor_int = int(valor)
-    if valor_int <= 0:
-        raise DatoInválidoException(mensaje + 'debe ser un número entero positivo.')
-    
-    return valor_int
+    if valor is None or valor == '':
+        return None
+    else:
+        es_número_entero = isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
+        if not es_número_entero:
+            raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un número entero.')
+        
+        valor_int = int(valor)
+        if valor_int <= 0:
+            raise DatoInválidoException(mensaje + 'debe ser un número entero positivo.')
+        
+        return valor_int
 
 def debería_ser_time(valor: time|Any, mensaje: str) -> time:
     '''

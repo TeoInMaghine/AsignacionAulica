@@ -1,5 +1,4 @@
 from datetime import time, date, datetime
-import openpyxl
 import pytest
 
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException

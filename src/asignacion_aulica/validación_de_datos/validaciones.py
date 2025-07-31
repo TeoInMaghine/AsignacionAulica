@@ -4,6 +4,9 @@ from typing import Any
 from asignacion_aulica.lógica_de_asignación.día import Día
 from .excepciones import DatoInválidoException
 
+def _es_número_entero(valor: int|str|Any) -> bool:
+    return isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
+
 def _validar_no_vacío(valor: Any, mensaje: str) -> Any:
     '''
     Validar que `valor` no sea `None` ni un string vacío.
@@ -61,8 +64,7 @@ def validar_año(valor: int|str|Any, mensaje: str) -> int:
     '''
     _validar_no_vacío(valor, mensaje)
 
-    es_número_entero = isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
-    if not es_número_entero:
+    if not _es_número_entero(valor):
         raise DatoInválidoException(mensaje + 'no se reconoce como un número de año (debe ser un número entero).')
     
     valor = int(valor)
@@ -84,15 +86,14 @@ def validar_año_del_plan_de_estudios(valor: int|str|Any, mensaje) -> int:
     '''
     _validar_no_vacío(valor, mensaje)
 
-    es_número_entero = isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
-    if not es_número_entero:
+    if not _es_número_entero(valor):
         raise DatoInválidoException(mensaje + f'"{valor} no se reconoce como un año del plan de estudios (debe ser un número entero).')
     
-    valor = int(valor)
-    if not 0 < valor < 10:
+    valor_int = int(valor)
+    if not 0 < valor_int < 10:
         raise DatoInválidoException(mensaje + f'"{valor} no se reconoce como un año del plan de estudios (debe estar entre 1 y 9).')
     
-    return valor
+    return valor_int
 
 def validar_día(valor: str|Any, mensaje: str) -> Día:
     '''
@@ -109,18 +110,18 @@ def validar_día(valor: str|Any, mensaje: str) -> Día:
     elif not isinstance(valor, str):
         raise DatoInválidoException(mensaje + 'no se reconoce como un día de la semana.')
     
-    valor_mayus = valor.upper()
+    valor_mayúculas = valor.upper()
 
     # Permitir que les falte la tilde
-    if valor_mayus == 'MIERCOLES':
-        valor_mayus = 'MIÉRCOLES'
-    elif valor_mayus == 'SABADO':
-        valor_mayus = 'SÁBADO'
+    if valor_mayúculas == 'MIERCOLES':
+        valor_mayúculas = 'MIÉRCOLES'
+    elif valor_mayúculas == 'SABADO':
+        valor_mayúculas = 'SÁBADO'
     
-    if valor_mayus not in Día:
+    if valor_mayúculas not in Día:
         raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un día de la semana.')
     
-    return Día[valor_mayus]
+    return Día[valor_mayúculas]
 
 def validar_int_positivo_opcional(valor: int|str|None|Any, mensaje: str) -> int|None:
     '''
@@ -138,8 +139,7 @@ def validar_int_positivo_opcional(valor: int|str|None|Any, mensaje: str) -> int|
     if valor is None or valor == '':
         return None
     else:
-        es_número_entero = isinstance(valor, int) or (isinstance(valor, str) and valor.isdigit())
-        if not es_número_entero:
+        if not _es_número_entero(valor):
             raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un número entero.')
         
         valor_int = int(valor)

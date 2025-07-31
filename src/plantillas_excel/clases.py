@@ -25,6 +25,7 @@ from openpyxl import Workbook
 import sys
 
 from estilos import (
+    format_column_as_24hs_time,
     get_logo,
     fill_rojo_unrn,
     font_default,
@@ -66,6 +67,9 @@ COLUMNAS = (
 
 n_columnas = len(COLUMNAS)
 última_columna = get_column_letter(n_columnas)
+
+# Cantidad de filas a las que aplicar formato
+n_filas = 200
 
 def insertar_preámbulo(hoja: Worksheet):
     # Configurar tamaño de las filas
@@ -181,7 +185,11 @@ def insertar_tabla(hoja: Worksheet):
     día_de_la_semana.add(f'F{fila_header+1}:F1048576') # Día
     horario.add(f'G{fila_header+1}:G1048576') # Horario de inicio
     horario.add(f'H{fila_header+1}:H1048576') # Horario de fin
-    número_natural.add(f'I{fila_header+1}:I1048576') # Cupo 
+    número_natural.add(f'I{fila_header+1}:I1048576') # Cupo
+
+    # Configurar formato de las columnas de tiempo
+    format_column_as_24hs_time(hoja, 7, fila_header + 1, fila_header + n_filas)
+    format_column_as_24hs_time(hoja, 8, fila_header + 1, fila_header + n_filas)
 
 def crear_plantilla() -> Workbook:
     plantilla = Workbook()

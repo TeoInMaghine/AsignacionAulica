@@ -1,4 +1,5 @@
 from openpyxl.styles import PatternFill, Border, Side, Alignment, Font, Fill
+from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils.units import points_to_pixels
 from openpyxl.drawing.image import Image
 from copy import copy
@@ -36,3 +37,12 @@ def get_logo(height_points):
     imagen.width *= scale_ratio
 
     return imagen
+
+def format_column_as_24hs_time(
+    sheet: Worksheet,
+    column_index: int,
+    start_row: int,
+    end_row: int
+    ):
+    for i in range(start_row, end_row):
+        sheet.cell(i, column_index).number_format = 'HH:MM'

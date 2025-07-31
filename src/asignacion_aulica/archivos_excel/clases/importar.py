@@ -97,7 +97,7 @@ def leer_tabla(hoja: Worksheet) -> list[Clase]:
             cuatrimestral_o_anual =      str_posiblemente_vacío(fila[ 2].value)
             comisión =                   str_posiblemente_vacío(fila[ 3].value)
             teórica_o_práctica =         str_posiblemente_vacío(fila[ 4].value)
-            día =                                   validar_día(fila[ 5].value, f'Ena celda {_cell_coordinates(fila[5])}: ')
+            día =                                   validar_día(fila[ 5].value, f'En la celda {_cell_coordinates(fila[5])}: ')
             horario_inicio =                   debería_ser_time(fila[ 6].value, f'En la celda {_cell_coordinates(fila[6])}: ')
             horario_fin =                      debería_ser_time(fila[ 7].value, f'En la celda {_cell_coordinates(fila[7])}: ')
             cantidad_de_alumnos = validar_int_positivo_opcional(fila[ 8].value, f'En la celda {_cell_coordinates(fila[8])}: el cupo ')

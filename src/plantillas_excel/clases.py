@@ -33,12 +33,10 @@ from estilos import (
     font_default,
     font_preámbulo,
     font_bold,
-    centrado,
     a_la_derecha,
     a_la_izquierda,
     borde_blanco,
-    borde_negro,
-    todos_los_bordes_negros
+    borde_negro
 )
 
 from validadores import (

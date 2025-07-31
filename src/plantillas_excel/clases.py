@@ -25,12 +25,14 @@ from openpyxl import Workbook
 import sys
 
 from estilos import (
-    format_column_as_24hs_time,
     get_logo,
+    estilo_header,
+    estilo_horarios,
+    estilo_tabla,
     fill_rojo_unrn,
     font_default,
-    font_bold,
     font_preámbulo,
+    font_bold,
     centrado,
     a_la_derecha,
     a_la_izquierda,
@@ -158,10 +160,7 @@ def insertar_tabla(hoja: Worksheet):
 
     # Configurar estilo de los nombres
     for i in range(1, n_columnas+1):
-        cell = hoja.cell(fila_header, i)
-        cell.font = font_bold
-        cell.alignment = centrado
-        cell.border = todos_los_bordes_negros
+        cell = hoja.cell(fila_header, i).style = estilo_header
     
     # Ajustar tamaños de las columnas (los números fueron calibrados por prueba y error)
     font_size_ratio = font_bold.size / 11
@@ -187,9 +186,14 @@ def insertar_tabla(hoja: Worksheet):
     horario.add(f'H{fila_header+1}:H1048576') # Horario de fin
     número_natural.add(f'I{fila_header+1}:I1048576') # Cupo
 
-    # Configurar formato de las columnas de tiempo
-    format_column_as_24hs_time(hoja, 7, fila_header + 1, fila_header + n_filas)
-    format_column_as_24hs_time(hoja, 8, fila_header + 1, fila_header + n_filas)
+    # Configurar estilo de la tabla hasta la fila n_filas
+    columnas_horario = (7, 8)
+    for row in range(fila_header + 1, fila_header + n_filas):
+        for col in range(1, n_columnas):
+            if col in columnas_horario:
+                hoja.cell(row, col).style = estilo_horarios
+            else:
+                hoja.cell(row, col).style = estilo_tabla
 
 def crear_plantilla() -> Workbook:
     plantilla = Workbook()

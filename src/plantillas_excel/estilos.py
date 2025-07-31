@@ -1,4 +1,4 @@
-from openpyxl.styles import PatternFill, Border, Side, Alignment, Font, Fill
+from openpyxl.styles import NamedStyle, PatternFill, Border, Side, Alignment, Font, Fill
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils.units import points_to_pixels
 from openpyxl.drawing.image import Image
@@ -30,6 +30,10 @@ borde_negro_grueso = Side(border_style='medium', color='000000')
 borde_blanco = Side(border_style='thin', color='FFFFFF')
 todos_los_bordes_negros = Border(top=borde_negro, bottom=borde_negro, left=borde_negro, right=borde_negro)
 
+estilo_header = NamedStyle(name='header', font=font_bold, border=todos_los_bordes_negros, alignment=centrado)
+estilo_tabla = NamedStyle(name='tabla', font=font_default, alignment=centrado)
+estilo_horarios = NamedStyle(name='horarios', font=font_default, alignment=centrado, number_format='HH:MM')
+
 def get_logo(height_points):
     imagen = Image(logo_path)
     scale_ratio = points_to_pixels(height_points) / imagen.height
@@ -37,12 +41,3 @@ def get_logo(height_points):
     imagen.width *= scale_ratio
 
     return imagen
-
-def format_column_as_24hs_time(
-    sheet: Worksheet,
-    column_index: int,
-    start_row: int,
-    end_row: int
-    ):
-    for i in range(start_row, end_row):
-        sheet.cell(i, column_index).number_format = 'HH:MM'

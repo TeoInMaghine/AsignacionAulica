@@ -26,6 +26,10 @@ COLUMNAS = (
 )
 
 def _cell_coordinates(cell: Cell) -> str:
+    '''
+    Dada una celda, devuelve sus coordenadas en un formato legible para el usuario.
+    Por ejemplo: F5.
+    '''
     return cell.column_letter+str(cell.row)
 
 def _separar_celdas_unidas(hoja: Worksheet, min_row: int):

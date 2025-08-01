@@ -85,3 +85,4 @@ def test_asignación_imposible_por_aula_cerrada(aulas, clases):
 def test_asignación_imposible_por_equipamiento(aulas, clases):
     with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
         lógica_de_asignación.asignar(clases, aulas)
+

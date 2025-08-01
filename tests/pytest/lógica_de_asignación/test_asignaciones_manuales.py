@@ -102,7 +102,7 @@ def test_una_asignación_y_varias_superposiciones(aulas, clases):
     assert clases.at[0, 'aula_asignada'] == 1
     assert all ( clases.loc[[1, 2, 3, 4], 'aula_asignada'] != 1 )
 
-@pytest.mark.aulas(*[{}]*10) # Re críptico pero esto significa 10 aulas con valores deafut
+@pytest.mark.aulas(*[{}]*10) # Re críptico pero esto significa 10 aulas con valores default
 @pytest.mark.clases(
     dict(día=Día.MARTES, horario_inicio=10, horario_fin=13),
     dict(día=Día.MARTES, horario_inicio=10, horario_fin=13, aula_asignada=1), # Mismo horario
@@ -174,7 +174,7 @@ def test_asignaciones_manuales_que_inclumplen_restricciones(aulas, clases):
     assert clases.at[7, 'aula_asignada'] == 3
     assert clases.at[8, 'aula_asignada'] == 3
 
-@pytest.mark.aulas(*[{}]*5) # Re críptico pero esto significa 5 aulas con valores deafut
+@pytest.mark.aulas(*[{}]*5) # Re críptico pero esto significa 5 aulas con valores default
 @pytest.mark.clases(
     dict(aula_asignada=1),
     dict(aula_asignada=3),

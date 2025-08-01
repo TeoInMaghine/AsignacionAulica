@@ -20,14 +20,11 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "clases: marca para pasar parametros al fixture clases")
     config.addinivalue_line("markers", "asignaciones_forzadas: marca para pasar parametros al fixture asignaciones")
 
-@pytest.fixture
-def aulas(request) -> DataFrame:
+def _aulas(aulas) -> DataFrame:
     '''
-    Recibe en el marker "aulas" una tupla de diccionarios con datos
-    (posiblemente incompletos) de aulas.
+    Recibe datos de las aulas (posiblemente incompletos) y los rellena con valores por defecto.
 
-    Rellena esos datos con valores por defecto.
-    
+    :param aulas: Tupla de diccionarios con datos (posiblemente incompletos) de aulas.
     :return: Un DataFrame con el formato esperado por lógica_de_asignación.
     '''
     default_values = {
@@ -46,18 +43,26 @@ def aulas(request) -> DataFrame:
         }
     }
 
-    data = request.node.get_closest_marker('aulas').args
-
-    return DataFrame.from_records(default_values | explicit_values for explicit_values in data)
+    return DataFrame.from_records(default_values | explicit_values for explicit_values in aulas)
 
 @pytest.fixture
-def clases(request) -> DataFrame:
+def aulas(request) -> DataFrame:
     '''
-    Recibe en el marker "clases" una tupla de diccionarios con datos
-    (posiblemente incompletos) de clases.
+    Recibe en el marker "aulas" una tupla de diccionarios con datos
+    (posiblemente incompletos) de aulas.
 
     Rellena esos datos con valores por defecto.
-    
+
+    :return: Un DataFrame con el formato esperado por lógica_de_asignación.
+    '''
+    data = request.node.get_closest_marker('aulas').args
+    return _aulas(data)
+
+def _clases(clases) -> DataFrame:
+    '''
+    Recibe datos de las clases (posiblemente incompletos) y los rellena con valores por defecto.
+
+    :param clases: Tupla de diccionarios con datos (posiblemente incompletos) de clases.
     :return: Un DataFrame con el formato esperado por lógica_de_asignación.
     '''
     default_values = {
@@ -71,13 +76,25 @@ def clases(request) -> DataFrame:
         'aula_asignada': None
     }
 
-    clases = request.node.get_closest_marker('clases').args
     data = {
         columna: [clase.get(columna, default) for clase in clases]
         for columna, default in default_values.items()
     }
 
     return DataFrame(data, dtype=object)
+
+@pytest.fixture
+def clases(request) -> DataFrame:
+    '''
+    Recibe en el marker "clases" una tupla de diccionarios con datos
+    (posiblemente incompletos) de clases.
+
+    Rellena esos datos con valores por defecto.
+    
+    :return: Un DataFrame con el formato esperado por lógica_de_asignación.
+    '''
+    clases = request.node.get_closest_marker('clases').args
+    return _clases(clases)
 
 @pytest.fixture
 def modelo() -> CpModel:

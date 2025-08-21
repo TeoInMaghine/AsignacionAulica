@@ -1,2 +1,2 @@
 from .impossible_assignment_exception import ImposibleAssignmentException
-from .asignar import asignar
+from .asignación import asignar

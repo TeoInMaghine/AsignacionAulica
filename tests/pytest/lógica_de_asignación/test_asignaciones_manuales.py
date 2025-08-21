@@ -1,6 +1,6 @@
 import pytest
 
-from asignacion_aulica.lógica_de_asignación.asignar import separar_asignaciones_manuales, asignar
+from asignacion_aulica.lógica_de_asignación.asignación import separar_asignaciones_manuales, asignar
 from asignacion_aulica.lógica_de_asignación.restricciones import no_asignar_aulas_ocupadas
 from asignacion_aulica.lógica_de_asignación import ImposibleAssignmentException
 from asignacion_aulica.lógica_de_asignación.dia import Día

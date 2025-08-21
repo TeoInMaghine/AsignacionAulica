@@ -86,3 +86,22 @@ def test_asignación_imposible_por_equipamiento(aulas, clases):
     with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
         lógica_de_asignación.asignar(clases, aulas)
 
+@pytest.mark.aulas(
+    dict(preferir_no_usar=True),
+    dict(preferir_no_usar=False),
+    dict(preferir_no_usar=True),
+    dict(preferir_no_usar=False)
+)
+@pytest.mark.clases(
+    dict(cantidad_de_alumnos=15),
+    dict(cantidad_de_alumnos=23),
+    dict(cantidad_de_alumnos=2)
+)
+def test_evita_edificios_no_deseables(aulas, clases):
+    lógica_de_asignación.asignar(clases, aulas)
+
+    # Debería minimizar el uso de edificios no deseables poniendo las dos
+    # clases grandes en aulas buenas y la clase chica en un aula mala.
+    assert clases.at[0, 'aula_asignada'] in {1, 3}
+    assert clases.at[1, 'aula_asignada'] in {1, 3}
+    assert clases.at[2, 'aula_asignada'] in {0, 2}

@@ -63,6 +63,8 @@ def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[
         - nombre: str
         - capacidad: int
         - equipamiento: set[str]
+        - preferir_no_usar: bool (indica si el aula pertenece a un edificio no
+          deseable)
         - horarios: dict[Día, tuple[int, int]]
           Mapea días de la semana a tuplas (apertura, cierre). Los días que no
           están en el diccionario se considera que el aula está cerrada.

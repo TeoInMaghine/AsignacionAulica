@@ -169,11 +169,45 @@ def obtener_capacidad_sobrante(
 
     return capacidad_sobrante_total, cota_superior_total
 
+def obtener_cantidad_de_alumnos_en_edificios_no_deseables(
+        clases: DataFrame,
+        aulas: DataFrame,
+        modelo: cp_model.CpModel,
+        asignaciones: np.ndarray
+    ) -> tuple[LinearExpr, int]:
+    '''
+    Devuelve una expresión que representa la cantidad de alumnos que cursan en
+    edificios no deseables, y una cota superior de la expresión.
+    '''
+    aulas_de_edificios_no_deseables = aulas.index[aulas['preferir_no_usar']]
+
+    cantidad_de_alumnos_en_edificios_no_deseables = 0
+    cota_superior = 0
+
+    for clase in clases.itertuples():
+        # Esta lógica asume que no va a haber asignaciones en 1 nunca;
+        # que van a ser 0 (asignaciones prohibidas) o variables del modelo.
+        asignaciones_a_edificios_no_deseables = asignaciones[clase.Index, aulas_de_edificios_no_deseables]
+        puede_estar_en_edificio_no_deseable = any(map(lambda x: isinstance(x, cp_model.IntVar), asignaciones_a_edificios_no_deseables))
+
+        if puede_estar_en_edificio_no_deseable:
+            está_en_aula_no_deseable = sum(asignaciones_a_edificios_no_deseables)
+            cantidad_de_alumnos_en_edificios_no_deseables += clase.cantidad_de_alumnos * está_en_aula_no_deseable
+            cota_superior += clase.cantidad_de_alumnos
+
+    # Evitamos que la cota superior sea 0 porque luego se usa para dividir
+    if cota_superior == 0:
+        cota_superior = 1
+
+    return cantidad_de_alumnos_en_edificios_no_deseables, cota_superior
+
+
 # Iterable de tuplas (peso, función)
 todas_las_penalizaciones = (
-    (100,  obtener_cantidad_de_clases_fuera_del_edificio_preferido),
     (1000, obtener_cantidad_de_alumnos_fuera_del_aula),
-    (1, obtener_capacidad_sobrante),
+    (100,  obtener_cantidad_de_clases_fuera_del_edificio_preferido),
+    (10,   obtener_cantidad_de_alumnos_en_edificios_no_deseables),
+    (1,    obtener_capacidad_sobrante)
 )
 
 def obtener_penalización(
@@ -183,8 +217,8 @@ def obtener_penalización(
         asignaciones: np.ndarray
     ):
     '''
-    Calcula la suma de todas las penalizaciones con sus pesos,
-    y normalizadas usando sus cotas máximas.
+    Calcula la suma de todas las penalizaciones con sus pesos, y normalizadas
+    usando sus cotas máximas.
 
     :param clases: Tabla con los datos de las clases.
     :param aulas: Tabla con los datos de las aulas.

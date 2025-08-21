@@ -4,7 +4,7 @@ from pandas import DataFrame
 
 from asignacion_aulica.lógica_de_asignación.dia import Día
 from asignacion_aulica import lógica_de_asignación
-from conftest import _aulas, _clases
+from conftest import make_aulas, make_clases
 
 @pytest.fixture
 def aulas_generadas(
@@ -33,7 +33,7 @@ def aulas_generadas(
             'edificio': i % edificios_count,
         })
 
-    return _aulas(aulas_params)
+    return make_aulas(aulas_params)
 
 @pytest.fixture
 def clases_generadas(
@@ -73,7 +73,7 @@ def clases_generadas(
 
     logging.info(f'Cantidad de clases: {len(clases_params)}.')
 
-    return _clases(clases_params)
+    return make_clases(clases_params)
 
 # NOTE: Esta forma de parametrizar no está muy claramente documentada, la
 # encontré de casualidad en StackOverflow, pero la fuente primaria sería esta:

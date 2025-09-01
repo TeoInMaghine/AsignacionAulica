@@ -1,6 +1,5 @@
-from PySide6.QtGui import QGuiApplication, QFontDatabase, QIcon
-from PySide6.QtQuickControls2 import QQuickStyle
-from PySide6.QtQml import QQmlApplicationEngine
+from PyQt6.QtGui import QGuiApplication, QFontDatabase, QIcon
+from PyQt6.QtQml import QQmlApplicationEngine
 from pathlib import Path
 import sys, os
 
@@ -15,10 +14,9 @@ def configurar_fuente_por_defecto():
     QGuiApplication.setFont(default_font)
 
 def main() -> int:
-    app = QGuiApplication(sys.argv)
+    app = QGuiApplication(sys.argv + ['-style', 'Basic'])
     icono = QIcon(assets.get_path('iconos', 'unrn.ico'))
     app.setWindowIcon(icono)
-    QQuickStyle.setStyle('Basic')
 
     configurar_fuente_por_defecto()
 

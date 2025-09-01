@@ -1,11 +1,6 @@
-name: flet build windows
+name: Build For Windows
 
 on: workflow_dispatch
-
-env:
-  # Disables rich text formatting in Flet CLI output
-  FLET_CLI_NO_RICH_OUTPUT: 1
-  PYTHONUTF8: 1
 
 jobs:
   build-windows:
@@ -28,19 +23,34 @@ jobs:
           echo "PROJECT_VERSION=$PROJECT_VERSION"
           echo "PROJECT_VERSION=$PROJECT_VERSION" >> $env:GITHUB_ENV
 
+          # Copy the version number into the installer configuration
+          (Get-Content .\instalador.iss) | ForEach-Object { $_ -replace "AppVersion=esto se completa en el CI", "AppVersion=$PROJECT_VERSION" } | Set-Content .\instalador.iss
+
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: ${{ env.PYTHON_VERSION }}
-
+          
       - name: Build Windows App
         shell: pwsh
-        run: .\build.ps1
+        run: |
+          pip install .[build]
+          cxfreeze build --verbose
+      
+      - name: Make an installer
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: instalador.iss
+
+      - name: Log created files
+        run: |
+          ls build
+          ls .\
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4.3.4
         with:
-          name: asignacion-aulica-${{ env.PROJECT_VERSION }}-windows
-          path: build/windows
+          name: Instalador-AsignaciónÁulica-${{ env.PROJECT_VERSION }}
+          path: .\Instalador-AsignaciónÁulica.exe
           if-no-files-found: warn
           overwrite: false

@@ -1,7 +1,7 @@
 [project]
 name = "asignacion-aulica"
 description = "Software de asignación de aulas para la UNRN Sede Andina"
-version = "0.0.2"
+version = "0.1.0"
 
 authors = [
   {name = "Cristian Gustavo Mogensen"},
@@ -15,24 +15,24 @@ dependencies = [
   "pandas == 2.2.*",
   "numpy == 2.2.*",
   "ortools == 9.12.*",
-  "openpyxl == 3.1.*",
-  "pillow == 11.3.*",
-  "flet == 0.28.3"
+  "pyside6 == 6.9.*"
 ]
 
 [project.optional-dependencies]
-test = [
-  "pytest ~= 8.3"
-]
+test = ["pytest == 8.3.*"]
+build = ["cx_freeze == 8.4.*"]
+excel = ["openpyxl == 3.1.*", "pillow == 11.3.*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/pytest"]
 minversion = "8.3"
 
-[tool.flet]
-company = "UNRN"
-org = "ar.edu.unrn"
-product = "Asignacion Aulica"
+[tool.cxfreeze]
+executables = [
+    {script = "src/asignacion_aulica/main.py", base = "gui"}
+]
 
-[tool.flet.app]
-path = "src"
+[tool.cxfreeze.build_exe]
+build_exe = "build/AsignaciónÁulica"
+include_files = "assets,src/asignacion_aulica/GUI/QML"
+silent_level = 1

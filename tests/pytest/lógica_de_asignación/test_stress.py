@@ -95,6 +95,6 @@ def test_stress_asignación_posible(aulas_generadas, clases_generadas):
    [(             10,          100,         30,             31,                    100)]
 )
 def test_stress_asignación_imposible(aulas_generadas, clases_generadas):
-    with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
+    with pytest.raises(lógica_de_asignación.AsignaciónImposibleException):
         lógica_de_asignación.asignar(clases_generadas, aulas_generadas)
 

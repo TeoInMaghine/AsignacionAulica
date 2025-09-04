@@ -71,19 +71,19 @@ def test_horarios_no_solapan(aulas, clases):
         dict(horario_inicio=9, horario_fin=11, día=Día.LUNES)
     )
 def test_asignación_imposible_por_solapamiento_inevitable(aulas, clases):
-    with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
+    with pytest.raises(lógica_de_asignación.AsignaciónImposibleException):
         lógica_de_asignación.asignar(clases, aulas)
 
 @pytest.mark.aulas( dict(horarios={Día.LUNES: (8, 23)}) )
 @pytest.mark.clases( dict(horario_inicio=7, horario_fin=9, día=Día.LUNES) )
 def test_asignación_imposible_por_aula_cerrada(aulas, clases):
-    with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
+    with pytest.raises(lógica_de_asignación.AsignaciónImposibleException):
         lógica_de_asignación.asignar(clases, aulas)
 
 @pytest.mark.aulas( dict(capacidad=60) )
 @pytest.mark.clases( dict(día=Día.LUNES, cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}) )
 def test_asignación_imposible_por_equipamiento(aulas, clases):
-    with pytest.raises(lógica_de_asignación.ImposibleAssignmentException):
+    with pytest.raises(lógica_de_asignación.AsignaciónImposibleException):
         lógica_de_asignación.asignar(clases, aulas)
 
 @pytest.mark.aulas(

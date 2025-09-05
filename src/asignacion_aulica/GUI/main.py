@@ -1,7 +1,8 @@
 from PyQt6.QtGui import QGuiApplication, QFontDatabase, QIcon
-from PyQt6.QtQml import QQmlApplicationEngine
+from PyQt6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from pathlib import Path
 import sys, os
+from asignacion_aulica.GUI.table_view import TableModel
 
 from asignacion_aulica import assets
 
@@ -17,6 +18,8 @@ def main() -> int:
     app = QGuiApplication(sys.argv + ['-style', 'Basic'])
     icono = QIcon(assets.get_path('iconos', 'unrn.ico'))
     app.setWindowIcon(icono)
+
+    qmlRegisterType(TableModel, 'IDontKnowMan', 1, 0, 'OurTableBitch')
 
     configurar_fuente_por_defecto()
 

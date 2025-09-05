@@ -9,6 +9,7 @@ class Clase:
     # Datos obligatorios:
     año: int # Año dentro del plan de estudios de la carrera
     materia: str
+    carrera: str
     día: Día
     horario_inicio: time
     horario_fin: time

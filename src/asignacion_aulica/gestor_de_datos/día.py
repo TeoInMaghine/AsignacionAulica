@@ -1,4 +1,4 @@
-from enum import Enum, StrEnum, auto
+from enum import StrEnum
 
 class Día(StrEnum):
     LUNES = 'Lunes'
@@ -8,7 +8,3 @@ class Día(StrEnum):
     VIERNES = 'Viernes'
     SÁBADO = 'Sábado'
     DOMINGO = 'Domingo'
-
-class PeriodoDeClases(Enum):
-    CUATRIMESTRAL = auto()
-    ANUAL = auto()

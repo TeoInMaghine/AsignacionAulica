@@ -1,3 +1,5 @@
+from typing import Optional
+
 from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio, Carrera, Clase
 from asignacion_aulica.lógica_de_asignación import AsignaciónImposibleException
 from asignacion_aulica.gestor_de_datos.enums import Día, PeriodoDeClases
@@ -48,4 +50,45 @@ class GestorDeDatos:
         # Nota: Este método debería llamar a archivos_excel.clases.importar,
         # y actualizar la base de datos con el resultado.
         # (El módulo archivos_excel todavía no existe, ver Issue #52)
+        pass
+
+    def exportar_clases_a_excel(self, path: str, carrera: Optional[str] = None):
+        '''
+        Escribir los datos de las clases (incluyendo la asignación de aulas) en
+        un archivo excel.
+
+        Si se especifica el nombre de una carrera, se exportan solamente las
+        clases de esa carrera. Si no se especifica el nombre de una carrera, se
+        exportan los datos de todas las carreras, una en cada hoja del archivo.
+
+        :param path: El path absoluto del archivo.
+        :param carrera: El nombre de una carrera, o None.
+
+        :raise ValueError: Si `carrera` no es `None` y no es el nombre de una
+        carrera que existe.
+        :raise TBD: Si no se puede escribir el archivo en el path dado.
+        '''
+        # Nota: Este método debería llamar a archivos_excel.clases.exportar.
+        # (El módulo archivos_excel todavía no existe, ver Issue #74)
+        pass
+
+    def exportar_cronograma_de_edificios_a_excel(self, path: str, edificio: Optional[str] = None):
+        '''
+        Generar un archivo excel con el cronograma de cada aula en formato de
+        línea de tiempo.
+
+        Si se especifica el nombre de un edificio, se genera solamente el
+        cronograma de ese edificio. Si no se especifica el nombre de un
+        edificio, se generan los cronogramas de todos los edificios, uno en cada
+        hoja del archivo.
+
+        :param path: El path absoluto del archivo.
+        :param edificio: El nombre de un edificio, o None.
+
+        :raise ValueError: Si `edificio` no es `None` y no es el nombre de un
+        edificio que existe.
+        :raise TBD: Si no se puede escribir el archivo en el path dado.
+        '''
+        # Nota: Este método debería llamar a archivos_excel.cronograma.exportar.
+        # (El módulo archivos_excel todavía no existe, ver Issue #75)
         pass

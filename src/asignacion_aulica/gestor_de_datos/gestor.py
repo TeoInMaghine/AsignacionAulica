@@ -1,13 +1,12 @@
-from typing import Optional
+from collections.abc import Iterable
 
-from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio, Carrera, Clase
+from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio, Carrera, Materia, Clase
 from asignacion_aulica.lógica_de_asignación import AsignaciónImposibleException
-from asignacion_aulica.gestor_de_datos.enums import Día, PeriodoDeClases
 
 class GestorDeDatos:
     '''
-    Objeto encargado de administrar todos los datos de edificios, clases, y
-    aulas.
+    Objeto encargado de administrar todos los datos de edificios, aulas, y
+    clases.
 
     Internamente usa una base de datos para almacenar los datos de manera
     persistente.
@@ -20,6 +19,170 @@ class GestorDeDatos:
         '''
         pass
 
+    def get_edificios(self) -> Iterable[Edificio]:
+        '''
+        :return: Un iterable de todos los edificios en la base de datos.
+        '''
+        pass
+
+    def get_edificio(self, nombre: str) -> Edificio:
+        '''
+        :return: El edificio con el nombre dado.
+        :raise KeyError: Si no existe un edificio con el nombre dado.
+        '''
+        pass
+
+    def existe_edificio(self, nombre: str) -> bool:
+        '''
+        :return: `True` si hay un edificio con ese nombre en la base de datos,
+        `False` si no.
+        '''
+        pass
+
+    def set_edificio(self, edificio: Edificio):
+        '''
+        Actualizar la base de datos con el edificio dado.
+
+        Si ya existe un edificio con el mismo nombre, se sobreescriben sus
+        valores. Si no existe un edificio con el mismo nombre, se agrega.
+        '''
+        pass
+
+    def get_aulas(self, edificio: str) -> Iterable[Aula]:
+        '''
+        :return: Un iterable de todas las aulas pertenecientes al edificio dado.
+        :raise KeyError: Si no existe un edificio con el nombre dado.
+        '''
+        pass
+
+    def get_aula(self, edificio: str, nombre: str) -> Aula:
+        '''
+        :return: El aula con el nombre dado.
+        :raise KeyError: Si no existe un aula con el nombre dado en ese edificio.
+        '''
+        pass
+
+    def existe_aula(self, edificio: str, nombre: str) -> bool:
+        '''
+        :return: `True` si hay un aula con ese nombre en ese edificio , `False`
+        si no.
+        :raise KeyError: Si no existe un edificio con ese nombre.
+        '''
+        pass
+
+    def set_aula(self, edificio: str, aula: Aula):
+        '''
+        Actualizar la base de datos con el aula dada en el edificio dado.
+
+        Si ya existe un aula con el mismo nombre en ese edificio, se
+        sobreescriben sus valores. Si no existe un aula con el mismo nombre en
+        ese edificio, se agrega.
+
+        :raise KeyError: Si no existe un edificio con ese nombre.
+        '''
+        pass
+    
+    def get_carreras(self) -> Iterable[Carrera]:
+        '''
+        :return: Un iterable de todas las carreras en la base de datos.
+        '''
+        pass
+
+    def get_carrera(self, nombre: str) -> Carrera:
+        '''
+        :return: La carrera con el nombre dado.
+        :raise KeyError: Si no existe una carrera con ese nombre.
+        '''
+        pass
+    
+    def existe_carrera(self, nombre: str) -> bool:
+        '''
+        :return: `True` si hay una carrera con ese nombre, `False` si no.
+        '''
+        pass
+
+    def set_carrera(self, carrera: Carrera):
+        '''
+        Actualizar la base de datos con la carrera dada.
+
+        Si ya existe una carrera con el mismo nombre, se sobreescriben sus
+        valores. Si no existe una carrera con el mismo nombre, se agrega.
+        '''
+        pass
+
+    def get_materias(self, carrera: str) -> Iterable[Materia]:
+        '''
+        :return: Un iterable de todas las materias de la carrera dada.
+        :raise KeyError: Si no existe una carrera con el nombre dado.
+        '''
+        pass
+
+    def get_materia(self, carrera: str, nombre: str) -> Materia:
+        '''
+        :return: La materia con el nombre dado.
+        :raise KeyError: Si no existe una materia con el nombre dado en esa
+        carrera.
+        '''
+        pass
+
+    def existe_materia(self, carrera: str, nombre: str) -> bool:
+        '''
+        :return: `True` si hay una materia con ese nombre en esa carrera,
+        `False` si no.
+        :raise KeyError: Si no existe una carrera con ese nombre.
+        '''
+        pass
+
+    def set_materia(self, carrera: str, materia: Materia):
+        '''
+        Actualizar la base de datos con la materia dada en la carrera dada.
+
+        Si ya existe una materia con el mismo nombre en esa carrera, se
+        sobreescriben sus valores. Si no existe una materia con el mismo nombre
+        en esa carrera, se agrega.
+
+        :raise KeyError: Si no existe una carrera con ese nombre.
+        '''
+        pass
+    
+    def get_clases(self, carrera: str, materia: str) -> Iterable[Clase]:
+        '''
+        :return: Un iterable de todas las clases de la materia dada.
+        :raise KeyError: Si no existe una materia con el nombre dado en la
+        carrera dada.
+        '''
+        pass
+
+    def get_clase(self, carrera: str, materia: str, id: int) -> Clase:
+        '''
+        :return: La clase con el id dado.
+        :raise KeyError: Si no existe una clase con el id dado en esa materia y
+        carrera.
+        '''
+        pass
+
+    def nuevo_id_para_clase(self, carrera: str, materia: str) -> int:
+        '''
+        :return: Un id que actualmente no existe, para una nueva clase en la
+        materia dada.
+        :raise KeyError: Si no existe una materia con el nombre dado en esa
+        carrera.
+        '''
+        pass
+
+    def set_clase(self, carrera: str, materia: str, clase: Clase):
+        '''
+        Actualizar la base de datos con la clase dada en la materia dada.
+
+        Si ya existe una clase con el mismo id en esa carrera, se
+        sobreescriben sus valores. Si no existe una materia con el mismo nombre
+        en esa carrera, se agrega.
+        
+        :raise KeyError: Si no existe una materia con el nombre dado en esa
+        carrera.
+        '''
+        pass
+    
     def asignar_aulas(self):
         '''
         Asignar aulas a todas las clases que no tengan una asignación forzada.
@@ -35,10 +198,10 @@ class GestorDeDatos:
 
     def importar_clases_de_excel(self, path: str):
         '''
-        Leer datos de clases de un archivo excel e incorporarlos a la base de
-        datos.
+        Leer datos de carreras, materias y clases de un archivo excel e
+        incorporarlos a la base de datos.
 
-        TODO: Decidir si esta acción debería sobreescribir clases que ya existen
+        TODO: Decidir si esta acción debería sobreescribir cosas que ya existen
         o tirar una excepción o qué hacer.
 
         :param path: El path absoluto del archivo.
@@ -52,7 +215,7 @@ class GestorDeDatos:
         # (El módulo archivos_excel todavía no existe, ver Issue #52)
         pass
 
-    def exportar_clases_a_excel(self, path: str, carrera: Optional[str] = None):
+    def exportar_clases_a_excel(self, path: str, carrera: str|None = None):
         '''
         Escribir los datos de las clases (incluyendo la asignación de aulas) en
         un archivo excel.
@@ -62,7 +225,7 @@ class GestorDeDatos:
         exportan los datos de todas las carreras, una en cada hoja del archivo.
 
         :param path: El path absoluto del archivo.
-        :param carrera: El nombre de una carrera, o None.
+        :param carrera: El nombre de una carrera, o `None`.
 
         :raise ValueError: Si `carrera` no es `None` y no es el nombre de una
         carrera que existe.
@@ -72,7 +235,7 @@ class GestorDeDatos:
         # (El módulo archivos_excel todavía no existe, ver Issue #74)
         pass
 
-    def exportar_cronograma_de_edificios_a_excel(self, path: str, edificio: Optional[str] = None):
+    def exportar_cronograma_de_edificios_a_excel(self, path: str, edificio: str|None = None):
         '''
         Generar un archivo excel con el cronograma de cada aula en formato de
         línea de tiempo.
@@ -83,7 +246,7 @@ class GestorDeDatos:
         hoja del archivo.
 
         :param path: El path absoluto del archivo.
-        :param edificio: El nombre de un edificio, o None.
+        :param edificio: El nombre de un edificio, o `None`.
 
         :raise ValueError: Si `edificio` no es `None` y no es el nombre de un
         edificio que existe.

@@ -1,7 +1,6 @@
-// import Qt.labs.qmlmodels
 import QtQuick
 import QtQuick.Controls
-import IDontKnowMan
+import Custom
 
 TableView {
     anchors.fill: parent
@@ -9,7 +8,7 @@ TableView {
     rowSpacing: 1
     clip: true
 
-    model: OurTableBitch {
+    model: Table {
     }
 
     selectionModel: ItemSelectionModel {}
@@ -30,9 +29,6 @@ TableView {
 
                TableView.onCommit: {
                    display = text
-                   // 'display = text' is short-hand for:
-                   // let index = TableView.view.index(row, column)
-                   // TableView.view.model.setData(index, "display", text)
                }
        }
     }

@@ -1,6 +1,6 @@
 from PyQt6.QtCore import QAbstractTableModel, Qt
 
-class TableModel(QAbstractTableModel):
+class Table(QAbstractTableModel):
     def __init__(self, parent):
         super().__init__(parent)
         self.rows = 5

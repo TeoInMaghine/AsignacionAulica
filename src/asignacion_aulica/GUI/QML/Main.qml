@@ -18,7 +18,7 @@ Window {
         spacing: 0
         anchors.fill: parent
 
-        BarraLateral{
+        BarraLateral {
             id: sidebar
         }
 
@@ -40,7 +40,7 @@ Window {
 
     Component {
         id: pestañaAulas
-        PruebaTablaSql{}
+        Aulas { }
     }
 
     Component {

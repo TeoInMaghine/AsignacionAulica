@@ -47,9 +47,6 @@ class Materia:
     # (no usamos estos datos, pero los tenemos que guardar para exportarlos)
     # (son strings con contenido libre, el usuario puede escribir cualquier cosa)
     cuatrimestral_o_anual: str|None = None
-    promocionable: str|None = None
-    docente: str|None = None
-    auxiliar: str|None = None
 
 @dataclass
 class Clase:
@@ -75,3 +72,6 @@ class Clase:
     # (son strings con contenido libre, el usuario puede escribir cualquier cosa)
     comisión: str|None = None
     teórica_o_práctica: str|None = None
+    promocionable: str|None = None
+    docente: str|None = None
+    auxiliar: str|None = None

@@ -48,6 +48,14 @@ class GestorDeDatos:
         '''
         pass
 
+    def borrar_edificio(self, nombre: str):
+        '''
+        Borrar un edificio de la base de datos.
+
+        :raise KeyError: Si no existe un edificio con el nombre dado.
+        '''
+        pass
+
     def get_aulas(self, edificio: str) -> Iterable[Aula]:
         '''
         :return: Un iterable de todas las aulas pertenecientes al edificio dado.
@@ -58,7 +66,8 @@ class GestorDeDatos:
     def get_aula(self, edificio: str, nombre: str) -> Aula:
         '''
         :return: El aula con el nombre dado.
-        :raise KeyError: Si no existe un aula con el nombre dado en ese edificio.
+        :raise KeyError: Si no existe un aula con el nombre dado en ese
+        edificio, o si no existe un edificio con ese nombre.
         '''
         pass
 
@@ -82,6 +91,15 @@ class GestorDeDatos:
         '''
         pass
     
+    def borrar_aula(self, edificio: str, nombre: str):
+        '''
+        Borrar un aula de la base de datos.
+
+        :raise KeyError: Si no existe un aula con el nombre dado en ese
+        edificio, o si no existe un edificio con ese nombre.
+        '''
+        pass
+
     def get_carreras(self) -> Iterable[Carrera]:
         '''
         :return: Un iterable de todas las carreras en la base de datos.
@@ -110,6 +128,14 @@ class GestorDeDatos:
         '''
         pass
 
+    def borrar_carrera(self, nombre: str):
+        '''
+        Borrar una carrera de la base de datos.
+
+        :raise KeyError: Si no existe una carrera con el nombre dado.
+        '''
+        pass
+
     def get_materias(self, carrera: str) -> Iterable[Materia]:
         '''
         :return: Un iterable de todas las materias de la carrera dada.
@@ -121,7 +147,7 @@ class GestorDeDatos:
         '''
         :return: La materia con el nombre dado.
         :raise KeyError: Si no existe una materia con el nombre dado en esa
-        carrera.
+        carrera, o si no existe una carrera con ese nombre.
         '''
         pass
 
@@ -145,11 +171,20 @@ class GestorDeDatos:
         '''
         pass
     
+    def borrar_materia(self, carrera: str, nombre: str) -> Materia:
+        '''
+        Borrar una materia de la base de datos.
+
+        :raise KeyError: Si no existe una materia con el nombre dado en esa
+        carrera, o si no existe una carrera con ese nombre.
+        '''
+        pass
+
     def get_clases(self, carrera: str, materia: str) -> Iterable[Clase]:
         '''
         :return: Un iterable de todas las clases de la materia dada.
-        :raise KeyError: Si no existe una materia con el nombre dado en la
-        carrera dada.
+        :raise KeyError: Si no existe una clase con el id dado en esa materia y
+        carrera, o si no existe una carrera o materia con ese nombre.
         '''
         pass
 
@@ -157,7 +192,7 @@ class GestorDeDatos:
         '''
         :return: La clase con el id dado.
         :raise KeyError: Si no existe una clase con el id dado en esa materia y
-        carrera.
+        carrera, o si no existe una carrera o materia con ese nombre.
         '''
         pass
 
@@ -165,8 +200,8 @@ class GestorDeDatos:
         '''
         :return: Un id que actualmente no existe, para una nueva clase en la
         materia dada.
-        :raise KeyError: Si no existe una materia con el nombre dado en esa
-        carrera.
+        :raise KeyError: Si no existe una clase con el id dado en esa materia y
+        carrera, o si no existe una carrera o materia con ese nombre.
         '''
         pass
 
@@ -174,15 +209,24 @@ class GestorDeDatos:
         '''
         Actualizar la base de datos con la clase dada en la materia dada.
 
-        Si ya existe una clase con el mismo id en esa carrera, se
-        sobreescriben sus valores. Si no existe una materia con el mismo nombre
-        en esa carrera, se agrega.
+        Si ya existe una clase con el mismo id en esa materia, se sobreescriben
+        sus valores. Si no existe una clase con el mismo id en esa carrera,
+        se agrega.
         
-        :raise KeyError: Si no existe una materia con el nombre dado en esa
-        carrera.
+        :raise KeyError: Si no existe una clase con el id dado en esa materia y
+        carrera, o si no existe una carrera o materia con ese nombre.
         '''
         pass
     
+    def borrar_clase(self, carrera: str, materia: str, id: int) -> Clase:
+        '''
+        Borrar una clase de la base de datos.
+
+        :raise KeyError: Si no existe una clase con el id dado en esa materia y
+        carrera, o si no existe una carrera o materia con ese nombre.
+        '''
+        pass
+
     def asignar_aulas(self):
         '''
         Asignar aulas a todas las clases que no tengan una asignación forzada.

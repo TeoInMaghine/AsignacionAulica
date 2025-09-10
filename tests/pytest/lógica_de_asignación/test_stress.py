@@ -2,7 +2,7 @@ import pytest, random, logging
 
 from pandas import DataFrame
 
-from asignacion_aulica.lógica_de_asignación.dia import Día
+from asignacion_aulica.gestor_de_datos.día import Día
 from asignacion_aulica import lógica_de_asignación
 from conftest import make_aulas, make_clases
 

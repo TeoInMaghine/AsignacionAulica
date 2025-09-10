@@ -28,9 +28,9 @@ from pandas import DataFrame
 import numpy as np
 import logging
 
-from .excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación import restricciones
-from .dia import Día
+from asignacion_aulica.gestor_de_datos.día import Día
+from .excepciones import AsignaciónImposibleException
 from .preferencias import obtener_penalización
 
 def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[int,int] ] = {}):

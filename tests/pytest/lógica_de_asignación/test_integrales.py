@@ -1,7 +1,7 @@
 import pytest
 
 from asignacion_aulica import lógica_de_asignación
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos import Día
 
 @pytest.mark.aulas(
     dict(capacidad=60),

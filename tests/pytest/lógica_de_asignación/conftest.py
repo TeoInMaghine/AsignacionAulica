@@ -12,7 +12,7 @@ from ortools.sat.python.cp_model import CpModel
 from pandas import DataFrame
 import numpy as np
 
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos import Día
 
 def pytest_configure(config):
     # Registrar los markers usados por las fixtures

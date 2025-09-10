@@ -2,7 +2,7 @@ import pytest
 from verificación_de_predicados import predicado_es_nand_entre_dos_variables_bool
 
 from asignacion_aulica.lógica_de_asignación import restricciones
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos import Día
 
 @pytest.mark.aulas({})
 @pytest.mark.clases(

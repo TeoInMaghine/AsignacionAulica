@@ -45,6 +45,9 @@ class GestorDeDatos:
 
         Si ya existe un edificio con el mismo nombre, se sobreescriben sus
         valores. Si no existe un edificio con el mismo nombre, se agrega.
+
+        :raise ValueError: Si el horario de cierre de algún día es más temprano
+        que el horario de apertura.
         '''
         pass
 
@@ -79,15 +82,17 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_aula(self, edificio: str, aula: Aula):
+    def set_aula(self, aula: Aula):
         '''
-        Actualizar la base de datos con el aula dada en el edificio dado.
+        Actualizar la base de datos con el aula dada.
 
         Si ya existe un aula con el mismo nombre en ese edificio, se
         sobreescriben sus valores. Si no existe un aula con el mismo nombre en
         ese edificio, se agrega.
 
-        :raise KeyError: Si no existe un edificio con ese nombre.
+        :raise KeyError: Si no existe el edificio al que pertenece el aula.
+        :raise ValueError: Si la capacidad es negativa, si el horario de cierre
+        de algún día es más temprano que el horario de apertura.
         '''
         pass
     
@@ -125,6 +130,9 @@ class GestorDeDatos:
 
         Si ya existe una carrera con el mismo nombre, se sobreescriben sus
         valores. Si no existe una carrera con el mismo nombre, se agrega.
+
+        :raise ValueError: Si `carrera.edificio_preferido` no es `None` y no es
+        el nombre de un edificio que existe.
         '''
         pass
 
@@ -159,15 +167,17 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_materia(self, carrera: str, materia: Materia):
+    def set_materia(self, materia: Materia):
         '''
-        Actualizar la base de datos con la materia dada en la carrera dada.
+        Actualizar la base de datos con la materia.
 
-        Si ya existe una materia con el mismo nombre en esa carrera, se
+        Si ya existe una materia con el mismo nombre en la misma carrera, se
         sobreescriben sus valores. Si no existe una materia con el mismo nombre
         en esa carrera, se agrega.
 
-        :raise KeyError: Si no existe una carrera con ese nombre.
+        :raise KeyError: Si `materia.carrera` no es el nombre de una carrera que
+        existe.
+        :raise ValueError: Si `carrera.año` no es mayor a cero.
         '''
         pass
     
@@ -200,21 +210,29 @@ class GestorDeDatos:
         '''
         :return: Un id que actualmente no existe, para una nueva clase en la
         materia dada.
-        :raise KeyError: Si no existe una clase con el id dado en esa materia y
-        carrera, o si no existe una carrera o materia con ese nombre.
+        :raise KeyError: Si no existe una materia con el nombre dado en la
+        carrera dada, o si no existe una carrera con ese nombre.
         '''
         pass
 
-    def set_clase(self, carrera: str, materia: str, clase: Clase):
+    def set_clase(self, clase: Clase):
         '''
-        Actualizar la base de datos con la clase dada en la materia dada.
+        Actualizar la base de datos con la clase dada.
 
-        Si ya existe una clase con el mismo id en esa materia, se sobreescriben
-        sus valores. Si no existe una clase con el mismo id en esa carrera,
-        se agrega.
+        Si ya existe una clase con el mismo id en la misma materia de la misma
+        carrera, se sobreescriben sus valores. Si no, se agrega.
         
-        :raise KeyError: Si no existe una materia con el nombre dado en la
-        carrera dada, o si no existe una carrera con ese nombre.
+        :raise KeyError: Si `clase.carrera` no es el nombre de una carrera que
+        existe, o si `clase.materia` no es el nombre de una materia de esa
+        carrera.
+        :raise ValueError: En los siguientes casos:
+        - `clase.horario_fin` es más temprano que `clase.horario_inicio`
+        - `clase.cantidad_de_alumnos` es negativo
+        - uno de `clase.aula` y `clase.edificio` es `None` y el otro no
+        - `clase.edificio` no es `None` y no es el nombre de un edificio que
+          existe
+        - `clase.aula` no es `None` y no es el nombre de un aula que pertenece a
+          ese edificio
         '''
         pass
     
@@ -224,6 +242,25 @@ class GestorDeDatos:
 
         :raise KeyError: Si no existe una clase con el id dado en esa materia y
         carrera, o si no existe una carrera o materia con ese nombre.
+        '''
+        pass
+
+    def validar_datos(self) -> str|None:
+        '''
+        Verificar que los datos contenidos en la base de datos sean válidos y
+        compatibles entre sí.
+
+        La mayoría de los datos se pueden validar en el momento en el que se
+        ingresan, pero hay algunas relaciones entre datos que no se pueden
+        validar hasta que todos los datos fueron cargados.
+
+        Las validaciones que se hacen en esta función son:
+        - Que el diccionario de aulas dobles de cada edificio contenga aulas que
+          existen en ese edificio.
+        - (Puede ser que después se agreguen otras)
+        
+        :return: `None` si está todo bien, un string con la descripción del
+        problema si hay algún problema.
         '''
         pass
 

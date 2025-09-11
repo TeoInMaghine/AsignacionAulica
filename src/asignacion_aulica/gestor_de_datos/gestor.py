@@ -183,8 +183,8 @@ class GestorDeDatos:
     def get_clases(self, carrera: str, materia: str) -> Iterable[Clase]:
         '''
         :return: Un iterable de todas las clases de la materia dada.
-        :raise KeyError: Si no existe una clase con el id dado en esa materia y
-        carrera, o si no existe una carrera o materia con ese nombre.
+        :raise KeyError: Si no existe una materia con el nombre dado en la
+        carrera dada, o si no existe una carrera con ese nombre.
         '''
         pass
 
@@ -213,8 +213,8 @@ class GestorDeDatos:
         sus valores. Si no existe una clase con el mismo id en esa carrera,
         se agrega.
         
-        :raise KeyError: Si no existe una clase con el id dado en esa materia y
-        carrera, o si no existe una carrera o materia con ese nombre.
+        :raise KeyError: Si no existe una materia con el nombre dado en la
+        carrera dada, o si no existe una carrera con ese nombre.
         '''
         pass
     

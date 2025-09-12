@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+from typing import Callable
 
 from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio, Carrera, Materia, Clase
 from asignacion_aulica.lógica_de_asignación import AsignaciónImposibleException
@@ -283,15 +284,24 @@ class GestorDeDatos:
         # y actualizar la base de datos con el resultado.
         pass
 
-    def importar_clases_de_excel(self, path: str):
+    def importar_clases_de_excel(self, path: str, confirmación_de_sobreescritura: Callable[[list[str]], bool]):
         '''
         Leer datos de carreras, materias y clases de un archivo excel e
         incorporarlos a la base de datos.
 
-        TODO: Decidir si esta acción debería sobreescribir cosas que ya existen
-        o tirar una excepción o qué hacer.
+        Las clases/materias/carreras que estén definidas en el archivo y que no
+        existan en la base de datos, se agregan. Las que ya existan, se
+        actualizan con los nuevos datos (los datos presentes en el excel se
+        sobreescriben, los datos no presentes en el excel -como el equipamiento
+        requerido- se dejan como estaban).
 
         :param path: El path absoluto del archivo.
+        :param confirmación_de_sobreescritura: Una función para preguntarle al
+        usuario si quiere sobreescribir datos. La función recibe una lista de
+        nombres de carreras en las que se sobreescribirán datos, y devuelve un
+        `bool`. Si devuelve `True` se continúa con la operación; si devuelve
+        `False` se cancela la operación sin hacer ningún cambio en la base de
+        datos.
 
         :raise FileNotFoundError: Si el archivo no existe.
         :raise ExcelInválidoException: Si el formato del archivo no es correcto.

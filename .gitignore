@@ -130,6 +130,9 @@ cython_debug/
 .cursorignore
 .cursorindexingignore
 
+# Typechecker settings
+pyrightconfig.json
+
 # Ignorar archivos temporales de MicrosoftOffice/LibreOffice
 # (creados por ejemplo cuando abrís un excel)
 .$*

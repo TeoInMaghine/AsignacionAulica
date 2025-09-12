@@ -47,17 +47,20 @@ def asignar(
 
     A las clases con `no_cambiar_asignación == False` se les asigna un aula y se
     sobreescriben sus atributos `aula` y `edificio` (el valor que tengan
-    inicialmente es indistinto).
+    inicialmente es ignorado).
 
     A las clases con `no_cambiar_asignación == True` no se les modifica nada,
     pero se tiene en cuenta el aula que tienen asignada para evitar
     superposiciones.
     
-    :param edificios: Los edificios disponibles. #TODO: ¿pueden venir ordenados de la base de datos?
-    :param aulas: Las aulas disponibles en todos los edificios. #TODO: ¿pueden venir ordenadas por edificio?
-    :param carreras: Las carreras que existen. #TODO: orden?
-    :param materias: Las materias de todas las carreras. #TODO: orden?
-    :param clases: Las clases de todas las materias. #TODO: pueden venir ordenadas por carrera y materia?
+    :param edificios: Los edificios disponibles.
+    :param aulas: Las aulas disponibles en cada uno de los edificios (agrupadas
+    por edificio, en el mismo orden que la secuencia de edificios).
+    :param carreras: Las carreras que existen.
+    :param materias: Las materias de todas las carreras (agrupadas por carrera
+    en el mismo orden que la secuencia de carreras).
+    :param clases: Las clases de todas las materias (agrupadas por materia, en
+    el mismo orden que la secuencia de materias).
     
     :raise AsignaciónImposibleException: Si no es posible asignar aula a una o
     más clases.

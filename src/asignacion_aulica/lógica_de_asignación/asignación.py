@@ -24,57 +24,43 @@ Luego se usa el solver para encontrar una combinación de variables que cumpla
 con todas las restricciones y que tenga la menor penalización posible.
 '''
 from ortools.sat.python import cp_model
+from collections.abc import Sequence
 from pandas import DataFrame
 import numpy as np
 import logging
 
+from asignacion_aulica.gestor_de_datos import Edificio, Aula, Carrera, Materia, Clase, Día
+from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
+from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
 from asignacion_aulica.lógica_de_asignación import restricciones
-from asignacion_aulica.gestor_de_datos.día import Día
-from .excepciones import AsignaciónImposibleException
-from .preferencias import obtener_penalización
 
-def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[int,int] ] = {}):
+def asignar(
+    edificios: Sequence[Edificio],
+    aulas: Sequence[Aula],
+    carreras: Sequence[Carrera],
+    materias: Sequence[Materia],
+    clases: Sequence[Clase],
+):
     '''
-    Resolver el problema de asignación.
+    Asignar aula a todas las clases presenciales que no tienen una asignación
+    fijada.
 
-    Las aulas asignadas se representan en la columna 'aula_asignada' de la tabla
-    de clases. Las clases con asignaciones manuales tienen un número de aula en
-    esta columna, y las clases que no tienen un aula asignada tienen `None`.
+    A las clases con `no_cambiar_asignación == False` se les asigna un aula y se
+    sobreescriben sus atributos `aula` y `edificio` (el valor que tengan
+    inicialmente es indistinto).
 
-    Esta función asigna aulas a las clases que no tienen un aula asignada
-    manualmente, y reemplaza el valor `None` con el número de aula que se
-    asignó.
-
-    :param clases: Tabla con los datos de todas las clases.
-        Una clase por fila.
-        Columnas:
-        - nombre: str (materia y comisión)
-        - día: Día
-        - horario_inicio: int (medido en minutos)
-        - horario_fin: int (medido en minutos)
-        - cantidad_de_alumnos: int
-        - equipamiento_necesario: set[str]
-        - edificio_preferido: Optional[str]
-        - aula_asignada: Optional[int]
+    A las clases con `no_cambiar_asignación == True` no se les modifica nada,
+    pero se tiene en cuenta el aula que tienen asignada para evitar
+    superposiciones.
     
-    :param aulas: Tabla con los datos de todas las aulas disponibles.
-        Columnas:
-        - edificio: str
-        - nombre: str
-        - capacidad: int
-        - equipamiento: set[str]
-        - preferir_no_usar: bool (indica si el aula pertenece a un edificio no
-          deseable)
-        - horarios: dict[Día, tuple[int, int]]
-          Mapea días de la semana a tuplas (apertura, cierre). Los días que no
-          están en el diccionario se considera que el aula está cerrada.
-          Apertura y cierre se miden en minutos.
+    :param edificios: Los edificios disponibles. #TODO: ¿pueden venir ordenados de la base de datos?
+    :param aulas: Las aulas disponibles en todos los edificios. #TODO: ¿pueden venir ordenadas por edificio?
+    :param carreras: Las carreras que existen. #TODO: orden?
+    :param materias: Las materias de todas las carreras. #TODO: orden?
+    :param clases: Las clases de todas las materias. #TODO: pueden venir ordenadas por carrera y materia?
     
-    :param aulas_dobles: Diccionario donde las keys son los índices de las
-        aulas dobles y los valores son tuplas con las aulas individuales que
-        conforman el aula doble.
-    
-    :raise AsignaciónImposibleException: Si no es posible hacer la asignación.
+    :raise AsignaciónImposibleException: Si no es posible asignar aula a una o
+    más clases.
     '''
     # Las clases con asignaciones manuales no son parte del problema de
     # asignación, sólo generan restricciones de aulas ocupadas.

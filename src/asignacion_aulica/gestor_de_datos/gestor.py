@@ -21,7 +21,8 @@ class GestorDeDatos:
 
     def get_edificios(self) -> Iterable[Edificio]:
         '''
-        :return: Un iterable de todos los edificios en la base de datos.
+        :return: Un iterable de todos los edificios en la base de datos,
+        ordenados alfabéticamente.
         '''
         pass
 
@@ -61,7 +62,8 @@ class GestorDeDatos:
 
     def get_aulas(self, edificio: str) -> Iterable[Aula]:
         '''
-        :return: Un iterable de todas las aulas pertenecientes al edificio dado.
+        :return: Un iterable de todas las aulas pertenecientes al edificio dado,
+        ordenadas alfabéticamente.
         :raise KeyError: Si no existe un edificio con el nombre dado.
         '''
         pass
@@ -107,7 +109,8 @@ class GestorDeDatos:
 
     def get_carreras(self) -> Iterable[Carrera]:
         '''
-        :return: Un iterable de todas las carreras en la base de datos.
+        :return: Un iterable de todas las carreras en la base de datos,
+        ordenadas alfabéticamente.
         '''
         pass
 
@@ -147,7 +150,8 @@ class GestorDeDatos:
 
     def get_materias(self, carrera: str) -> Iterable[Materia]:
         '''
-        :return: Un iterable de todas las materias de la carrera dada.
+        :return: Un iterable de todas las materias de la carrera dada, ordenadas
+        por año, y dentro de cada año ordenadas alfabéticamente.
         :raise KeyError: Si no existe una carrera con el nombre dado.
         '''
         pass
@@ -193,7 +197,8 @@ class GestorDeDatos:
 
     def get_clases(self, carrera: str, materia: str) -> Iterable[Clase]:
         '''
-        :return: Un iterable de todas las clases de la materia dada.
+        :return: Un iterable de todas las clases de la materia dada, ordenadas
+        cronológicamente.
         :raise KeyError: Si no existe una materia con el nombre dado en la
         carrera dada, o si no existe una carrera con ese nombre.
         '''

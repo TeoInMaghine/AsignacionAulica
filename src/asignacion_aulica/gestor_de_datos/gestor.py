@@ -53,7 +53,7 @@ class GestorDeDatos:
 
     def borrar_edificio(self, nombre: str):
         '''
-        Borrar un edificio de la base de datos.
+        Borrar de la base de datos el edificio dado y todas sus aulas.
 
         :raise KeyError: Si no existe un edificio con el nombre dado.
         '''
@@ -138,7 +138,8 @@ class GestorDeDatos:
 
     def borrar_carrera(self, nombre: str):
         '''
-        Borrar una carrera de la base de datos.
+        Borrar de la base de datos la carrera dada, junto con todas sus materias
+        y clases.
 
         :raise KeyError: Si no existe una carrera con el nombre dado.
         '''
@@ -183,7 +184,7 @@ class GestorDeDatos:
     
     def borrar_materia(self, carrera: str, nombre: str) -> Materia:
         '''
-        Borrar una materia de la base de datos.
+        Borrar de la base de datos una materia y todas sus clases.
 
         :raise KeyError: Si no existe una materia con el nombre dado en esa
         carrera, o si no existe una carrera con ese nombre.

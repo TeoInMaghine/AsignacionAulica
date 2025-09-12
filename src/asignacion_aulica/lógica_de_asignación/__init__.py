@@ -1,2 +1,2 @@
-from .excepciones import AsignaciónImposibleException
-from .asignación import asignar
+from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
+from asignacion_aulica.lógica_de_asignación.asignación import asignar

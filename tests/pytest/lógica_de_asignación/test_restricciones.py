@@ -20,14 +20,14 @@ def test_superposición(aulas, clases, asignaciones):
     assert asignaciones[0,0] in predicado.vars
     assert asignaciones[1,0] in predicado.vars
 
-@pytest.mark.clases( dict(horario_inicio=10, horario_fin=13, día=Día.LUNES) )
+@pytest.mark.clases( dict(horario_inicio=10, horario_fin=13, día=Día.Lunes) )
 @pytest.mark.aulas(
-    dict(horarios={Día.LUNES: (10, 13)}), # Igual que la clase
-    dict(horarios={Día.LUNES: (10, 11)}), # Cierra temprano
-    dict(horarios={Día.LUNES: (11, 13)}), # Abre tarde
-    dict(horarios={Día.LUNES: (9, 14)}),  # Sobra
-    dict(horarios={Día.LUNES: (11, 12)}), # Abre tarde y cierra temprano
-    dict(horarios={Día.MARTES: (9, 14)}), # No abre los lunes
+    dict(horarios={Día.Lunes: (10, 13)}), # Igual que la clase
+    dict(horarios={Día.Lunes: (10, 11)}), # Cierra temprano
+    dict(horarios={Día.Lunes: (11, 13)}), # Abre tarde
+    dict(horarios={Día.Lunes: (9, 14)}),  # Sobra
+    dict(horarios={Día.Lunes: (11, 12)}), # Abre tarde y cierra temprano
+    dict(horarios={Día.Martes: (9, 14)}), # No abre los lunes
 )
 def test_aulas_cerradas(clases, aulas):
     prohibidas = list(restricciones.no_asignar_en_aula_cerrada(clases, aulas))

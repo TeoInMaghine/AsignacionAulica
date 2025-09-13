@@ -8,10 +8,10 @@ from asignacion_aulica.gestor_de_datos import Día
     dict(capacidad=40, equipamiento={"proyector"}),
 )
 @pytest.mark.clases(
-    dict(día=Día.LUNES, cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
-    dict(día=Día.LUNES, cantidad_de_alumnos=50),
-    dict(día=Día.MIÉRCOLES, cantidad_de_alumnos=56),
-    dict(día=Día.MIÉRCOLES, cantidad_de_alumnos=55),
+    dict(día=Día.Lunes, cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}),
+    dict(día=Día.Lunes, cantidad_de_alumnos=50),
+    dict(día=Día.Miércoles, cantidad_de_alumnos=56),
+    dict(día=Día.Miércoles, cantidad_de_alumnos=55),
 )
 def test_restricciones_y_preferencias(aulas, clases):
     '''
@@ -49,10 +49,10 @@ def test_aulas_dobles(aulas, clases):
     lógica_de_asignación.asignar(clases, aulas, aulas_dobles)
     assert all(clases['aula_asignada'] == asignaciones_esperadas)
 
-@pytest.mark.aulas( dict(horarios={Día.LUNES: (8, 10)}) )
+@pytest.mark.aulas( dict(horarios={Día.Lunes: (8, 10)}) )
 @pytest.mark.clases(
-    dict(horario_inicio=8, horario_fin=9, día=Día.LUNES),
-    dict(horario_inicio=9, horario_fin=10, día=Día.LUNES)
+    dict(horario_inicio=8, horario_fin=9, día=Día.Lunes),
+    dict(horario_inicio=9, horario_fin=10, día=Día.Lunes)
 )
 def test_horarios_no_solapan(aulas, clases):
     '''
@@ -65,23 +65,23 @@ def test_horarios_no_solapan(aulas, clases):
     lógica_de_asignación.asignar(clases, aulas)
     assert all(clases['aula_asignada'] == asignaciones_esperadas)
 
-@pytest.mark.aulas( dict(horarios={Día.LUNES: (8, 10)}) )
+@pytest.mark.aulas( dict(horarios={Día.Lunes: (8, 10)}) )
 @pytest.mark.clases(
-        dict(horario_inicio=8, horario_fin=10, día=Día.LUNES),
-        dict(horario_inicio=9, horario_fin=11, día=Día.LUNES)
+        dict(horario_inicio=8, horario_fin=10, día=Día.Lunes),
+        dict(horario_inicio=9, horario_fin=11, día=Día.Lunes)
     )
 def test_asignación_imposible_por_solapamiento_inevitable(aulas, clases):
     with pytest.raises(lógica_de_asignación.AsignaciónImposibleException):
         lógica_de_asignación.asignar(clases, aulas)
 
-@pytest.mark.aulas( dict(horarios={Día.LUNES: (8, 23)}) )
-@pytest.mark.clases( dict(horario_inicio=7, horario_fin=9, día=Día.LUNES) )
+@pytest.mark.aulas( dict(horarios={Día.Lunes: (8, 23)}) )
+@pytest.mark.clases( dict(horario_inicio=7, horario_fin=9, día=Día.Lunes) )
 def test_asignación_imposible_por_aula_cerrada(aulas, clases):
     with pytest.raises(lógica_de_asignación.AsignaciónImposibleException):
         lógica_de_asignación.asignar(clases, aulas)
 
 @pytest.mark.aulas( dict(capacidad=60) )
-@pytest.mark.clases( dict(día=Día.LUNES, cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}) )
+@pytest.mark.clases( dict(día=Día.Lunes, cantidad_de_alumnos=70, equipamiento_necesario={"proyector"}) )
 def test_asignación_imposible_por_equipamiento(aulas, clases):
     with pytest.raises(lógica_de_asignación.AsignaciónImposibleException):
         lógica_de_asignación.asignar(clases, aulas)

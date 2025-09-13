@@ -34,13 +34,13 @@ def make_aulas(aulas) -> DataFrame:
         'equipamiento': set(),
         'preferir_no_usar': False,
         'horarios': {
-            Día.LUNES:     (0, 24),
-            Día.MARTES:    (0, 24),
-            Día.MIÉRCOLES: (0, 24),
-            Día.JUEVES:    (0, 24),
-            Día.VIERNES:   (0, 24),
-            Día.SÁBADO:    (0, 24),
-            Día.DOMINGO:   (0, 24)
+            Día.Lunes:     (0, 24),
+            Día.Martes:    (0, 24),
+            Día.Miércoles: (0, 24),
+            Día.Jueves:    (0, 24),
+            Día.Viernes:   (0, 24),
+            Día.Sábado:    (0, 24),
+            Día.Domingo:   (0, 24)
         }
     }
 
@@ -55,7 +55,7 @@ def make_clases(clases) -> DataFrame:
     '''
     default_values = {
         'nombre': 'materia',
-        'día': Día.LUNES,
+        'día': Día.Lunes,
         'horario_inicio': 10,
         'horario_fin': 11,
         'cantidad_de_alumnos': 1,

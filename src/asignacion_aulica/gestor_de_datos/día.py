@@ -1,10 +1,10 @@
-from enum import StrEnum
+from enum import IntEnum, auto
 
-class Día(StrEnum):
-    LUNES = 'Lunes'
-    MARTES = 'Martes'
-    MIÉRCOLES = 'Miércoles'
-    JUEVES = 'Jueves'
-    VIERNES = 'Viernes'
-    SÁBADO = 'Sábado'
-    DOMINGO = 'Domingo'
+class Día(IntEnum):
+    Lunes = 0
+    Martes = auto()
+    Miércoles = auto()
+    Jueves = auto()
+    Viernes = auto()
+    Sábado = auto()
+    Domingo = auto()

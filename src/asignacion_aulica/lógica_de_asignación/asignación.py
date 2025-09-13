@@ -29,7 +29,8 @@ from pandas import DataFrame
 import numpy as np
 import logging
 
-from asignacion_aulica.gestor_de_datos import Edificio, Aula, Carrera, Materia, Clase, Día
+from asignacion_aulica.gestor_de_datos import Edificio, Aula, Carrera, Materia, Clase
+from asignacion_aulica.gestor_de_datos.día import Día
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
 from asignacion_aulica.lógica_de_asignación import restricciones

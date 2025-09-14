@@ -28,9 +28,9 @@ from pandas import DataFrame
 import numpy as np
 import logging
 
-from .impossible_assignment_exception import ImposibleAssignmentException
 from asignacion_aulica.lógica_de_asignación import restricciones
-from .dia import Día
+from asignacion_aulica.gestor_de_datos.día import Día
+from .excepciones import AsignaciónImposibleException
 from .preferencias import obtener_penalización
 
 def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[int,int] ] = {}):
@@ -74,7 +74,7 @@ def asignar(clases: DataFrame, aulas: DataFrame, aulas_dobles: dict[ int, tuple[
         aulas dobles y los valores son tuplas con las aulas individuales que
         conforman el aula doble.
     
-    :raise ImposibleAssignmentException: Si no es posible hacer la asignación.
+    :raise AsignaciónImposibleException: Si no es posible hacer la asignación.
     '''
     # Las clases con asignaciones manuales no son parte del problema de
     # asignación, sólo generan restricciones de aulas ocupadas.
@@ -152,7 +152,7 @@ def resolver_problema_de_asignación(
     status = solver.solve(modelo)
     # TODO: ¿qué hacer si da FEASIBLE?¿en qué condiciones ocurre?¿aceptamos la solución suboptima o tiramos excepción?
     if status != cp_model.OPTIMAL:
-        raise ImposibleAssignmentException(f'El solucionador de restricciones terminó con status {solver.status_name(status)}.')
+        raise AsignaciónImposibleException(f'El solucionador de restricciones terminó con status {solver.status_name(status)}.')
     
     # Armar lista con las asignaciones
     asignaciones_finales = np.vectorize(solver.value)(asignaciones)

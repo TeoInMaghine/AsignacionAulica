@@ -2,8 +2,8 @@ import pytest
 
 from asignacion_aulica.lógica_de_asignación.asignación import separar_asignaciones_manuales, asignar
 from asignacion_aulica.lógica_de_asignación.restricciones import no_asignar_aulas_ocupadas
-from asignacion_aulica.lógica_de_asignación import AsignaciónImposibleException
-from asignacion_aulica.gestor_de_datos import Día
+from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
+from asignacion_aulica.gestor_de_datos.día import Día
 
 @pytest.mark.clases(
     dict(aula_asignada=1, día=Día.Lunes, horario_inicio=10, horario_fin=15),

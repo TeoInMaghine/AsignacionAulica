@@ -18,9 +18,8 @@ class AulaPreprocesada:
     preferir_no_usar: bool
 
     # Tuplas (apertura, cierre) para cada día de la semana.
-    # Los horarios son en minutos desde las 0AM.
-    horarios: tuple[tuple[int, int], tuple[int, int], tuple[int, int],
-        tuple[int, int], tuple[int, int], tuple[int, int], tuple[int, int]]
+    horarios: tuple[tuple[time, time], tuple[time, time], tuple[time, time],
+        tuple[time, time], tuple[time, time], tuple[time, time], tuple[time, time]]
 
 def calcular_rango_de_aulas_por_edificio(
     edificios: Sequence[Edificio],
@@ -92,13 +91,13 @@ def preprocesar_aulas(
                 equipamiento=aula.equipamiento,
                 preferir_no_usar=edificio.preferir_no_usar,
                 horarios=(
-                    _time_a_minutos(aula.horario_lunes     or edificio.horario_lunes),
-                    _time_a_minutos(aula.horario_martes    or edificio.horario_martes),
-                    _time_a_minutos(aula.horario_miércoles or edificio.horario_miércoles),
-                    _time_a_minutos(aula.horario_jueves    or edificio.horario_jueves),
-                    _time_a_minutos(aula.horario_viernes   or edificio.horario_viernes),
-                    _time_a_minutos(aula.horario_sábado    or edificio.horario_sábado),
-                    _time_a_minutos(aula.horario_domingo   or edificio.horario_domingo),
+                    aula.horario_lunes     or edificio.horario_lunes,
+                    aula.horario_martes    or edificio.horario_martes,
+                    aula.horario_miércoles or edificio.horario_miércoles,
+                    aula.horario_jueves    or edificio.horario_jueves,
+                    aula.horario_viernes   or edificio.horario_viernes,
+                    aula.horario_sábado    or edificio.horario_sábado,
+                    aula.horario_domingo   or edificio.horario_domingo,
                 )
             ))
 
@@ -144,6 +143,3 @@ def separar_clases_a_asignar_por_día(clases: Sequence[Clase]) -> tuple[
             datos_procesados[clase.día][1].append(i)
 
     return datos_procesados
-
-def _time_a_minutos(t: tuple[time, time]) -> tuple[int, int]:
-    return t[0].minute + 60*t[0].hour, t[1].minute + 60*t[1].hour

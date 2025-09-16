@@ -60,14 +60,14 @@ def test_preprocesar_aulas_un_solo_edificio(edificios, aulas, rangos_de_aulas):
             25,
             {'qué equipazo'},
             False,
-            ((13*60, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 17*60), (0, 0)),
+            ((time(13), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(17)), (time(0), time(0))),
         ),
         AulaPreprocesada(
             0,
             50,
             set(),
             False,
-            ((13*60, 20*60), (8*60, 20*60), (14*60, 19*60), (8*60, 20*60), (15*60, 18*60), (8*60, 17*60), (16*60, 17*60)),
+            ((time(13), time(20)), (time(8), time(20)), (time(14), time(19)), (time(8), time(20)), (time(15), time(18)), (time(8), time(17)), (time(16), time(17))),
         )
     ]
     assert preprocesar_aulas(edificios, aulas, rangos_de_aulas) == aulas_preprocesadas_esperadas
@@ -132,21 +132,21 @@ def test_preprocesar_aulas_varios_edificios(edificios, aulas, rangos_de_aulas):
             25,
             {'qué equipazo'},
             False,
-            ((13*60, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 17*60), (0, 0)),
+            ((time(13), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(17)), (time(0), time(0))),
         ),
         AulaPreprocesada(
             2,
             50,
             set(),
             True,
-            ((15*60, 20*60), (8*60+30, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 17*60), (0, 0)),
+            ((time(15), time(20)), (time(8, 30), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(17)), (time(0), time(0))),
         ),
         AulaPreprocesada(
             2,
             31,
             set(),
             True,
-            ((15*60, 20*60), (8*60+30, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 20*60), (8*60, 17*60), (0, 0)),
+            ((time(15), time(20)), (time(8, 30), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(20)), (time(8), time(17)), (time(0), time(0))),
         )
     ]
 

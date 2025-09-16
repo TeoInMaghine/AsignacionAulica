@@ -2,11 +2,28 @@ from datetime import time
 
 import pytest
 
-from asignacion_aulica.lógica_de_asignación.aulas_preprocesadas import (
+from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
     AulaPreprocesada,
+    calcular_rango_de_aulas_por_edificio,
     preprocesar_aulas,
-    calcular_índices_de_aulas_dobles
+    calcular_índices_de_aulas_dobles,
+    separar_clases_a_asignar_por_día
 )
+
+@pytest.mark.edificios({}, {}, {})
+@pytest.mark.aulas(
+    dict(edificio='edificio 0'),
+    dict(edificio='edificio 0'),
+    dict(edificio='edificio 0'),
+    dict(edificio='edificio 1'),
+    dict(edificio='edificio 1'),
+    dict(edificio='edificio 1'),
+    dict(edificio='edificio 2'),
+)
+def test_calcular_rango_de_aulas_por_edificio(edificios, aulas):
+    rangos_esperados = {'edificio 0': (0, 3), 'edificio 1': (3, 6), 'edificio 2': (6, 7)}
+    assert calcular_rango_de_aulas_por_edificio(edificios, aulas) == rangos_esperados
 
 @pytest.mark.edificios(dict(
     nombre = 'nombre',
@@ -36,7 +53,7 @@ from asignacion_aulica.lógica_de_asignación.aulas_preprocesadas import (
         horario_domingo=(time(16), time(17))
     )
 )
-def test_un_solo_edificio(edificios, aulas):
+def test_preprocesar_aulas_un_solo_edificio(edificios, aulas, rangos_de_aulas):
     aulas_preprocesadas_esperadas = [
         AulaPreprocesada(
             0,
@@ -53,8 +70,7 @@ def test_un_solo_edificio(edificios, aulas):
             ((13*60, 20*60), (8*60, 20*60), (14*60, 19*60), (8*60, 20*60), (15*60, 18*60), (8*60, 17*60), (16*60, 17*60)),
         )
     ]
-
-    assert preprocesar_aulas(edificios, aulas) == aulas_preprocesadas_esperadas
+    assert preprocesar_aulas(edificios, aulas, rangos_de_aulas) == aulas_preprocesadas_esperadas
 
 @pytest.mark.edificios(
     dict(
@@ -109,7 +125,7 @@ def test_un_solo_edificio(edificios, aulas):
         capacidad=31
     )
 )
-def test_varios_edificios(edificios, aulas):
+def test_preprocesar_aulas_varios_edificios(edificios, aulas, rangos_de_aulas):
     aulas_preprocesadas_esperadas = [
         AulaPreprocesada(
             0,
@@ -134,7 +150,7 @@ def test_varios_edificios(edificios, aulas):
         )
     ]
 
-    assert preprocesar_aulas(edificios, aulas) == aulas_preprocesadas_esperadas
+    assert preprocesar_aulas(edificios, aulas, rangos_de_aulas) == aulas_preprocesadas_esperadas
 
 @pytest.mark.edificios(
     dict(
@@ -189,8 +205,8 @@ def test_varios_edificios(edificios, aulas):
         capacidad=31
     )
 )
-def test_aulas_dobles_ninguna(edificios, aulas):
-    assert calcular_índices_de_aulas_dobles(edificios, aulas) == {}
+def test_aulas_dobles_ninguna(edificios, aulas, rangos_de_aulas):
+    assert calcular_índices_de_aulas_dobles(edificios, aulas, rangos_de_aulas) == {}
 
 @pytest.mark.edificios(
     dict(
@@ -245,7 +261,68 @@ def test_aulas_dobles_ninguna(edificios, aulas):
     dict(nombre='B202A', edificio='Anasagasti 3'),
     dict(nombre='B202B', edificio='Anasagasti 3')
 )
-def test_aulas_dobles_en_varios_edificios(edificios, aulas):
-    assert calcular_índices_de_aulas_dobles(edificios, aulas) == {
-        0: (1, 2), 4: (5, 6), 8: (10, 12)
-    }
+def test_aulas_dobles_en_varios_edificios(edificios, aulas, rangos_de_aulas):
+    aulas_dobles = {0: (1, 2), 4: (5, 6), 8: (10, 12)}
+    assert calcular_índices_de_aulas_dobles(edificios, aulas, rangos_de_aulas) == aulas_dobles
+
+@pytest.mark.clases(
+    dict(aula='1', edificio='abc', no_cambiar_asignación=True, día=Día.Lunes, horario_inicio=time(10), horario_fin=time(15)),
+    dict(día=Día.Lunes),
+    dict(aula='33', edificio='def', no_cambiar_asignación=True, día=Día.Lunes, horario_inicio=time(20), horario_fin=time(23)),
+    dict(día=Día.Lunes),
+    dict(día=Día.Lunes)
+)
+def test_separar_asignaciones_manuales(clases):
+    clases_preprocesadas = separar_clases_a_asignar_por_día(clases)
+    clases_a_asignar, índices, aulas_ocupadas = clases_preprocesadas[Día.Lunes]
+
+    assert len(clases_a_asignar) == 3
+    assert all(clase.no_cambiar_asignación == False for clase in clases_a_asignar)
+    assert índices == [1, 3, 4]
+    assert aulas_ocupadas == {('abc', '1', time(10), time(15)), ('def', '33', time(20), time(23))}
+
+@pytest.mark.clases(
+    dict(materia='1', día=Día.Martes),
+    dict(materia='2', día=Día.Jueves),
+    dict(materia='2', día=Día.Martes),
+    dict(materia='2', día=Día.Sábado),
+    dict(materia='3', día=Día.Martes),
+    dict(materia='4', día=Día.Lunes)
+)
+def test_separar_clases_por_día(clases):
+    clases_preprocesadas = separar_clases_a_asignar_por_día(clases)
+    
+    # Lunes
+    clases_a_asignar, índices, aulas_ocupadas = clases_preprocesadas[Día.Lunes]
+    assert len(clases_a_asignar) == 1
+    assert clases_a_asignar[0].materia == '4'
+    assert índices == [5]
+    assert aulas_ocupadas == set()
+
+    # Martes
+    clases_a_asignar, índices, aulas_ocupadas = clases_preprocesadas[Día.Martes]
+    assert len(clases_a_asignar) == 3
+    assert clases_a_asignar[0].materia == '1'
+    assert clases_a_asignar[1].materia == '2'
+    assert clases_a_asignar[2].materia == '3'
+    assert índices == [0, 2, 4]
+    assert aulas_ocupadas == set()
+
+    # Jueves
+    clases_a_asignar, índices, aulas_ocupadas = clases_preprocesadas[Día.Jueves]
+    assert len(clases_a_asignar) == 1
+    assert clases_a_asignar[0].materia == '2'
+    assert índices == [1]
+    assert aulas_ocupadas == set()
+
+    # Sábado
+    clases_a_asignar, índices, aulas_ocupadas = clases_preprocesadas[Día.Sábado]
+    assert len(clases_a_asignar) == 1
+    assert clases_a_asignar[0].materia == '2'
+    assert índices == [3]
+    assert aulas_ocupadas == set()
+
+    # Los otros días
+    assert clases_preprocesadas[Día.Miércoles] == ([], [], set())
+    assert clases_preprocesadas[Día.Viernes] == ([], [], set())
+    assert clases_preprocesadas[Día.Domingo] == ([], [], set())

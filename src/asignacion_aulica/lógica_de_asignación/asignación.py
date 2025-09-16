@@ -35,6 +35,11 @@ from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImpo
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
 from asignacion_aulica.lógica_de_asignación import restricciones
 
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
+    AulaPreprocesada, calcular_rango_de_aulas_por_edificio,
+    calcular_índices_de_aulas_dobles, preprocesar_aulas
+)
+
 def asignar(
     edificios: Sequence[Edificio],
     aulas: Sequence[Aula],
@@ -54,9 +59,10 @@ def asignar(
     pero se tiene en cuenta el aula que tienen asignada para evitar
     superposiciones.
     
-    :param edificios: Los edificios disponibles.
+    :param edificios: Los edificios disponibles (ordenados alfabéticamente).
     :param aulas: Las aulas disponibles en cada uno de los edificios (agrupadas
-    por edificio, en el mismo orden que la secuencia de edificios).
+    por edificio, en el mismo orden que la secuencia de edificios, y dentro de
+    cada edificio ordenadas alfabéticamente).
     :param carreras: Las carreras que existen.
     :param materias: Las materias de todas las carreras (agrupadas por carrera
     en el mismo orden que la secuencia de carreras).
@@ -66,6 +72,10 @@ def asignar(
     :raise AsignaciónImposibleException: Si no es posible asignar aula a una o
     más clases.
     '''
+    rangos_de_aulas: dict[str, tuple[int, int]] = calcular_rango_de_aulas_por_edificio(edificios, aulas)
+    aulas_dobles: dict[int, tuple[int, int]] = calcular_índices_de_aulas_dobles(edificios, aulas, rangos_de_aulas)
+    aulas_preprocesadas: Sequence[AulaPreprocesada] = preprocesar_aulas(edificios, aulas, rangos_de_aulas)
+    
     # Las clases con asignaciones manuales no son parte del problema de
     # asignación, sólo generan restricciones de aulas ocupadas.
     clases_sin_asignar, índices_sin_asignar, aulas_ocupadas = separar_asignaciones_manuales(clases)
@@ -76,30 +86,6 @@ def asignar(
     # Escribir los resultados en la tabla de clases
     clases.loc[índices_sin_asignar, 'aula_asignada'] = asignaciones
 
-
-def separar_asignaciones_manuales(clases: DataFrame) -> tuple[ DataFrame, list[int], set[tuple[int, Día, int, int]] ]:
-    '''
-    Separa los datos de la clases que ya tienen aulas asignadas.
-
-    :return:
-        - Una copia de la tabla de clases pero sin las filas de las clases con
-          asignación manual
-        - Una lista de los índices (en la tabla original) de las clases sin
-          asignación manual
-        - Un set de horarios en los que algunas aulas están ocupadas con
-          las asignaciones maunales, en tuplas (aula, día, inicio, fin).
-    '''
-    sin_asignar = clases['aula_asignada'].isnull()
-    clases_sin_asignar = clases[sin_asignar].copy()
-    índices_sin_asignar = list(clases_sin_asignar.index)
-    clases_sin_asignar.reset_index(drop=True, inplace=True)
-    
-    aulas_ocupadas = {
-        (clase.aula_asignada, clase.día, clase.horario_inicio, clase.horario_fin)
-        for clase in clases[~sin_asignar].itertuples()
-    }
-
-    return clases_sin_asignar, índices_sin_asignar, aulas_ocupadas
 
 def resolver_problema_de_asignación(
     clases: DataFrame,
@@ -198,4 +184,3 @@ def crear_matriz_de_asignaciones(
         modelo.add_exactly_one(asignaciones[clase,:])
     
     return asignaciones
-

@@ -18,6 +18,8 @@ from datetime import time
 from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Materia, Clase
 from asignacion_aulica.gestor_de_datos.día import Día
 
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import calcular_rango_de_aulas_por_edificio
+
 def pytest_configure(config):
     # Registrar los markers usados por las fixtures
     config.addinivalue_line("markers", "edificios: marca para pasar parametros al fixture edificios")
@@ -228,6 +230,10 @@ def aulas(request) -> Sequence[Aula]:
     '''
     data = request.node.get_closest_marker('aulas').args
     return make_aulas(data)
+
+@pytest.fixture
+def rangos_de_aulas(edificios, aulas) -> dict[str, tuple[int, int]]:
+    return calcular_rango_de_aulas_por_edificio(edificios, aulas)
 
 @pytest.fixture
 def carreras(request) -> Sequence[Carrera]:

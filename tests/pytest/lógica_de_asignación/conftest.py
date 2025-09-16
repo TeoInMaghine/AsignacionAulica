@@ -18,7 +18,7 @@ from datetime import time
 from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Materia, Clase
 from asignacion_aulica.gestor_de_datos.día import Día
 
-from asignacion_aulica.lógica_de_asignación.preprocesamiento import calcular_rango_de_aulas_por_edificio
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulaPreprocesada, calcular_rango_de_aulas_por_edificio, preprocesar_aulas
 
 def pytest_configure(config):
     # Registrar los markers usados por las fixtures
@@ -39,7 +39,7 @@ def make_edificios(edificios: tuple[dict[str, Any], ...]) -> list[Edificio]:
     '''
     # Tiene que haber al menos un edificio
     if len(edificios) == 0:
-        edificios = ({})
+        edificios = ({},)
 
     horario_default = (time(0), time(23, 59))
     _edificios = [
@@ -98,7 +98,7 @@ def make_carreras(carreras: tuple[dict[str, Any], ...]) -> list[Carrera]:
     '''
     # Tiene que haber al menos una carrera
     if len(carreras) == 0:
-        carreras = ({})
+        carreras = ({},)
 
     _carreras = [
         Carrera(
@@ -120,7 +120,7 @@ def make_materias(materias: tuple[dict[str, Any], ...]) -> list[Materia]:
     '''
     # Tiene que haber al menos una materia
     if len(materias) == 0:
-        materias = ({})
+        materias = ({},)
 
     _materias = [
         Materia(
@@ -215,7 +215,8 @@ def edificios(request: pytest.FixtureRequest) -> Sequence[Edificio]:
 
     :return: La secuencia de edificios esperada por lógica_de_asignación.
     '''
-    data = request.node.get_closest_marker('edificios').args
+    marker = request.node.get_closest_marker('edificios')
+    data = marker.args if marker else ()
     return make_edificios(data)
 
 @pytest.fixture
@@ -234,6 +235,11 @@ def aulas(request) -> Sequence[Aula]:
 @pytest.fixture
 def rangos_de_aulas(edificios, aulas) -> dict[str, tuple[int, int]]:
     return calcular_rango_de_aulas_por_edificio(edificios, aulas)
+
+@pytest.fixture
+def aulas_preprocesadas(edificios, aulas, rangos_de_aulas) -> Sequence[AulaPreprocesada]:
+    print(aulas)
+    return preprocesar_aulas(edificios, aulas, rangos_de_aulas)
 
 @pytest.fixture
 def carreras(request) -> Sequence[Carrera]:

@@ -170,8 +170,8 @@ def make_clases(clases: tuple[dict[str, Any], ...]) -> list[Clase]:
     return _clases
 
 def make_asignaciones(
-        clases: DataFrame,
-        aulas: DataFrame,
+        clases: Sequence[Clase],
+        aulas: Sequence[Aula],
         modelo: CpModel,
         asignaciones_forzadas: dict[int, int] = {}
     ) -> np.ndarray:
@@ -184,9 +184,6 @@ def make_asignaciones(
     También se agregan restricciones para que cada clase se asigne exactamente a
     un aula.
 
-    :param clases: Tabla con los datos de las clases.
-    :param aulas: Tabla con los datos de las aulas.
-    :param modelo: El modelo que usar para generar variables.
     :param asignaciones_forzadas: Diccionario de índices de clases a índices de
     aulas.
     :return: Matriz con los datos de asignaciones.
@@ -200,7 +197,7 @@ def make_asignaciones(
             asignaciones[clase, aula] = 0
     
     # Asegurar que cada clase se asigna a exactamente un aula
-    for clase in clases.index:
+    for clase in range(asignaciones.shape[0]):
         modelo.add_exactly_one(asignaciones[clase,:])
     
     return asignaciones

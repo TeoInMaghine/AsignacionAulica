@@ -11,8 +11,8 @@ from asignacion_aulica.gestor_de_datos.día import Día
         dict(horario_inicio=2, horario_fin=4),
         dict(horario_inicio=5, horario_fin=6)
     )
-def test_superposición(aulas, clases, asignaciones):
-    predicados = list(restricciones.no_superponer_clases(clases, aulas, {}, asignaciones))
+def test_superposición(aulas_preprocesadas, clases, asignaciones):
+    predicados = list(restricciones.no_superponer_clases(clases, aulas_preprocesadas, {}, asignaciones))
 
     # Debería generar solamente un predicado entre las primeras dos clases
     assert len(predicados) == 1
@@ -46,8 +46,8 @@ def test_aulas_cerradas(clases, aulas_preprocesadas):
     dict(capacidad = 50),
     dict(capacidad = 10)
 )
-def test_capacidad_suficiente(clases, aulas):
-    prohibidas = list(restricciones.asignar_aulas_con_capacidad_suficiente(clases, aulas))
+def test_capacidad_suficiente(clases, aulas_preprocesadas):
+    prohibidas = list(restricciones.asignar_aulas_con_capacidad_suficiente(clases, aulas_preprocesadas))
 
     # Debería generar una sola restricción con el aula 2
     assert len(prohibidas) == 1
@@ -59,8 +59,8 @@ def test_capacidad_suficiente(clases, aulas):
     dict(equipamiento = set(('proyector', 'otra cosa'))),
     dict(equipamiento = set())
 )
-def test_equipamiento(clases, aulas):
-    prohibidas = list(restricciones.asignar_aulas_con_el_equipamiento_requerido(clases, aulas))
+def test_equipamiento(clases, aulas_preprocesadas):
+    prohibidas = list(restricciones.asignar_aulas_con_el_equipamiento_requerido(clases, aulas_preprocesadas))
 
     # Debería generar una sola restricción con el aula 2
     assert len(prohibidas) == 1
@@ -75,11 +75,11 @@ def test_equipamiento(clases, aulas):
     dict(nombre = 'Clase 1'),
     dict(nombre = 'Clase 2')
 )
-def test_aulas_dobles(aulas, clases, asignaciones): 
+def test_aulas_dobles(aulas_preprocesadas, clases, asignaciones): 
     # 102 es un aula doble conformada por 102A y 102B
     aulas_dobles = { 2: (0, 1) }
 
-    predicados = list(restricciones.no_asignar_aula_doble_y_sus_hijas_al_mismo_tiempo(clases, aulas, aulas_dobles, asignaciones))
+    predicados = list(restricciones.no_asignar_aula_doble_y_sus_hijas_al_mismo_tiempo(clases, aulas_preprocesadas, aulas_dobles, asignaciones))
 
     assert len(predicados) == 4
     for predicado in predicados:

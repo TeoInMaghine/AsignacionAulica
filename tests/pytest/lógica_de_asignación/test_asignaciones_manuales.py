@@ -1,6 +1,6 @@
 import pytest
 
-from asignacion_aulica.lógica_de_asignación.preprocesamiento import separar_asignaciones_manuales
+#from asignacion_aulica.lógica_de_asignación.preprocesamiento import separar_asignaciones_manuales
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
 from asignacion_aulica.lógica_de_asignación.restricciones import no_asignar_aulas_ocupadas
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException

@@ -14,22 +14,25 @@ aulas, y la matriz de asignaciones, y devuelven predicados que se deben agregar
 al modelo.
 
 Estas funciones toman los siguientes argumentos:
-- clases: DataFrame, tabla con los datos de las clases.
-- aulas: DataFrame, tabla con los datos de las aulas.
+- clases: Los datos de las clases en un problema de asignación.
+- aulas: Los datos de todas las aulas disponibles.
 - aulas_dobles: Diccionario con los datos de aulas dobles.
 - asignaciones: Matriz con los datos de asignaciones, donde las filas son
   clases y las columnas son aulas.
 
 Esto se omite de los docstrings para no tener que repetirlo en todos lados.
 '''
+from datetime import time
 from itertools import combinations, product
 from pandas import DataFrame
-from typing import Iterable
+from collections.abc import Iterable, Sequence
 import numpy as np
 
 from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.entidades import Clase
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulaPreprocesada
 
-def clases_se_superponen(clase1, clase2) -> bool:
+def clases_se_superponen(clase1: Clase, clase2: Clase) -> bool:
     '''
     Evalúa si las clases están en el mismo día y tienen horarios que se superponen.
     :return: Booleano, verdadero si se superponen, falso si no.
@@ -61,16 +64,15 @@ def no_asignar_aula_doble_y_sus_hijas_al_mismo_tiempo(clases: DataFrame, aulas: 
                     yield asignaciones[clase1.Index, aula_doble] + asignaciones[clase2.Index, aula_hija] <= 1
                     yield asignaciones[clase2.Index, aula_doble] + asignaciones[clase1.Index, aula_hija] <= 1
 
-def no_asignar_en_aula_cerrada(clases: DataFrame, aulas: DataFrame):
+def no_asignar_en_aula_cerrada(clases: Sequence[Clase], aulas: Sequence[AulaPreprocesada]) -> Iterable[ tuple[int, int] ]:
     '''
     La clase no puede estar en un aula que no esté abierta en ese horario.
     '''
-    for aula, clase in product(aulas.itertuples(), clases.itertuples()):
-        aula_cerrada = clase.día not in aula.horarios or \
-                       aula.horarios[clase.día][0] > clase.horario_inicio or \
-                       aula.horarios[clase.día][1] < clase.horario_fin
+    for i_clase, clase, i_aula, aula in _combinaciones_de_clases_y_aulas(clases, aulas):
+        aula_abre, aula_cierra = aula.horarios[clase.día]
+        aula_cerrada = aula_abre > clase.horario_inicio or aula_cierra < clase.horario_fin
         if aula_cerrada:
-            yield (clase.Index, aula.Index)
+            yield (i_clase, i_aula)
 
 def asignar_aulas_con_capacidad_suficiente(clases: DataFrame, aulas: DataFrame):
     '''
@@ -160,3 +162,13 @@ def restricciones_con_variables(clases: DataFrame, aulas: DataFrame, aulas_doble
         for predicado in restricción(clases, aulas, aulas_dobles, asignaciones):
             yield predicado
 
+def _combinaciones_de_clases_y_aulas(clases: Sequence[Clase], aulas: Sequence[AulaPreprocesada]) -> Iterable[tuple[int, Clase, int, AulaPreprocesada]]:
+    '''
+    Devuelve un iterable de todas las combinaciones de clases y aulas.
+
+    El iterable produce tuplas (índice de la clase, clase, índice del aula, aula).
+    '''
+    for clase_con_índice, aula_con_ìndice in product(enumerate(clases), enumerate(aulas)):
+        i_clase, clase = clase_con_índice
+        i_aula, aula = aula_con_ìndice
+        yield i_clase, clase, i_aula, aula

@@ -1,3 +1,4 @@
+from datetime import time
 import pytest
 from verificación_de_predicados import predicado_es_nand_entre_dos_variables_bool
 
@@ -20,17 +21,17 @@ def test_superposición(aulas, clases, asignaciones):
     assert asignaciones[0,0] in predicado.vars
     assert asignaciones[1,0] in predicado.vars
 
-@pytest.mark.clases( dict(horario_inicio=10, horario_fin=13, día=Día.Lunes) )
+@pytest.mark.clases( dict(horario_inicio=time(10), horario_fin=time(13), día=Día.Lunes) )
 @pytest.mark.aulas(
-    dict(horarios={Día.Lunes: (10, 13)}), # Igual que la clase
-    dict(horarios={Día.Lunes: (10, 11)}), # Cierra temprano
-    dict(horarios={Día.Lunes: (11, 13)}), # Abre tarde
-    dict(horarios={Día.Lunes: (9, 14)}),  # Sobra
-    dict(horarios={Día.Lunes: (11, 12)}), # Abre tarde y cierra temprano
-    dict(horarios={Día.Martes: (9, 14)}), # No abre los lunes
+    dict(horario_lunes=(time(10), time(13))), # Igual que la clase
+    dict(horario_lunes=(time(10), time(11))), # Cierra temprano
+    dict(horario_lunes=(time(11), time(13))), # Abre tarde
+    dict(horario_lunes=(time( 9), time(14))), # Sobra
+    dict(horario_lunes=(time(11), time(12))), # Abre tarde y cierra temprano
+    dict(horario_lunes=(time( 0), time( 0))), # No abre los lunes
 )
-def test_aulas_cerradas(clases, aulas):
-    prohibidas = list(restricciones.no_asignar_en_aula_cerrada(clases, aulas))
+def test_aulas_cerradas(clases, aulas_preprocesadas):
+    prohibidas = list(restricciones.no_asignar_en_aula_cerrada(clases, aulas_preprocesadas))
 
     # Debería generar restricciones con las aulas 1, 2, 4 y 5
     assert len(prohibidas) == 4

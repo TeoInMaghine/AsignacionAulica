@@ -36,8 +36,8 @@ from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penali
 from asignacion_aulica.lógica_de_asignación import restricciones
 
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
-    AulaPreprocesada, calcular_rango_de_aulas_por_edificio,
-    calcular_índices_de_aulas_dobles, preprocesar_aulas
+    calcular_rango_de_aulas_por_edificio, calcular_índices_de_aulas_dobles,
+    preprocesar_aulas, separar_clases_a_asignar_por_día, AulaPreprocesada
 )
 
 def asignar(
@@ -72,20 +72,29 @@ def asignar(
     :raise AsignaciónImposibleException: Si no es posible asignar aula a una o
     más clases.
     '''
+    # Preprocesar los datos
     rangos_de_aulas: dict[str, tuple[int, int]] = calcular_rango_de_aulas_por_edificio(edificios, aulas)
     aulas_dobles: dict[int, tuple[int, int]] = calcular_índices_de_aulas_dobles(edificios, aulas, rangos_de_aulas)
     aulas_preprocesadas: Sequence[AulaPreprocesada] = preprocesar_aulas(edificios, aulas, rangos_de_aulas)
+    clases_preprocesadas = separar_clases_a_asignar_por_día(clases)
+
+    # Asignar las aulas de cada día
+    días_sin_asignar: list[Día] = []
+    for día in Día:
+        clases, índices_de_las_clases, aulas_ocupadas = clases_preprocesadas[día]
+        asignaciones: list[int] = resolver_problema_de_asignación(clases, aulas_preprocesadas, aulas_dobles, aulas_ocupadas)
+        if len(asignaciones) == len(clases):
+            for i_clase, i_aula in zip(índices_de_las_clases, asignaciones):
+                clase = clases[i_clase]
+                aula = aulas[i_aula]
+                clase.edificio = aula.edificio
+                clase.aula = aula.nombre
+        else:
+            días_sin_asignar.append(día)
     
-    # Las clases con asignaciones manuales no son parte del problema de
-    # asignación, sólo generan restricciones de aulas ocupadas.
-    clases_sin_asignar, índices_sin_asignar, aulas_ocupadas = separar_asignaciones_manuales(clases)
-
-    # Resolver el problema de asignación de las aulas no asignadas manualmente
-    asignaciones = resolver_problema_de_asignación(clases_sin_asignar, aulas, aulas_dobles, aulas_ocupadas)
-
-    # Escribir los resultados en la tabla de clases
-    clases.loc[índices_sin_asignar, 'aula_asignada'] = asignaciones
-
+    # Tirar excepción si no se pudo asignar algún día
+    if len(días_sin_asignar) != 0:
+        raise AsignaciónImposibleException(*días_sin_asignar)
 
 def resolver_problema_de_asignación(
     clases: DataFrame,

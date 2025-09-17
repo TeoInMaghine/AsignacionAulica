@@ -4,7 +4,13 @@ from dataclasses import dataclass
 from datetime import time
 
 from asignacion_aulica.gestor_de_datos.día import Día
-from asignacion_aulica.gestor_de_datos.entidades import Aula, Clase, Edificio
+from asignacion_aulica.gestor_de_datos.entidades import (
+    Edificio,
+    Aula,
+    Carrera,
+    Materia,
+    Clase
+)
 
 @dataclass
 class AulaPreprocesada:
@@ -20,6 +26,25 @@ class AulaPreprocesada:
     # Tuplas (apertura, cierre) para cada día de la semana.
     horarios: tuple[tuple[time, time], tuple[time, time], tuple[time, time],
         tuple[time, time], tuple[time, time], tuple[time, time], tuple[time, time]]
+
+@dataclass
+class ClasePreprocesada:
+    '''
+    Es como `gestor_de_datos.Clase`, pero con los datos transformados de una
+    forma conveniente para `lógica_de_asignación`.
+
+    No hay atributos `virtual` y `no_cambiar_asignación` porque esta clase sólo
+    representa clases que han de ser asignadas.
+    '''
+    carrera: str
+    materia: str
+    año: int
+    día: Día
+    horario_inicio: time
+    horario_fin: time
+    cantidad_de_alumnos: int
+    equipamiento_necesario: set[str]
+    edificio_preferido: str|None
 
 def calcular_rango_de_aulas_por_edificio(
     edificios: Sequence[Edificio],
@@ -103,18 +128,25 @@ def preprocesar_aulas(
 
     return aulas_preprocesadas
 
-def separar_clases_a_asignar_por_día(clases: Sequence[Clase]) -> tuple[
-    tuple[ list[Clase], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[Clase], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[Clase], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[Clase], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[Clase], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[Clase], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[Clase], list[int], set[tuple[str, str, time, time]] ]
+def preprocesar_clases(
+    clases: Sequence[Clase],
+    materias: Sequence[Materia],
+    carreras: Sequence[Carrera]
+) -> tuple[
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ]
 ]:
     '''
-    Separar los datos de clases que hay que asignar en cada día de la semana,
-    filtrando clases virtuales y clases con asignación manual.
+    Preprocesar los datos de clases/materias/carreras provenientes del gestor de
+    datos para que queden en un formato cómodo para la lógica de asignación.
+
+    Separar los datos de las clases que hay que asignar en cada día de la
+    semana, filtrando clases virtuales y clases con asignación manual.
 
     :return: Para cada día de la semana, una tupla con:
     - Una lista de las clases que hay que asignar ese día.
@@ -123,13 +155,13 @@ def separar_clases_a_asignar_por_día(clases: Sequence[Clase]) -> tuple[
       asignaciones manuales, expresados en tuplas (edificio, aula, inicio, fin).
     '''
     datos_procesados = (
-        (list[Clase](), list[int](), set[tuple[str, str, time, time]]()),
-        (list[Clase](), list[int](), set[tuple[str, str, time, time]]()),
-        (list[Clase](), list[int](), set[tuple[str, str, time, time]]()),
-        (list[Clase](), list[int](), set[tuple[str, str, time, time]]()),
-        (list[Clase](), list[int](), set[tuple[str, str, time, time]]()),
-        (list[Clase](), list[int](), set[tuple[str, str, time, time]]()),
-        (list[Clase](), list[int](), set[tuple[str, str, time, time]]())
+        (list[ClasePreprocesada](), list[int](), set[tuple[str, str, time, time]]()),
+        (list[ClasePreprocesada](), list[int](), set[tuple[str, str, time, time]]()),
+        (list[ClasePreprocesada](), list[int](), set[tuple[str, str, time, time]]()),
+        (list[ClasePreprocesada](), list[int](), set[tuple[str, str, time, time]]()),
+        (list[ClasePreprocesada](), list[int](), set[tuple[str, str, time, time]]()),
+        (list[ClasePreprocesada](), list[int](), set[tuple[str, str, time, time]]()),
+        (list[ClasePreprocesada](), list[int](), set[tuple[str, str, time, time]]())
     )
 
     for i, clase in enumerate(clases):
@@ -139,7 +171,14 @@ def separar_clases_a_asignar_por_día(clases: Sequence[Clase]) -> tuple[
             if clase.edificio is not None and clase.aula is not None:
                 datos_procesados[clase.día][2].add((clase.edificio, clase.aula, clase.horario_inicio, clase.horario_fin))
         else:
-            datos_procesados[clase.día][0].append(clase)
+            i_carrera = bisect_left(carreras, clase.carrera, key=lambda c:c.nombre)
+            i_materia = bisect_left(materias, clase.carrera+clase.materia, key=lambda m:m.carrera+m.nombre)
             datos_procesados[clase.día][1].append(i)
+            datos_procesados[clase.día][0].append(ClasePreprocesada(
+                clase.carrera, clase.materia, materias[i_materia].año,
+                clase.día, clase.horario_inicio, clase.horario_fin,
+                clase.cantidad_de_alumnos, clase.equipamiento_necesario,
+                carreras[i_carrera].edificio_preferido
+            ))
 
     return datos_procesados

@@ -37,7 +37,7 @@ from asignacion_aulica.lógica_de_asignación import restricciones
 
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
     calcular_rango_de_aulas_por_edificio, calcular_índices_de_aulas_dobles,
-    preprocesar_aulas, separar_clases_a_asignar_por_día, AulaPreprocesada
+    preprocesar_aulas, preprocesar_clases, AulaPreprocesada
 )
 
 def asignar(
@@ -76,7 +76,7 @@ def asignar(
     rangos_de_aulas: dict[str, tuple[int, int]] = calcular_rango_de_aulas_por_edificio(edificios, aulas)
     aulas_dobles: dict[int, tuple[int, int]] = calcular_índices_de_aulas_dobles(edificios, aulas, rangos_de_aulas)
     aulas_preprocesadas: Sequence[AulaPreprocesada] = preprocesar_aulas(edificios, aulas, rangos_de_aulas)
-    clases_preprocesadas = separar_clases_a_asignar_por_día(clases)
+    clases_preprocesadas = preprocesar_clases(clases, materias, carreras)
 
     # Asignar las aulas de cada día
     días_sin_asignar: list[Día] = []

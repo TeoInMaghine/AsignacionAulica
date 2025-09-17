@@ -226,7 +226,8 @@ def aulas(request) -> Sequence[Aula]:
 
     :return: La secuencia de aulas esperada por lógica_de_asignación.
     '''
-    data = request.node.get_closest_marker('aulas').args
+    marker = request.node.get_closest_marker('aulas')
+    data = marker.args if marker else ()
     return make_aulas(data)
 
 @pytest.fixture
@@ -248,7 +249,8 @@ def carreras(request) -> Sequence[Carrera]:
 
     :return: La secuencia de carreras esperada por lógica_de_asignación.
     '''
-    data = request.node.get_closest_marker('carreras').args
+    marker = request.node.get_closest_marker('carreras')
+    data = marker.args if marker else ()
     return make_carreras(data)
 
 @pytest.fixture
@@ -261,7 +263,8 @@ def materias(request) -> Sequence[Materia]:
 
     :return: La secuencia de materias esperada por lógica_de_asignación.
     '''
-    data = request.node.get_closest_marker('materias').args
+    marker = request.node.get_closest_marker('materias')
+    data = marker.args if marker else ()
     return make_materias(data)
 
 @pytest.fixture
@@ -274,8 +277,9 @@ def clases(request) -> Sequence[Clase]:
     
     :return: La secuencia de clases esperada por lógica_de_asignación.
     '''
-    clases = request.node.get_closest_marker('clases').args
-    return make_clases(clases)
+    marker = request.node.get_closest_marker('clases')
+    data = marker.args if marker else ()
+    return make_clases(data)
 
 @pytest.fixture
 def modelo() -> CpModel:

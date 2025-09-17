@@ -8,7 +8,7 @@ from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
     calcular_rango_de_aulas_por_edificio,
     preprocesar_aulas,
     calcular_índices_de_aulas_dobles,
-    separar_clases_a_asignar_por_día
+    preprocesar_clases
 )
 
 @pytest.mark.edificios({}, {}, {})
@@ -267,17 +267,19 @@ def test_aulas_dobles_en_varios_edificios(edificios, aulas, rangos_de_aulas):
 
 @pytest.mark.clases(
     dict(aula='1', edificio='abc', no_cambiar_asignación=True, día=Día.Lunes, horario_inicio=time(10), horario_fin=time(15)),
-    dict(día=Día.Lunes),
+    dict(día=Día.Lunes, horario_inicio=time(1)),
     dict(aula='33', edificio='def', no_cambiar_asignación=True, día=Día.Lunes, horario_inicio=time(20), horario_fin=time(23)),
-    dict(día=Día.Lunes),
-    dict(día=Día.Lunes)
+    dict(día=Día.Lunes, horario_inicio=time(2)),
+    dict(día=Día.Lunes, horario_inicio=time(3))
 )
-def test_separar_asignaciones_manuales(clases):
-    clases_preprocesadas = separar_clases_a_asignar_por_día(clases)
+def test_separar_asignaciones_manuales(clases, materias, carreras):
+    clases_preprocesadas = preprocesar_clases(clases, materias, carreras)
     clases_a_asignar, índices, aulas_ocupadas = clases_preprocesadas[Día.Lunes]
 
     assert len(clases_a_asignar) == 3
-    assert all(clase.no_cambiar_asignación == False for clase in clases_a_asignar)
+    assert clases_a_asignar[0].horario_inicio == time(1)
+    assert clases_a_asignar[1].horario_inicio == time(2)
+    assert clases_a_asignar[2].horario_inicio == time(3)
     assert índices == [1, 3, 4]
     assert aulas_ocupadas == {('abc', '1', time(10), time(15)), ('def', '33', time(20), time(23))}
 
@@ -289,8 +291,8 @@ def test_separar_asignaciones_manuales(clases):
     dict(materia='3', día=Día.Martes),
     dict(materia='4', día=Día.Lunes)
 )
-def test_separar_clases_por_día(clases):
-    clases_preprocesadas = separar_clases_a_asignar_por_día(clases)
+def test_separar_clases_por_día(clases, materias, carreras):
+    clases_preprocesadas = preprocesar_clases(clases, materias, carreras)
     
     # Lunes
     clases_a_asignar, índices, aulas_ocupadas = clases_preprocesadas[Día.Lunes]

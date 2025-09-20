@@ -119,30 +119,31 @@ def cantidad_de_alumnos_fuera_del_aula(
 
     return cantidad_de_alumnos_fuera_del_aula, cota_superior_total
 
-def obtener_capacidad_sobrante(
-        clases: DataFrame,
-        aulas: DataFrame,
+def capacidad_sobrante(
+        clases: Sequence[ClasePreprocesada],
+        aulas: Sequence[AulaPreprocesada],
+        rangos_de_aulas: dict[str, tuple[int, int]],
         modelo: cp_model.CpModel,
         asignaciones: np.ndarray
-    ) -> tuple[LinearExpr, int]:
+) -> tuple[LinearExpr|int, int]:
     '''
     Devuelve una expresión que representa la cantidad de asientos que sobran en
     el aula asignada a cada clase, y su cota superior.
     '''
-    máxima_capacidad = max(aulas["capacidad"])
+    máxima_capacidad = max(aula.capacidad for aula in aulas)
 
-    capacidad_sobrante_total = 0
-    cota_superior_total = 0
+    capacidad_sobrante_total: LinearExpr|int = 0
+    cota_superior_total: int = 0
 
-    for clase in clases.itertuples():
+    for i_clase, clase in enumerate(clases):
         # Un modelo es inválido si una variable tiene un upper bound menor a su
         # lower bound, así que tenemos que limitarlo
         máxima_capacidad_sobrante = max(0, máxima_capacidad - clase.cantidad_de_alumnos)
-        capacidad_sobrante = modelo.new_int_var(0, máxima_capacidad_sobrante, f"capacidad_sobrante_{clase.nombre}")
+        capacidad_sobrante = modelo.new_int_var(0, máxima_capacidad_sobrante, f"capacidad_sobrante_clase_{i_clase}")
         cota_superior = 0
 
-        for aula in aulas.itertuples():
-            asignada_a_este_aula = asignaciones[clase.Index, aula.Index]
+        for i_aula, aula in enumerate(aulas):
+            asignada_a_este_aula = asignaciones[i_clase, i_aula]
 
             # Esta lógica asume que no va a haber asignaciones en 1 nunca;
             # que van a ser 0 (asignaciones prohibidas) o variables del modelo
@@ -200,7 +201,7 @@ todas_las_penalizaciones = (
     (1000, cantidad_de_alumnos_fuera_del_aula),
     (100,  cantidad_de_clases_fuera_del_edificio_preferido),
     (10,   obtener_cantidad_de_alumnos_en_edificios_no_deseables),
-    (1,    obtener_capacidad_sobrante)
+    (1,    capacidad_sobrante)
 )
 
 def obtener_penalización(

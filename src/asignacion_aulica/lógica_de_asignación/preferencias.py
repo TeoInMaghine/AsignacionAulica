@@ -10,22 +10,24 @@ necesarias y devuelve una tupla con: una expresión que representa el valor a
 minimizar, y el valor máximo que puede llegar a tener esa expresión una vez
 resuelto el modelo (excepto si el valor máximo es 0, en cuyo caso devuelve 1).
 
-Este valor máximo o cota superior se utiliza para normalizar los valores de las
+Las penalizaciones individuales se suman para formar una penalización total.
+Cada penalización tiene un peso distinto en esa suma, para permitir darle más
+importancia a unas que a otras.
+
+El valor máximo o cota superior se utiliza para normalizar los valores de las
 penalizaciones. Esto hace que las escalas de penalizaciones sean más
 comparables, facilitando la selección de pesos.
 
-Estas funciones toman los siguientes argumentos:
-- clases: DataFrame, tabla con los datos de las clases
-- aulas: DataFrame, tabla con los datos de las aulas
-- modelo: el CpModel al que agregar variables
+Las funciones de penalización toman los siguientes argumentos:
+- clases: Los datos de las clases en el problema de asignación.
+- aulas: Los datos de todas las aulas disponibles.
+- rangos_de_aulas: Diccionario de nombres de edificios a rangos de índices de
+  las aulas de cada edificio.
+- modelo: el CpModel al que agregar variables.
 - asignaciones: Matriz con los datos de asignaciones, donde las filas son
   clases y las columnas son aulas.
 
 Esto se omite de los docstrings para no tener que repetirlo en todos lados.
-
-Las penalizaciones individuales se suman para formar una penalización total.
-Cada penalización tiene un peso distinto en esa suma, para permitir darle más
-importancia a unas que a otras.
 
 La función `obtener_penalizaciones` es la que hay que llamar desde fuera de este
 módulo. Devuelve un diccionario con todas las penalizaciones, incluyendo una
@@ -33,45 +35,35 @@ llamada "total" que es la que hay que minimizar.
 '''
 from ortools.sat.python.cp_model_helper import LinearExpr
 from ortools.sat.python import cp_model
+from collections.abc import Sequence
 from pandas import DataFrame
 import numpy as np
 
-def construir_edificios(aulas: DataFrame) -> dict[str, set[int]]:
-    '''
-    Devuelve el diccionario de nombres de edificio a set de aulas que tiene cada edificio.
-    '''
-    edificios = {}
-    for aula in aulas.itertuples():
-        if not aula.edificio in edificios:
-            edificios[aula.edificio] = set((aula.Index,))
-        else:
-            edificios[aula.edificio].add(aula.Index)
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulaPreprocesada, ClasePreprocesada
 
-    return edificios
-
-def obtener_cantidad_de_clases_fuera_del_edificio_preferido(
-        clases: DataFrame,
-        aulas: DataFrame,
+def cantidad_de_clases_fuera_del_edificio_preferido(
+        clases: Sequence[ClasePreprocesada],
+        aulas: Sequence[AulaPreprocesada],
+        rangos_de_aulas: dict[str, tuple[int, int]],
         modelo: cp_model.CpModel,
         asignaciones: np.ndarray
-    ) -> tuple[LinearExpr, int]:
+) -> tuple[LinearExpr|int, int]:
     '''
     Devuelve una expresión que representa la cantidad de clases fuera de su
     edificio preferido, y su cota superior.
     '''
-    edificios = construir_edificios(aulas)
-
     # La cantidad comienza con el total de clases, y por cada clase que se
     # encuentra dentro de su edificio preferido se resta 1 a la cantidad de
     # clases fuera del edificio preferido
-    cantidad_de_clases_fuera_del_edificio_preferido = len(clases)
+    cantidad_de_clases_fuera_del_edificio_preferido: LinearExpr|int = len(clases)
     cota_superior = len(clases)
 
-    for clase in clases.itertuples():
+    for i_clase, clase in enumerate(clases):
         if clase.edificio_preferido:
+            aulas_preferidas = slice(*rangos_de_aulas[clase.edificio_preferido])
             # Esta expresión da 1 o 0
-            en_edificio_preferido = sum(asignaciones[clase.Index, aula] for aula in edificios[clase.edificio_preferido])
-            cantidad_de_clases_fuera_del_edificio_preferido -= en_edificio_preferido
+            está_en_el_edificio_preferido = sum(asignaciones[i_clase, aulas_preferidas])
+            cantidad_de_clases_fuera_del_edificio_preferido -= está_en_el_edificio_preferido
         else:
             # Si no tiene edificio preferido, no puede estar fuera de su edificio preferido
             cantidad_de_clases_fuera_del_edificio_preferido -= 1
@@ -205,7 +197,7 @@ def obtener_cantidad_de_alumnos_en_edificios_no_deseables(
 # Iterable de tuplas (peso, función)
 todas_las_penalizaciones = (
     (1000, obtener_cantidad_de_alumnos_fuera_del_aula),
-    (100,  obtener_cantidad_de_clases_fuera_del_edificio_preferido),
+    (100,  cantidad_de_clases_fuera_del_edificio_preferido),
     (10,   obtener_cantidad_de_alumnos_en_edificios_no_deseables),
     (1,    obtener_capacidad_sobrante)
 )

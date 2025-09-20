@@ -18,7 +18,13 @@ from datetime import time
 from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Materia, Clase
 from asignacion_aulica.gestor_de_datos.día import Día
 
-from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulaPreprocesada, calcular_rango_de_aulas_por_edificio, preprocesar_aulas
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
+    AulaPreprocesada,
+    ClasePreprocesada,
+    calcular_rango_de_aulas_por_edificio,
+    preprocesar_aulas,
+    preprocesar_clases
+)
 
 def pytest_configure(config):
     # Registrar los markers usados por las fixtures
@@ -279,6 +285,22 @@ def clases(request) -> Sequence[Clase]:
     marker = request.node.get_closest_marker('clases')
     data = marker.args if marker else ()
     return make_clases(data)
+
+@pytest.fixture
+def clases_preprocesadas(clases, materias, carreras) -> tuple[
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ]
+]:
+    '''
+    :return: El resultado de preprocesar las clases/materias/carreras obtenidas
+    de los correspondientes fixtures.
+    '''
+    return preprocesar_clases(clases, materias, carreras)
 
 @pytest.fixture
 def modelo() -> CpModel:

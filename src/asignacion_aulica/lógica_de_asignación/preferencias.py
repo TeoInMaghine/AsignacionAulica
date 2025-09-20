@@ -75,30 +75,31 @@ def cantidad_de_clases_fuera_del_edificio_preferido(
 
     return cantidad_de_clases_fuera_del_edificio_preferido, cota_superior
 
-def obtener_cantidad_de_alumnos_fuera_del_aula(
-        clases: DataFrame,
-        aulas: DataFrame,
+def cantidad_de_alumnos_fuera_del_aula(
+        clases: Sequence[ClasePreprocesada],
+        aulas: Sequence[AulaPreprocesada],
+        rangos_de_aulas: dict[str, tuple[int, int]],
         modelo: cp_model.CpModel,
         asignaciones: np.ndarray
-    ) -> tuple[LinearExpr, int]:
+) -> tuple[LinearExpr|int, int]:
     '''
     Devuelve una expresión que representa la cantidad de alumnos que exceden la
     capacidad del aula asignada a su clase, y su cota superior.
     '''
-    mínima_capacidad = min(aulas["capacidad"])
+    mínima_capacidad = min(aula.capacidad for aula in aulas)
 
-    cantidad_de_alumnos_fuera_del_aula = 0
+    cantidad_de_alumnos_fuera_del_aula: LinearExpr|int = 0
     cota_superior_total = 0
 
-    for clase in clases.itertuples():
+    for i_clase, clase in enumerate(clases):
         # Un modelo es inválido si una variable tiene un upper bound menor a su
         # lower bound, así que tenemos que limitarlo
-        máximo_exceso_de_capacidad = max(0, clase.cantidad_de_alumnos - mínima_capacidad)
-        exceso_de_capacidad = modelo.new_int_var(0, máximo_exceso_de_capacidad, f"exceso_de_capacidad_de_{clase.nombre}")
+        máximo_exceso_de_capacidad: LinearExpr|int = max(0, clase.cantidad_de_alumnos - mínima_capacidad)
+        exceso_de_capacidad = modelo.new_int_var(0, máximo_exceso_de_capacidad, f"exceso_de_capacidad_de_clase{i_clase}")
         cota_superior = 0
 
-        for aula in aulas.itertuples():
-            asignada_a_este_aula = asignaciones[clase.Index, aula.Index]
+        for i_aula, aula in enumerate(aulas):
+            asignada_a_este_aula = asignaciones[i_clase, i_aula]
 
             # Esta lógica asume que no va a haber asignaciones en 1 nunca;
             # que van a ser 0 (asignaciones prohibidas) o variables del modelo
@@ -196,7 +197,7 @@ def obtener_cantidad_de_alumnos_en_edificios_no_deseables(
 
 # Iterable de tuplas (peso, función)
 todas_las_penalizaciones = (
-    (1000, obtener_cantidad_de_alumnos_fuera_del_aula),
+    (1000, cantidad_de_alumnos_fuera_del_aula),
     (100,  cantidad_de_clases_fuera_del_edificio_preferido),
     (10,   obtener_cantidad_de_alumnos_en_edificios_no_deseables),
     (1,    obtener_capacidad_sobrante)

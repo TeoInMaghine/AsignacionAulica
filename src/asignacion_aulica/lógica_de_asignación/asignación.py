@@ -73,7 +73,7 @@ def asignar(
     más clases.
     '''
     # Preprocesar los datos
-    rangos_de_aulas: dict[str, tuple[int, int]] = calcular_rango_de_aulas_por_edificio(edificios, aulas)
+    rangos_de_aulas: dict[str, slice] = calcular_rango_de_aulas_por_edificio(edificios, aulas)
     aulas_dobles: dict[int, tuple[int, int]] = calcular_índices_de_aulas_dobles(edificios, aulas, rangos_de_aulas)
     aulas_preprocesadas: Sequence[AulaPreprocesada] = preprocesar_aulas(edificios, aulas, rangos_de_aulas)
     clases_preprocesadas = preprocesar_clases(clases, materias, carreras)

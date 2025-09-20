@@ -20,9 +20,7 @@ from asignacion_aulica.gestor_de_datos.día import Día
 
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
     AulaPreprocesada,
-    ClasePreprocesada,
-    calcular_rango_de_aulas_por_edificio,
-    preprocesar_aulas,
+    AulasPreprocesadas,
     preprocesar_clases
 )
 
@@ -237,12 +235,8 @@ def aulas(request) -> Sequence[Aula]:
     return make_aulas(data)
 
 @pytest.fixture
-def rangos_de_aulas(edificios, aulas) -> dict[str, tuple[int, int]]:
-    return calcular_rango_de_aulas_por_edificio(edificios, aulas)
-
-@pytest.fixture
-def aulas_preprocesadas(edificios, aulas, rangos_de_aulas) -> Sequence[AulaPreprocesada]:
-    return preprocesar_aulas(edificios, aulas, rangos_de_aulas)
+def aulas_preprocesadas(edificios, aulas) -> AulasPreprocesadas:
+    return AulasPreprocesadas(edificios, aulas)
 
 @pytest.fixture
 def carreras(request) -> Sequence[Carrera]:
@@ -286,50 +280,50 @@ def clases(request) -> Sequence[Clase]:
     data = marker.args if marker else ()
     return make_clases(data)
 
-@pytest.fixture
-def clases_preprocesadas(clases, materias, carreras) -> tuple[
-    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
-    tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ]
-]:
-    '''
-    :return: El resultado de preprocesar las clases/materias/carreras obtenidas
-    de los correspondientes fixtures.
-    '''
-    return preprocesar_clases(clases, materias, carreras)
+# @pytest.fixture
+# def clases_preprocesadas(clases, materias, carreras) -> tuple[
+#     tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+#     tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+#     tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+#     tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+#     tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+#     tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ],
+#     tuple[ list[ClasePreprocesada], list[int], set[tuple[str, str, time, time]] ]
+# ]:
+#     '''
+#     :return: El resultado de preprocesar las clases/materias/carreras obtenidas
+#     de los correspondientes fixtures.
+#     '''
+#     return preprocesar_clases(clases, materias, carreras)
 
-@pytest.fixture
-def modelo() -> CpModel:
-    ':return: Un CpModel para este caso de prueba.'
-    return CpModel()
+# @pytest.fixture
+# def modelo() -> CpModel:
+#     ':return: Un CpModel para este caso de prueba.'
+#     return CpModel()
 
-@pytest.fixture
-def asignaciones(
-        request,
-        clases: Sequence[Clase],
-        aulas: Sequence[Aula],
-        modelo: CpModel
-    ) -> np.ndarray:
-    '''
-    Genera una matriz con las variables de asignación. No hay constantes, todas
-    son variables que se agregan al modelo, a menos que se especifiquen
-    asignaciones forzadas, en cuyo caso se colocan los ceros donde corresponda
-    (no unos, para simular como ocurriría en la asignación real).
+# @pytest.fixture
+# def asignaciones(
+#         request,
+#         clases: Sequence[Clase],
+#         aulas: Sequence[Aula],
+#         modelo: CpModel
+#     ) -> np.ndarray:
+#     '''
+#     Genera una matriz con las variables de asignación. No hay constantes, todas
+#     son variables que se agregan al modelo, a menos que se especifiquen
+#     asignaciones forzadas, en cuyo caso se colocan los ceros donde corresponda
+#     (no unos, para simular como ocurriría en la asignación real).
 
-    También se agregan restricciones para que cada clase se asigne exactamente a
-    un aula.
+#     También se agregan restricciones para que cada clase se asigne exactamente a
+#     un aula.
 
-    Las asignaciones forzadas se definen en el marker "asignaciones_forzadas",
-    que si está presente tiene que tener un diccionario que mapea índices de
-    clases a índices de aulas.
+#     Las asignaciones forzadas se definen en el marker "asignaciones_forzadas",
+#     que si está presente tiene que tener un diccionario que mapea índices de
+#     clases a índices de aulas.
 
-    :return: Matriz con los datos de asignaciones.
-    '''
-    marker = request.node.get_closest_marker('asignaciones_forzadas')
-    asignaciones_forzadas: dict[int, int] = marker.args[0] if marker else dict()
+#     :return: Matriz con los datos de asignaciones.
+#     '''
+#     marker = request.node.get_closest_marker('asignaciones_forzadas')
+#     asignaciones_forzadas: dict[int, int] = marker.args[0] if marker else dict()
 
-    return make_asignaciones(len(clases), len(aulas), modelo, asignaciones_forzadas)
+#     return make_asignaciones(len(clases), len(aulas), modelo, asignaciones_forzadas)

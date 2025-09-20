@@ -328,3 +328,14 @@ def test_separar_clases_por_día(clases, materias, carreras):
     assert clases_preprocesadas[Día.Miércoles] == ([], [], set())
     assert clases_preprocesadas[Día.Viernes] == ([], [], set())
     assert clases_preprocesadas[Día.Domingo] == ([], [], set())
+
+@pytest.mark.carreras(dict(nombre='c', edificio_preferido='preferido'))
+@pytest.mark.materias(dict(nombre='m', carrera='c'))
+@pytest.mark.clases(
+    dict(carrera='c', materia='m', día=Día.Lunes),
+    dict(carrera='c', materia='m', día=Día.Jueves)
+)
+def test_preprocesar_clases_con_edificio_preferido(clases, materias, carreras):
+    clases_preprocesadas = preprocesar_clases(clases, materias, carreras)
+    assert clases_preprocesadas[Día.Lunes][0][0].edificio_preferido == 'preferido'
+    assert clases_preprocesadas[Día.Jueves][0][0].edificio_preferido == 'preferido'

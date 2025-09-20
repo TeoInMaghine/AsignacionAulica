@@ -173,12 +173,20 @@ def preprocesar_clases(
         else:
             i_carrera = bisect_left(carreras, clase.carrera, key=lambda c:c.nombre)
             i_materia = bisect_left(materias, clase.carrera+clase.materia, key=lambda m:m.carrera+m.nombre)
+            carrera = carreras[i_carrera]
+            materia = materias[i_materia]
+            
             datos_procesados[clase.día][1].append(i)
             datos_procesados[clase.día][0].append(ClasePreprocesada(
-                clase.carrera, clase.materia, materias[i_materia].año,
-                clase.día, clase.horario_inicio, clase.horario_fin,
-                clase.cantidad_de_alumnos, clase.equipamiento_necesario,
-                carreras[i_carrera].edificio_preferido
+                carrera=clase.carrera,
+                materia=clase.materia,
+                año=materia.año,
+                día=clase.día,
+                horario_inicio=clase.horario_inicio,
+                horario_fin=clase.horario_fin,
+                cantidad_de_alumnos=clase.cantidad_de_alumnos,
+                equipamiento_necesario=clase.equipamiento_necesario,
+                edificio_preferido=carrera.edificio_preferido
             ))
 
     return datos_procesados

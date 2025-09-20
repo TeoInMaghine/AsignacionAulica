@@ -103,7 +103,7 @@ def make_carreras(carreras: tuple[dict[str, Any], ...]) -> list[Carrera]:
     _carreras = [
         Carrera(
             carrera.get('nombre', f'carrera {i}'),
-            carrera.get('edificio_freferido', None)
+            carrera.get('edificio_preferido', None)
         )
         for i, carrera in enumerate(carreras)
     ]
@@ -170,11 +170,11 @@ def make_clases(clases: tuple[dict[str, Any], ...]) -> list[Clase]:
     return _clases
 
 def make_asignaciones(
-        clases: Sequence[Clase],
-        aulas: Sequence[Aula],
+        n_clases: int,
+        n_aulas: int,
         modelo: CpModel,
         asignaciones_forzadas: dict[int, int] = {}
-    ) -> np.ndarray:
+) -> np.ndarray:
     '''
     Genera una matriz con las variables de asignación. No hay constantes, todas
     son variables que se agregan al modelo, a menos que se especifiquen
@@ -188,7 +188,7 @@ def make_asignaciones(
     aulas.
     :return: Matriz con los datos de asignaciones.
     '''
-    asignaciones = np.empty(shape=(len(clases), len(aulas)), dtype=object)
+    asignaciones = np.empty(shape=(n_clases, n_aulas), dtype=object)
     
     for clase, aula in np.ndindex(asignaciones.shape):
         if clase not in asignaciones_forzadas or asignaciones_forzadas[clase] == aula:
@@ -236,7 +236,6 @@ def rangos_de_aulas(edificios, aulas) -> dict[str, tuple[int, int]]:
 
 @pytest.fixture
 def aulas_preprocesadas(edificios, aulas, rangos_de_aulas) -> Sequence[AulaPreprocesada]:
-    print(aulas)
     return preprocesar_aulas(edificios, aulas, rangos_de_aulas)
 
 @pytest.fixture
@@ -289,8 +288,8 @@ def modelo() -> CpModel:
 @pytest.fixture
 def asignaciones(
         request,
-        clases: DataFrame,
-        aulas: DataFrame,
+        clases: Sequence[Clase],
+        aulas: Sequence[Aula],
         modelo: CpModel
     ) -> np.ndarray:
     '''
@@ -311,4 +310,4 @@ def asignaciones(
     marker = request.node.get_closest_marker('asignaciones_forzadas')
     asignaciones_forzadas: dict[int, int] = marker.args[0] if marker else dict()
 
-    return make_asignaciones(clases, aulas, modelo, asignaciones_forzadas)
+    return make_asignaciones(len(clases), len(aulas), modelo, asignaciones_forzadas)

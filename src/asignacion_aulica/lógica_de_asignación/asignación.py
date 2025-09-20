@@ -63,7 +63,7 @@ def asignar(
     :param aulas: Las aulas disponibles en cada uno de los edificios (agrupadas
     por edificio, en el mismo orden que la secuencia de edificios, y dentro de
     cada edificio ordenadas alfabéticamente).
-    :param carreras: Las carreras que existen.
+    :param carreras: Las carreras que existen, en orden alfabético.
     :param materias: Las materias de todas las carreras (agrupadas por carrera
     en el mismo orden que la secuencia de carreras).
     :param clases: Las clases de todas las materias (agrupadas por materia, en

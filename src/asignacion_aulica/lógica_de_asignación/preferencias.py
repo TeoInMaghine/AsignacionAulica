@@ -41,6 +41,11 @@ import numpy as np
 
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulaPreprocesada, ClasePreprocesada
 
+#TODO: Preferir que clases del mismo año de la misma carrera el mismo día se
+#      asignen en el mismo edificio.
+#TODO: ¿Tal vez preferir que las clases de la misma materia se asignen al mismo
+#      edificio?
+
 def cantidad_de_clases_fuera_del_edificio_preferido(
         clases: Sequence[ClasePreprocesada],
         aulas: Sequence[AulaPreprocesada],

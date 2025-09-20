@@ -163,25 +163,26 @@ def capacidad_sobrante(
 
     return capacidad_sobrante_total, cota_superior_total
 
-def obtener_cantidad_de_alumnos_en_edificios_no_deseables(
-        clases: DataFrame,
-        aulas: DataFrame,
+def cantidad_de_alumnos_en_edificios_no_deseables(
+        clases: Sequence[ClasePreprocesada],
+        aulas: Sequence[AulaPreprocesada],
+        rangos_de_aulas: dict[str, tuple[int, int]],
         modelo: cp_model.CpModel,
         asignaciones: np.ndarray
-    ) -> tuple[LinearExpr, int]:
+) -> tuple[LinearExpr|int, int]:
     '''
     Devuelve una expresión que representa la cantidad de alumnos que cursan en
-    edificios no deseables, y una cota superior de la expresión.
+    edificios que se prefiere no usar, y una cota superior de la expresión.
     '''
-    aulas_de_edificios_no_deseables = aulas.index[aulas['preferir_no_usar']]
+    aulas_de_edificios_no_deseables = [i for i, aula in enumerate(aulas) if aula.preferir_no_usar]
 
     cantidad_de_alumnos_en_edificios_no_deseables = 0
     cota_superior = 0
 
-    for clase in clases.itertuples():
+    for i_clase, clase in enumerate(clases):
         # Esta lógica asume que no va a haber asignaciones en 1 nunca;
         # que van a ser 0 (asignaciones prohibidas) o variables del modelo.
-        asignaciones_a_edificios_no_deseables = asignaciones[clase.Index, aulas_de_edificios_no_deseables]
+        asignaciones_a_edificios_no_deseables = asignaciones[i_clase, aulas_de_edificios_no_deseables]
         puede_estar_en_edificio_no_deseable = any(map(lambda x: isinstance(x, cp_model.IntVar), asignaciones_a_edificios_no_deseables))
 
         if puede_estar_en_edificio_no_deseable:
@@ -200,7 +201,7 @@ def obtener_cantidad_de_alumnos_en_edificios_no_deseables(
 todas_las_penalizaciones = (
     (1000, cantidad_de_alumnos_fuera_del_aula),
     (100,  cantidad_de_clases_fuera_del_edificio_preferido),
-    (10,   obtener_cantidad_de_alumnos_en_edificios_no_deseables),
+    (10,   cantidad_de_alumnos_en_edificios_no_deseables),
     (1,    capacidad_sobrante)
 )
 

@@ -3,7 +3,6 @@ from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 from datetime import time
 
-from asignacion_aulica.gestor_de_datos.día import Día
 from asignacion_aulica.gestor_de_datos.entidades import (
     Edificio,
     Aula,
@@ -104,7 +103,7 @@ class ClasesPreprocesadas:
     de `ClasesPreprocesadas`, pero por el momento eso no se está haciendo.
     '''
     # Un conjunto de clases que han de ser asignadas. Las clases en este
-    # conjunto no son virtuales y no tienen asignación manual.
+    # conjunto son presenciales y no tienen asignación manual.
     clases: Sequence[Clase]
 
     # Los índices que tienen las clases de este conjunto en la secuencia de
@@ -116,9 +115,8 @@ class ClasesPreprocesadas:
     # aulas contenidas en el segundo rango.
     rangos_de_aulas_preferidas: Iterable[tuple[slice, slice]]
 
-    # Un set de horarios en los que algunas aulas están ocupadas con clases que
-    # tienen asignación manual.
-    # Expresados en tuplas (edificio, aula, inicio, fin).
+    # Horarios en los que algunas aulas están ocupadas con clases que tienen
+    # asignación manual, expresados en tuplas (edificio, aula, inicio, fin).
     aulas_ocupadas: Iterable[tuple[str, str, time, time]]
 
 def preprocesar_clases(
@@ -135,8 +133,8 @@ def preprocesar_clases(
     Preprocesar los datos de clases/materias/carreras provenientes del gestor de
     datos para que queden en un formato cómodo para la lógica de asignación.
 
-    Separar los datos de las clases que hay que asignar en cada día de la
-    semana, filtrando clases virtuales y clases con asignación manual.
+    Separar por día de la semana los datos de las clases que hay que asignar,
+    filtrando clases virtuales y clases con asignación manual.
 
     :param carreras: Las carreras que existen, en orden alfabético.
     :param materias: Las materias de todas las carreras (agrupadas por carrera

@@ -35,11 +35,10 @@ llamada "total" que es la que hay que minimizar.
 '''
 from ortools.sat.python.cp_model_helper import LinearExpr
 from ortools.sat.python import cp_model
-from collections.abc import Sequence
 from pandas import DataFrame
 import numpy as np
 
-from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulaPreprocesada, ClasePreprocesada
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadas
 
 #TODO: Preferir que clases del mismo año de la misma carrera el mismo día se
 #      asignen en el mismo edificio.
@@ -47,32 +46,25 @@ from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulaPrepro
 #      edificio?
 
 def cantidad_de_clases_fuera_del_edificio_preferido(
-        clases: Sequence[ClasePreprocesada],
-        aulas: Sequence[AulaPreprocesada],
-        rangos_de_aulas: dict[str, tuple[int, int]],
+        clases: ClasesPreprocesadas,
+        aulas: AulasPreprocesadas,
         modelo: cp_model.CpModel,
         asignaciones: np.ndarray
 ) -> tuple[LinearExpr|int, int]:
     '''
     Devuelve una expresión que representa la cantidad de clases fuera de su
     edificio preferido, y su cota superior.
-    '''
-    # La cantidad comienza con el total de clases, y por cada clase que se
-    # encuentra dentro de su edificio preferido se resta 1 a la cantidad de
-    # clases fuera del edificio preferido
-    cantidad_de_clases_fuera_del_edificio_preferido: LinearExpr|int = len(clases)
-    cota_superior = len(clases)
 
-    for i_clase, clase in enumerate(clases):
-        if clase.edificio_preferido:
-            aulas_preferidas = slice(*rangos_de_aulas[clase.edificio_preferido])
-            # Esta expresión da 1 o 0
-            está_en_el_edificio_preferido = sum(asignaciones[i_clase, aulas_preferidas])
-            cantidad_de_clases_fuera_del_edificio_preferido -= está_en_el_edificio_preferido
-        else:
-            # Si no tiene edificio preferido, no puede estar fuera de su edificio preferido
-            cantidad_de_clases_fuera_del_edificio_preferido -= 1
-            cota_superior -= 1
+    TODO: calcular cantidad de alumnos en vez de cantidad de clases.
+    '''
+    cantidad_de_clases_fuera_del_edificio_preferido: LinearExpr|int = 0
+    cota_superior: int = 0
+
+    for rango_clases, rango_aulas_preferidas in clases.rangos_de_aulas_preferidas:
+        n_clases = rango_clases.stop - rango_clases.start
+        asignaciones_a_aulas_preferidas = asignaciones[rango_clases, rango_aulas_preferidas]
+        cantidad_de_clases_fuera_del_edificio_preferido += n_clases - asignaciones_a_aulas_preferidas.sum()
+        cota_superior += n_clases
 
     # Evitamos que la cota superior sea 0 porque luego se usa para dividir
     if cota_superior == 0:
@@ -81,53 +73,50 @@ def cantidad_de_clases_fuera_del_edificio_preferido(
     return cantidad_de_clases_fuera_del_edificio_preferido, cota_superior
 
 def cantidad_de_alumnos_fuera_del_aula(
-        clases: Sequence[ClasePreprocesada],
-        aulas: Sequence[AulaPreprocesada],
-        rangos_de_aulas: dict[str, tuple[int, int]],
+        clases: ClasesPreprocesadas,
+        aulas: AulasPreprocesadas,
         modelo: cp_model.CpModel,
         asignaciones: np.ndarray
 ) -> tuple[LinearExpr|int, int]:
     '''
     Devuelve una expresión que representa la cantidad de alumnos que exceden la
     capacidad del aula asignada a su clase, y su cota superior.
-    '''
-    mínima_capacidad = min(aula.capacidad for aula in aulas)
 
-    cantidad_de_alumnos_fuera_del_aula: LinearExpr|int = 0
+    TODO: cambiar nombre a cantidad_de_alumnos_que_no_entran_en_el_aula
+    '''
+    mínima_capacidad = min(aula.capacidad for aula in aulas.aulas)
+
+    cantidad_de_alumnos_que_no_entran_en_el_aula: LinearExpr|int = 0
     cota_superior_total = 0
 
-    for i_clase, clase in enumerate(clases):
-        # Un modelo es inválido si una variable tiene un upper bound menor a su
-        # lower bound, así que tenemos que limitarlo
+    for i_clase, clase in enumerate(clases.clases):
         máximo_exceso_de_capacidad: LinearExpr|int = max(0, clase.cantidad_de_alumnos - mínima_capacidad)
-        exceso_de_capacidad = modelo.new_int_var(0, máximo_exceso_de_capacidad, f"exceso_de_capacidad_de_clase{i_clase}")
-        cota_superior = 0
+        exceso_de_capacidad_en_esta_clase = modelo.new_int_var(0, máximo_exceso_de_capacidad, f"exceso_de_capacidad_de_clase{i_clase}")
+        cota_superior_en_esta_clase = 0
 
-        for i_aula, aula in enumerate(aulas):
+        for i_aula, aula in enumerate(aulas.aulas):
             asignada_a_este_aula = asignaciones[i_clase, i_aula]
 
             # Esta lógica asume que no va a haber asignaciones en 1 nunca;
             # que van a ser 0 (asignaciones prohibidas) o variables del modelo
             if isinstance(asignada_a_este_aula, cp_model.IntVar):
-                posible_exceso = max(0, clase.cantidad_de_alumnos - aula.capacidad)
-                modelo.add(exceso_de_capacidad == posible_exceso).only_enforce_if(asignada_a_este_aula)
+                exceso_si_se_asigna_a_este_aula = max(0, clase.cantidad_de_alumnos - aula.capacidad)
+                modelo.add(exceso_de_capacidad_en_esta_clase == exceso_si_se_asigna_a_este_aula).only_enforce_if(asignada_a_este_aula)
 
-                # Si no se sabe la asignación de antemano, la cota superior puede necesitar actualización
-                cota_superior = max(cota_superior, posible_exceso)
+                cota_superior_en_esta_clase = max(cota_superior_en_esta_clase, exceso_si_se_asigna_a_este_aula)
 
-        cantidad_de_alumnos_fuera_del_aula += exceso_de_capacidad
-        cota_superior_total += cota_superior
+        cantidad_de_alumnos_que_no_entran_en_el_aula += exceso_de_capacidad_en_esta_clase
+        cota_superior_total += cota_superior_en_esta_clase
 
     # Evitamos que la cota superior sea 0 porque luego se usa para dividir
     if cota_superior_total == 0:
         cota_superior_total = 1
 
-    return cantidad_de_alumnos_fuera_del_aula, cota_superior_total
+    return cantidad_de_alumnos_que_no_entran_en_el_aula, cota_superior_total
 
 def capacidad_sobrante(
-        clases: Sequence[ClasePreprocesada],
-        aulas: Sequence[AulaPreprocesada],
-        rangos_de_aulas: dict[str, tuple[int, int]],
+        clases: ClasesPreprocesadas,
+        aulas: AulasPreprocesadas,
         modelo: cp_model.CpModel,
         asignaciones: np.ndarray
 ) -> tuple[LinearExpr|int, int]:
@@ -135,32 +124,29 @@ def capacidad_sobrante(
     Devuelve una expresión que representa la cantidad de asientos que sobran en
     el aula asignada a cada clase, y su cota superior.
     '''
-    máxima_capacidad = max(aula.capacidad for aula in aulas)
+    máxima_capacidad = max(aula.capacidad for aula in aulas.aulas)
 
     capacidad_sobrante_total: LinearExpr|int = 0
     cota_superior_total: int = 0
 
-    for i_clase, clase in enumerate(clases):
-        # Un modelo es inválido si una variable tiene un upper bound menor a su
-        # lower bound, así que tenemos que limitarlo
+    for i_clase, clase in enumerate(clases.clases):
         máxima_capacidad_sobrante = max(0, máxima_capacidad - clase.cantidad_de_alumnos)
-        capacidad_sobrante = modelo.new_int_var(0, máxima_capacidad_sobrante, f"capacidad_sobrante_clase_{i_clase}")
-        cota_superior = 0
+        capacidad_sobrante_en_esta_clase = modelo.new_int_var(0, máxima_capacidad_sobrante, f"capacidad_sobrante_clase_{i_clase}")
+        cota_superior_en_esta_clase = 0
 
-        for i_aula, aula in enumerate(aulas):
+        for i_aula, aula in enumerate(aulas.aulas):
             asignada_a_este_aula = asignaciones[i_clase, i_aula]
 
             # Esta lógica asume que no va a haber asignaciones en 1 nunca;
             # que van a ser 0 (asignaciones prohibidas) o variables del modelo
             if isinstance(asignada_a_este_aula, cp_model.IntVar):
-                posible_sobra = max(0, aula.capacidad - clase.cantidad_de_alumnos)
-                modelo.add(capacidad_sobrante == posible_sobra).only_enforce_if(asignada_a_este_aula)
+                sobrante_si_se_asigna_a_este_aula = max(0, aula.capacidad - clase.cantidad_de_alumnos)
+                modelo.add(capacidad_sobrante_en_esta_clase == sobrante_si_se_asigna_a_este_aula).only_enforce_if(asignada_a_este_aula)
 
-                # Si no se sabe la asignación de antemano, la cota superior puede necesitar actualización
-                cota_superior = max(cota_superior, posible_sobra)
+                cota_superior_en_esta_clase = max(cota_superior_en_esta_clase, sobrante_si_se_asigna_a_este_aula)
 
-        capacidad_sobrante_total += capacidad_sobrante
-        cota_superior_total += cota_superior
+        capacidad_sobrante_total += capacidad_sobrante_en_esta_clase
+        cota_superior_total += cota_superior_en_esta_clase
 
     # Evitamos que la cota superior sea 0 porque luego se usa para dividir
     if cota_superior_total == 0:
@@ -169,9 +155,8 @@ def capacidad_sobrante(
     return capacidad_sobrante_total, cota_superior_total
 
 def cantidad_de_alumnos_en_edificios_no_deseables(
-        clases: Sequence[ClasePreprocesada],
-        aulas: Sequence[AulaPreprocesada],
-        rangos_de_aulas: dict[str, tuple[int, int]],
+        clases: ClasesPreprocesadas,
+        aulas: AulasPreprocesadas,
         modelo: cp_model.CpModel,
         asignaciones: np.ndarray
 ) -> tuple[LinearExpr|int, int]:
@@ -179,20 +164,18 @@ def cantidad_de_alumnos_en_edificios_no_deseables(
     Devuelve una expresión que representa la cantidad de alumnos que cursan en
     edificios que se prefiere no usar, y una cota superior de la expresión.
     '''
-    aulas_de_edificios_no_deseables = [i for i, aula in enumerate(aulas) if aula.preferir_no_usar]
-
     cantidad_de_alumnos_en_edificios_no_deseables = 0
     cota_superior = 0
 
-    for i_clase, clase in enumerate(clases):
+    for i_clase, clase in enumerate(clases.clases):
         # Esta lógica asume que no va a haber asignaciones en 1 nunca;
         # que van a ser 0 (asignaciones prohibidas) o variables del modelo.
-        asignaciones_a_edificios_no_deseables = asignaciones[i_clase, aulas_de_edificios_no_deseables]
+        asignaciones_a_edificios_no_deseables = asignaciones[i_clase, aulas.preferir_no_usar]
         puede_estar_en_edificio_no_deseable = any(map(lambda x: isinstance(x, cp_model.IntVar), asignaciones_a_edificios_no_deseables))
 
         if puede_estar_en_edificio_no_deseable:
-            está_en_aula_no_deseable = sum(asignaciones_a_edificios_no_deseables)
-            cantidad_de_alumnos_en_edificios_no_deseables += clase.cantidad_de_alumnos * está_en_aula_no_deseable
+            está_en_edificio_no_deseable = sum(asignaciones_a_edificios_no_deseables)
+            cantidad_de_alumnos_en_edificios_no_deseables += clase.cantidad_de_alumnos * está_en_edificio_no_deseable
             cota_superior += clase.cantidad_de_alumnos
 
     # Evitamos que la cota superior sea 0 porque luego se usa para dividir

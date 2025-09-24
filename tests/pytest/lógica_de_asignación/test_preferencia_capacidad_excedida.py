@@ -18,9 +18,9 @@ from asignacion_aulica.lógica_de_asignación import preferencias
     dict(cantidad_de_alumnos=100, día=Día.Lunes)
 )
 @pytest.mark.asignaciones_forzadas({ 0: 0, 1: 1, 2: 2 }) # Asignaciones arbitrarias (clase i con aula i)
-def test_algunas_clases_exceden_capacidad(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
-    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+def test_algunas_clases_exceden_capacidad(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
+    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (31 - 30 + 50 - 40 + 100 - 25)
 
     # Resolver
@@ -42,9 +42,9 @@ def test_algunas_clases_exceden_capacidad(aulas_preprocesadas, clases_preprocesa
     dict(cantidad_de_alumnos=50, día=Día.Lunes),
     dict(cantidad_de_alumnos=100, día=Día.Lunes)
 )
-def test_ninguna_clase_excede_capacidad(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
-    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+def test_ninguna_clase_excede_capacidad(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
+    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     # La cota superior sería 0, pero en cambio se devuelve 1 porque si no
     # fallaría al normalizar, siendo que debe dividir por la cota superior
     assert cota_superior == 1
@@ -67,16 +67,16 @@ def test_ninguna_clase_excede_capacidad(aulas_preprocesadas, clases_preprocesada
     dict(cantidad_de_alumnos=20, día=Día.Lunes),
     dict(cantidad_de_alumnos=30, día=Día.Lunes)
 )
-def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
+def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
 
     # Restricciones para que no estén en el mismo aula
-    for i_clase1, i_clase2 in combinations(range(len(clases_lunes)), 2):
-        for i_aula in range(len(aulas_preprocesadas)):
+    for i_clase1, i_clase2 in combinations(range(len(clases_lunes.clases)), 2):
+        for i_aula in range(len(aulas_preprocesadas.aulas)):
             modelo.add( asignaciones[i_clase1, i_aula] + asignaciones[i_clase2, i_aula] <= 1 )
 
     # Minimizar capacidad excedida
-    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (10 - 10 + 20 - 10 + 30 - 10)
 
     # Resolver
@@ -102,7 +102,7 @@ def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, rangos_de_aul
     dict(cantidad_de_alumnos=21, día=Día.Lunes),
     dict(cantidad_de_alumnos=31, día=Día.Lunes)
 )
-def test_minimiza_capacidad_excedida(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
+def test_minimiza_capacidad_excedida(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
     '''
     Esta prueba es para verificar que minimiza la capacidad excedida en total, y
     no el número de aulas con capacidad excedida.
@@ -111,15 +111,15 @@ def test_minimiza_capacidad_excedida(aulas_preprocesadas, clases_preprocesadas, 
     grande en el aula más chica y quedaría mucha gente afuera. En cambio si
     minimiza la gente que queda afuera, queda menos gente afuera.
     '''
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
+    clases_lunes = clases_preprocesadas[Día.Lunes]
 
     # Restricciones para que no estén en el mismo aula
-    for i_clase1, i_clase2 in combinations(range(len(clases_lunes)), 2):
-        for i_aula in range(len(aulas_preprocesadas)):
+    for i_clase1, i_clase2 in combinations(range(len(clases_lunes.clases)), 2):
+        for i_aula in range(len(aulas_preprocesadas.aulas)):
             modelo.add( asignaciones[i_clase1, i_aula] + asignaciones[i_clase2, i_aula] <= 1 )
 
     # Minimizar capacidad excedida
-    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (31 - 10 + 21 - 10 + 11 - 10)
 
     # Resolver

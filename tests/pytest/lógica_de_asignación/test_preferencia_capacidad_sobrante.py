@@ -18,9 +18,9 @@ from asignacion_aulica.gestor_de_datos.día import Día
     dict(cantidad_de_alumnos=25, día=Día.Lunes)
     )
 @pytest.mark.asignaciones_forzadas({ 0: 0, 1: 1, 2: 2 }) # Asignaciones arbitrarias: clase i con aula i
-def test_a_algunas_clases_les_sobra_capacidad(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
-    cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+def test_a_algunas_clases_les_sobra_capacidad(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
+    cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (31 - 30 + 50 - 40 + 100 - 25)
 
     # Resolver
@@ -42,9 +42,9 @@ def test_a_algunas_clases_les_sobra_capacidad(aulas_preprocesadas, clases_prepro
     dict(cantidad_de_alumnos=400, día=Día.Lunes),
     dict(cantidad_de_alumnos=100, día=Día.Lunes)
 )
-def test_a_ninguna_clase_le_sobra_capacidad(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
-    cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+def test_a_ninguna_clase_le_sobra_capacidad(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
+    cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     # La cota superior sería 0, pero en cambio se devuelve 1 porque si no
     # fallaría al normalizar, siendo que debe dividir por la cota superior
     assert cota_superior == 1
@@ -67,16 +67,16 @@ def test_a_ninguna_clase_le_sobra_capacidad(aulas_preprocesadas, clases_preproce
     dict(cantidad_de_alumnos=20, día=Día.Lunes),
     dict(cantidad_de_alumnos=30, día=Día.Lunes)
 )
-def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
+def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
 
     # Restricciones para que no estén en el mismo aula
-    for i_clase1, i_clase2 in combinations(range(len(clases_lunes)), 2):
-        for i_aula in range(len(aulas_preprocesadas)):
+    for i_clase1, i_clase2 in combinations(range(len(clases_lunes.clases)), 2):
+        for i_aula in range(len(aulas_preprocesadas.aulas)):
             modelo.add( asignaciones[i_clase1, i_aula] + asignaciones[i_clase2, i_aula] <= 1 )
 
     # Minimizar capacidad sobrante
-    cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+    cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (30 - 10 + 30 - 20 + 30 - 30)
 
     # Resolver
@@ -102,7 +102,7 @@ def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, rangos_de_aul
     dict(cantidad_de_alumnos=20, día=Día.Lunes),
     dict(cantidad_de_alumnos=30, día=Día.Lunes)
 )
-def test_minimiza_capacidad_sobrante(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
+def test_minimiza_capacidad_sobrante(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
     '''
     Esta prueba es para verificar que minimiza la capacidad sobrante en total, y
     no el número de aulas con capacidad sobrante.
@@ -111,15 +111,15 @@ def test_minimiza_capacidad_sobrante(aulas_preprocesadas, clases_preprocesadas, 
     chica en el aula más grande y quedaría mucha gente afuera. En cambio si
     minimiza la gente que queda afuera, queda menos gente afuera.
     '''
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
+    clases_lunes = clases_preprocesadas[Día.Lunes]
 
     # Restricciones para que no estén en el mismo aula
-    for i_clase1, i_clase2 in combinations(range(len(clases_lunes)), 2):
-        for i_aula in range(len(aulas_preprocesadas)):
+    for i_clase1, i_clase2 in combinations(range(len(clases_lunes.clases)), 2):
+        for i_aula in range(len(aulas_preprocesadas.aulas)):
             modelo.add( asignaciones[i_clase1, i_aula] + asignaciones[i_clase2, i_aula] <= 1 )
 
     # Minimizar capacidad sobrante
-    cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+    cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (31 - 10 + 31 - 20 + 31 - 30)
 
     # Resolver

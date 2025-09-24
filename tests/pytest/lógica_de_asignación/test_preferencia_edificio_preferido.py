@@ -18,9 +18,9 @@ from asignacion_aulica.lógica_de_asignación import preferencias
     dict(carrera='c', materia='m', día=Día.Lunes)
 )
 @pytest.mark.asignaciones_forzadas({ 0: 1, 1: 2 })
-def test_todas_las_aulas_en_el_edificio_preferido(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
-    clases_fuera_del_edificio_preferido, cota_superior = preferencias.cantidad_de_clases_fuera_del_edificio_preferido(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+def test_todas_las_aulas_en_el_edificio_preferido(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
+    clases_fuera_del_edificio_preferido, cota_superior = preferencias.cantidad_de_clases_fuera_del_edificio_preferido(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == 2
 
     # Resolver
@@ -61,12 +61,12 @@ def test_todas_las_aulas_en_el_edificio_preferido(aulas_preprocesadas, clases_pr
     dict(carrera='c', materia='c', día=Día.Lunes)
 )
 @pytest.mark.asignaciones_forzadas({ 0: 2, 1: 1, 2: 2, 3: 2, 4: 0, 5: 0 })
-def test_algunas_aulas_en_el_edificio_preferido(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
-    clases_fuera_del_edificio_preferido, cota_superior = preferencias.cantidad_de_clases_fuera_del_edificio_preferido(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+def test_algunas_aulas_en_el_edificio_preferido(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
+    clases_fuera_del_edificio_preferido, cota_superior = preferencias.cantidad_de_clases_fuera_del_edificio_preferido(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     # La clase que no tiene edificio preferido no puede estar fuera de su
     # edificio preferido, y la cota máxima refleja este hecho
-    assert cota_superior == len(clases_lunes) - 1
+    assert cota_superior == len(clases_lunes.clases) - 1
 
     # Resolver
     solver = cp_model.CpSolver()
@@ -93,9 +93,9 @@ def test_algunas_aulas_en_el_edificio_preferido(aulas_preprocesadas, clases_prep
 @pytest.mark.carreras(dict(nombre='c', edificio_preferido='2 preferido') )
 @pytest.mark.materias(dict(nombre='m', carrera='c'))
 @pytest.mark.clases(dict(carrera='c', materia='m', día=Día.Lunes))
-def test_elije_aula_en_edificio_preferido(aulas_preprocesadas, clases_preprocesadas, rangos_de_aulas, modelo, asignaciones):
-    clases_lunes = clases_preprocesadas[Día.Lunes][0]
-    clases_fuera_del_edificio_preferido, cota_superior = preferencias.cantidad_de_clases_fuera_del_edificio_preferido(clases_lunes, aulas_preprocesadas, rangos_de_aulas, modelo, asignaciones)
+def test_elije_aula_en_edificio_preferido(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+    clases_lunes = clases_preprocesadas[Día.Lunes]
+    clases_fuera_del_edificio_preferido, cota_superior = preferencias.cantidad_de_clases_fuera_del_edificio_preferido(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == 1
 
     # Pedir al modelo minimizar cantidad de clases fuera del edificio preferido 

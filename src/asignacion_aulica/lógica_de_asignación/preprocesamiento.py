@@ -23,6 +23,7 @@ class AulaPreprocesada:
     '''
     capacidad: int
     equipamiento: set[str]
+    nombre: str
 
     # Tuplas (apertura, cierre) para cada día de la semana.
     horarios: tuple[tuple[time, time], tuple[time, time], tuple[time, time],
@@ -76,6 +77,7 @@ class AulasPreprocesadas:
                 self.aulas.append(AulaPreprocesada(
                     capacidad=aula.capacidad,
                     equipamiento=aula.equipamiento,
+                    nombre=aula.nombre,
                     horarios=(
                         aula.horario_lunes     or edificio.horario_lunes,
                         aula.horario_martes    or edificio.horario_martes,
@@ -116,8 +118,8 @@ class ClasesPreprocesadas:
     rangos_de_aulas_preferidas: Iterable[tuple[slice, slice]]
 
     # Horarios en los que algunas aulas están ocupadas con clases que tienen
-    # asignación manual, expresados en tuplas (edificio, aula, inicio, fin).
-    aulas_ocupadas: Iterable[tuple[str, str, time, time]]
+    # asignación manual, expresados en tuplas (índice del aula, inicio, fin).
+    aulas_ocupadas: Iterable[tuple[int, time, time]]
 
 def preprocesar_clases(
     carreras: Sequence[Carrera],
@@ -162,8 +164,10 @@ def preprocesar_clases(
             continue
         elif clase.no_cambiar_asignación:
             if clase.edificio is not None and clase.aula is not None:
+                rango_del_edificio: slice = aulas.rangos_de_aulas[clase.edificio]
+                i_aula: int = bisect_left(aulas.aulas, clase.aula, key=lambda a:a.nombre, lo=rango_del_edificio.start, hi=rango_del_edificio.stop)
                 datos_procesados[clase.día].aulas_ocupadas.append(
-                    (clase.edificio, clase.aula, clase.horario_inicio, clase.horario_fin)
+                    (i_aula, clase.horario_inicio, clase.horario_fin)
                 )
         else:
             datos_procesados[clase.día].clases.append(clase)

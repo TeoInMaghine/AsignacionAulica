@@ -58,6 +58,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios, aulas):
         AulaPreprocesada(
             capacidad=25,
             equipamiento={'qué equipazo'},
+            nombre='una',
             horarios=(
                 (time(13), time(20)), (time(8), time(20)),
                 (time(8), time(20)), (time(8), time(20)),
@@ -68,6 +69,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios, aulas):
         AulaPreprocesada(
             capacidad=50,
             equipamiento=set(),
+            nombre='y otra',
             horarios=(
                 (time(13), time(20)), (time(8), time(20)),
                 (time(14), time(19)), (time(8), time(20)),
@@ -140,6 +142,7 @@ def test_preprocesar_aulas_varios_edificios(edificios, aulas):
         AulaPreprocesada(
             capacidad=25,
             equipamiento={'qué equipazo'},
+            nombre='A102',
             horarios=(
                 (time(13), time(20)), (time(8), time(20)), (time(8), time(20)),
                 (time(8), time(20)), (time(8), time(20)), (time(8), time(17)),
@@ -149,6 +152,7 @@ def test_preprocesar_aulas_varios_edificios(edificios, aulas):
         AulaPreprocesada(
             capacidad=50,
             equipamiento=set(),
+            nombre='C306',
             horarios=(
                 (time(15), time(20)), (time(8, 30), time(20)),
                 (time(8), time(20)), (time(8), time(20)), (time(8), time(20)),
@@ -158,6 +162,7 @@ def test_preprocesar_aulas_varios_edificios(edificios, aulas):
         AulaPreprocesada(
             capacidad=31,
             equipamiento=set(),
+            nombre='C345',
             horarios=(
                 (time(15), time(20)), (time(8, 30), time(20)),
                 (time(8), time(20)), (time(8), time(20)), (time(8), time(20)),
@@ -251,7 +256,7 @@ def test_separar_asignaciones_manuales(clases, materias, carreras, aulas_preproc
     assert clases_lunes.clases[1].horario_inicio == time(2)
     assert clases_lunes.clases[2].horario_inicio == time(3)
     assert clases_lunes.índices_originales == [1, 3, 4]
-    assert clases_lunes.aulas_ocupadas == [('abc', '1', time(10), time(15)), ('def', '33', time(20), time(23))]
+    assert clases_lunes.aulas_ocupadas == [(0, time(10), time(15)), (1, time(20), time(23))]
 
 @pytest.mark.clases(
     dict(materia='1', día=Día.Martes),

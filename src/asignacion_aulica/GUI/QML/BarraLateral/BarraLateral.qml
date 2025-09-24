@@ -9,7 +9,7 @@ Rectangle {
     Layout.fillHeight: true
     color: Constantes.rojo_unrn
 
-    property string pestaña_actual: "Edificios"
+    property string pestaña_actual: "Aulas"
 
     ColumnLayout {
         anchors.fill: parent
@@ -38,11 +38,14 @@ Rectangle {
         }
 
         // Botones de las pestañas
-        BotónPestaña{ nombre: "Edificios" }
-        BotónPestaña{ nombre: "Aulas"     }
-        BotónPestaña{ nombre: "Carreras"  }
-        BotónPestaña{ nombre: "Materias"  }
-        BotónPestaña{ nombre: "Horarios"  }
+        BotónPestaña {
+            nombre: "Aulas"
+            onClicked: () => pestaña_actual = nombre
+        }
+        BotónPestaña {
+            nombre: "Materias"
+            onClicked: () => pestaña_actual = nombre
+        }
 
         // Spacer to push tabs to the top
         Item {

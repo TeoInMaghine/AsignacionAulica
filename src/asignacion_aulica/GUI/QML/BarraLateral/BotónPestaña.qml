@@ -32,13 +32,14 @@ Button {
     }
     
     background: Rectangle {
-        color: sidebar.pestaña_actual === self.nombre || self.hovered
-                ? Constantes.rojo_unrn_oscuro 
-                : "transparent"
-    }
+        color: self.pressed ? Constantes.rojo_unrn_oscurísimo :
+            sidebar.pestaña_actual === self.nombre || self.hovered ?
+            Constantes.rojo_unrn_oscuro : Constantes.rojo_unrn
 
-    // Tab selection logic
-    onClicked: {
-        parent.parent.pestaña_actual = self.nombre
+        Behavior on color {
+            ColorAnimation {
+                easing.type: Easing.OutQuart
+            }
+        }
     }
 }

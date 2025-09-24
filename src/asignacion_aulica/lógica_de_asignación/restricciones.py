@@ -73,15 +73,6 @@ def no_asignar_en_aula_cerrada(clases: Sequence[Clase], aulas: Sequence[AulaPrep
         if aula_cerrada:
             yield (i_clase, i_aula)
 
-def asignar_aulas_con_capacidad_suficiente(clases: Sequence[Clase], aulas: Sequence[AulaPreprocesada]) -> Iterable[ tuple[int, int] ]:
-    '''
-    Una clase no puede ser asignada a un aula que tenga una capacidad menor a la
-    cantidad de alumnos.
-    '''
-    for i_clase, clase, i_aula, aula in _combinaciones_de_clases_y_aulas(clases, aulas):
-        if clase.cantidad_de_alumnos > aula.capacidad:
-            yield (i_clase, i_aula)
-
 def asignar_aulas_con_el_equipamiento_requerido(clases: Sequence[Clase], aulas: Sequence[AulaPreprocesada]) -> Iterable[ tuple[int, int] ]:
     '''
     Una clase no puede ser asignada a un aula que no tenga todo el equipamiento
@@ -117,7 +108,6 @@ def no_asignar_aulas_ocupadas(
 
 funciones_de_restricciones_de_aulas_prohibidas = (
     no_asignar_en_aula_cerrada,
-    # asignar_aulas_con_capacidad_suficiente, # Se movió a preferencias porque tercer mundo
     asignar_aulas_con_el_equipamiento_requerido
 )
 

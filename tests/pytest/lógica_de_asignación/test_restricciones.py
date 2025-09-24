@@ -40,19 +40,6 @@ def test_aulas_cerradas(clases, aulas_preprocesadas):
     assert (0, 4) in prohibidas
     assert (0, 5) in prohibidas
 
-@pytest.mark.clases( dict(cantidad_de_alumnos = 50) )
-@pytest.mark.aulas(
-    dict(capacidad = 100),
-    dict(capacidad = 50),
-    dict(capacidad = 10)
-)
-def test_capacidad_suficiente(clases, aulas_preprocesadas):
-    prohibidas = list(restricciones.asignar_aulas_con_capacidad_suficiente(clases, aulas_preprocesadas))
-
-    # Debería generar una sola restricción con el aula 2
-    assert len(prohibidas) == 1
-    assert (0, 2) in prohibidas
-
 @pytest.mark.clases( dict(equipamiento_necesario = set(('proyector',))) )
 @pytest.mark.aulas(
     dict(equipamiento = set(('proyector',))),

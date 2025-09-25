@@ -32,7 +32,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "clases: marca para pasar parametros al fixture clases")
     config.addinivalue_line("markers", "asignaciones_forzadas: marca para pasar parametros al fixture asignaciones")
 
-def make_edificios(edificios: tuple[dict[str, Any], ...]) -> list[Edificio]:
+def make_edificios(edificios: Sequence[dict[str, Any]]) -> list[Edificio]:
     '''
     Recibe datos de los edificios (posiblemente incompletos) y los rellena con
     valores por defecto.
@@ -63,7 +63,7 @@ def make_edificios(edificios: tuple[dict[str, Any], ...]) -> list[Edificio]:
     _edificios.sort(key=lambda e: e.nombre)
     return _edificios
 
-def make_aulas(aulas: tuple[dict[str, Any], ...]) -> list[Aula]:
+def make_aulas(aulas: Sequence[dict[str, Any]]) -> list[Aula]:
     '''
     Recibe datos de las aulas (posiblemente incompletos) y los rellena con
     valores por defecto.
@@ -91,7 +91,7 @@ def make_aulas(aulas: tuple[dict[str, Any], ...]) -> list[Aula]:
     _aulas.sort(key=lambda a: a.edificio)
     return _aulas
 
-def make_carreras(carreras: tuple[dict[str, Any], ...]) -> list[Carrera]:
+def make_carreras(carreras: Sequence[dict[str, Any]]) -> list[Carrera]:
     '''
     Recibe datos de las carreras (posiblemente incompletos) y los rellena con
     valores por defecto.
@@ -113,7 +113,7 @@ def make_carreras(carreras: tuple[dict[str, Any], ...]) -> list[Carrera]:
     _carreras.sort(key=lambda c: c.nombre)
     return _carreras
 
-def make_materias(materias: tuple[dict[str, Any], ...]) -> list[Materia]:
+def make_materias(materias: Sequence[dict[str, Any]]) -> list[Materia]:
     '''
     Recibe datos de las materias (posiblemente incompletos) y los rellena con
     valores por defecto.
@@ -138,7 +138,7 @@ def make_materias(materias: tuple[dict[str, Any], ...]) -> list[Materia]:
     _materias.sort(key=lambda c: c.carrera)
     return _materias
 
-def make_clases(clases: tuple[dict[str, Any], ...]) -> list[Clase]:
+def make_clases(clases: Sequence[dict[str, Any]]) -> list[Clase]:
     '''
     Recibe datos de las clases (posiblemente incompletos) y los rellena con
     valores por defecto.

@@ -25,20 +25,19 @@ con todas las restricciones y que tenga la menor penalización posible.
 '''
 from ortools.sat.python import cp_model
 from collections.abc import Sequence
-from pandas import DataFrame
 import numpy as np
 import logging
 
 from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Materia, Clase
-from asignacion_aulica.gestor_de_datos.día import Día
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
 from asignacion_aulica.lógica_de_asignación import restricciones
-
+from asignacion_aulica.gestor_de_datos.día import Día
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
-    calcular_rango_de_aulas_por_edificio, calcular_índices_de_aulas_dobles,
-    preprocesar_aulas, preprocesar_clases, AulaPreprocesada
+    AulasPreprocesadas, ClasesPreprocesadas, preprocesar_clases
 )
+
+logger = logging.getLogger(__name__)
 
 def asignar(
     edificios: Sequence[Edificio],
@@ -73,71 +72,64 @@ def asignar(
     más clases.
     '''
     # Preprocesar los datos
-    rangos_de_aulas: dict[str, slice] = calcular_rango_de_aulas_por_edificio(edificios, aulas)
-    aulas_dobles: dict[int, tuple[int, int]] = calcular_índices_de_aulas_dobles(edificios, aulas, rangos_de_aulas)
-    aulas_preprocesadas: Sequence[AulaPreprocesada] = preprocesar_aulas(edificios, aulas, rangos_de_aulas)
-    clases_preprocesadas = preprocesar_clases(clases, materias, carreras)
+    aulas_preprocesadas: AulasPreprocesadas = AulasPreprocesadas(edificios, aulas)
+    clases_preprocesadas = preprocesar_clases(carreras, materias, clases, aulas_preprocesadas)
 
     # Asignar las aulas de cada día
     días_sin_asignar: list[Día] = []
-    for día in Día:
-        clases, índices_de_las_clases, aulas_ocupadas = clases_preprocesadas[día]
-        asignaciones: list[int] = resolver_problema_de_asignación(clases, aulas_preprocesadas, aulas_dobles, aulas_ocupadas)
-        if len(asignaciones) == len(clases):
-            for i_clase, i_aula in zip(índices_de_las_clases, asignaciones):
+    for día, clases_del_día in zip(Día, clases_preprocesadas):
+        try:
+            asignaciones: list[int] = resolver_problema_de_asignación(clases_del_día, aulas_preprocesadas)
+        except RuntimeError as err:
+            logger.error('Falló la asignación para el día %s: %s', día.name, err)
+            días_sin_asignar.append(día)
+        else:
+            for i_clase, i_aula in zip(clases_del_día.índices_originales, asignaciones):
                 clase = clases[i_clase]
                 aula = aulas[i_aula]
                 clase.edificio = aula.edificio
                 clase.aula = aula.nombre
-        else:
-            días_sin_asignar.append(día)
     
     # Tirar excepción si no se pudo asignar algún día
     if len(días_sin_asignar) != 0:
         raise AsignaciónImposibleException(*días_sin_asignar)
 
 def resolver_problema_de_asignación(
-    clases: DataFrame,
-    aulas: DataFrame,
-    aulas_dobles: dict[ int, tuple[int,int] ],
-    aulas_ocupadas: set[tuple[int, Día, int, int]]
-    ) -> list[int]:
+    clases: ClasesPreprocesadas,
+    aulas: AulasPreprocesadas
+) -> list[int]:
     '''
-    El docstring de `asignar` miente, la que resuelve el problema de asignación
-    soy yo!
+    Asignar aulas a todas las clases en un problema de asignación.
 
-    Pero no manejo el tema de las asignaciones manuales.
+    :param clases: Los datos de las clases de el problema de asignación.
+    :pram aulas: Los datos de las aulas disponibles.
 
-    :param aulas_ocupadas: Horarios en los que algunas aulas están ocupadas con
-        otra cosa, en tuplas (aula, día, inicio, fin).
     :return: Una lista con el número de aula asignada a cada clase.
+    :raise RuntimeError: Si el CpModel no se puede resolver. 
     '''
-
-    if clases.empty:
+    if len(clases.clases) == 0:
         return []
 
     # Crear modelo, variables, restricciones, y penalizaciones
     modelo = cp_model.CpModel()
-    asignaciones = crear_matriz_de_asignaciones(clases, aulas, aulas_dobles, aulas_ocupadas, modelo)
+    asignaciones = crear_matriz_de_asignaciones(clases, aulas, modelo)
 
-    for predicado in restricciones.restricciones_con_variables(clases, aulas, aulas_dobles, asignaciones):
+    for predicado in restricciones.restricciones_con_variables(clases, aulas, asignaciones):
         modelo.add(predicado)
     
     penalización = obtener_penalización(clases, aulas, modelo, asignaciones)
     modelo.minimize(penalización)
 
-    # Resolver
+    # Resolver (loggueando el proceso)
     solver = cp_model.CpSolver()
-
-    # Loguear progreso de forma limpia
     solver.parameters.log_search_progress = True
     solver.parameters.log_to_stdout = False
-    solver.log_callback = logging.debug
+    solver.log_callback = logger.debug
 
     status = solver.solve(modelo)
     # TODO: ¿qué hacer si da FEASIBLE?¿en qué condiciones ocurre?¿aceptamos la solución suboptima o tiramos excepción?
     if status != cp_model.OPTIMAL:
-        raise AsignaciónImposibleException(f'El solucionador de restricciones terminó con status {solver.status_name(status)}.')
+        raise RuntimeError(f'El solucionador de restricciones terminó con status {solver.status_name(status)}.')
     
     # Armar lista con las asignaciones
     asignaciones_finales = np.vectorize(solver.value)(asignaciones)
@@ -146,12 +138,10 @@ def resolver_problema_de_asignación(
     return aulas_asignadas
 
 def crear_matriz_de_asignaciones(
-    clases: DataFrame,
-    aulas: DataFrame,
-    aulas_dobles: dict[ int, tuple[int,int] ],
-    aulas_ocupadas: set[tuple[int, Día, int, int]],
+    clases: ClasesPreprocesadas,
+    aulas: AulasPreprocesadas,
     modelo: cp_model.CpModel
-    ) -> np.ndarray:
+) -> np.ndarray:
     '''
     Genera una matriz con las variables de asignación.
 
@@ -160,36 +150,32 @@ def crear_matriz_de_asignaciones(
     asignada a esa clase. El booleano puede ser una constante 0, o puede ser una
     variable booleana del modelo.
 
-    Algunos elementos de la matriz se inicializan con las constantes que se
+    Algunos elementos de la matriz se inicializan con las constantes 0 que se
     pueden deducir de las restricciones. Luego se agregan variables al modelo
     para completar los elementos restantes.
 
     También se agregan restricciones para que cada clase se asigne exactamente a
     un aula.
-
-    :param clases: Tabla con los datos de las clases.
-    :param aulas: Tabla con los datos de las aulas.
-    :param aulas_dobles: Diccionario donde las keys son los índices de las
-        aulas dobles y los valores son tuplas con las aulas individuales que
-        conforman el aula doble.
-    :param aulas_ocupadas: Horarios en los que algunas aulas están ocupadas con
-        otra cosa, en tuplas (aula, día, inicio, fin).
+    
+    :param clases: Los datos de las clases de el problema de asignación.
+    :pram aulas: Los datos de las aulas disponibles.
     :param modelo: El CpModel al que agregar variables.
-    :return: La expresión de penalización total.
+
+    :return: La matriz con las variables de asignación.
     '''
-    asignaciones = np.empty(shape=(len(clases), len(aulas)), dtype=object)
+    asignaciones = np.empty(shape=(len(clases.clases), len(aulas.aulas)), dtype=object)
 
     # Popular con constantes
-    for índices in restricciones.aulas_prohibidas(clases, aulas, aulas_dobles, aulas_ocupadas):
+    for índices in restricciones.aulas_prohibidas(clases, aulas):
         asignaciones[*índices] = 0
     
     # Rellenar los elementos vacíos con variables
-    for clase, aula in np.ndindex(asignaciones.shape):
-        if asignaciones[clase, aula] is None:
-            asignaciones[clase, aula] = modelo.new_bool_var(f'clase_{clase}_asignada_al_aula_{aula}')
+    for asignaciones_de_una_clase, aula in np.ndindex(asignaciones.shape):
+        if asignaciones[asignaciones_de_una_clase, aula] is None:
+            asignaciones[asignaciones_de_una_clase, aula] = modelo.new_bool_var(f'clase_{asignaciones_de_una_clase}_asignada_al_aula_{aula}')
     
     # Asegurar que cada clase se asigna a exactamente un aula
-    for clase in clases.index:
-        modelo.add_exactly_one(asignaciones[clase,:])
+    for asignaciones_de_una_clase in asignaciones:
+        modelo.add_exactly_one(asignaciones_de_una_clase)
     
     return asignaciones

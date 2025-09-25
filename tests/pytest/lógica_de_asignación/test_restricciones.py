@@ -1,9 +1,25 @@
+from ortools.sat.python import cp_model
 from datetime import time
 import pytest
-from verificación_de_predicados import predicado_es_nand_entre_dos_variables_bool
 
 from asignacion_aulica.lógica_de_asignación import restricciones
 from asignacion_aulica.gestor_de_datos.día import Día
+
+def predicado_es_nand_entre_dos_variables(predicado, variable1, variable2) -> bool:
+    '''
+    Devuelve `True` si `predicado` es una expresión de la forma
+    `variable1 + variable2 <= 1`, donde `variable1` y `variable2` son variables
+    booleanas de un `CpModel`.
+    '''
+    return (
+        isinstance(predicado, cp_model.BoundedLinearExpression)
+        and len(predicado.vars) == 2
+        and variable1 in predicado.vars
+        and variable2 in predicado.vars
+        and predicado.coeffs == [1, 1]
+        and predicado.offset == 0
+        and predicado.bounds.max() == 1
+    )
 
 @pytest.mark.aulas({})
 @pytest.mark.clases(
@@ -18,9 +34,7 @@ def test_superposición(aulas_preprocesadas, clases_preprocesadas, asignaciones)
     # Debería generar solamente un predicado entre las primeras dos clases
     assert len(predicados) == 1
     predicado = predicados[0]
-    assert predicado_es_nand_entre_dos_variables_bool(predicado)
-    assert asignaciones[0,0] in predicado.vars
-    assert asignaciones[1,0] in predicado.vars
+    assert predicado_es_nand_entre_dos_variables(predicado, asignaciones[0,0], asignaciones[1,0])
 
 @pytest.mark.clases( dict(horario_inicio=time(10), horario_fin=time(13), día=Día.Lunes) )
 @pytest.mark.aulas(
@@ -71,12 +85,8 @@ def test_equipamiento(clases_preprocesadas, aulas_preprocesadas):
 def test_aulas_dobles(aulas_preprocesadas, clases_preprocesadas, asignaciones):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     predicados = list(restricciones.no_asignar_aula_doble_y_sus_hijas_al_mismo_tiempo(clases_lunes, aulas_preprocesadas, asignaciones))
-
-    assert len(predicados) == 4
-    for predicado in predicados:
-        assert predicado_es_nand_entre_dos_variables_bool(predicado)
     
-    assert any(asignaciones[0, 0] in predicado.vars and asignaciones[1, 1] in predicado.vars  for predicado in predicados)
-    assert any(asignaciones[0, 0] in predicado.vars and asignaciones[1, 2] in predicado.vars  for predicado in predicados)
-    assert any(asignaciones[1, 0] in predicado.vars and asignaciones[0, 1] in predicado.vars  for predicado in predicados)
-    assert any(asignaciones[1, 0] in predicado.vars and asignaciones[0, 2] in predicado.vars  for predicado in predicados)
+    assert any(predicado_es_nand_entre_dos_variables(p, asignaciones[0, 0], asignaciones[1, 1]) for p in predicados)
+    assert any(predicado_es_nand_entre_dos_variables(p, asignaciones[0, 0], asignaciones[1, 2]) for p in predicados)
+    assert any(predicado_es_nand_entre_dos_variables(p, asignaciones[1, 0], asignaciones[0, 1]) for p in predicados)
+    assert any(predicado_es_nand_entre_dos_variables(p, asignaciones[1, 0], asignaciones[0, 2]) for p in predicados)

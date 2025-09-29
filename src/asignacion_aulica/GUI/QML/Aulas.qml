@@ -2,34 +2,50 @@ import QtQuick
 import QtQuick.Controls
 import Custom
 
-TableView {
+ListView {
     anchors.fill: parent
-    columnSpacing: 1
-    rowSpacing: 1
-    clip: true
+    spacing: 1
 
-    model: Table {
+    // TODO: reemplazar esto con una implementación de QAbstractListModel
+    model: ListModel {
+        ListElement {
+            nombre: "B101"
+            edificio: "Anasagasti I"
+            capacidad: 45
+        }
+        ListElement {
+            nombre: "B102"
+            edificio: "Anasagasti I"
+            capacidad: 35
+        }
+        ListElement {
+            nombre: "Aula random"
+            edificio: "Tacuarí"
+            capacidad: 20
+        }
     }
 
-    selectionModel: ItemSelectionModel {}
+    delegate: Row {
+        id: delegate
+        spacing: 1
 
-    delegate: Rectangle {
-        implicitWidth: 100
-        implicitHeight: 50
-        Text {
-            text: display
+        TextField {
+            text: model.nombre
+            onEditingFinished: {
+                model.nombre = text
+            }
         }
-
-       TableView.editDelegate: TextField {
-           anchors.fill: parent
-               text: display
-               horizontalAlignment: TextInput.AlignHCenter
-               verticalAlignment: TextInput.AlignVCenter
-               Component.onCompleted: selectAll()
-
-               TableView.onCommit: {
-                   display = text
-               }
-       }
+        TextField {
+            text: model.edificio
+            onEditingFinished: {
+                model.edificio = text
+            }
+        }
+        TextField {
+            text: model.capacidad
+            onEditingFinished: {
+                model.capacidad = parseInt(text)
+            }
+        }
     }
 }

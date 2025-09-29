@@ -2,7 +2,7 @@ from PyQt6.QtGui import QGuiApplication, QFontDatabase, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine, qmlRegisterType
 from pathlib import Path
 import sys, os
-from asignacion_aulica.GUI.table import Table
+from asignacion_aulica.GUI.list_model import ListAulas
 
 from asignacion_aulica import assets
 
@@ -19,7 +19,7 @@ def main() -> int:
     icono = QIcon(assets.get_path('iconos', 'unrn.ico'))
     app.setWindowIcon(icono)
 
-    qmlRegisterType(Table, 'Custom', 1, 0, 'Table')
+    qmlRegisterType(ListAulas, 'Custom', 1, 0, 'ListAulas')
 
     configurar_fuente_por_defecto()
 

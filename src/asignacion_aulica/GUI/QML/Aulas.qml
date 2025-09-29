@@ -6,28 +6,13 @@ ListView {
     anchors.fill: parent
     spacing: 1
 
-    // TODO: reemplazar esto con una implementación de QAbstractListModel
-    model: ListModel {
-        ListElement {
-            nombre: "B101"
-            edificio: "Anasagasti I"
-            capacidad: 45
-        }
-        ListElement {
-            nombre: "B102"
-            edificio: "Anasagasti I"
-            capacidad: 35
-        }
-        ListElement {
-            nombre: "Aula random"
-            edificio: "Tacuarí"
-            capacidad: 20
-        }
-    }
+    model: ListAulas { }
 
     delegate: Row {
         id: delegate
         spacing: 1
+
+        required property var model
 
         TextField {
             text: model.nombre

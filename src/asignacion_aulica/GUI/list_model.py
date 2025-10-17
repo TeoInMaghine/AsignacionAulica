@@ -12,7 +12,7 @@ class ListAulas(QAbstractListModel):
             # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt
             i + Qt.ItemDataRole.UserRole + 1: atributo for i, atributo in enumerate(atributos_aulas)
         }
-        # TODO: Esto es placeholder, falta usar el gestor de datos (que va a ser un quilombo btw)
+        # TODO: Esto es placeholder, falta usar el gestor de datos
         self.edificio = 'Anasagasti 1'
         self.aulas = [
             Aula('B101', self.edificio, 45),

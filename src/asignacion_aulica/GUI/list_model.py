@@ -1,6 +1,6 @@
 from dataclasses import fields, asdict
 from typing import Any
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray
 
 from asignacion_aulica.gestor_de_datos import Aula
 
@@ -21,7 +21,7 @@ class ListAulas(QAbstractListModel):
         ]
 
     # Constante
-    def roleNames(self):
+    def roleNames(self) -> dict[int, QByteArray]:
         return {i: nombre.encode() for i, nombre in self.nombres_de_roles.items()}
 
     def rowCount(self, _parent: QModelIndex):

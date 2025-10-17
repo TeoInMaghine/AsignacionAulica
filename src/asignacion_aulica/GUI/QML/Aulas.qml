@@ -33,6 +33,12 @@ ListView {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
         }
+        Button {
+            text: "Ordenar"
+            onClicked: {
+                aulas.ordenar()
+            }
+        }
     }
 
     delegate: Row {

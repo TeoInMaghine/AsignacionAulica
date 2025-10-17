@@ -1,6 +1,6 @@
 from dataclasses import fields, asdict
 from typing import Any
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos import Aula
 
@@ -19,6 +19,12 @@ class ListAulas(QAbstractListModel):
             Aula('B102', self.edificio, 45),
             Aula('B201', self.edificio, 45)
         ]
+
+    @pyqtSlot()
+    def ordenar(self):
+        self.layoutAboutToBeChanged.emit()
+        self.aulas.sort(key=lambda x: x.nombre)
+        self.layoutChanged.emit()
 
     # Constante
     def roleNames(self) -> dict[int, QByteArray]:

@@ -1,5 +1,5 @@
 from collections.abc import Iterable
-from typing import Callable
+from typing import Callable, Any
 
 from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio, Carrera, Materia, Clase
 from asignacion_aulica.lógica_de_asignación import AsignaciónImposibleException
@@ -20,17 +20,22 @@ class GestorDeDatos:
         '''
         pass
 
-    def get_edificios(self) -> Iterable[Edificio]:
+    def get_edificios(self) -> list[str]:
         '''
-        :return: Un iterable de todos los edificios en la base de datos,
-        ordenados alfabéticamente.
+        :return: Los nombres de todos los edificios en la base de
+        datos, ordenados alfabéticamente.
         '''
         pass
 
-    def get_edificio(self, nombre: str) -> Edificio:
+    def cantidad_de_edificios(self) -> int:
+        pass
+
+    def get_edificio(self, índice: int, miembro: int) -> Any:
         '''
-        :return: El edificio con el nombre dado.
-        :raise KeyError: Si no existe un edificio con el nombre dado.
+        :param índice: El índice del edificio.
+        :param miembro: El índice del miembro.
+        :return: El valor del miembro especificado.
+        :raise IndexError: Si el índice o el miembro están fuera de rango.
         '''
         pass
 
@@ -41,84 +46,160 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_edificio(self, edificio: Edificio):
+    def set_edificio(self, índice: int, miembro: int, valor: Any):
         '''
-        Actualizar la base de datos con el edificio dado.
+        Actualizar el valor de un miembro de un edificio existente.
 
-        Si ya existe un edificio con el mismo nombre, se sobreescriben sus
-        valores. Si no existe un edificio con el mismo nombre, se agrega.
+        El valor dado se asume como válido.
 
-        :raise ValueError: Si el horario de cierre de algún día es más temprano
-        que el horario de apertura.
+        :param índice: El índice del edificio.
+        :param miembro: El índice del miembro.
+        :param valor: El nuevo valor del miembro especificado.
+        :raise IndexError: Si el índice o el miembro están fuera de rango.
         '''
         pass
 
-    def borrar_edificio(self, nombre: str):
+    def add_edificio(self):
         '''
-        Borrar de la base de datos el edificio dado y todas sus aulas.
+        Añadir un nuevo edificio después del último índice existente.
+
+        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+        '''
+        pass
+
+    def borrar_edificio(self, índice: int):
+        '''
+        Borrar de la base de datos el edificio en el índice dado.
 
         :raise KeyError: Si no existe un edificio con el nombre dado.
         '''
         pass
 
-    def get_aulas(self, edificio: str) -> Iterable[Aula]:
+    def cantidad_de_aulas(self, edificio: int) -> int:
+        pass
+
+    def get_aulas(self, edificio: int) -> list[str]:
         '''
-        :return: Un iterable de todas las aulas pertenecientes al edificio dado,
-        ordenadas alfabéticamente.
-        :raise KeyError: Si no existe un edificio con el nombre dado.
+        :return: Los nombres de todas las aulas de un edificio en la base de
+        datos, ordenados alfabéticamente.
         '''
         pass
 
-    def get_aula(self, edificio: str, nombre: str) -> Aula:
+    def get_aula(self, edificio: int, índice: int, miembro: int) -> Any:
         '''
-        :return: El aula con el nombre dado.
-        :raise KeyError: Si no existe un aula con el nombre dado en ese
-        edificio, o si no existe un edificio con ese nombre.
-        '''
-        pass
-
-    def existe_aula(self, edificio: str, nombre: str) -> bool:
-        '''
-        :return: `True` si hay un aula con ese nombre en ese edificio , `False`
-        si no.
-        :raise KeyError: Si no existe un edificio con ese nombre.
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula.
+        :param miembro: El índice del miembro.
+        :return: El valor del miembro especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def set_aula(self, aula: Aula):
+    def set_aula(self, edificio: int, índice: int, miembro: int, valor: Any):
         '''
-        Actualizar la base de datos con el aula dada.
+        Actualizar el valor de un miembro de un aula existente.
 
-        Si ya existe un aula con el mismo nombre en ese edificio, se
-        sobreescriben sus valores. Si no existe un aula con el mismo nombre en
-        ese edificio, se agrega.
+        El valor dado se asume como válido.
 
-        :raise KeyError: Si no existe el edificio al que pertenece el aula.
-        :raise ValueError: Si la capacidad es negativa, si el horario de cierre
-        de algún día es más temprano que el horario de apertura.
-        '''
-        pass
-    
-    def borrar_aula(self, edificio: str, nombre: str):
-        '''
-        Borrar un aula de la base de datos.
-
-        :raise KeyError: Si no existe un aula con el nombre dado en ese
-        edificio, o si no existe un edificio con ese nombre.
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula.
+        :param miembro: El índice del miembro.
+        :param valor: El nuevo valor del miembro especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def get_carreras(self) -> Iterable[Carrera]:
+    def add_aula(self, edificio: int):
         '''
-        :return: Un iterable de todas las carreras en la base de datos,
-        ordenadas alfabéticamente.
+        Añadir al edificio un nuevo aula, después del último índice existente.
+
+        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+
+        :param edificio: El índice del edificio.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
         pass
 
-    def get_carrera(self, nombre: str) -> Carrera:
+    def existe_aula(self, edificio: int, nombre: str) -> bool:
         '''
-        :return: La carrera con el nombre dado.
-        :raise KeyError: Si no existe una carrera con ese nombre.
+        :return: `True` si el aula especificada existe en la base de datos,
+        `False` si no.
+
+        :param edificio: El índice del edificio.
+        :param nombre: El nombre del aula.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
+        '''
+        pass
+
+    def borrar_aula(self, edificio: int, índice: int):
+        '''
+        Borrar de la base de datos el aula especificada.
+
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        pass
+
+    def cantidad_de_aulas_dobles(self, edificio: int) -> int:
+        pass
+
+    def get_aula_doble(self, edificio: int, índice: int, miembro: int) -> Any:
+        '''
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula doble.
+        :param miembro: El índice del miembro.
+        :return: El valor del miembro especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        pass
+
+    def set_aula_doble(self, edificio: int, índice: int, miembro: int, valor: Any):
+        '''
+        Actualizar el valor de un miembro de un aula doble existente.
+
+        El valor dado se asume como válido.
+
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula doble.
+        :param miembro: El índice del miembro.
+        :param valor: El nuevo valor del miembro especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        pass
+
+    def add_aula_doble(self, edificio: int):
+        '''
+        Añadir al edificio un nuevo aula doble, después del último índice existente.
+
+        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+
+        :param edificio: El índice del edificio.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
+        '''
+        pass
+
+    def borrar_aula_doble(self, edificio: int, índice: int):
+        '''
+        Borrar de la base de datos el aula doble especificada.
+
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula doble.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        pass
+
+    def get_carreras(self) -> list[str]:
+        '''
+        :return: Los nombres de todas las carreras en la base de
+        datos, ordenadas alfabéticamente.
+        '''
+        pass
+
+    def get_carrera(self, índice: int) -> Carrera:
+        '''
+        :return: La carrera con el índice dado.
+        :raise IndexError: Si el índice está fuera de rango.
         '''
         pass
     
@@ -128,127 +209,164 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_carrera(self, carrera: Carrera):
+    def set_carrera_nombre(self, índice: int, nombre: str) -> int:
         '''
-        Actualizar la base de datos con la carrera dada.
+        Renombrar una carrera existente.
 
-        Si ya existe una carrera con el mismo nombre, se sobreescriben sus
-        valores. Si no existe una carrera con el mismo nombre, se agrega.
-
-        :raise ValueError: Si `carrera.edificio_preferido` no es `None` y no es
-        el nombre de un edificio que existe.
+        :return: El nuevo índice de la carrera.
+        :raise IndexError: Si el índice está fuera de rango.
+        :raise ValueError: Si ya existe una carrera con el nombre dado.
         '''
         pass
 
-    def borrar_carrera(self, nombre: str):
+    def set_carrera_edificio_preferido(self, índice: int, edificio: str|None):
         '''
-        Borrar de la base de datos la carrera dada, junto con todas sus materias
-        y clases.
+        Cambiar el edificio preferido de una carrera existente.
 
-        :raise KeyError: Si no existe una carrera con el nombre dado.
+        :param índice: El índice de la carrera.
+        :param edificio: El nombre del nuevo edificio preferido o None para que
+        no tenga preferencia.
+
+        :raise IndexError: Si el índice está fuera de rango.
+        :raise ValueError: Si no existe un edificio con el nombre dado.
         '''
         pass
 
-    def get_materias(self, carrera: str) -> Iterable[Materia]:
+    def borrar_carrera(self, índice: int):
         '''
-        :return: Un iterable de todas las materias de la carrera dada, ordenadas
-        por año, y dentro de cada año ordenadas alfabéticamente.
-        :raise KeyError: Si no existe una carrera con el nombre dado.
+        Borrar una carrera de la base de datos.
+
+        :raise IndexError: Si el índice está fuera de rango.
         '''
         pass
 
-    def get_materia(self, carrera: str, nombre: str) -> Materia:
+    def cantidad_de_materias(self, carrera: int) -> int:
         '''
-        :return: La materia con el nombre dado.
-        :raise KeyError: Si no existe una materia con el nombre dado en esa
-        carrera, o si no existe una carrera con ese nombre.
+        :param carrera: El índice de la carrera.
         '''
         pass
 
-    def existe_materia(self, carrera: str, nombre: str) -> bool:
+    def get_materia(self, carrera: int, índice: int, miembro: int) -> Any:
         '''
-        :return: `True` si hay una materia con ese nombre en esa carrera,
+        :param carrera: El índice de la carrera.
+        :param índice: El índice de la materia.
+        :param miembro: El índice del miembro.
+        :return: El valor del miembro especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        pass
+
+    def existe_materia(self, carrera: int, nombre: str) -> bool:
+        '''
+        :return: `True` si la materia especificada existe en la base de datos,
         `False` si no.
-        :raise KeyError: Si no existe una carrera con ese nombre.
+
+        :param carrera: El índice de la carrera.
+        :param nombre: El nombre de la materia a buscar.
+        :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
         pass
 
-    def set_materia(self, materia: Materia):
+    def set_materia(self, carrera: int, índice: int, miembro: int, valor: Any):
         '''
-        Actualizar la base de datos con la materia.
+        Actualizar el valor de un miembro de un materia existente.
 
-        Si ya existe una materia con el mismo nombre en la misma carrera, se
-        sobreescriben sus valores. Si no existe una materia con el mismo nombre
-        en esa carrera, se agrega.
+        El valor dado se asume como válido.
 
-        :raise KeyError: Si `materia.carrera` no es el nombre de una carrera que
-        existe.
-        :raise ValueError: Si `carrera.año` no es mayor a cero.
-        '''
-        pass
-    
-    def borrar_materia(self, carrera: str, nombre: str) -> Materia:
-        '''
-        Borrar de la base de datos una materia y todas sus clases.
-
-        :raise KeyError: Si no existe una materia con el nombre dado en esa
-        carrera, o si no existe una carrera con ese nombre.
+        :param carrera: El índice de la carrera.
+        :param índice: El índice de la materia.
+        :param miembro: El índice del miembro.
+        :param valor: El nuevo valor del miembro especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def get_clases(self, carrera: str, materia: str) -> Iterable[Clase]:
+    def add_materia(self, carrera: int):
         '''
-        :return: Un iterable de todas las clases de la materia dada, ordenadas
-        cronológicamente.
-        :raise KeyError: Si no existe una materia con el nombre dado en la
-        carrera dada, o si no existe una carrera con ese nombre.
+        Añadir al carrera un nuevo materia, después del último índice existente.
+
+        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+
+        :param carrera: El índice de la carrera.
+        :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
         pass
 
-    def get_clase(self, carrera: str, materia: str, id: int) -> Clase:
+    def borrar_materia(self, carrera: int, índice: int):
         '''
-        :return: La clase con el id dado.
-        :raise KeyError: Si no existe una clase con el id dado en esa materia y
-        carrera, o si no existe una carrera o materia con ese nombre.
+        Borrar de la base de datos la materia especificada.
+
+        :param carrera: El índice de la carrera.
+        :param índice: El índice de la materia.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def nuevo_id_para_clase(self, carrera: str, materia: str) -> int:
+    def cantidad_de_clases(self, carrera: int, materia: int) -> int:
         '''
-        :return: Un id que actualmente no existe, para una nueva clase en la
-        materia dada.
-        :raise KeyError: Si no existe una materia con el nombre dado en la
-        carrera dada, o si no existe una carrera con ese nombre.
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
         '''
         pass
 
-    def set_clase(self, clase: Clase):
+    def get_clase(self, carrera: int, materia: int, índice: int, miembro: int) -> Any:
         '''
-        Actualizar la base de datos con la clase dada.
-
-        Si ya existe una clase con el mismo id en la misma materia de la misma
-        carrera, se sobreescriben sus valores. Si no, se agrega.
-        
-        :raise KeyError: Si `clase.carrera` no es el nombre de una carrera que
-        existe, o si `clase.materia` no es el nombre de una materia de esa
-        carrera.
-        :raise ValueError: En los siguientes casos:
-        - `clase.horario_fin` es más temprano que `clase.horario_inicio`
-        - `clase.cantidad_de_alumnos` es negativo
-        - uno de `clase.aula` y `clase.edificio` es `None` y el otro no
-        - `clase.edificio` no es `None` y no es el nombre de un edificio que
-          existe
-        - `clase.aula` no es `None` y no es el nombre de un aula que pertenece a
-          ese edificio
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :param índice: El índice de la clase.
+        :param miembro: El índice del miembro.
+        :return: El valor del miembro especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
-    
-    def borrar_clase(self, carrera: str, materia: str, id: int) -> Clase:
-        '''
-        Borrar una clase de la base de datos.
 
-        :raise KeyError: Si no existe una clase con el id dado en esa materia y
-        carrera, o si no existe una carrera o materia con ese nombre.
+    def existe_clase(self, carrera: int, materia: int, nombre: str) -> bool:
+        '''
+        :return: `True` si la clase especificada existe en la base de datos,
+        `False` si no.
+
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :param nombre: El nombre de la clase a buscar.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        pass
+
+    def set_clase(self, carrera: int, materia: int, índice: int, miembro: int, valor: Any):
+        '''
+        Actualizar el valor de un miembro de una clase existente.
+
+        El valor dado se asume como válido.
+
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :param índice: El índice de la clase.
+        :param miembro: El índice del miembro.
+        :param valor: El nuevo valor del miembro especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        pass
+
+    def add_clase(self, carrera: int, materia: int):
+        '''
+        Añadir una nueva clase a una carrera, después del último índice existente.
+
+        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :raise IndexError: Si el índice de la carrera está fuera de rango.
+        '''
+        pass
+
+    def borrar_clase(self, carrera: int, materia: int, índice: int):
+        '''
+        Borrar de la base de datos la clase especificada.
+
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :param índice: El índice de la clase.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
@@ -262,12 +380,13 @@ class GestorDeDatos:
         validar hasta que todos los datos fueron cargados.
 
         Las validaciones que se hacen en esta función son:
-        - Que el diccionario de aulas dobles de cada edificio contenga aulas que
-          existen en ese edificio.
+        - Que la lista de aulas dobles no tenga aulas vacías, aulas chicas
+          repetidas, y que un aula que se usa como aula grande no se use
+          también como aula chica.
         - (Puede ser que después se agreguen otras)
         
-        :return: `None` si está todo bien, un string con la descripción del
-        problema si hay algún problema.
+        :return: Un string con la descripción del primer problema, o `None` si
+        no hay ningún problema.
         '''
         pass
 

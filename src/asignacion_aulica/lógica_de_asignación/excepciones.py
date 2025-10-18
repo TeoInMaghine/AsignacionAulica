@@ -1,4 +1,4 @@
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 class AsignaciónImposibleException(Exception):
     def __init__(self, *días_sin_asignar: Día):

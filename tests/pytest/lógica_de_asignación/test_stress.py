@@ -6,7 +6,7 @@ from conftest import make_aulas, make_carreras, make_clases, make_edificios, mak
 from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Clase, Materia
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 logger = logging.getLogger()
 

@@ -2,7 +2,7 @@ from __future__ import annotations  # Para soportar referencias circulares en lo
 from dataclasses import dataclass, field
 from datetime import time
 
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 @dataclass
 class RangoHorario:

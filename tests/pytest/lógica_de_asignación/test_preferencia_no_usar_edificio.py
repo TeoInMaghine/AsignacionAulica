@@ -6,7 +6,7 @@ from conftest import make_aulas, make_clases, make_asignaciones
 
 from asignacion_aulica.gestor_de_datos.entidades import Aula, Clase
 from asignacion_aulica.lógica_de_asignación import preferencias
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
     AulasPreprocesadas, Clase, ClasesPreprocesadas, preprocesar_clases

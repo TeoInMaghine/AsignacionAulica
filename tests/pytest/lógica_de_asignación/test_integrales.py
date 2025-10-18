@@ -3,7 +3,7 @@ import pytest
 
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 @pytest.mark.aulas(
     dict(capacidad=60),

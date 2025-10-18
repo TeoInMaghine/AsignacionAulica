@@ -5,7 +5,7 @@ import pytest
 
 from asignacion_aulica.lógica_de_asignación.restricciones import no_superponer_clases
 from asignacion_aulica.lógica_de_asignación import preferencias
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 @pytest.mark.aulas(
     dict(capacidad=31),

@@ -3,7 +3,7 @@ from datetime import time
 import pytest
 
 from asignacion_aulica.lógica_de_asignación import restricciones
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 def predicado_es_nand_entre_dos_variables(predicado, variable1, variable2) -> bool:
     '''

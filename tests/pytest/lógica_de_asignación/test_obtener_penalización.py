@@ -3,7 +3,7 @@ import numpy as np
 import pytest
 
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 @pytest.mark.aulas(
     dict(capacidad=34, nombre="1 - peor: sobrante=0, excedente=1"),

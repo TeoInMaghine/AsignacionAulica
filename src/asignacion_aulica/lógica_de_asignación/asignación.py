@@ -32,7 +32,7 @@ from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera,
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
 from asignacion_aulica.lógica_de_asignación import restricciones
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
     AulasPreprocesadas, ClasesPreprocesadas, preprocesar_clases
 )

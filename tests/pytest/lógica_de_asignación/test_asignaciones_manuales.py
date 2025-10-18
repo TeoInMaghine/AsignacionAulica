@@ -6,7 +6,7 @@ from asignacion_aulica.lógica_de_asignación.asignación import asignar
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadas
 from asignacion_aulica.lógica_de_asignación.restricciones import no_asignar_aulas_ocupadas
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
-from asignacion_aulica.gestor_de_datos.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
 @pytest.mark.edificios(
     dict(nombre='edificio 0', aulas_dobles={'1': ('0', '2')})

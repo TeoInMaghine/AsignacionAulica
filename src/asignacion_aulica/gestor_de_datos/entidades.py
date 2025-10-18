@@ -5,22 +5,33 @@ from datetime import time
 from asignacion_aulica.gestor_de_datos.día import Día
 
 @dataclass
+class RangoHorario:
+    inicio: time
+    fin: time
+
+    @staticmethod
+    def cerrado()-> RangoHorario:
+        return RangoHorario(time(0), time(0))
+    
+    def es_cerrado(self) -> bool:
+        return self.inicio == self.fin
+
+@dataclass
 class Edificio:
     nombre: str
-    aulas: list[Aula]
-    
-    horario_lunes:     RangoHorario
-    horario_martes:    RangoHorario
-    horario_miércoles: RangoHorario
-    horario_jueves:    RangoHorario
-    horario_viernes:   RangoHorario
-    horario_sábado:    RangoHorario
-    horario_domingo:   RangoHorario
-
-    # Mapea el nombre del aula grande a los nombres de las aulas que la componen
+    aulas: list[Aula] = field(default_factory=list)
     aulas_dobles: list[AulaDoble] = field(default_factory=list)
+
     # Indica que este edificio no es cómodo, y hay que evitarlo si es posible.
     preferir_no_usar: bool = False
+    
+    horario_lunes:     RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_martes:    RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_miércoles: RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_jueves:    RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_viernes:   RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_sábado:    RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_domingo:   RangoHorario = field(default_factory=RangoHorario.cerrado)
 
 @dataclass
 class Aula:
@@ -78,18 +89,6 @@ class Clase:
     promocionable: str|None = None
     docente: str|None = None
     auxiliar: str|None = None
-
-@dataclass
-class RangoHorario:
-    inicio: time
-    fin: time
-
-    @staticmethod
-    def cerrado()-> RangoHorario:
-        return RangoHorario(time(0), time(0))
-    
-    def es_cerrado(self) -> bool:
-        return self.inicio == self.fin
 
 @dataclass
 class AulaDoble:

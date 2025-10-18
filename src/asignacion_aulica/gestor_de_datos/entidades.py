@@ -1,37 +1,24 @@
 from __future__ import annotations  # Para soportar referencias circulares en los type hints
 from dataclasses import dataclass, field
-from datetime import time
 
-from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
-
-@dataclass
-class RangoHorario:
-    inicio: time
-    fin: time
-
-    @staticmethod
-    def cerrado()-> RangoHorario:
-        return RangoHorario(time(0), time(0))
-    
-    def es_cerrado(self) -> bool:
-        return self.inicio == self.fin
+from asignacion_aulica.gestor_de_datos.días_y_horarios import (
+    Día,
+    RangoHorario,
+    HorariosSemanales,
+    crear_horarios_semanales,
+    HorariosSemanalesOpcionales,
+    crear_horarios_semanales_opcionales
+)
 
 @dataclass
 class Edificio:
     nombre: str
     aulas: list[Aula] = field(default_factory=list)
     aulas_dobles: list[AulaDoble] = field(default_factory=list)
+    horarios: HorariosSemanales = field(default_factory=crear_horarios_semanales)
 
     # Indica que este edificio no es cómodo, y hay que evitarlo si es posible.
     preferir_no_usar: bool = False
-    
-    horario_lunes:     RangoHorario = field(default_factory=RangoHorario.cerrado)
-    horario_martes:    RangoHorario = field(default_factory=RangoHorario.cerrado)
-    horario_miércoles: RangoHorario = field(default_factory=RangoHorario.cerrado)
-    horario_jueves:    RangoHorario = field(default_factory=RangoHorario.cerrado)
-    horario_viernes:   RangoHorario = field(default_factory=RangoHorario.cerrado)
-    horario_sábado:    RangoHorario = field(default_factory=RangoHorario.cerrado)
-    horario_domingo:   RangoHorario = field(default_factory=RangoHorario.cerrado)
 
 @dataclass
 class Aula:
@@ -39,13 +26,9 @@ class Aula:
     edificio: Edificio
     capacidad: int
     equipamiento: set[str] = field(default_factory=set)
-    horario_lunes:     RangoHorario|None = None # None significa que se usa el horario del edificio.
-    horario_martes:    RangoHorario|None = None
-    horario_miércoles: RangoHorario|None = None
-    horario_jueves:    RangoHorario|None = None
-    horario_viernes:   RangoHorario|None = None
-    horario_sábado:    RangoHorario|None = None
-    horario_domingo:   RangoHorario|None = None
+
+    # None significa que se usa el horario del edificio.
+    horarios: HorariosSemanalesOpcionales = field(default_factory=crear_horarios_semanales_opcionales)
 
 @dataclass
 class AulaDoble:

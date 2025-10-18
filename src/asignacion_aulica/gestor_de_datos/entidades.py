@@ -9,8 +9,6 @@ class Edificio:
     nombre: str
     aulas: list[Aula]
     
-    # Los horarios son tuplas (apretura, cierre).
-    # La tupla (time(0), time(0)) indica que está cerrado.
     horario_lunes:     RangoHorario
     horario_martes:    RangoHorario
     horario_miércoles: RangoHorario
@@ -85,6 +83,13 @@ class Clase:
 class RangoHorario:
     inicio: time
     fin: time
+
+    @staticmethod
+    def cerrado()-> RangoHorario:
+        return RangoHorario(time(0), time(0))
+    
+    def es_cerrado(self) -> bool:
+        return self.inicio == self.fin
 
 @dataclass
 class AulaDoble:

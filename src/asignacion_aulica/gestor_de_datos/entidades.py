@@ -50,15 +50,15 @@ class Aula:
 @dataclass
 class Carrera:
     nombre: str
-    materias: list[Materia]
     edificio_preferido: Edificio|None = None
+    materias: list[Materia] = field(default_factory=list)
 
 @dataclass
 class Materia:
     nombre: str
     carrera: Carrera
     año: int # Año dentro del plan de estudios de la carrera
-    clases: list[Clase]
+    clases: list[Clase] = field(default_factory=list)
     
     # Datos que pueden ser ingresados o no:
     # (no usamos estos datos, pero los tenemos que guardar para exportarlos)

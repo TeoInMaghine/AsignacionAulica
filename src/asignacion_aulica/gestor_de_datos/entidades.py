@@ -48,6 +48,12 @@ class Aula:
     horario_domingo:   RangoHorario|None = None
 
 @dataclass
+class AulaDoble:
+    aula_grande: Aula
+    aula_chica_1: Aula
+    aula_chica_2: Aula
+
+@dataclass
 class Carrera:
     nombre: str
     edificio_preferido: Edificio|None = None
@@ -89,9 +95,3 @@ class Clase:
     promocionable: str|None = None
     docente: str|None = None
     auxiliar: str|None = None
-
-@dataclass
-class AulaDoble:
-    aula_grande: int
-    aula_chica_1: int
-    aula_chica_2: int

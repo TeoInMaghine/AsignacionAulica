@@ -11,8 +11,8 @@ class GestorDeDatos:
     persistente.
 
     Los miembros de las entidades se representan con números, los cuales se
-    corresponden con el orden de los miembros en cada entidad y los mal
-    llamados roles de la UI.
+    corresponden con el orden de los miembros en cada entidad y los mal llamados
+    roles de la UI.
     '''
 
     def __init__(self, path_base_de_datos: str):
@@ -24,18 +24,18 @@ class GestorDeDatos:
 
     def get_edificios(self) -> list[str]:
         '''
-        :return: Los nombres de todos los edificios en la base de
-        datos, ordenados alfabéticamente.
+        :return: Los nombres de todos los edificios en la base de datos,
+        ordenados alfabéticamente.
         '''
         pass
 
     def cantidad_de_edificios(self) -> int:
         pass
 
-    def get_edificio(self, índice: int, miembro: int) -> Any:
+    def get_edificio(self, edificio: int, miembro: int) -> Any:
         '''
-        :param índice: El índice del edificio.
-        :param miembro: El índice del miembro.
+        :param edificio: El índice de un edificio.
+        :param miembro: El índice de un miembro.
         :return: El valor del miembro especificado.
         :raise IndexError: Si el índice o el miembro están fuera de rango.
         '''
@@ -48,13 +48,13 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_edificio(self, índice: int, miembro: int, valor: Any):
+    def set_edificio(self, edificio: int, miembro: int, valor: Any):
         '''
         Actualizar el valor de un miembro de un edificio existente.
 
         El valor dado se asume como válido.
 
-        :param índice: El índice del edificio.
+        :param edificio: El índice del edificio.
         :param miembro: El índice del miembro.
         :param valor: El nuevo valor del miembro especificado.
         :raise IndexError: Si el índice o el miembro están fuera de rango.
@@ -65,7 +65,8 @@ class GestorDeDatos:
         '''
         Añadir un nuevo edificio después del último índice existente.
 
-        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+        Se inicializa con valores por defecto, asegurando que tenga un nombre
+        único.
         '''
         pass
 
@@ -73,7 +74,7 @@ class GestorDeDatos:
         '''
         Borrar de la base de datos el edificio en el índice dado.
 
-        :raise KeyError: Si no existe un edificio con el nombre dado.
+        :raise IndexError: Si el índice está fuera de rango.
         '''
         pass
 
@@ -121,7 +122,8 @@ class GestorDeDatos:
         '''
         Añadir al edificio un nuevo aula, después del último índice existente.
 
-        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+        Se inicializa con valores por defecto, asegurando que tenga un nombre
+        único.
 
         :param edificio: El índice del edificio.
         :raise IndexError: Si el índice del edificio está fuera de rango.
@@ -152,30 +154,32 @@ class GestorDeDatos:
     def ordenar_aulas(self, edificio: int):
         '''
         Ordena alfabéticamente las aulas del edificio especificado.
+
+        :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
         pass
 
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
         pass
 
-    def get_aula_doble(self, edificio: int, índice: int, miembro: int) -> Any:
+    def get_aula_doble(self, edificio: int, aula_doble: int, miembro: int) -> Any:
         '''
         :param edificio: El índice del edificio.
-        :param índice: El índice del aula doble.
+        :param aula_doble: El índice del aula doble.
         :param miembro: El índice del miembro.
         :return: El valor del miembro especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def set_aula_doble(self, edificio: int, índice: int, miembro: int, valor: Any):
+    def set_aula_doble(self, edificio: int, aula_doble: int, miembro: int, valor: Any):
         '''
         Actualizar el valor de un miembro de un aula doble existente.
 
         El valor dado se asume como válido.
 
         :param edificio: El índice del edificio.
-        :param índice: El índice del aula doble.
+        :param aula_doble: El índice del aula doble.
         :param miembro: El índice del miembro.
         :param valor: El nuevo valor del miembro especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
@@ -184,9 +188,8 @@ class GestorDeDatos:
 
     def add_aula_doble(self, edificio: int):
         '''
-        Añadir al edificio un nuevo aula doble, después del último índice existente.
-
-        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+        Añadir al edificio un nuevo aula doble, después del último índice
+        existente.
 
         :param edificio: El índice del edificio.
         :raise IndexError: Si el índice del edificio está fuera de rango.
@@ -207,6 +210,8 @@ class GestorDeDatos:
         '''
         Ordena las aulas dobles del edificio especificado, por orden alfabético
         de los nombres de las aulas grandes.
+
+        :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
 
     def get_carreras(self) -> list[str]:
@@ -244,7 +249,7 @@ class GestorDeDatos:
         Cambiar el edificio preferido de una carrera existente.
 
         :param índice: El índice de la carrera.
-        :param edificio: El nombre del nuevo edificio preferido o None para que
+        :param edificio: El nombre del nuevo edificio preferido, o None para que
         no tenga preferencia.
 
         :raise IndexError: Si el índice está fuera de rango.
@@ -266,10 +271,10 @@ class GestorDeDatos:
         '''
         pass
 
-    def get_materia(self, carrera: int, índice: int, miembro: int) -> Any:
+    def get_materia(self, carrera: int, materia: int, miembro: int) -> Any:
         '''
         :param carrera: El índice de la carrera.
-        :param índice: El índice de la materia.
+        :param materia: El índice de la materia.
         :param miembro: El índice del miembro.
         :return: El valor del miembro especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
@@ -287,14 +292,14 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_materia(self, carrera: int, índice: int, miembro: int, valor: Any):
+    def set_materia(self, carrera: int, materia: int, miembro: int, valor: Any):
         '''
         Actualizar el valor de un miembro de un materia existente.
 
         El valor dado se asume como válido.
 
         :param carrera: El índice de la carrera.
-        :param índice: El índice de la materia.
+        :param materia: El índice de la materia.
         :param miembro: El índice del miembro.
         :param valor: El nuevo valor del miembro especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
@@ -303,21 +308,23 @@ class GestorDeDatos:
 
     def add_materia(self, carrera: int):
         '''
-        Añadir al carrera un nuevo materia, después del último índice existente.
+        Añadir a una carrera una nueva materia, después del último índice
+        existente.
 
-        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+        Se inicializa con valores por defecto, asegurando que tenga un nombre
+        único.
 
         :param carrera: El índice de la carrera.
         :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
         pass
 
-    def borrar_materia(self, carrera: int, índice: int):
+    def borrar_materia(self, carrera: int, materia: int):
         '''
-        Borrar de la base de datos la materia especificada.
+        Borrar la materia especificada de la base de datos.
 
         :param carrera: El índice de la carrera.
-        :param índice: El índice de la materia.
+        :param materia: El índice de la materia.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
@@ -325,6 +332,8 @@ class GestorDeDatos:
     def ordenar_materias(self, carrera: int):
         '''
         Ordena alfabéticamente las materias de la carrera especificada.
+
+        :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
         pass
 
@@ -332,14 +341,16 @@ class GestorDeDatos:
         '''
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
+        :return: la cantidad de clases que tiene la materia especificada.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def get_clase(self, carrera: int, materia: int, índice: int, miembro: int) -> Any:
+    def get_clase(self, carrera: int, materia: int, clase: int, miembro: int) -> Any:
         '''
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :param índice: El índice de la clase.
+        :param clase: El índice de la clase.
         :param miembro: El índice del miembro.
         :return: El valor del miembro especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
@@ -358,7 +369,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_clase(self, carrera: int, materia: int, índice: int, miembro: int, valor: Any):
+    def set_clase(self, carrera: int, materia: int, clase: int, miembro: int, valor: Any):
         '''
         Actualizar el valor de un miembro de una clase existente.
 
@@ -366,7 +377,7 @@ class GestorDeDatos:
 
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :param índice: El índice de la clase.
+        :param clase: El índice de la clase.
         :param miembro: El índice del miembro.
         :param valor: El nuevo valor del miembro especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
@@ -375,23 +386,24 @@ class GestorDeDatos:
 
     def add_clase(self, carrera: int, materia: int):
         '''
-        Añadir una nueva clase a una carrera, después del último índice existente.
+        Añadir una nueva clase a una carrera, después del último índice
+        existente.
 
-        Se inicializa con valores por defecto, asegurando que tenga un nombre único.
+        Se inicializa con valores por defecto.
 
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :raise IndexError: Si el índice de la carrera está fuera de rango.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def borrar_clase(self, carrera: int, materia: int, índice: int):
+    def borrar_clase(self, carrera: int, materia: int, clase: int):
         '''
         Borrar de la base de datos la clase especificada.
 
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :param índice: El índice de la clase.
+        :param clase: El índice de la clase.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
@@ -406,9 +418,8 @@ class GestorDeDatos:
         validar hasta que todos los datos fueron cargados.
 
         Las validaciones que se hacen en esta función son:
-        - Que la lista de aulas dobles no tenga aulas vacías, aulas chicas
-          repetidas, y que un aula que se usa como aula grande no se use
-          también como aula chica.
+        - Que la lista de aulas dobles no tenga aulas vacías.
+        - Que ningún aula aparezca más de una vez en la lista de aulas dobles.
         - (Puede ser que después se agreguen otras)
         
         :return: Un string con la descripción del primer problema, o `None` si

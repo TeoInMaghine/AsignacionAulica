@@ -2,10 +2,10 @@ from dataclasses import fields, asdict
 from typing import Any
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
 
-from asignacion_aulica.gestor_de_datos import Aula
+from asignacion_aulica.gestor_de_datos import GestorDeDatos, Aula
 
 class ListAulas(QAbstractListModel):
-    def __init__(self, parent):
+    def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
         atributos_aulas = [field.name for field in fields(Aula)]
         self.nombres_de_roles = {
@@ -20,6 +20,8 @@ class ListAulas(QAbstractListModel):
             Aula('B201', self.edificio, 45)
         ]
 
+    # TODO: Mover ordenamiento al nivel de elemento de lista de edificios
+    # (para que al ordenar también se actualizen los índices de las aulas dobles)
     @pyqtSlot()
     def ordenar(self):
         self.layoutAboutToBeChanged.emit()

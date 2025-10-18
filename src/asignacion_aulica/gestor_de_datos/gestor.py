@@ -1,4 +1,3 @@
-from collections.abc import Iterable
 from typing import Callable, Any
 
 from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio, Carrera, Materia, Clase
@@ -11,6 +10,10 @@ class GestorDeDatos:
 
     Internamente usa una base de datos para almacenar los datos de manera
     persistente.
+
+    Los miembros de las entidades se representan con números, los cuales se
+    corresponden con el orden de los miembros en cada entidad y los mal
+    llamados roles de la UI.
     '''
 
     def __init__(self, path_base_de_datos: str):
@@ -72,6 +75,12 @@ class GestorDeDatos:
         Borrar de la base de datos el edificio en el índice dado.
 
         :raise KeyError: Si no existe un edificio con el nombre dado.
+        '''
+        pass
+
+    def ordenar_edificios(self):
+        '''
+        Ordena los edificios alfabéticamente.
         '''
         pass
 
@@ -141,6 +150,12 @@ class GestorDeDatos:
         '''
         pass
 
+    def ordenar_aulas(self, edificio: int):
+        '''
+        Ordena alfabéticamente las aulas del edificio especificado.
+        '''
+        pass
+
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
         pass
 
@@ -188,6 +203,12 @@ class GestorDeDatos:
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
+
+    def ordenar_aulas_dobles(self, edificio: int):
+        '''
+        Ordena las aulas dobles del edificio especificado, por orden alfabético
+        de los nombres de las aulas grandes.
+        '''
 
     def get_carreras(self) -> list[str]:
         '''
@@ -299,6 +320,12 @@ class GestorDeDatos:
         :param carrera: El índice de la carrera.
         :param índice: El índice de la materia.
         :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        pass
+
+    def ordenar_materias(self, carrera: int):
+        '''
+        Ordena alfabéticamente las materias de la carrera especificada.
         '''
         pass
 

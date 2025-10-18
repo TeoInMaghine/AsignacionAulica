@@ -1,51 +1,70 @@
+from __future__ import annotations  # Para soportar referencias circulares en los type hints
 from dataclasses import dataclass, field
 from datetime import time
 
 from asignacion_aulica.gestor_de_datos.día import Día
 
 @dataclass
+class RangoHorario:
+    inicio: time
+    fin: time
+
+    @staticmethod
+    def cerrado()-> RangoHorario:
+        return RangoHorario(time(0), time(0))
+    
+    def es_cerrado(self) -> bool:
+        return self.inicio == self.fin
+
+@dataclass
 class Edificio:
     nombre: str
-    
-    # Los horarios son tuplas (apretura, cierre).
-    # La tupla (time(0), time(0)) indica que está cerrado.
-    horario_lunes:     tuple[time, time]
-    horario_martes:    tuple[time, time]
-    horario_miércoles: tuple[time, time]
-    horario_jueves:    tuple[time, time]
-    horario_viernes:   tuple[time, time]
-    horario_sábado:    tuple[time, time]
-    horario_domingo:   tuple[time, time]
+    aulas: list[Aula] = field(default_factory=list)
+    aulas_dobles: list[AulaDoble] = field(default_factory=list)
 
-    # Mapea el nombre del aula grande a los nombres de las aulas que la componen
-    aulas_dobles: dict[str, tuple[str, str]] = field(default_factory=dict)
     # Indica que este edificio no es cómodo, y hay que evitarlo si es posible.
     preferir_no_usar: bool = False
+    
+    horario_lunes:     RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_martes:    RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_miércoles: RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_jueves:    RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_viernes:   RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_sábado:    RangoHorario = field(default_factory=RangoHorario.cerrado)
+    horario_domingo:   RangoHorario = field(default_factory=RangoHorario.cerrado)
 
 @dataclass
 class Aula:
     nombre: str
-    edificio: str
+    edificio: Edificio
     capacidad: int
     equipamiento: set[str] = field(default_factory=set)
-    horario_lunes:     tuple[time, time]|None = None # Los horarios son tuplas (apretura, cierre).
-    horario_martes:    tuple[time, time]|None = None # None significa que se usa el horario del edificio.
-    horario_miércoles: tuple[time, time]|None = None
-    horario_jueves:    tuple[time, time]|None = None
-    horario_viernes:   tuple[time, time]|None = None
-    horario_sábado:    tuple[time, time]|None = None
-    horario_domingo:   tuple[time, time]|None = None
+    horario_lunes:     RangoHorario|None = None # None significa que se usa el horario del edificio.
+    horario_martes:    RangoHorario|None = None
+    horario_miércoles: RangoHorario|None = None
+    horario_jueves:    RangoHorario|None = None
+    horario_viernes:   RangoHorario|None = None
+    horario_sábado:    RangoHorario|None = None
+    horario_domingo:   RangoHorario|None = None
+
+@dataclass
+class AulaDoble:
+    aula_grande: Aula
+    aula_chica_1: Aula
+    aula_chica_2: Aula
 
 @dataclass
 class Carrera:
     nombre: str
-    edificio_preferido: str|None = None
+    edificio_preferido: Edificio|None = None
+    materias: list[Materia] = field(default_factory=list)
 
 @dataclass
 class Materia:
     nombre: str
-    carrera: str
+    carrera: Carrera
     año: int # Año dentro del plan de estudios de la carrera
+    clases: list[Clase] = field(default_factory=list)
     
     # Datos que pueden ser ingresados o no:
     # (no usamos estos datos, pero los tenemos que guardar para exportarlos)
@@ -54,14 +73,10 @@ class Materia:
 
 @dataclass
 class Clase:
-    id: int # Identificador para distinguir entre distintas clases de la misma materia. No es para que lo vea el usuario.
-
     # Datos obligatorios:
-    materia: str
-    carrera: str
+    materia: Materia
     día: Día
-    horario_inicio: time
-    horario_fin: time
+    horario: RangoHorario
     virtual: bool
     cantidad_de_alumnos: int
     equipamiento_necesario: set[str] = field(default_factory=set)

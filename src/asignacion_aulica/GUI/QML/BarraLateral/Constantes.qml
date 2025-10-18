@@ -5,6 +5,7 @@ pragma Singleton
 QtObject {
     readonly property color rojo_unrn: "#EB1C38"
     readonly property color rojo_unrn_oscuro: "#B70C0C"
+    readonly property color rojo_unrn_oscurísimo: "#730202"
     
     readonly property int ancho_de_la_barra: 230
 

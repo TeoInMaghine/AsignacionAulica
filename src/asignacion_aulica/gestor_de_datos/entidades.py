@@ -65,10 +65,8 @@ class Clase:
     equipamiento_necesario: set[str] = field(default_factory=set)
     
     # Asignación manual/automática:
-    # (None significa que todavía no se asignó)
-    no_cambiar_asignación: bool = False # Indica si el aula y edificio se tienen que asignar automáticamente o mantener los valores puestos a mano.
-    edificio: str|None = None
-    aula: str|None = None
+    aula_asignada: Aula|None = None # None significa que todavía no se asignó
+    no_cambiar_asignación: bool = False # Indica si el aula se tiene que asignar automáticamente o mantener El valor puesto a mano.
 
     # Datos que pueden ser ingresados o no:
     # (no usamos estos datos, pero los tenemos que guardar para exportarlos)

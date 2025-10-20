@@ -12,6 +12,7 @@ ListView {
     header: HeaderAulas { leftPadding: 20; verticalPadding: 5 }
 
     delegate: RowLayout {
+        id: editorDeAula
         spacing: headerItem.spacing
 
         // Referencia: https://doc.qt.io/qt-6/qtquick-modelviewsdata-modelview.html#models
@@ -19,9 +20,8 @@ ListView {
         required property var model
         required property var index
 
-        required property var nombre
-        required property var edificio
-        required property var capacidad
+        property alias aula : editorDeAula.model
+
         property var rolesDeHorarios: [
             "horario_lunes",
             "horario_martes",
@@ -36,17 +36,17 @@ ListView {
             Layout.leftMargin: headerItem.leftPadding // Cumple la función de leftPadding
             Layout.preferredWidth: headerItem.widthNombre
 
-            text: nombre
+            text: aula.nombre
             onEditingFinished: {
-                nombre = text
+                aula.nombre = text
             }
         }
         TextField {
             Layout.preferredWidth: headerItem.widthCapacidad
 
-            text: capacidad
+            text: aula.capacidad
             onEditingFinished: {
-                capacidad = parseInt(text)
+                aula.capacidad = parseInt(text)
             }
         }
 
@@ -60,15 +60,17 @@ ListView {
                 // Este modelData es del Repeater, no del model de ListView...
                 required property var modelData
 
-                // ... mientras que este model sí se refiere al del ListView
-                text: model[modelData] == undefined ? "NaN" : model[modelData]
+                text: aula[modelData] == undefined ? "NaN" : aula[modelData]
                 onEditingFinished: {
-                    model[modelData] = text
+                    aula[modelData] = text
                 }
             }
         }
 
-        // TODO: editor de equipamiento
+        SelectorEquipamiento {
+            Layout.preferredWidth: headerItem.widthEquipamiento
+            aula: parent.aula
+        }
 
         // TODO: crear un componente de botón reusable custom (para que las
         // animaciones y eso sean todas iguales)

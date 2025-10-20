@@ -45,7 +45,7 @@ class ListAulas(QAbstractListModel):
         if index.isValid() and role in self.nombres_de_roles:
             # TODO: validar value
             setattr(self.aulas[index.row()], self.nombres_de_roles[role], value)
-            self.dataChanged.emit(index, index)
+            self.dataChanged.emit(index, index, [role])
             return True
 
         return False

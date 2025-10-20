@@ -1,3 +1,4 @@
 module Aulas
 Aulas Aulas.qml
 internal HeaderAulas HeaderAulas.qml
+internal SelectorEquipamiento SelectorEquipamiento.qml

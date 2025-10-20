@@ -13,6 +13,7 @@ RowLayout {
     // Si la resolución de dependencias de Qt funciona, esto no se recalcula al
     // menos que cambien los anchos de los horarios...
     property int widthHorario : Math.max(...horarios.children.map(c => c.width))
+    property alias widthEquipamiento : headerEquipamiento.width
 
     Layout.alignment: Qt.AlignHCenter
     Layout.topMargin: verticalPadding
@@ -44,6 +45,14 @@ RowLayout {
                 text: modelData
             }
         }
+    }
+
+    Label {
+        id: headerEquipamiento
+        leftPadding: 50
+        rightPadding: 50
+        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+        text: "Equipamiento"
     }
 
     Button {

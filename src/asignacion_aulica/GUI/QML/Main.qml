@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.15
 
 import "."
 import "./BarraLateral"
+import "./Aulas"
 
 Window {
     id: mainWindow
@@ -23,6 +24,8 @@ Window {
         }
 
         // Mecanismo para cambiar de pestaña
+        // TODO: Quizás cambiarlo a TabBar
+        // (https://doc.qt.io/qt-6/qml-qtquick-controls-tabbar.html)
         Loader {
             id: tabLoader
             Layout.fillWidth: true

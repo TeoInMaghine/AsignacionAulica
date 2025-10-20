@@ -2,7 +2,7 @@ from dataclasses import fields, asdict
 from typing import Any
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
 
-from asignacion_aulica.gestor_de_datos import GestorDeDatos, Aula
+from asignacion_aulica.gestor_de_datos import GestorDeDatos, Aula, Edificio
 
 class ListAulas(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
@@ -13,12 +13,13 @@ class ListAulas(QAbstractListModel):
             i + Qt.ItemDataRole.UserRole + 1: atributo for i, atributo in enumerate(atributos_aulas)
         }
         # TODO: Esto es placeholder, falta usar el gestor de datos
-        self.edificio = 'Anasagasti 1'
+        self.edificio = Edificio('Anasagasti 1')
         self.aulas = [
             Aula('B101', self.edificio, 45),
             Aula('B102', self.edificio, 45),
             Aula('B201', self.edificio, 45)
         ]
+        self.edificio = self.aulas
 
     # TODO: Mover ordenamiento al nivel de elemento de lista de edificios
     # (para que al ordenar también se actualizen los índices de las aulas dobles)

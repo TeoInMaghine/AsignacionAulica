@@ -19,7 +19,6 @@ class ListAulas(QAbstractListModel):
             Aula('B102', self.edificio, 45),
             Aula('B201', self.edificio, 45)
         ]
-        self.edificio = self.aulas
 
     # TODO: Mover ordenamiento al nivel de elemento de lista de edificios
     # (para que al ordenar también se actualizen los índices de las aulas dobles)

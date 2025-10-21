@@ -1,34 +1,30 @@
-from bisect import bisect_left, bisect_right
-from collections.abc import Iterable, Sequence
-from dataclasses import dataclass
-from datetime import time
+from dataclasses import dataclass, field
+from collections.abc import Sequence
+from typing import TypeAlias
+import itertools
 
+from asignacion_aulica.gestor_de_datos.días_y_horarios import (
+    HorariosSemanales,
+    RangoHorario,
+    Día
+)
 from asignacion_aulica.gestor_de_datos.entidades import (
     Edificio,
-    Aula,
     Carrera,
-    Materia,
     Clase
 )
 
 @dataclass
 class AulaPreprocesada:
     '''
-    Es como `gestor_de_datos.Aula`, pero con los datos transformados de una
-    forma conveniente para `lógica_de_asignación`.
-
-    Por el momento, la única diferencia importante entre `Aula` y
-    `AulaPreprocesada` es que los horarios están en una tupla, y que no pueden
-    ser `None`.
+    Es como `gestor_de_datos.entidades.Aula`, pero con los horarios
+    preprocesados para que ya no sean opcionales.
     '''
+    nombre: str
+    edificio: Edificio
     capacidad: int
     equipamiento: set[str]
-    nombre: str
-
-    # Tuplas (apertura, cierre) para cada día de la semana.
-    horarios: tuple[tuple[time, time], tuple[time, time], tuple[time, time],
-        tuple[time, time], tuple[time, time], tuple[time, time], tuple[time, time]]
-
+    horarios: HorariosSemanales
 
 class AulasPreprocesadas:
     '''
@@ -36,16 +32,13 @@ class AulasPreprocesadas:
     preprocesados para que queden en un formato cómodo para la lógica de
     asignación.
     '''
-    def __init__(self, edificios: Sequence[Edificio], aulas: Sequence[Aula]):
+    def __init__(self, edificios: Sequence[Edificio]):
         '''
-        :param edificios: Los edificios disponibles (en orden alfabético).
-        :param aulas: Las aulas disponibles en cada uno de los edificios
-        (agrupadas por edificio, en el mismo orden que la secuencia de
-        edificios).
+        :param edificios: Los edificios disponibles.
         '''
-        # Datos de aulas preprocesadas, en el mismo orden que la secuencia
-        # original.
-        self.aulas: Sequence[AulaPreprocesada] = []
+        # Las aulas de todos los edificios, concatenadas en el mismo orden que
+        # la secuencia de edificios, y preprocesadas.
+        self.aulas: list[AulaPreprocesada] = []
         
         # Diccionario de nombre de edificio a rango de índices de sus aulas.
         self.rangos_de_aulas: dict[str, slice] = dict()
@@ -57,36 +50,32 @@ class AulasPreprocesadas:
         # la componen.
         self.aulas_dobles: dict[int, tuple[int, int]] = {}
 
-
+        # Popular las variables con los datos de las aulas:
         for edificio in edificios:
-            inicio_rango = bisect_left(aulas, edificio.nombre, key=lambda a: a.edificio)
-            fin_rango = bisect_right(aulas, edificio.nombre, key=lambda a: a.edificio)
+            inicio_rango = len(self.aulas)
+            fin_rango = inicio_rango + len(edificio.aulas)
             rango = slice(inicio_rango, fin_rango)
             self.rangos_de_aulas[edificio.nombre] = rango
 
             if edificio.preferir_no_usar:
                 self.preferir_no_usar.extend(range(inicio_rango, fin_rango))
 
-            for aula_grande, aulas_chicas in edificio.aulas_dobles.items():
-                i_aula_grande = bisect_left(aulas, aula_grande, lo=inicio_rango, hi=fin_rango, key=lambda a: a.nombre)
-                i_aula_chica0 = bisect_left(aulas, aulas_chicas[0], lo=inicio_rango, hi=fin_rango, key=lambda a: a.nombre)
-                i_aula_chica1 = bisect_left(aulas, aulas_chicas[1], lo=inicio_rango, hi=fin_rango, key=lambda a: a.nombre)
-                self.aulas_dobles[i_aula_grande] = (i_aula_chica0, i_aula_chica1)
+            for aula_doble in edificio.aulas_dobles:
+                i_aula_grande = inicio_rango + edificio.aulas.index(aula_doble.aula_grande)
+                i_aula_chica_1 = inicio_rango + edificio.aulas.index(aula_doble.aula_chica_1)
+                i_aula_chica_2 = inicio_rango + edificio.aulas.index(aula_doble.aula_chica_2)
+                self.aulas_dobles[i_aula_grande] = (i_aula_chica_1, i_aula_chica_2)
 
-            for aula in aulas[rango]:
+            for aula in edificio.aulas:
                 self.aulas.append(AulaPreprocesada(
+                    nombre=aula.nombre,
+                    edificio=edificio,
                     capacidad=aula.capacidad,
                     equipamiento=aula.equipamiento,
-                    nombre=aula.nombre,
-                    horarios=(
-                        aula.horario_lunes     or edificio.horario_lunes,
-                        aula.horario_martes    or edificio.horario_martes,
-                        aula.horario_miércoles or edificio.horario_miércoles,
-                        aula.horario_jueves    or edificio.horario_jueves,
-                        aula.horario_viernes   or edificio.horario_viernes,
-                        aula.horario_sábado    or edificio.horario_sábado,
-                        aula.horario_domingo   or edificio.horario_domingo,
-                    )
+                    horarios=HorariosSemanales((
+                        aula.horarios[día] or edificio.horarios[día]
+                        for día in Día
+                    ))
                 ))
 
 @dataclass
@@ -106,31 +95,30 @@ class ClasesPreprocesadas:
     '''
     # Un conjunto de clases que han de ser asignadas. Las clases en este
     # conjunto son presenciales y no tienen asignación manual.
-    clases: Sequence[Clase]
-
-    # Los índices que tienen las clases de este conjunto en la secuencia de
-    # clases completa.
-    índices_originales: Sequence[int]
+    clases: list[Clase] = field(default_factory=list)
 
     # Tuplas (rango de clases, rango de aulas) que indican que las clases del
     # primer rango pertenecen a una carrera que tiene un edificio preferido con
     # aulas contenidas en el segundo rango.
-    rangos_de_aulas_preferidas: Iterable[tuple[slice, slice]]
+    rangos_de_aulas_preferidas: list[tuple[slice, slice]] = field(default_factory=list)
 
     # Horarios en los que algunas aulas están ocupadas con clases que tienen
-    # asignación manual, expresados en tuplas (índice del aula, inicio, fin).
-    aulas_ocupadas: Iterable[tuple[int, time, time]]
+    # asignación manual.
+    aulas_ocupadas: list[tuple[int, RangoHorario]] = field(default_factory=list)
 
-def preprocesar_clases(
-    carreras: Sequence[Carrera],
-    materias: Sequence[Materia],
-    clases: Sequence[Clase],
-    aulas: AulasPreprocesadas
-) -> tuple[
+ClasesPreprocesadasPorDía: TypeAlias = tuple[
     ClasesPreprocesadas, ClasesPreprocesadas, ClasesPreprocesadas,
     ClasesPreprocesadas, ClasesPreprocesadas, ClasesPreprocesadas,
     ClasesPreprocesadas
-]:
+]
+'''
+Tupla con una instancia de ClasesPreprocesadas para cada día de la semana.
+'''
+
+def preprocesar_clases(
+    carreras: Sequence[Carrera],
+    aulas: AulasPreprocesadas
+) -> ClasesPreprocesadasPorDía:
     '''
     Preprocesar los datos de clases/materias/carreras provenientes del gestor de
     datos para que queden en un formato cómodo para la lógica de asignación.
@@ -138,50 +126,44 @@ def preprocesar_clases(
     Separar por día de la semana los datos de las clases que hay que asignar,
     filtrando clases virtuales y clases con asignación manual.
 
-    :param carreras: Las carreras que existen, en orden alfabético.
-    :param materias: Las materias de todas las carreras (agrupadas por carrera
-    en el mismo orden que la secuencia de carreras).
-    :param clases: Las clases de todas las materias (agrupadas por materia, en
-    el mismo orden que la secuencia de materias).
+    :param carreras: Las carreras que existen.
     :param aulas: El conjunto de aulas disponibles, preprocesadas.
-
-    :return: Una tupla con un objeto `ClasesPreprocesadas` para cada día de la
-    semana.
     '''
-    datos_procesados = (
-        ClasesPreprocesadas(list(), list(), list(), list()),
-        ClasesPreprocesadas(list(), list(), list(), list()),
-        ClasesPreprocesadas(list(), list(), list(), list()),
-        ClasesPreprocesadas(list(), list(), list(), list()),
-        ClasesPreprocesadas(list(), list(), list(), list()),
-        ClasesPreprocesadas(list(), list(), list(), list()),
-        ClasesPreprocesadas(list(), list(), list(), list())
-    )
+    clases_preprocesadas = ClasesPreprocesadasPorDía((
+        ClasesPreprocesadas(), ClasesPreprocesadas(), ClasesPreprocesadas(),
+        ClasesPreprocesadas(), ClasesPreprocesadas(), ClasesPreprocesadas(),
+        ClasesPreprocesadas()
+    ))
 
-    # Filtrar clases virtuales, construir listas de aulas ocupadas, y clases a asignar
-    for i_clase, clase in enumerate(clases):
-        if clase.virtual:
-            continue
-        elif clase.no_cambiar_asignación:
-            if clase.edificio is not None and clase.aula is not None:
-                rango_del_edificio: slice = aulas.rangos_de_aulas[clase.edificio]
-                i_aula: int = bisect_left(aulas.aulas, clase.aula, key=lambda a:a.nombre, lo=rango_del_edificio.start, hi=rango_del_edificio.stop)
-                datos_procesados[clase.día].aulas_ocupadas.append(
-                    (i_aula, clase.horario_inicio, clase.horario_fin)
-                )
-        else:
-            datos_procesados[clase.día].clases.append(clase)
-            datos_procesados[clase.día].índices_originales.append(i_clase)
-    
-    # Construir los rangos de clases con aulas preferidas
     for carrera in carreras:
-        if carrera.edificio_preferido:
-            rango_de_aulas: slice = aulas.rangos_de_aulas[carrera.edificio_preferido]
-            for día in datos_procesados:
-                inicio_rango = bisect_left(día.clases, carrera.nombre, key=lambda c: c.carrera)
-                fin_rango = bisect_right(día.clases, carrera.nombre, key=lambda c: c.carrera)
-                if inicio_rango != fin_rango:
-                    rango_de_clases = slice(inicio_rango, fin_rango)
-                    día.rangos_de_aulas_preferidas.append((rango_de_clases, rango_de_aulas))
+        clases_en_cada_día_antes_de_procesar_esta_carrera = tuple(len(día.clases) for día in clases_preprocesadas)
 
-    return datos_procesados
+        # Popular clases y aulas ocupadas:
+        clases_de_la_carrera = itertools.chain.from_iterable(
+            materia.clases for materia in carrera.materias
+        )
+        for clase in clases_de_la_carrera:
+            if clase.virtual:
+                continue
+            elif clase.no_cambiar_asignación:
+                if clase.aula_asignada:
+                    edificio = clase.aula_asignada.edificio
+                    rango_del_edificio: slice = aulas.rangos_de_aulas[edificio.nombre]
+                    i_aula: int = rango_del_edificio.start + edificio.aulas.index(clase.aula_asignada)
+                    clases_preprocesadas[clase.día].aulas_ocupadas.append(
+                        (i_aula, clase.horario)
+                    )
+            else:
+                clases_preprocesadas[clase.día].clases.append(clase)
+    
+        # Popular rangos de aulas preferidas:
+        if carrera.edificio_preferido:
+            rango_de_aulas: slice = aulas.rangos_de_aulas[carrera.edificio_preferido.nombre]
+            for día in Día:
+                inicio_rango_esta_carrera = clases_en_cada_día_antes_de_procesar_esta_carrera[día]
+                fin_rango_esta_carrera = len(clases_preprocesadas[día].clases)
+                if fin_rango_esta_carrera != inicio_rango_esta_carrera:
+                    rango_de_clases = slice(inicio_rango_esta_carrera, fin_rango_esta_carrera)
+                    clases_preprocesadas[día].rangos_de_aulas_preferidas.append((rango_de_clases, rango_de_aulas))
+
+    return clases_preprocesadas

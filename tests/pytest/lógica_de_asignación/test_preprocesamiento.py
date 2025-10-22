@@ -1,9 +1,8 @@
-from collections.abc import Sequence
 from datetime import time
 import pytest
 
 from asignacion_aulica.gestor_de_datos.días_y_horarios import HorariosSemanales, RangoHorario, Día
-from asignacion_aulica.gestor_de_datos.entidades import Carrera, Edificio
+from asignacion_aulica.gestor_de_datos.entidades import Carreras, Edificios
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
     AulaPreprocesada,
     AulasPreprocesadas,
@@ -18,7 +17,7 @@ from mocks import MockCarrera, MockClase, MockEdificio, MockAula, MockMateria
     MockEdificio(aulas=(MockAula(), MockAula(), MockAula())),
     MockEdificio(aulas=(MockAula(), )),
 )
-def test_rango_de_aulas_por_edificio(edificios: Sequence[Edificio]):
+def test_rango_de_aulas_por_edificio(edificios: Edificios):
     rangos_esperados = {'edificio 0': slice(0, 3), 'edificio 1': slice(3, 6), 'edificio 2': slice(6, 7)}
     aulas_preprocesadas = AulasPreprocesadas(edificios)
     assert aulas_preprocesadas.rangos_de_aulas == rangos_esperados
@@ -49,7 +48,7 @@ def test_rango_de_aulas_por_edificio(edificios: Sequence[Edificio]):
         )
     )
 ))
-def test_preprocesar_aulas_un_solo_edificio(edificios: Sequence[Edificio]):
+def test_preprocesar_aulas_un_solo_edificio(edificios: Edificios):
     aulas_preprocesadas_esperadas = [
         AulaPreprocesada(
             nombre='una',
@@ -140,7 +139,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios: Sequence[Edificio]):
         )
     )
 )
-def test_preprocesar_aulas_varios_edificios(edificios: Sequence[Edificio]):
+def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
     aulas_preprocesadas_esperadas = [
         AulaPreprocesada(
             nombre='A102',
@@ -252,7 +251,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Sequence[Edificio]):
         )
     )
 )
-def test_aulas_dobles_en_varios_edificios(edificios: Sequence[Edificio]):
+def test_aulas_dobles_en_varios_edificios(edificios: Edificios):
     aulas_dobles_esperadas = {0: (1, 2), 4: (5, 6), 8: (9, 12)}
     aulas_preprocesadas = AulasPreprocesadas(edificios)
     assert aulas_preprocesadas.aulas_dobles == aulas_dobles_esperadas
@@ -277,7 +276,7 @@ def test_aulas_dobles_en_varios_edificios(edificios: Sequence[Edificio]):
     MockClase(día=Día.Lunes, horario=RangoHorario(time(2), time(10))),
     MockClase(día=Día.Lunes, horario=RangoHorario(time(3), time(10)))
 )
-def test_separar_asignaciones_manuales(carreras: Sequence[Carrera], aulas_preprocesadas: AulasPreprocesadas):
+def test_separar_asignaciones_manuales(carreras: Carreras, aulas_preprocesadas: AulasPreprocesadas):
     clases_preprocesadas = preprocesar_clases(carreras, aulas_preprocesadas)
     clases_lunes = clases_preprocesadas[Día.Lunes]
     assert len(clases_lunes.clases) == 3
@@ -305,7 +304,7 @@ def test_separar_asignaciones_manuales(carreras: Sequence[Carrera], aulas_prepro
         MockMateria(clases=(MockClase(día=Día.Lunes),)),
     )
 ))
-def test_separar_clases_por_día(carreras: Sequence[Carrera], aulas_preprocesadas: AulasPreprocesadas):
+def test_separar_clases_por_día(carreras: Carreras, aulas_preprocesadas: AulasPreprocesadas):
     clases_preprocesadas = preprocesar_clases(carreras, aulas_preprocesadas)
     
     # Lunes
@@ -368,7 +367,7 @@ def test_separar_clases_por_día(carreras: Sequence[Carrera], aulas_preprocesada
         ,)
     )
 )
-def test_preprocesar_clases_con_edificio_preferido(carreras: Sequence[Carrera], aulas_preprocesadas: AulasPreprocesadas):
+def test_preprocesar_clases_con_edificio_preferido(carreras: Carreras, aulas_preprocesadas: AulasPreprocesadas):
     clases_preprocesadas = preprocesar_clases(carreras, aulas_preprocesadas)
     assert clases_preprocesadas[Día.Lunes].rangos_de_aulas_preferidas == []
     assert clases_preprocesadas[Día.Jueves].rangos_de_aulas_preferidas == [(slice(1, 2), slice(3, 5))]

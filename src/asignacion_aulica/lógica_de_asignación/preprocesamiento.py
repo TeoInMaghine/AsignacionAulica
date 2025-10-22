@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from collections.abc import Sequence
 from typing import TypeAlias
 import itertools
 
@@ -9,8 +8,9 @@ from asignacion_aulica.gestor_de_datos.días_y_horarios import (
     Día
 )
 from asignacion_aulica.gestor_de_datos.entidades import (
+    Edificios,
     Edificio,
-    Carrera,
+    Carreras,
     Clase
 )
 
@@ -32,7 +32,7 @@ class AulasPreprocesadas:
     preprocesados para que queden en un formato cómodo para la lógica de
     asignación.
     '''
-    def __init__(self, edificios: Sequence[Edificio]):
+    def __init__(self, edificios: Edificios):
         '''
         :param edificios: Los edificios disponibles.
         '''
@@ -116,7 +116,7 @@ Tupla con una instancia de ClasesPreprocesadas para cada día de la semana.
 '''
 
 def preprocesar_clases(
-    carreras: Sequence[Carrera],
+    carreras: Carreras,
     aulas: AulasPreprocesadas
 ) -> ClasesPreprocesadasPorDía:
     '''

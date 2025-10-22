@@ -28,7 +28,7 @@ from collections.abc import Sequence
 import numpy as np
 import logging
 
-from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Materia, Clase
+from asignacion_aulica.gestor_de_datos.entidades import Edificios, Aula, Carreras, Materia, Clase
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
 from asignacion_aulica.lógica_de_asignación import restricciones
@@ -40,9 +40,9 @@ from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
 logger = logging.getLogger(__name__)
 
 def asignar(
-    edificios: Sequence[Edificio],
+    edificios: Edificios,
     aulas: Sequence[Aula],
-    carreras: Sequence[Carrera],
+    carreras: Carreras,
     materias: Sequence[Materia],
     clases: Sequence[Clase],
 ):

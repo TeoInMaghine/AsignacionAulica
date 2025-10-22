@@ -3,12 +3,12 @@ from datetime import time
 from typing import Any
 import pytest
 
-from asignacion_aulica.gestor_de_datos.entidades import Carrera, Edificio
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadas, ClasesPreprocesadasPorDía
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación.restricciones import no_asignar_aulas_ocupadas
-from asignacion_aulica.lógica_de_asignación.asignación import asignar
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
+from asignacion_aulica.gestor_de_datos.entidades import Carreras, Edificios
+from asignacion_aulica.lógica_de_asignación.asignación import asignar
 
 from mocks import MockAula, MockClase, MockEdificio
 
@@ -30,8 +30,8 @@ from mocks import MockAula, MockClase, MockEdificio
     )
 )
 def test_asignación_manual_al_aula_doble(
-    edificios: Sequence[Edificio],
-    carreras: Sequence[Carrera],
+    edificios: Edificios,
+    carreras: Carreras,
     aulas_preprocesadas: AulasPreprocesadas,
     clases_preprocesadas: ClasesPreprocesadasPorDía
 ):

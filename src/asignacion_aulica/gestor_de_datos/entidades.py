@@ -1,5 +1,7 @@
 from __future__ import annotations  # Para soportar referencias circulares en los type hints
 from dataclasses import dataclass, field
+from collections.abc import Sequence
+from typing import TypeAlias
 
 from asignacion_aulica.gestor_de_datos.días_y_horarios import (
     Día,
@@ -19,6 +21,8 @@ class Edificio:
 
     # Indica que este edificio no es cómodo, y hay que evitarlo si es posible.
     preferir_no_usar: bool = False
+
+Edificios: TypeAlias = Sequence[Edificio]
 
 @dataclass
 class Aula:
@@ -41,6 +45,8 @@ class Carrera:
     nombre: str
     edificio_preferido: Edificio|None = None
     materias: list[Materia] = field(default_factory=list)
+
+Carreras: TypeAlias = Sequence[Carrera]
 
 @dataclass
 class Materia:

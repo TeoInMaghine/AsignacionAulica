@@ -7,6 +7,7 @@ import numpy as np
 
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import (
+    Edificios,
     Edificio,
     Aula,
     AulaDoble,
@@ -120,7 +121,7 @@ def make_edificios(edificios: Sequence[MockEdificio]) -> list[Edificio]:
     
     return edificios_de_verdad
 
-def make_carreras(edificios: Sequence[Edificio], carreras: Sequence[MockCarrera]) -> list[Carrera]:
+def make_carreras(edificios: Edificios, carreras: Sequence[MockCarrera]) -> list[Carrera]:
     '''
     Recibe datos (posiblemente incompletos) de las carreras/materias/clases, y
     los rellena con valores por defecto.

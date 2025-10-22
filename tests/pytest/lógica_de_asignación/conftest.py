@@ -8,11 +8,10 @@ prueba que lo necesita.
 Ver https://docs.pytest.org/en/stable/how-to/fixtures.html
 '''
 from ortools.sat.python.cp_model import CpModel
-from collections.abc import Sequence
 import numpy as np
 import pytest
 
-from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Clase
+from asignacion_aulica.gestor_de_datos.entidades import Edificios, Carreras
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
     ClasesPreprocesadasPorDía,
     AulasPreprocesadas,
@@ -37,7 +36,7 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "asignaciones_forzadas: marca para pasar parametros al fixture asignaciones")
 
 @pytest.fixture
-def edificios(request: pytest.FixtureRequest) -> Sequence[Edificio]:
+def edificios(request: pytest.FixtureRequest) -> Edificios:
     '''
     Recibe datos (posiblemente incompletos) de edificios y/o aulas. Rellena esos
     datos con valores por defecto.
@@ -68,11 +67,11 @@ def edificios(request: pytest.FixtureRequest) -> Sequence[Edificio]:
     return make_edificios(edificios)
 
 @pytest.fixture
-def aulas_preprocesadas(edificios: Sequence[Edificio]) -> AulasPreprocesadas:
+def aulas_preprocesadas(edificios: Edificios) -> AulasPreprocesadas:
     return AulasPreprocesadas(edificios)
 
 @pytest.fixture
-def carreras(request, edificios: Sequence[Edificio]) -> Sequence[Carrera]:
+def carreras(request, edificios: Edificios) -> Carreras:
     '''
     Recibe datos (posiblemente incompletos) de carreras/materias/clases. Rellena
     esos datos con valores por defecto.
@@ -106,7 +105,7 @@ def carreras(request, edificios: Sequence[Edificio]) -> Sequence[Carrera]:
 
 @pytest.fixture
 def clases_preprocesadas(
-    carreras: Sequence[Carrera],
+    carreras: Carreras,
     aulas_preprocesadas: AulasPreprocesadas
 ) -> ClasesPreprocesadasPorDía:
     '''

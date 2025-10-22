@@ -1,31 +1,39 @@
+from collections.abc import Sequence
+from datetime import time
 from typing import Any
 import pytest
-from datetime import time
 
-from asignacion_aulica.lógica_de_asignación.asignación import asignar
-from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadas
-from asignacion_aulica.lógica_de_asignación.restricciones import no_asignar_aulas_ocupadas
+from asignacion_aulica.gestor_de_datos.entidades import Carrera, Edificio
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadas, ClasesPreprocesadasPorDía
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
-from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
+from asignacion_aulica.lógica_de_asignación.restricciones import no_asignar_aulas_ocupadas
+from asignacion_aulica.lógica_de_asignación.asignación import asignar
+from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 
-@pytest.mark.edificios(
-    dict(nombre='edificio 0', aulas_dobles={'1': ('0', '2')})
-)
-@pytest.mark.aulas(
-    dict(edificio='edificio 0', nombre='0'),
-    dict(edificio='edificio 0', nombre='1'),
-    dict(edificio='edificio 0', nombre='2'),
-)
+from mocks import MockAula, MockClase, MockEdificio
+
+@pytest.mark.edificios(MockEdificio(
+        aulas=(
+            MockAula(nombre='0'),
+            MockAula(nombre='1'),
+            MockAula(nombre='2'),
+        ),
+        aulas_dobles={1: (0, 2)}
+))
 @pytest.mark.clases(
-    dict(día=Día.Martes, horario_inicio=time(19), horario_fin=time(23)),
-    dict(
-        día=Día.Martes, horario_inicio=time(20), horario_fin=time(22),
-        no_cambiar_asignación=True, edificio='edificio 0', aula='1'
+    MockClase(
+        día=Día.Martes, horario=RangoHorario(time(19), time(23))
+    ),
+    MockClase(
+        día=Día.Martes, horario=RangoHorario(time(20), time(22)),
+        no_cambiar_asignación=True, aula_asignada=(0, 1)
     )
 )
 def test_asignación_manual_al_aula_doble(
-    edificios, aulas, carreras, materias, clases,
-    aulas_preprocesadas, clases_preprocesadas
+    edificios: Sequence[Edificio],
+    carreras: Sequence[Carrera],
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía
 ):
     '''
     Verificar que si se asigna manualmente al aula doble, las aulas individuales
@@ -35,8 +43,7 @@ def test_asignación_manual_al_aula_doble(
 
     # Probar que se separaron las asignaciones manuales
     assert len(clases_martes.clases) == 1
-    assert clases_martes.índices_originales == [0]
-    assert clases_martes.aulas_ocupadas == [(1, time(20), time(22))]
+    assert clases_martes.aulas_ocupadas == [(1, RangoHorario(time(20), time(22)))]
 
     # Probar no_asignar_aulas_ocupadas
     prohibidas = set(no_asignar_aulas_ocupadas(clases_martes, aulas_preprocesadas))
@@ -46,7 +53,7 @@ def test_asignación_manual_al_aula_doble(
 
     # Probar asignar
     with pytest.raises(AsignaciónImposibleException) as exc_info:
-        asignar(edificios, aulas, carreras, materias, clases)
+        asignar(edificios, carreras)
     
     assert exc_info.value.días_sin_asignar == (Día.Martes,)
     

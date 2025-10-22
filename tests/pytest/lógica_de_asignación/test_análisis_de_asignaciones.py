@@ -1,17 +1,21 @@
+from collections.abc import Sequence
 import pytest
 from asignacion_aulica import análisis_de_asignaciones
 
+from asignacion_aulica.gestor_de_datos.entidades import Carrera, Edificio
+from mocks import MockAula, MockClase
+
 @pytest.mark.aulas(
-    dict(capacidad = 30),
-    dict(capacidad = 100),
-    dict(capacidad = 10) # Esta queda justito para la clase 0
+    MockAula(capacidad = 30),
+    MockAula(capacidad = 100),
+    MockAula(capacidad = 10) # Esta queda justito para la clase 0
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos = 10),
-    dict(cantidad_de_alumnos = 25),
-    dict(cantidad_de_alumnos = 80)
+    MockClase(cantidad_de_alumnos = 10),
+    MockClase(cantidad_de_alumnos = 25),
+    MockClase(cantidad_de_alumnos = 80)
 )
-def test_ningún_aula_chica(aulas, clases):
+def test_ningún_aula_chica(edificios: Sequence[Edificio], carreras: Sequence[Carrera]):
     asignaciones = [2, 0, 1]
     clases_excedidas = análisis_de_asignaciones.clases_con_aula_chica(clases, aulas, asignaciones)
     assert len(clases_excedidas) == 0

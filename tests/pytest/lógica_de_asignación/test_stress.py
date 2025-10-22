@@ -1,7 +1,7 @@
 from datetime import time
 import pytest, random, logging
 
-from conftest import make_aulas, make_carreras, make_clases, make_edificios, make_materias
+from mocks import make_carreras, make_edificios
 
 from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Clase, Materia
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException

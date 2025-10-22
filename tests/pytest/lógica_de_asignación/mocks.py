@@ -1,6 +1,9 @@
+from ortools.sat.python.cp_model import CpModel
 from dataclasses import dataclass, field
 from collections.abc import Sequence
 from datetime import time
+import numpy as np
+
 
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import (
@@ -162,3 +165,36 @@ def make_carreras(edificios: Sequence[Edificio], carreras: Sequence[MockCarrera]
         carreras_de_verdad.append(carrera_de_verdad)
     
     return carreras_de_verdad
+
+def make_asignaciones(
+    n_clases: int,
+    n_aulas: int,
+    modelo: CpModel,
+    asignaciones_forzadas: dict[int, int]
+) -> np.ndarray:
+    '''
+    Genera una matriz con las variables de asignación. No hay constantes, todas
+    son variables que se agregan al modelo, a menos que se especifiquen
+    asignaciones forzadas, en cuyo caso se colocan los ceros donde corresponda
+    (no unos, para simular como ocurriría en la asignación real).
+
+    También se agregan restricciones para que cada clase se asigne exactamente a
+    un aula.
+
+    :param asignaciones_forzadas: Diccionario de índices de clases a índices de
+    aulas.
+    :return: Matriz con los datos de asignaciones.
+    '''
+    asignaciones = np.empty(shape=(n_clases, n_aulas), dtype=object)
+    
+    for clase, aula in np.ndindex(asignaciones.shape):
+        if clase not in asignaciones_forzadas or asignaciones_forzadas[clase] == aula:
+            asignaciones[clase, aula] = modelo.new_bool_var(f'clase_{clase}_asignada_al_aula_{aula}')
+        else:
+            asignaciones[clase, aula] = 0
+    
+    # Asegurar que cada clase se asigna a exactamente un aula
+    for clase in range(asignaciones.shape[0]):
+        modelo.add_exactly_one(asignaciones[clase,:])
+    
+    return asignaciones

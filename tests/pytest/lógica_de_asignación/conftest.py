@@ -24,7 +24,8 @@ from mocks import (
     MockCarrera,
     MockMateria,
     make_edificios,
-    make_carreras
+    make_carreras,
+    make_asignaciones
 )
 
 def pytest_configure(config):
@@ -34,39 +35,6 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "carreras: marca para pasar parametros al fixture carreras")
     config.addinivalue_line("markers", "clases: marca para pasar parametros al fixture clases")
     config.addinivalue_line("markers", "asignaciones_forzadas: marca para pasar parametros al fixture asignaciones")
-
-def make_asignaciones(
-    n_clases: int,
-    n_aulas: int,
-    modelo: CpModel,
-    asignaciones_forzadas: dict[int, int] = {}
-) -> np.ndarray:
-    '''
-    Genera una matriz con las variables de asignación. No hay constantes, todas
-    son variables que se agregan al modelo, a menos que se especifiquen
-    asignaciones forzadas, en cuyo caso se colocan los ceros donde corresponda
-    (no unos, para simular como ocurriría en la asignación real).
-
-    También se agregan restricciones para que cada clase se asigne exactamente a
-    un aula.
-
-    :param asignaciones_forzadas: Diccionario de índices de clases a índices de
-    aulas.
-    :return: Matriz con los datos de asignaciones.
-    '''
-    asignaciones = np.empty(shape=(n_clases, n_aulas), dtype=object)
-    
-    for clase, aula in np.ndindex(asignaciones.shape):
-        if clase not in asignaciones_forzadas or asignaciones_forzadas[clase] == aula:
-            asignaciones[clase, aula] = modelo.new_bool_var(f'clase_{clase}_asignada_al_aula_{aula}')
-        else:
-            asignaciones[clase, aula] = 0
-    
-    # Asegurar que cada clase se asigna a exactamente un aula
-    for clase in range(asignaciones.shape[0]):
-        modelo.add_exactly_one(asignaciones[clase,:])
-    
-    return asignaciones
 
 @pytest.fixture
 def edificios(request: pytest.FixtureRequest) -> Sequence[Edificio]:
@@ -155,8 +123,8 @@ def modelo() -> CpModel:
 @pytest.fixture
 def asignaciones(
     request,
-    clases: Sequence[Clase],
-    aulas: Sequence[Aula],
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
     modelo: CpModel
 ) -> np.ndarray:
     '''
@@ -180,5 +148,5 @@ def asignaciones(
     '''
     marker = request.node.get_closest_marker('asignaciones_forzadas')
     asignaciones_forzadas: dict[int, int] = marker.args[0] if marker else dict()
-
-    return make_asignaciones(len(clases), len(aulas), modelo, asignaciones_forzadas)
+    #TODO: ¿las clases de qué día??
+    return make_asignaciones(4, len(aulas_preprocesadas.aulas), modelo, asignaciones_forzadas)

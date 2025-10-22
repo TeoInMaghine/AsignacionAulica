@@ -1,6 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import Custom
 
 // https://forum.qt.io/topic/87306/multiselect-combobox/2
 // https://doc.qt.io/qt-6/qtquickcontrols-customize.html#customizing-combobox
@@ -9,53 +10,33 @@ ComboBox {
 
     required property var aula
 
-    displayText: selectedElements.length == 0 ? "Select" : selectedElements.join(",")
-    property list<string> selectedElements: []
-    function changeSelectedElements(elementName, selected) {
-        if (selected) {
-            selectedElements.push(elementName)
-        }
-        else {
-            const index = selectedElements.indexOf(elementName)
-            if (index > -1) selectedElements.splice(index, 1)
-        }
-        selectedElements.sort()
-    }
+    displayText: equipamientos.seleccionadosText
 
-    // TODO: reemplazar con un modelo propio
-    // TODO: usar aula.equipamiento para saber que está seleccionado, y setear
-    // aula.equipamiento para actualizar
-    model: ListModel {
+    model: ListEquipamientos {
         id: equipamientos
-        ListElement { name: "One"; selected: false }
-        ListElement { name: "Two"; selected: false }
-        ListElement { name: "Three"; selected: false }
+        indexAula: aula.index
     }
 
     // ComboBox cierra el popup cuando sus items (si heredan de AbstractButton)
     // son activados. Wrappear el delegate es lo que previene que eso pase.
-    delegate: RowLayout {
-        Layout.margins: 10
+    delegate: Item {
+        width: parent.width
+        height: checkDelegate.height
+
+        function toggle() {
+            // checkDelegate.toggle() no triggerea onToggled, lol
+            checkDelegate.click()
+        }
 
         CheckDelegate {
             id: checkDelegate
-            text: model.name
+            anchors.fill: parent
+
+            text: model.nombre
             highlighted: comboBox.highlightedIndex == index
-            checked: model.selected
-            onCheckedChanged: {
-                if (model.selected != checked) {
-                    model.selected = checked
-                    comboBox.changeSelectedElements(name, selected)
-                    aula.equipamiento = "TODO"
-                }
-            }
-        }
-        Button {
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
-            text: "del"
-            onClicked: {
-                comboBox.changeSelectedElements(name, false)
-                equipamientos.remove(index)
+            checked: model.seleccionado
+            onToggled: {
+                 model.seleccionado = checked
             }
         }
     }
@@ -84,7 +65,7 @@ ComboBox {
                 Button {
                     text: "add"
                     onClicked: {
-                        equipamientos.append({ "name": "Four", "selected": false })
+                        equipamientos.insertRow(equipamientos.rowCount())
                     }
                 }
             }
@@ -105,7 +86,7 @@ ComboBox {
         if (comboBox.popup.visible) {
             var currentItem = comboBox.popup.contentItem.currentItem
             if (currentItem) {
-                currentItem.checkDelegate.toggle()
+                currentItem.toggle()
                 event.accepted = true
             }
         }

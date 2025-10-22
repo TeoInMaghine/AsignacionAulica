@@ -5,6 +5,7 @@ from PyQt6.QtGui import QGuiApplication, QFontDatabase, QIcon
 from PyQt6.QtQml import QQmlApplicationEngine, qmlRegisterType
 
 from asignacion_aulica.GUI.list_model import ListAulas
+from asignacion_aulica.GUI.equipamiento_model import ListEquipamientos
 from asignacion_aulica.gestor_de_datos import GestorDeDatos
 from asignacion_aulica import assets
 
@@ -30,8 +31,12 @@ def main() -> int:
     class _ListAulas(ListAulas):
         def __init__(self, parent):
             super().__init__(parent, gestor_de_datos_de_la_aplicación)
+    class _ListEquipamientos(ListEquipamientos):
+        def __init__(self, parent):
+            super().__init__(parent, gestor_de_datos_de_la_aplicación)
 
     qmlRegisterType(_ListAulas, 'Custom', 1, 0, 'ListAulas')
+    qmlRegisterType(_ListEquipamientos, 'Custom', 1, 0, 'ListEquipamientos')
 
     configurar_fuente_por_defecto()
 

@@ -23,6 +23,8 @@ ComboBox {
         width: parent.width
         height: checkDelegate.height
 
+        required property var model
+
         function toggle() {
             // checkDelegate.toggle() no triggerea onToggled, lol
             checkDelegate.click()

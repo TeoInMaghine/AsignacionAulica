@@ -32,16 +32,20 @@ class ListAulas(QAbstractListModel):
     def roleNames(self) -> dict[int, QByteArray]:
         return {i: nombre.encode() for i, nombre in self.nombres_de_roles.items()}
 
-    def rowCount(self, _parent: QModelIndex):
+    def rowCount(self, _parent: QModelIndex) -> int:
         return len(self.aulas)
 
-    def data(self, index: QModelIndex, role: int):
-        if index.isValid() and role in self.nombres_de_roles:
+    def data(self, index: QModelIndex, role: int) -> Any:
+        if not index.isValid(): return
+
+        if role in self.nombres_de_roles:
             aula = self.aulas[index.row()]
             return asdict(aula)[self.nombres_de_roles[role]]
 
-    def setData(self, index: QModelIndex, value: Any, role: int):
-        if index.isValid() and role in self.nombres_de_roles:
+    def setData(self, index: QModelIndex, value: Any, role: int) -> bool:
+        if not index.isValid(): return False
+
+        if role in self.nombres_de_roles:
             # TODO: validar value
             setattr(self.aulas[index.row()], self.nombres_de_roles[role], value)
             self.dataChanged.emit(index, index, [role])
@@ -49,14 +53,14 @@ class ListAulas(QAbstractListModel):
 
         return False
 
-    def removeRows(self, row: int, count: int, _parent: QModelIndex):
+    def removeRows(self, row: int, count: int, _parent: QModelIndex) -> bool:
         # Borra un solo elemento aún cuando count > 1
         self.beginRemoveRows(_parent, row, row)
         self.aulas.pop(row)
         self.endRemoveRows()
         return True
 
-    def insertRows(self, row: int, count: int, _parent: QModelIndex):
+    def insertRows(self, row: int, count: int, _parent: QModelIndex) -> bool:
         # Inserta un solo elemento aún cuando count > 1
         self.beginInsertRows(_parent, row, row)
         # TODO: validar value (ej.: no dejar insertar si ya hay un aula "sin rellenar")

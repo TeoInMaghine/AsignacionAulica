@@ -4,7 +4,7 @@ from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtPr
 from asignacion_aulica.gestor_de_datos import GestorDeDatos, Aula, Edificio
 
 class ListEquipamientos(QAbstractListModel):
-    seleccionadosTextChanged = pyqtSignal()
+    seleccionadosTextChanged: pyqtSignal = pyqtSignal()
 
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
@@ -13,18 +13,18 @@ class ListEquipamientos(QAbstractListModel):
         self.equipamientos = ["Proyector", "Computadoras", "No sé lol"]
 
     @pyqtProperty(str, notify=seleccionadosTextChanged)
-    def seleccionadosText(self):
+    def seleccionadosText(self) -> str:
         if len(self.aula.equipamiento) == 0:
             return "Ninguno"
 
         return ",".join(self.aula.equipamiento)
 
     @pyqtProperty(int)
-    def indexAula(self):
+    def indexAula(self) -> int:
         return self._indexAula
 
     @indexAula.setter
-    def indexAula(self, indexAula):
+    def indexAula(self, indexAula: int):
         self._indexAula = indexAula
 
     # Constante
@@ -34,10 +34,10 @@ class ListEquipamientos(QAbstractListModel):
             Qt.ItemDataRole.UserRole + 2: "seleccionado".encode()
         }
 
-    def rowCount(self, _parent: QModelIndex):
+    def rowCount(self, _parent: QModelIndex) -> int:
         return len(self.equipamientos)
 
-    def data(self, index: QModelIndex, role: int):
+    def data(self, index: QModelIndex, role: int) -> Any:
         if not index.isValid(): return
 
         if role == Qt.ItemDataRole.UserRole + 1: # nombre
@@ -46,7 +46,7 @@ class ListEquipamientos(QAbstractListModel):
             # TODO: Esto tendría que ser basado en el índice del aula y usar el gestor, obvio
             return self.equipamientos[index.row()] in self.aula.equipamiento
 
-    def setData(self, index: QModelIndex, value: Any, role: int):
+    def setData(self, index: QModelIndex, value: Any, role: int) -> bool:
         if not index.isValid(): return False
 
         if role == Qt.ItemDataRole.UserRole + 1: # nombre
@@ -66,7 +66,7 @@ class ListEquipamientos(QAbstractListModel):
 
         return False
 
-    def insertRows(self, row: int, count: int, _parent: QModelIndex):
+    def insertRows(self, row: int, count: int, _parent: QModelIndex) -> bool:
         # TODO: Dejar nombre de equipamiento por defecto razonable y único
         # Inserta un solo elemento aún cuando count > 1
         self.beginInsertRows(_parent, row, row)

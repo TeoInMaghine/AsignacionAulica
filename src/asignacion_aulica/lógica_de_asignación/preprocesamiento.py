@@ -10,6 +10,7 @@ from asignacion_aulica.gestor_de_datos.días_y_horarios import (
 from asignacion_aulica.gestor_de_datos.entidades import (
     Edificios,
     Edificio,
+    Aula,
     Carreras,
     Clase
 )
@@ -25,6 +26,7 @@ class AulaPreprocesada:
     capacidad: int
     equipamiento: set[str]
     horarios: HorariosSemanales
+    aula_original: Aula
 
 class AulasPreprocesadas:
     '''
@@ -72,6 +74,7 @@ class AulasPreprocesadas:
                     edificio=edificio,
                     capacidad=aula.capacidad,
                     equipamiento=aula.equipamiento,
+                    aula_original=aula,
                     horarios=HorariosSemanales((
                         aula.horarios[día] or edificio.horarios[día]
                         for día in Día

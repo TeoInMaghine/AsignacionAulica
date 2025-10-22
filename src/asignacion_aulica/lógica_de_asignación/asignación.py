@@ -24,75 +24,57 @@ Luego se usa el solver para encontrar una combinación de variables que cumpla
 con todas las restricciones y que tenga la menor penalización posible.
 '''
 from ortools.sat.python import cp_model
-from collections.abc import Sequence
 import numpy as np
 import logging
 
-from asignacion_aulica.gestor_de_datos.entidades import Edificios, Aula, Carreras, Materia, Clase
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
+from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
-from asignacion_aulica.lógica_de_asignación import restricciones
+from asignacion_aulica.gestor_de_datos.entidades import Edificios, Carreras
 from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
+from asignacion_aulica.lógica_de_asignación import restricciones
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
-    AulasPreprocesadas, ClasesPreprocesadas, preprocesar_clases
+    AulasPreprocesadas, ClasesPreprocesadas, ClasesPreprocesadasPorDía, preprocesar_clases
 )
 
 logger = logging.getLogger(__name__)
 
-def asignar(
-    edificios: Edificios,
-    aulas: Sequence[Aula],
-    carreras: Carreras,
-    materias: Sequence[Materia],
-    clases: Sequence[Clase],
-):
+def asignar(edificios: Edificios, carreras: Carreras) -> InfoPostAsignación:
     '''
     Asignar aula a todas las clases presenciales que no tienen una asignación
     fijada.
 
     A las clases con `no_cambiar_asignación == False` se les asigna un aula y se
-    sobreescriben sus atributos `aula` y `edificio` (el valor que tengan
-    inicialmente es ignorado).
+    les sobreescribe el atributo `aula` (el valor que tenga inicialmente es
+    ignorado).
 
     A las clases con `no_cambiar_asignación == True` no se les modifica nada,
     pero se tiene en cuenta el aula que tienen asignada para evitar
     superposiciones.
     
-    :param edificios: Los edificios disponibles (ordenados alfabéticamente).
-    :param aulas: Las aulas disponibles en cada uno de los edificios (agrupadas
-    por edificio, en el mismo orden que la secuencia de edificios, y dentro de
-    cada edificio ordenadas alfabéticamente).
-    :param carreras: Las carreras que existen, en orden alfabético.
-    :param materias: Las materias de todas las carreras (agrupadas por carrera
-    en el mismo orden que la secuencia de carreras).
-    :param clases: Las clases de todas las materias (agrupadas por materia, en
-    el mismo orden que la secuencia de materias).
+    :param edificios: Los edificios disponibles.
+    :param carreras: Las carreras que existen.
     
-    :raise AsignaciónImposibleException: Si no es posible asignar aula a una o
-    más clases.
+    :return: Info sobre el resultado de la asignación.
     '''
     # Preprocesar los datos
-    aulas_preprocesadas: AulasPreprocesadas = AulasPreprocesadas(edificios, aulas)
-    clases_preprocesadas = preprocesar_clases(carreras, materias, clases, aulas_preprocesadas)
+    aulas_preprocesadas: AulasPreprocesadas = AulasPreprocesadas(edificios)
+    clases_preprocesadas: ClasesPreprocesadasPorDía = preprocesar_clases(carreras, aulas_preprocesadas)
 
     # Asignar las aulas de cada día
-    días_sin_asignar: list[Día] = []
-    for día, clases_del_día in zip(Día, clases_preprocesadas):
+    reporte = InfoPostAsignación()
+    for día in Día:
+        clases_del_día = clases_preprocesadas[día]
         try:
             asignaciones: list[int] = resolver_problema_de_asignación(clases_del_día, aulas_preprocesadas)
-        except RuntimeError as err:
-            logger.error('Falló la asignación para el día %s: %s', día.name, err)
-            días_sin_asignar.append(día)
+        except AsignaciónImposibleException as exc:
+            logger.error('Falló la asignación para el día %s: %s', día.name, exc)
+            reporte.días_sin_asignar.append(día)
         else:
-            for i_clase, i_aula in zip(clases_del_día.índices_originales, asignaciones):
-                clase = clases[i_clase]
-                aula = aulas[i_aula]
-                clase.edificio = aula.edificio
-                clase.aula = aula.nombre
+            for clase, i_aula in zip(clases_del_día.clases, asignaciones):
+                clase.aula_asignada = aulas_preprocesadas.aulas[i_aula].aula_original
     
-    # Tirar excepción si no se pudo asignar algún día
-    if len(días_sin_asignar) != 0:
-        raise AsignaciónImposibleException(*días_sin_asignar)
+    return reporte
 
 def resolver_problema_de_asignación(
     clases: ClasesPreprocesadas,
@@ -129,7 +111,7 @@ def resolver_problema_de_asignación(
     status = solver.solve(modelo)
     # TODO: ¿qué hacer si da FEASIBLE?¿en qué condiciones ocurre?¿aceptamos la solución suboptima o tiramos excepción?
     if status != cp_model.OPTIMAL:
-        raise RuntimeError(f'El solucionador de restricciones terminó con status {solver.status_name(status)}.')
+        raise AsignaciónImposibleException(f'El solucionador de restricciones terminó con status {solver.status_name(status)}.')
     
     # Armar lista con las asignaciones
     asignaciones_finales = np.vectorize(solver.value)(asignaciones)

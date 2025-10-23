@@ -93,4 +93,7 @@ ListView {
             }
         }
     }
+
+    ScrollBar.vertical: ScrollBar { }
+    // TODO: esto no funciona todavía: ScrollBar.horizontal: ScrollBar { }
 }

@@ -1,5 +1,5 @@
 from typing import Any
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSignal
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSignal, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos import GestorDeDatos, Aula, Edificio
 
@@ -50,6 +50,12 @@ class ListEquipamientos(QAbstractListModel):
         if not index.isValid(): return False
 
         if role == Qt.ItemDataRole.UserRole + 1: # nombre
+            # No hay capacidad de renombrar equipamientos existentes. Si
+            # quisieramos, podríamos:
+            # - Tener un dataclass Equipamiento que wrappee el string del
+            #   nombre, así es mutable
+            # - En Aula y Clase usar listas en vez de sets de equipamiento; porque si algo es
+            #   mutable no es hasheable de forma segura
             return False
         elif role == Qt.ItemDataRole.UserRole + 2: # seleccionado
             if value:
@@ -66,11 +72,14 @@ class ListEquipamientos(QAbstractListModel):
 
         return False
 
-    def insertRows(self, row: int, count: int, _parent: QModelIndex) -> bool:
-        # TODO: Dejar nombre de equipamiento por defecto razonable y único
-        # Inserta un solo elemento aún cuando count > 1
-        self.beginInsertRows(_parent, row, row)
-        self.equipamientos.insert(row, "Nuevo equipamiento")
+    # Función custom (en vez de insertRows) para poder poner un nombre
+    # (es necesaria esta funcionalidad al no poder renombrar)
+    @pyqtSlot(str, result=bool)
+    def appendEquipamiento(self, name: str) -> bool:
+        # TODO: validar (chequeos básicos y que no exista un equipamiento con
+        # el mismo nombre)
+        row_at_the_end = len(self.equipamientos)
+        self.beginInsertRows(QModelIndex(), row_at_the_end, row_at_the_end)
+        self.equipamientos.insert(row_at_the_end, name)
         self.endInsertRows()
         return True
-

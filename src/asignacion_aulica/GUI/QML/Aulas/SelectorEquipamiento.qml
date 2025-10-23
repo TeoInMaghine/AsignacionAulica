@@ -20,7 +20,7 @@ ComboBox {
     // ComboBox cierra el popup cuando sus items (si heredan de AbstractButton)
     // son activados. Wrappear el delegate es lo que previene que eso pase.
     delegate: Item {
-        width: parent.width
+        width: comboBox.width
         height: checkDelegate.height
 
         required property var model
@@ -33,12 +33,14 @@ ComboBox {
         CheckDelegate {
             id: checkDelegate
             anchors.fill: parent
+            LayoutMirroring.enabled: true
 
             text: model.nombre
             highlighted: comboBox.highlightedIndex == index
+
             checked: model.seleccionado
             onToggled: {
-                 model.seleccionado = checked
+                model.seleccionado = checked
             }
         }
     }
@@ -46,7 +48,12 @@ ComboBox {
     popup: Popup {
         y: comboBox.height - 1
         width: comboBox.width
+
+        // Para que el popup no se clippee con los bordes de la ventana:
+        topMargin: comboBox.height
+        bottomMargin: comboBox.height
         height: Math.min(contentItem.implicitHeight, comboBox.Window.height - topMargin - bottomMargin)
+
         padding: 0
 
         contentItem: ListView {
@@ -58,21 +65,37 @@ ComboBox {
             Rectangle {
                 width: parent.width
                 height: parent.height
-                z: 10
                 color: "transparent"
                 border.color: comboBox.palette.mid
             }
 
             footer: RowLayout {
+                width: parent.width
+                spacing: 0
+
                 Button {
+                    Layout.preferredWidth: 50
+
                     text: "add"
                     onClicked: {
-                        equipamientos.insertRow(equipamientos.rowCount())
+                        if (equipamientos.appendEquipamiento(editorNuevoEquipamiento.text)) {
+                            editorNuevoEquipamiento.clear()
+                        }
                     }
+                }
+                TextField {
+                    id: editorNuevoEquipamiento
+                    Layout.fillWidth: true
+
+                    // TOC, para que quede alineado con los check delegates
+                    rightPadding: 12
+                    horizontalAlignment: TextInput.AlignRight
+
+                    placeholderText: "Nuevo"
                 }
             }
 
-            ScrollIndicator.vertical: ScrollIndicator { }
+            ScrollBar.vertical: ScrollBar { }
         }
 
         background: Item {

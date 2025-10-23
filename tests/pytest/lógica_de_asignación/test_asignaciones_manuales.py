@@ -52,10 +52,10 @@ def test_asignación_manual_al_aula_doble(
     assert (0, 2) in prohibidas
 
     # Probar asignar
-    with pytest.raises(AsignaciónImposibleException) as exc_info:
-        asignar(edificios, carreras)
+    result = asignar(edificios, carreras)
     
-    assert exc_info.value.días_sin_asignar == (Día.Martes,)
+    assert not result.todo_ok()
+    assert result.días_sin_asignar == [Día.Martes,]
     
 
 @pytest.mark.aulas({}, {})

@@ -18,6 +18,9 @@ class RangoHorario:
     inicio: time
     fin: time
 
+    def se_superpone_con(self, otro: RangoHorario) -> bool:
+        return self.inicio < otro.fin and otro.inicio < self.fin
+
     @staticmethod
     def cerrado()-> RangoHorario:
         return RangoHorario(time(0), time(0))

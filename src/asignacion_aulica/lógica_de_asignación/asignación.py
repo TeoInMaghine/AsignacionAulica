@@ -89,8 +89,8 @@ def resolver_problema_de_asignación(
     :param clases: Los datos de las clases de el problema de asignación.
     :pram aulas: Los datos de las aulas disponibles.
 
-    :return: Una lista con el número de aula asignada a cada clase.
-    :raise RuntimeError: Si el CpModel no se puede resolver. 
+    :return: Una lista con el índice del aula asignada a cada clase.
+    :raise AsignaciónImposibleException: Si el CpModel no se puede resolver. 
     '''
     if len(clases.clases) == 0:
         return []
@@ -111,6 +111,7 @@ def resolver_problema_de_asignación(
     solver.parameters.log_to_stdout = False
     solver.log_callback = logger.debug
 
+    logger.info('Resolviendo el modelo para el día %s.', clases.clases[0].día.name)
     status = solver.solve(modelo)
     # TODO: ¿qué hacer si da FEASIBLE?¿en qué condiciones ocurre?¿aceptamos la solución suboptima o tiramos excepción?
     if status != cp_model.OPTIMAL:
@@ -142,7 +143,7 @@ def crear_matriz_de_asignaciones(
     También se agregan restricciones para que cada clase se asigne exactamente a
     un aula.
     
-    :param clases: Los datos de las clases de el problema de asignación.
+    :param clases: Los datos de las clases del problema de asignación.
     :pram aulas: Los datos de las aulas disponibles.
     :param modelo: El CpModel al que agregar variables.
 
@@ -155,12 +156,12 @@ def crear_matriz_de_asignaciones(
         asignaciones[*índices] = 0
     
     # Rellenar los elementos vacíos con variables
-    for asignaciones_de_una_clase, aula in np.ndindex(asignaciones.shape):
-        if asignaciones[asignaciones_de_una_clase, aula] is None:
-            asignaciones[asignaciones_de_una_clase, aula] = modelo.new_bool_var(f'clase_{asignaciones_de_una_clase}_asignada_al_aula_{aula}')
+    for i_clase, i_aula in np.ndindex(asignaciones.shape):
+        if asignaciones[i_clase, i_aula] is None:
+            asignaciones[i_clase, i_aula] = modelo.new_bool_var(f'clase_{i_clase}_asignada_al_aula_{i_aula}')
     
     # Asegurar que cada clase se asigna a exactamente un aula
-    for asignaciones_de_una_clase in asignaciones:
-        modelo.add_exactly_one(asignaciones_de_una_clase)
+    for clase in asignaciones:
+        modelo.add_exactly_one(clase)
     
     return asignaciones

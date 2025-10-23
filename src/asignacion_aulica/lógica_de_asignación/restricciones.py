@@ -15,7 +15,6 @@ del modelo. Estas restricciones se calculan con la función
 Estas funciones toman los siguientes argumentos:
 - clases: Los datos de las clases en el problema de asignación.
 - aulas: Los datos de todas las aulas disponibles.
-- aulas_dobles: Diccionario con los índices de las aulas dobles.
 - asignaciones: Matriz con los datos de asignaciones, donde las filas son
   clases y las columnas son aulas.
 
@@ -41,8 +40,8 @@ Las restricciones de aulas prohibidas se representan con funciones que reciben:
 - Los datos de las clases de el problema de asignación.
 - Los datos de las aulas disponibles.
 
-Y devuelven un iterable de tuplas `(clase, aula)` que representan las
-combinaciones de índice de clase e índice de aula que hay que evitar.
+Y devuelven un iterable de tuplas `(índice de clase, índice de aula)` que
+representan las combinaciones de clases y aulas que hay que evitar.
 '''
 
 restricción_con_variables: TypeAlias = Callable[
@@ -98,10 +97,8 @@ def no_asignar_aulas_ocupadas(
     '''
     for clase_e_índice, aula_ocupada in product(enumerate(clases.clases), clases.aulas_ocupadas):
         i_clase, clase = clase_e_índice
-        i_aula, inicio, fin = aula_ocupada
-        se_superponen = clase.horario_inicio < fin and \
-                        clase.horario_fin > inicio
-        if se_superponen:
+        i_aula, horario_aula = aula_ocupada
+        if clase.horario.se_superpone_con(horario_aula):
             yield (i_clase, i_aula)
             if i_aula in aulas.aulas_dobles:
                 aula1, aula2 = aulas.aulas_dobles[i_aula]
@@ -116,8 +113,8 @@ def no_asignar_en_aula_cerrada(
     Una clase no se puede asignar a un aula que no esté abierta en ese horario.
     '''
     for i_clase, clase, i_aula, aula in _combinaciones_de_clases_y_aulas(clases, aulas):
-        aula_abre, aula_cierra = aula.horarios[clase.día]
-        aula_está_cerrada = aula_abre > clase.horario_inicio or aula_cierra < clase.horario_fin
+        horario_aula = aula.horarios[clase.día]
+        aula_está_cerrada = horario_aula.inicio > clase.horario.inicio or horario_aula.fin < clase.horario.fin
         if aula_está_cerrada:
             yield (i_clase, i_aula)
 
@@ -201,8 +198,6 @@ def _pares_de_clases_que_se_superponen(clases: ClasesPreprocesadas) -> Iterable[
     for clase1_e_índice, clase2_e_índice in combinations(enumerate(clases.clases), 2):
         i_clase1, clase1 = clase1_e_índice
         i_clase2, clase2 = clase2_e_índice
-        se_superpopnen = clase1.día == clase2.día and \
-           clase1.horario_inicio < clase2.horario_fin and \
-           clase2.horario_inicio < clase1.horario_fin
+        se_superpopnen = clase1.día == clase2.día and clase1.horario.se_superpone_con(clase2.horario)
         if se_superpopnen:
             yield i_clase1, i_clase2

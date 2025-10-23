@@ -62,17 +62,20 @@ def asignar(edificios: Edificios, carreras: Carreras) -> InfoPostAsignación:
     clases_preprocesadas: ClasesPreprocesadasPorDía = preprocesar_clases(carreras, aulas_preprocesadas)
 
     # Asignar las aulas de cada día
-    reporte = InfoPostAsignación()
+    días_sin_asignar: list[Día] = []
     for día in Día:
         clases_del_día = clases_preprocesadas[día]
         try:
             asignaciones: list[int] = resolver_problema_de_asignación(clases_del_día, aulas_preprocesadas)
         except AsignaciónImposibleException as exc:
             logger.error('Falló la asignación para el día %s: %s', día.name, exc)
-            reporte.días_sin_asignar.append(día)
+            días_sin_asignar.append(día)
         else:
             for clase, i_aula in zip(clases_del_día.clases, asignaciones):
                 clase.aula_asignada = aulas_preprocesadas.aulas[i_aula].aula_original
+    
+    # Postprocesar los datos
+    reporte = InfoPostAsignación(edificios, carreras, días_sin_asignar)
     
     return reporte
 

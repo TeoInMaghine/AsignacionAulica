@@ -7,12 +7,10 @@ RowLayout {
 
     required property int leftPadding
     required property int verticalPadding
+    required property int widthHeaderHorario
 
     property alias widthNombre : headerNombre.width
     property alias widthCapacidad : headerCapacidad.width
-    // Si la resolución de dependencias de Qt funciona, esto no se recalcula al
-    // menos que cambien los anchos de los horarios...
-    property int widthHorario : Math.max(...horarios.children.map(c => c.width))
     property alias widthEquipamiento : headerEquipamiento.width
 
     Layout.alignment: Qt.AlignHCenter
@@ -32,20 +30,20 @@ RowLayout {
         text: "Capacidad"
     }
 
-    RowLayout {
-        id: horarios
-        spacing: parent.spacing
-        uniformCellSizes: true
+    Item { } // Espacio vacío de 2 * spacing de ancho
 
-        Repeater {
-            model: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
-            Label {
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-                required property string modelData
-                text: modelData
-            }
+    Repeater {
+        model: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        Label {
+            Layout.preferredWidth: widthHeaderHorario
+            horizontalAlignment: Text.AlignHCenter
+
+            required property string modelData
+            text: modelData
         }
     }
+
+    Item { } // Espacio vacío de 2 * spacing de ancho
 
     Label {
         id: headerEquipamiento
@@ -56,7 +54,6 @@ RowLayout {
     }
 
     Button {
-        height: horarios.height
         text: "Ordenar"
         onClicked: {
             aulas.ordenar()

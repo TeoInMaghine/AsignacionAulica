@@ -6,10 +6,17 @@ import Custom
 ListView {
     anchors.fill: parent
     spacing: headerItem.spacing
+    clip: true
 
     model: ListAulas { id: aulas }
 
-    header: HeaderAulas { leftPadding: 20; verticalPadding: 5 }
+    property int widthHorario: 100 // Hardcodeado porque no encontré una forma mejor
+
+    header: HeaderAulas {
+        leftPadding: 20
+        verticalPadding: 5
+        widthHeaderHorario: widthHorario
+    }
 
     delegate: RowLayout {
         id: editorDeAula
@@ -50,22 +57,21 @@ ListView {
             }
         }
 
+        Item { } // Espacio vacío de 2 * spacing de ancho
+
         Repeater {
-            id: horarios
             model: rolesDeHorarios
 
-            TextField {
-                Layout.preferredWidth: headerItem.widthHorario
-
+            EditorHorarioDoble {
                 // Este modelData es del Repeater, no del model de ListView...
-                required property var modelData
-
-                text: aula[modelData] == undefined ? "NaN" : aula[modelData]
-                onEditingFinished: {
-                    aula[modelData] = text
-                }
+                required property string modelData
+                rolDeHorario: modelData
+                Layout.preferredWidth: widthHorario
+                Layout.alignment: Qt.AlignCenter
             }
         }
+
+        Item { } // Espacio vacío de 2 * spacing de ancho
 
         SelectorEquipamiento {
             Layout.preferredWidth: headerItem.widthEquipamiento

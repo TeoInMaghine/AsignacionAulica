@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import Custom
 
+// Referencias:
 // https://forum.qt.io/topic/87306/multiselect-combobox/2
 // https://doc.qt.io/qt-6/qtquickcontrols-customize.html#customizing-combobox
 ComboBox {

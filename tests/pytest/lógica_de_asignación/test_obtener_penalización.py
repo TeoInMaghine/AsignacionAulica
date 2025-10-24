@@ -2,17 +2,24 @@ from ortools.sat.python import cp_model
 import numpy as np
 import pytest
 
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadasPorDía
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
 from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 
+from mocks import MockAula, MockClase
+
 @pytest.mark.aulas(
-    dict(capacidad=34, nombre="1 - peor: sobrante=0, excedente=1"),
-    # Importante el orden, esta tiene que ser el de índice 1
-    dict(capacidad=40, nombre="2 - óptima: sobrante=5, excedente=0"),
-    dict(capacidad=50, nombre="3 - subótima: sobrante=15, excedente=0")
+    MockAula(capacidad=34, nombre="0 - peor: sobrante=0, excedente=1"),
+    MockAula(capacidad=40, nombre="1 - óptima: sobrante=5, excedente=0"),
+    MockAula(capacidad=50, nombre="2 - subótima: sobrante=15, excedente=0")
 )
-@pytest.mark.clases( dict(día=Día.Lunes, cantidad_de_alumnos=35) )
-def test_minimiza_capacidad_sobrante_y_excedida(clases_preprocesadas, aulas_preprocesadas, modelo, asignaciones):
+@pytest.mark.clases( MockClase(día=Día.Lunes, cantidad_de_alumnos=35) )
+def test_minimiza_capacidad_sobrante_y_excedida(
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    aulas_preprocesadas: AulasPreprocesadas,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     '''
     Verifica que minimiza la capacidad sobrante y excedida, dando prioridad a la excedida.
     '''

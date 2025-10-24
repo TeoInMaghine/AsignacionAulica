@@ -53,6 +53,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios: Edificios):
         AulaPreprocesada(
             nombre='una',
             edificio=edificios[0],
+            aula_original=edificios[0].aulas[0],
             capacidad=25,
             equipamiento={'qué equipazo'},
             horarios=HorariosSemanales((
@@ -68,6 +69,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios: Edificios):
         AulaPreprocesada(
             nombre='y otra',
             edificio=edificios[0],
+            aula_original=edificios[0].aulas[1],
             capacidad=50,
             equipamiento=set(),
             horarios=HorariosSemanales((
@@ -144,6 +146,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
         AulaPreprocesada(
             nombre='A102',
             edificio=edificios[0],
+            aula_original=edificios[0].aulas[0],
             capacidad=25,
             equipamiento={'qué equipazo'},
             horarios=(
@@ -159,6 +162,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
         AulaPreprocesada(
             nombre='C306',
             edificio=edificios[2],
+            aula_original=edificios[2].aulas[0],
             capacidad=50,
             equipamiento=set(),
             horarios=(
@@ -174,6 +178,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
         AulaPreprocesada(
             nombre='C345',
             edificio=edificios[2],
+            aula_original=edificios[2].aulas[1],
             capacidad=31,
             equipamiento=set(),
             horarios=(

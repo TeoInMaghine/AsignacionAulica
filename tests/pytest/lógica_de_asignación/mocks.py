@@ -7,6 +7,7 @@ import numpy as np
 
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import (
+    Carreras,
     Edificios,
     Edificio,
     Aula,
@@ -69,7 +70,7 @@ class MockCarrera:
     materias: Sequence[MockMateria] = field(default_factory=list)
 
 
-def make_edificios(edificios: Sequence[MockEdificio]) -> list[Edificio]:
+def make_edificios(edificios: Sequence[MockEdificio]) -> Edificios:
     '''
     Recibe datos (posiblemente incompletos) de los edificios y aulas, y los
     rellena con valores por defecto.
@@ -121,7 +122,7 @@ def make_edificios(edificios: Sequence[MockEdificio]) -> list[Edificio]:
     
     return edificios_de_verdad
 
-def make_carreras(edificios: Edificios, carreras: Sequence[MockCarrera]) -> list[Carrera]:
+def make_carreras(edificios: Edificios, carreras: Sequence[MockCarrera]) -> Carreras:
     '''
     Recibe datos (posiblemente incompletos) de las carreras/materias/clases, y
     los rellena con valores por defecto.
@@ -135,7 +136,7 @@ def make_carreras(edificios: Edificios, carreras: Sequence[MockCarrera]) -> list
     for i_carrera, carrera in enumerate(carreras):
         carrera_de_verdad = Carrera(
             nombre=carrera.nombre or f'carrera {i_carrera}',
-            edificio_preferido=edificios[carrera.edificio_preferido] if carrera.edificio_preferido else None
+            edificio_preferido=edificios[carrera.edificio_preferido] if carrera.edificio_preferido is not None else None
         )
         for i_materia, materia in enumerate(carrera.materias):
             materia_de_verdad = Materia(

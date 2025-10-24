@@ -1,24 +1,31 @@
-from itertools import combinations
 from ortools.sat.python import cp_model
+from itertools import combinations
 import numpy as np
 import pytest
 
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadasPorDía
 from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
-from asignacion_aulica.lógica_de_asignación.restricciones import no_superponer_clases
 from asignacion_aulica.lógica_de_asignación import preferencias
 
+from mocks import MockAula, MockClase
+
 @pytest.mark.aulas(
-    dict(capacidad=30),
-    dict(capacidad=40),
-    dict(capacidad=25)
+    MockAula(capacidad=30),
+    MockAula(capacidad=40),
+    MockAula(capacidad=25)
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos=31, día=Día.Lunes),
-    dict(cantidad_de_alumnos=50, día=Día.Lunes),
-    dict(cantidad_de_alumnos=100, día=Día.Lunes)
+    MockClase(cantidad_de_alumnos=31, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=50, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=100, día=Día.Lunes)
 )
 @pytest.mark.asignaciones_forzadas({ 0: 0, 1: 1, 2: 2 }) # Asignaciones arbitrarias (clase i con aula i)
-def test_algunas_clases_exceden_capacidad(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+def test_algunas_clases_exceden_capacidad(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (31 - 30 + 50 - 40 + 100 - 25)
@@ -33,16 +40,21 @@ def test_algunas_clases_exceden_capacidad(aulas_preprocesadas, clases_preprocesa
     assert solver.value(cantidad_excedida) == cota_superior
 
 @pytest.mark.aulas(
-    dict(capacidad=250),
-    dict(capacidad=400),
-    dict(capacidad=100)
+    MockAula(capacidad=250),
+    MockAula(capacidad=400),
+    MockAula(capacidad=100)
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos=31, día=Día.Lunes),
-    dict(cantidad_de_alumnos=50, día=Día.Lunes),
-    dict(cantidad_de_alumnos=100, día=Día.Lunes)
+    MockClase(cantidad_de_alumnos=31, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=50, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=100, día=Día.Lunes)
 )
-def test_ninguna_clase_excede_capacidad(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+def test_ninguna_clase_excede_capacidad(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     # La cota superior sería 0, pero en cambio se devuelve 1 porque si no
@@ -58,16 +70,21 @@ def test_ninguna_clase_excede_capacidad(aulas_preprocesadas, clases_preprocesada
     assert solver.value(cantidad_excedida) == 0
 
 @pytest.mark.aulas(
-    dict(capacidad=10),
-    dict(capacidad=20),
-    dict(capacidad=30)
+    MockAula(capacidad=10),
+    MockAula(capacidad=20),
+    MockAula(capacidad=30)
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos=10, día=Día.Lunes),
-    dict(cantidad_de_alumnos=20, día=Día.Lunes),
-    dict(cantidad_de_alumnos=30, día=Día.Lunes)
+    MockClase(cantidad_de_alumnos=10, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=20, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=30, día=Día.Lunes)
 )
-def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+def test_entran_justito(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
 
     # Restricciones para que no estén en el mismo aula
@@ -93,16 +110,21 @@ def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, modelo, asign
     assert solver.value(cantidad_excedida) == 0
 
 @pytest.mark.aulas(
-    dict(capacidad=10),
-    dict(capacidad=20),
-    dict(capacidad=30)
+    MockAula(capacidad=10),
+    MockAula(capacidad=20),
+    MockAula(capacidad=30)
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos=11, día=Día.Lunes),
-    dict(cantidad_de_alumnos=21, día=Día.Lunes),
-    dict(cantidad_de_alumnos=31, día=Día.Lunes)
+    MockClase(cantidad_de_alumnos=11, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=21, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=31, día=Día.Lunes)
 )
-def test_minimiza_capacidad_excedida(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+def test_minimiza_capacidad_excedida(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     '''
     Esta prueba es para verificar que minimiza la capacidad excedida en total, y
     no el número de aulas con capacidad excedida.

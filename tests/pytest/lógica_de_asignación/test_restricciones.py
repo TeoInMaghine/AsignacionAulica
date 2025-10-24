@@ -1,9 +1,13 @@
 from ortools.sat.python import cp_model
 from datetime import time
+import numpy as np
 import pytest
 
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadasPorDía
+from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.lógica_de_asignación import restricciones
-from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
+
+from mocks import MockAula, MockClase, MockEdificio
 
 def predicado_es_nand_entre_dos_variables(predicado, variable1, variable2) -> bool:
     '''
@@ -21,13 +25,17 @@ def predicado_es_nand_entre_dos_variables(predicado, variable1, variable2) -> bo
         and predicado.bounds.max() == 1
     )
 
-@pytest.mark.aulas({})
+@pytest.mark.aulas(MockAula())
 @pytest.mark.clases(
-        dict(día=Día.Lunes, horario_inicio=1, horario_fin=3),
-        dict(día=Día.Lunes, horario_inicio=2, horario_fin=4),
-        dict(día=Día.Lunes, horario_inicio=5, horario_fin=6)
-    )
-def test_superposición(aulas_preprocesadas, clases_preprocesadas, asignaciones):
+    MockClase(día=Día.Lunes, horario=RangoHorario(time(1), time(3))),
+    MockClase(día=Día.Lunes, horario=RangoHorario(time(2), time(4))),
+    MockClase(día=Día.Lunes, horario=RangoHorario(time(5), time(6)))
+)
+def test_superposición(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    asignaciones: np.ndarray
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     predicados = list(restricciones.no_superponer_clases(clases_lunes, aulas_preprocesadas, asignaciones))
 
@@ -36,16 +44,21 @@ def test_superposición(aulas_preprocesadas, clases_preprocesadas, asignaciones)
     predicado = predicados[0]
     assert predicado_es_nand_entre_dos_variables(predicado, asignaciones[0,0], asignaciones[1,0])
 
-@pytest.mark.clases( dict(horario_inicio=time(10), horario_fin=time(13), día=Día.Lunes) )
-@pytest.mark.aulas(
-    dict(horario_lunes=(time(10), time(13))), # Igual que la clase
-    dict(horario_lunes=(time(10), time(11))), # Cierra temprano
-    dict(horario_lunes=(time(11), time(13))), # Abre tarde
-    dict(horario_lunes=(time( 9), time(14))), # Sobra
-    dict(horario_lunes=(time(11), time(12))), # Abre tarde y cierra temprano
-    dict(horario_lunes=(time( 0), time( 0))), # No abre los lunes
+@pytest.mark.clases(
+    MockClase(horario=RangoHorario(time(10), time(13)), día=Día.Lunes)
 )
-def test_aulas_cerradas(clases_preprocesadas, aulas_preprocesadas):
+@pytest.mark.aulas(
+    MockAula(horario_lunes=RangoHorario(time(10), time(13))), # Igual que la clase
+    MockAula(horario_lunes=RangoHorario(time(10), time(11))), # Cierra temprano
+    MockAula(horario_lunes=RangoHorario(time(11), time(13))), # Abre tarde
+    MockAula(horario_lunes=RangoHorario(time( 9), time(14))), # Sobra
+    MockAula(horario_lunes=RangoHorario(time(11), time(12))), # Abre tarde y cierra temprano
+    MockAula(horario_lunes=RangoHorario(time( 0), time( 0))), # No abre los lunes
+)
+def test_aulas_cerradas(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     prohibidas = list(restricciones.no_asignar_en_aula_cerrada(clases_lunes, aulas_preprocesadas))
 
@@ -56,13 +69,18 @@ def test_aulas_cerradas(clases_preprocesadas, aulas_preprocesadas):
     assert (0, 4) in prohibidas
     assert (0, 5) in prohibidas
 
-@pytest.mark.clases( dict(equipamiento_necesario = set(('proyector',))) )
-@pytest.mark.aulas(
-    dict(equipamiento = set(('proyector',))),
-    dict(equipamiento = set(('proyector', 'otra cosa'))),
-    dict(equipamiento = set())
+@pytest.mark.clases(
+    MockClase(equipamiento_necesario = set(('proyector',)))
 )
-def test_equipamiento(clases_preprocesadas, aulas_preprocesadas):
+@pytest.mark.aulas(
+    MockAula(equipamiento = set(('proyector',))),
+    MockAula(equipamiento = set(('proyector', 'otra cosa'))),
+    MockAula(equipamiento = set())
+)
+def test_equipamiento(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     prohibidas = list(restricciones.asignar_aulas_con_el_equipamiento_requerido(clases_lunes, aulas_preprocesadas))
 
@@ -71,18 +89,20 @@ def test_equipamiento(clases_preprocesadas, aulas_preprocesadas):
     assert (0, 2) in prohibidas
 
 @pytest.mark.edificios(
-    dict(nombre='edificio 0', aulas_dobles={'102': ('102A', '102B')})
-)
-@pytest.mark.aulas(
-    dict(edificio='edificio 0', nombre = '102'),
-    dict(edificio='edificio 0', nombre = '102A'),
-    dict(edificio='edificio 0', nombre = '102B')
+    MockEdificio(
+        aulas=(MockAula(),)*3,
+        aulas_dobles={0: (1, 2)}
+    )
 )
 @pytest.mark.clases(
-    dict(día=Día.Lunes, nombre = 'Clase 1'),
-    dict(día=Día.Lunes, nombre = 'Clase 2')
+    MockClase(día=Día.Lunes),
+    MockClase(día=Día.Lunes)
 )
-def test_aulas_dobles(aulas_preprocesadas, clases_preprocesadas, asignaciones):
+def test_aulas_dobles(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    asignaciones: np.ndarray
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     predicados = list(restricciones.no_asignar_aula_doble_y_sus_hijas_al_mismo_tiempo(clases_lunes, aulas_preprocesadas, asignaciones))
     

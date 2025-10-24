@@ -1,21 +1,20 @@
 from datetime import time
 import pytest, random, logging
 
-from mocks import make_carreras, make_edificios
-
-from asignacion_aulica.gestor_de_datos.entidades import Edificio, Aula, Carrera, Clase, Materia
-from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
+from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
+from asignacion_aulica.gestor_de_datos.entidades import Carreras, Edificios
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
-from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
+
+from mocks import MockAula, MockClase, MockEdificio, MockCarrera, MockMateria, make_carreras, make_edificios
 
 logger = logging.getLogger()
 
 @pytest.fixture
-def aulas_generadas(
+def edificios_generados(
     n_aulas: int,
     n_edificios: int,
     capacidad_max: int
-) -> tuple[list[Edificio], list[Aula]]:
+) -> Edificios:
     '''
     Genera aulas *proceduralmente*.
 
@@ -26,30 +25,28 @@ def aulas_generadas(
     :param n_edificios: Cantidad total de edificios.
     :param capacidad_max: Capacidad máxima exclusiva para un aula.
 
-    :return: Las listas de edificios y aulas esperadas por lógica_de_asignación.
+    :return: La lista de edificios esperada por lógica_de_asignación.
     '''
     # Dar semilla para que siempre sean los mismos números
     random.seed(0)
-    edificios_params = tuple(
-        dict(nombre=str(i)) for i in range(n_edificios)
-    )
-    aulas_params = tuple(
-        dict(
-            capacidad=random.randrange(1, capacidad_max),
-            # Garantiza que haya al menos un aula por edificio (si aulas_count >= edificios_count)
-            edificio=str(i % n_edificios)
-        )
-        for i in range(n_aulas)
-    )
 
-    return make_edificios(edificios_params), make_aulas(aulas_params)
+    edificios = [MockEdificio(nombre=str(i), aulas=list()) for i in range(n_edificios)]
+
+    for i in range(n_aulas):
+        aula = MockAula(capacidad=random.randrange(1, capacidad_max))
+
+        # Garantiza que haya al menos un aula por edificio (si aulas_count >= edificios_count)
+        i_edificio=i % n_edificios
+        edificios[i_edificio].aulas.append(aula)
+
+    return make_edificios(edificios)
 
 @pytest.fixture
-def clases_generadas(
+def carreras_generadas(
     clases_por_hora: int,
     cantidad_de_alumnos_max: int,
-    n_edificios: int
-) -> tuple[list[Carrera], list[Materia], list[Clase]]:
+    edificios_generados: Edificios
+) -> Carreras:
     '''
     Genera clases *proceduralmente*.
 
@@ -61,46 +58,37 @@ def clases_generadas(
     semana. Debe ser menor o igual a la cantidad de aulas generadas para que la
     asignación sea posible.
     :param cantidad_de_alumnos_max: Cantidad máxima exclusiva de alumnos.
-    :param n_edificios: Cantidad total de edificios.
+    :param edificios_generados: Los edificios generados por el fixture correspondiente.
 
-    :return: Las listas de carreras, materias, y clases esperadas por
-    lógica_de_asignación.
+    :return: La lista de carreras esperada por lógica_de_asignación.
     '''
-    # Dar semilla para que siempre sean los mismo números
+    # Dar semilla para que siempre sean los mismos números
     random.seed(1)
 
-    # Crear una carrera que prefiere cada edificio
-    carreras = make_carreras(tuple(
-        dict(nombre=str(i), edificio_preferido=str(i))
-        for i in range(n_edificios)
-    ))
-
-    # Cada carrera tiene que tener una materia
-    materias = make_materias(tuple(
-        dict(carrera=carrera.nombre, nombre='m')
-        for carrera in carreras
-    ))
+    # Crear una carrera que prefiere cada edificio,
+    # y crear clases con algunos parámetros aleatorios
+    carreras = [
+        MockCarrera(
+            edificio_preferido=i,
+            materias=(MockMateria(clases=list()),) # Una sola materia por carrera.
+        )
+        for i in range(len(edificios_generados))
+    ]
 
     # Crear clases con algunos parámetros aleatorios
-    clases_params = []
-
     for día in Día:
         for hora in range(0, 23):
-            horario_inicio = time(hora)
-            horario_fin = time(hora + 1)
+            horario = RangoHorario(time(hora), time(hora+1))
             for _ in range(clases_por_hora):
-                clases_params.append(dict(
+                carrera=random.choice(carreras)
+                carrera.materias[0].clases.append(MockClase(
                     día=día,
-                    horario_inicio=horario_inicio,
-                    horario_fin=horario_fin,
+                    horario=horario,
                     cantidad_de_alumnos=random.randrange(1, cantidad_de_alumnos_max),
-                    carrera=random.choice(carreras).nombre,
-                    materia='m'
                 ))
-    clases = make_clases(clases_params)
-    logger.info(f'Cantidad de clases: {len(clases)}.')
 
-    return carreras, materias, clases
+    logger.debug('Se crearon un total de %d clases.', sum(len(materia.clases) for carrera in carreras for materia in carrera.materias))
+    return make_carreras(edificios_generados, carreras)
 
 # NOTE: Esta forma de parametrizar no está muy claramente documentada, la
 # encontré de casualidad en StackOverflow, pero la fuente primaria sería esta:
@@ -108,20 +96,21 @@ def clases_generadas(
 
 @pytest.mark.stress_test
 @pytest.mark.parametrize(
-    "n_edificios,capacidad_max,n_aulas,clases_por_hora,cantidad_de_alumnos_max",
-   [(         10,          100,     10,             10,                    100),
-    (         10,          100,     20,             20,                    100),
-    (         10,          100,     30,             30,                    100)]
+    argnames="n_edificios,capacidad_max,n_aulas,clases_por_hora,cantidad_de_alumnos_max",
+    argvalues=[(       10,          100,     10,             10,                    100),
+               (       10,          100,     20,             20,                    100),
+               (       10,          100,     30,             30,                    100)]
 )
-def test_stress_asignación_posible(aulas_generadas, clases_generadas):
-    asignar(*aulas_generadas, *clases_generadas)
+def test_stress_asignación_posible(edificios_generados: Edificios, carreras_generadas: Carreras):
+    resultado = asignar(edificios_generados, carreras_generadas)
+    assert resultado.todo_ok()
 
 @pytest.mark.stress_test
 @pytest.mark.parametrize(
-    "n_edificios,capacidad_max,n_aulas,clases_por_hora,cantidad_de_alumnos_max",
-   [(         10,          100,     30,             31,                    100)]
+    argnames="n_edificios,capacidad_max,n_aulas,clases_por_hora,cantidad_de_alumnos_max",
+    argvalues=[(       10,          100,     30,             31,                    100)]
 )
-def test_stress_asignación_imposible(aulas_generadas, clases_generadas):
-    with pytest.raises(AsignaciónImposibleException):
-        asignar(*aulas_generadas, *clases_generadas)
+def test_stress_asignación_imposible(edificios_generados: Edificios, carreras_generadas: Carreras):
+    resultado = asignar(edificios_generados, carreras_generadas)
+    assert not resultado.todo_ok()
 

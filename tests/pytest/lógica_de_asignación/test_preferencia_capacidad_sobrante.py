@@ -3,22 +3,29 @@ from itertools import combinations
 import numpy as np
 import pytest
 
-from asignacion_aulica.lógica_de_asignación.restricciones import no_superponer_clases
-from asignacion_aulica.lógica_de_asignación import preferencias
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import AulasPreprocesadas, ClasesPreprocesadasPorDía
 from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
+from asignacion_aulica.lógica_de_asignación import preferencias
+
+from mocks import MockAula, MockClase
 
 @pytest.mark.aulas(
-    dict(capacidad=31),
-    dict(capacidad=50),
-    dict(capacidad=100)
+    MockAula(capacidad=31),
+    MockAula(capacidad=50),
+    MockAula(capacidad=100)
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos=30, día=Día.Lunes),
-    dict(cantidad_de_alumnos=40, día=Día.Lunes),
-    dict(cantidad_de_alumnos=25, día=Día.Lunes)
+    MockClase(cantidad_de_alumnos=30, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=40, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=25, día=Día.Lunes)
     )
 @pytest.mark.asignaciones_forzadas({ 0: 0, 1: 1, 2: 2 }) # Asignaciones arbitrarias: clase i con aula i
-def test_a_algunas_clases_les_sobra_capacidad(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+def test_a_algunas_clases_les_sobra_capacidad(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (31 - 30 + 50 - 40 + 100 - 25)
@@ -33,16 +40,21 @@ def test_a_algunas_clases_les_sobra_capacidad(aulas_preprocesadas, clases_prepro
     assert solver.value(cantidad_sobrante) == cota_superior
 
 @pytest.mark.aulas(
-    dict(capacidad=31),
-    dict(capacidad=50),
-    dict(capacidad=100)
+    MockAula(capacidad=31),
+    MockAula(capacidad=50),
+    MockAula(capacidad=100)
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos=250, día=Día.Lunes),
-    dict(cantidad_de_alumnos=400, día=Día.Lunes),
-    dict(cantidad_de_alumnos=100, día=Día.Lunes)
+    MockClase(cantidad_de_alumnos=250, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=400, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=100, día=Día.Lunes)
 )
-def test_a_ninguna_clase_le_sobra_capacidad(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+def test_a_ninguna_clase_le_sobra_capacidad(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
     cantidad_sobrante, cota_superior = preferencias.capacidad_sobrante(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     # La cota superior sería 0, pero en cambio se devuelve 1 porque si no
@@ -58,16 +70,21 @@ def test_a_ninguna_clase_le_sobra_capacidad(aulas_preprocesadas, clases_preproce
     assert solver.value(cantidad_sobrante) == 0
 
 @pytest.mark.aulas(
-    dict(capacidad=10),
-    dict(capacidad=20),
-    dict(capacidad=30)
+    MockAula(capacidad=10),
+    MockAula(capacidad=20),
+    MockAula(capacidad=30)
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos=10, día=Día.Lunes),
-    dict(cantidad_de_alumnos=20, día=Día.Lunes),
-    dict(cantidad_de_alumnos=30, día=Día.Lunes)
+    MockClase(cantidad_de_alumnos=10, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=20, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=30, día=Día.Lunes)
 )
-def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+def test_entran_justito(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     clases_lunes = clases_preprocesadas[Día.Lunes]
 
     # Restricciones para que no estén en el mismo aula
@@ -93,16 +110,21 @@ def test_entran_justito(aulas_preprocesadas, clases_preprocesadas, modelo, asign
     assert solver.value(cantidad_sobrante) == 0
 
 @pytest.mark.aulas(
-    dict(capacidad=11),
-    dict(capacidad=21),
-    dict(capacidad=31)
+    MockAula(capacidad=11),
+    MockAula(capacidad=21),
+    MockAula(capacidad=31)
 )
 @pytest.mark.clases(
-    dict(cantidad_de_alumnos=10, día=Día.Lunes),
-    dict(cantidad_de_alumnos=20, día=Día.Lunes),
-    dict(cantidad_de_alumnos=30, día=Día.Lunes)
+    MockClase(cantidad_de_alumnos=10, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=20, día=Día.Lunes),
+    MockClase(cantidad_de_alumnos=30, día=Día.Lunes)
 )
-def test_minimiza_capacidad_sobrante(aulas_preprocesadas, clases_preprocesadas, modelo, asignaciones):
+def test_minimiza_capacidad_sobrante(
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: cp_model.CpModel,
+    asignaciones: np.ndarray
+):
     '''
     Esta prueba es para verificar que minimiza la capacidad sobrante en total, y
     no el número de aulas con capacidad sobrante.

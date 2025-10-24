@@ -1,7 +1,7 @@
 '''
 Configuraciones comunes a todos los tests unitarios.
 '''
-import pytest
+import pytest, logging
 
 def pytest_configure(config):
     # Registrar un marker para reconocer stress tests
@@ -19,3 +19,6 @@ def pytest_runtest_setup(item):
     if mark and not item.config.getoption("--stress-tests"):
         item.add_marker(pytest.mark.skip(reason="Estas pruebas toman mucho tiempo en ejecutar. Ejecutar con --stress-tests si quiere incluirlas."), append=False)
 
+@pytest.fixture(autouse=True)
+def log_start_of_tc(request):
+    logging.info('----- Inicio del TC %s.%s -----', request.function.__module__, request.function.__name__)

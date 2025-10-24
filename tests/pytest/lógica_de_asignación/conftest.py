@@ -147,5 +147,7 @@ def asignaciones(
     '''
     marker = request.node.get_closest_marker('asignaciones_forzadas')
     asignaciones_forzadas: dict[int, int] = marker.args[0] if marker else dict()
-    #TODO: ¿las clases de qué día??
-    return make_asignaciones(4, len(aulas_preprocesadas.aulas), modelo, asignaciones_forzadas)
+    
+    n_clases = max(len(día.clases) for día in clases_preprocesadas)
+
+    return make_asignaciones(n_clases, len(aulas_preprocesadas.aulas), modelo, asignaciones_forzadas)

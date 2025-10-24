@@ -60,7 +60,7 @@ ComboBox {
         contentItem: ListView {
             clip: true
             implicitHeight: contentHeight
-            model: comboBox.popup.visible ? comboBox.delegateModel : null
+            model: comboBox.delegateModel
             currentIndex: comboBox.highlightedIndex
 
             Rectangle {

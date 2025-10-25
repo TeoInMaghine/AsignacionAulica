@@ -1,6 +1,3 @@
-module Aulas
+module QML.Aulas
 Aulas Aulas.qml
 internal HeaderAulas HeaderAulas.qml
-internal SelectorEquipamiento SelectorEquipamiento.qml
-internal EditorHorarioDoble EditorHorarioDoble.qml
-internal EditorHorario EditorHorario.qml

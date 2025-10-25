@@ -1,0 +1,4 @@
+module QML.ComponentesUI
+SelectorEquipamiento SelectorEquipamiento.qml
+EditorRangoHorario EditorRangoHorario.qml
+EditorHorario EditorHorario.qml

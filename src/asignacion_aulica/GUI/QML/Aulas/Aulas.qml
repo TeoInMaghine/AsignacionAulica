@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import Custom
+import QML.ComponentesUI
 
 ListView {
     anchors.fill: parent
@@ -62,7 +63,7 @@ ListView {
         Repeater {
             model: rolesDeHorarios
 
-            EditorHorarioDoble {
+            EditorRangoHorario {
                 // Este modelData es del Repeater, no del model de ListView...
                 required property string modelData
                 rolDeHorario: modelData

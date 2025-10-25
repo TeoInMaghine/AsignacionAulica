@@ -1,2 +1,2 @@
-module UI
+module QML.UI
 Main Main.qml

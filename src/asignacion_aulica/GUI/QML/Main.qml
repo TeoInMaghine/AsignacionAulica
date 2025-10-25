@@ -1,10 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Layouts 1.15
-
-import "."
-import "./BarraLateral"
-import "./Aulas"
+import QtQuick
+import QtQuick.Window
+import QtQuick.Layouts
+import QML.Aulas
+import QML.BarraLateral
 
 Window {
     id: mainWindow

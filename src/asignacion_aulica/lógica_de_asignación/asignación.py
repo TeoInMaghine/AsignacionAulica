@@ -45,8 +45,8 @@ def asignar(edificios: Edificios, carreras: Carreras) -> InfoPostAsignación:
     fijada.
 
     A las clases con `no_cambiar_asignación == False` se les asigna un aula y se
-    les sobreescribe el atributo `aula` (el valor que tenga inicialmente es
-    ignorado).
+    les sobreescribe el atributo `aula_asignada` (el valor que tenga
+    inicialmente es ignorado).
 
     A las clases con `no_cambiar_asignación == True` no se les modifica nada,
     pero se tiene en cuenta el aula que tienen asignada para evitar

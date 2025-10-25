@@ -74,7 +74,7 @@ class Clase:
     
     # Asignación manual/automática:
     aula_asignada: Aula|None = None # None significa que todavía no se asignó
-    no_cambiar_asignación: bool = False # Indica si el aula se tiene que asignar automáticamente o mantener El valor puesto a mano.
+    no_cambiar_asignación: bool = False # Indica si el aula se tiene que asignar automáticamente o mantener el valor puesto a mano.
 
     # Datos que pueden ser ingresados o no:
     # (no usamos estos datos, pero los tenemos que guardar para exportarlos)

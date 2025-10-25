@@ -8,17 +8,9 @@ Hay algunas restricciones que se pueden calcular conociendo solamente los datos
 de las clases y los datos de las aulas, y que permiten anular algunas variables
 del modelo. Estas restricciones se calculan con la función `aulas_prohibidas`.
 
-Hay otras restricciones que para calcularla se necesita comparar las variables
+Hay otras restricciones que para calcularlas se necesita comparar las variables
 del modelo. Estas restricciones se calculan con la función
 `restricciones_con_variables`.
-
-Estas funciones toman los siguientes argumentos:
-- clases: Los datos de las clases en el problema de asignación.
-- aulas: Los datos de todas las aulas disponibles.
-- asignaciones: Matriz con los datos de asignaciones, donde las filas son
-  clases y las columnas son aulas.
-
-Esto se omite de los docstrings para no tener que repetirlo en todos lados.
 '''
 from ortools.sat.python.cp_model import BoundedLinearExpression
 from itertools import combinations, product, chain

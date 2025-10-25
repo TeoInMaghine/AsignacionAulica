@@ -1,7 +1,9 @@
 from __future__ import annotations  # Para soportar referencias circulares en los type hints
 from dataclasses import dataclass, field
+from collections.abc import Iterable
 from collections.abc import Sequence
 from typing import TypeAlias
+import itertools
 
 from asignacion_aulica.gestor_de_datos.días_y_horarios import (
     Día,
@@ -82,3 +84,6 @@ class Clase:
     promocionable: str|None = None
     docente: str|None = None
     auxiliar: str|None = None
+
+def todas_las_clases(carreras: Iterable[Carrera]) -> Iterable[Clase]:
+    return itertools.chain.from_iterable(materia.clases for carrera in carreras for materia in carrera.materias)

@@ -23,11 +23,19 @@ def test_restricciones_y_preferencias(edificios: Edificios, carreras: Carreras):
     y las penalizaciones son minimizadas.
     '''
     resultado = asignar(edificios, carreras)
-    assert resultado.todo_ok()
+    assert not resultado.todo_ok()
 
-    asignaciones_esperadas = [1, 0, 0, 1]
+    assert carreras[0].materias[0].clases[0].aula_asignada == edificios[0].aulas[1]
+    assert carreras[0].materias[0].clases[1].aula_asignada == edificios[0].aulas[0]
+    assert carreras[0].materias[0].clases[0] in resultado.clases_con_aula_chica
 
-    assert all(clase.aula_asignada.nombre == f'aula {esperada}' for clase, esperada in zip(carreras[0].materias[0].clases, asignaciones_esperadas))
+    assert carreras[0].materias[0].clases[2].aula_asignada == edificios[0].aulas[0]
+    assert carreras[0].materias[0].clases[3].aula_asignada == edificios[0].aulas[1]
+    assert carreras[0].materias[0].clases[3] in resultado.clases_con_aula_chica
+
+    assert len(resultado.clases_con_aula_chica) == 2
+    assert len(resultado.clases_fuera_de_su_edificio_preferido) == 0
+    assert len(resultado.días_sin_asignar) == 0
 
 @pytest.mark.edificios(MockEdificio(
     aulas=(
@@ -51,12 +59,16 @@ def test_aulas_dobles(edificios: Edificios, carreras: Carreras):
     # La individual no es preferida, pero es correcto que se asigne alguna
     # clase a esta porque no hay otra alternativa válida (no puede usarse la
     # doble y las hijas al mismo tiempo)
-    asignaciones_esperadas = ['individual', 'hija 2', 'hija 1']
-
     resultado = asignar(edificios, carreras)
-    assert resultado.todo_ok()
+    assert not resultado.todo_ok()
 
-    assert all(clase.aula_asignada.nombre == esperada for clase, esperada in zip(carreras[0].materias[0].clases, asignaciones_esperadas))
+    assert carreras[0].materias[0].clases[0].aula_asignada == edificios[0].aulas[3] # aula individual
+    assert carreras[0].materias[0].clases[1].aula_asignada == edificios[0].aulas[2] # hija 2
+    assert carreras[0].materias[0].clases[2].aula_asignada == edificios[0].aulas[1] # hija 1
+    
+    assert resultado.clases_con_aula_chica == [carreras[0].materias[0].clases[0]]
+    assert len(resultado.clases_fuera_de_su_edificio_preferido) == 0
+    assert len(resultado.días_sin_asignar) == 0
 
 @pytest.mark.aulas(MockAula())
 @pytest.mark.clases(
@@ -103,12 +115,12 @@ def test_asignación_imposible_por_equipamiento_y_capacidad(edificios: Edificios
     MockEdificio(
         nombre='este no',
         preferir_no_usar=True,
-        aulas=(MockAula(), MockAula())
+        aulas=(MockAula(capacidad=40), MockAula(capacidad=40))
     ),
     MockEdificio(
         nombre='este si',
         preferir_no_usar=False,
-        aulas=(MockAula(), MockAula())
+        aulas=(MockAula(capacidad=40), MockAula(capacidad=40))
     )
 )
 @pytest.mark.clases(

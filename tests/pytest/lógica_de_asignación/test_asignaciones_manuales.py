@@ -180,7 +180,7 @@ def test_varias_asignaciones_y_una_no_asignada(
 
 @pytest.mark.aulas(
     MockAula(),
-    MockAula(horario_viernes=RangoHorario(time(0), time(0))),
+    MockAula(horario_viernes=RangoHorario.cerrado()),
     MockAula(),
     MockAula(capacidad=20, equipamiento={'pizarrón'}),
 )
@@ -201,7 +201,8 @@ def test_asignaciones_manuales_que_inclumplen_restricciones(edificios: Edificios
     algunas restricciones
     '''
     result = asignar(edificios, carreras)
-    assert result.todo_ok()
+    assert not result.todo_ok()
+    assert result.clases_con_aula_chica == [carreras[0].materias[0].clases[7]]
 
     assert carreras[0].materias[0].clases[0].aula_asignada is not None # Verificar que se asignó algún aula
     assert carreras[0].materias[0].clases[1].aula_asignada == edificios[0].aulas[1]

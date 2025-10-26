@@ -10,13 +10,10 @@ RowLayout {
     spacing: 2
 
     // TODO: Fix. También, horario de edificio si el del aula == None (y engrisar también).
-    // Dudas:
-    // - ¿Queremos que por ejemplo puedas customizar el horario de
-    // inicio para un aula, pero también dejar el de fin con el valor del
-    // edificio?
-    // - ¿Tendría el usuario una forma de expresar explícitamente que el
-    // horario del aula use el horario del edificio, después de haber editado
-    // el campo por primera vez?
+    // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
+    // en la lista de clases) para resetear el horario al del edificio (por
+    // ejemplo con un ícono tipo 🔄), solo interactuable si el usuario cambió
+    // el horario.
     // property string horarioInicio : aula[rolDeHorario][0]
     // property string horarioFin : aula[rolDeHorario][1]
     property string horarioInicio : "00:00"

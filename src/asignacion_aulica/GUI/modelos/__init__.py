@@ -1,1 +1,1 @@
-from asignacion_aulica.GUI.modelos.registrador_de_modelos import args_para_registrar_modelos_qml
+from asignacion_aulica.GUI.modelos.registrador_de_modelos import registrar_modelos_qml

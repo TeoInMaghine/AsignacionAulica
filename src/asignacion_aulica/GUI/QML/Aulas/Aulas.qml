@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Custom
+import ModelosAsignaciónÁulica
 import QML.ComponentesUI
 
 ListView {

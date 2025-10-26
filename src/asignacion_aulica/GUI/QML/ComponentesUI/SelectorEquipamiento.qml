@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import Custom
+import ModelosAsignaciónÁulica
 
 // Referencias:
 // https://forum.qt.io/topic/87306/multiselect-combobox/2

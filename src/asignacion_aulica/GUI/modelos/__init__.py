@@ -1,0 +1,1 @@
+from asignacion_aulica.GUI.modelos.registrador_de_modelos import registrar_modelos_qml

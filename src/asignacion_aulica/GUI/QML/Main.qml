@@ -1,8 +1,8 @@
-import QtQuick 2.15
-import QtQuick.Window 2.15
-import QtQuick.Layouts 1.15
-
-import "./BarraLateral"
+import QtQuick
+import QtQuick.Window
+import QtQuick.Layouts
+import QML.Aulas
+import QML.BarraLateral
 
 Window {
     id: mainWindow
@@ -17,11 +17,13 @@ Window {
         spacing: 0
         anchors.fill: parent
 
-        BarraLateral{
+        BarraLateral {
             id: sidebar
         }
 
         // Mecanismo para cambiar de pestaña
+        // TODO: Quizás cambiarlo a TabBar
+        // (https://doc.qt.io/qt-6/qml-qtquick-controls-tabbar.html)
         Loader {
             id: tabLoader
             Layout.fillWidth: true
@@ -37,16 +39,9 @@ Window {
         }
     }
 
-    // Acá debería ir el contenido de cada pestaña
     Component {
         id: pestañaAulas
-        Rectangle {
-            Text {
-                anchors.centerIn: parent
-                text: "Aulas"
-                font.pixelSize: 24
-            }
-        }
+        Aulas { }
     }
 
     Component {

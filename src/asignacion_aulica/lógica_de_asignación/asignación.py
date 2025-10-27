@@ -30,7 +30,7 @@ import logging
 from asignacion_aulica.lógica_de_asignación.excepciones import AsignaciónImposibleException
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
 from asignacion_aulica.lógica_de_asignación.preferencias import obtener_penalización
-from asignacion_aulica.gestor_de_datos.entidades import Edificios, Carreras
+from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificios, Carreras
 from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 from asignacion_aulica.lógica_de_asignación import restricciones
 from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
@@ -71,8 +71,10 @@ def asignar(edificios: Edificios, carreras: Carreras) -> InfoPostAsignación:
             logger.error('Falló la asignación para el día %s: %s', día.name, exc)
             días_sin_asignar.append(día)
         else:
-            for clase, i_aula in zip(clases_del_día.clases, asignaciones):
-                clase.aula_asignada = aulas_preprocesadas.aulas[i_aula].aula_original
+            # Si no hubo excepciones, asignar las aulas a las clases que se pasaron por argumento
+            for clase, i_aula_asignada in zip(clases_del_día.clases, asignaciones):
+                aula_asignada: Aula = aulas_preprocesadas.aulas[i_aula_asignada].aula_original
+                clase.aula_asignada = aula_asignada
     
     # Postprocesar los datos
     reporte = InfoPostAsignación(edificios, carreras, días_sin_asignar)

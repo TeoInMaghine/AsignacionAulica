@@ -70,16 +70,18 @@ def test_aulas_dobles(edificios: Edificios, carreras: Carreras):
     assert len(resultado.clases_fuera_de_su_edificio_preferido) == 0
     assert len(resultado.días_sin_asignar) == 0
 
-@pytest.mark.aulas(MockAula())
+@pytest.mark.aulas(MockAula(horario_lunes=RangoHorario(time(8), time( 10))))
 @pytest.mark.clases(
     MockClase(día=Día.Lunes, horario=RangoHorario(time(8), time( 9))),
     MockClase(día=Día.Lunes, horario=RangoHorario(time(9), time(10)))
 )
 def test_horarios_no_solapan(edificios: Edificios, carreras: Carreras):
     '''
-    Verifica que asigna con horarios que entran justo, incluyendo que si una
-    clase empieza en una hora y otra termina a la misma hora que no tome que se
-    están superponiendo.
+    Verifica que asigna con horarios que entran justo, incluyendo:
+    - Si una clase empieza en una hora y otra termina a la misma hora, que no se
+      considere que se están superponiendo.
+    - Si una clase empieza/termina a la misma hora que el aula abre/cierra, que
+      no se considere que el aula esté cerrada en ese horario.
     '''
     resultado = asignar(edificios, carreras)
     assert resultado.todo_ok()

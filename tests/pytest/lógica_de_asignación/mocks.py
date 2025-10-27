@@ -1,3 +1,15 @@
+'''
+En este módulo se definen funciones para crear mocks de algunos objetos que son
+necesarios para probar funciones de lógica_de_asignación.
+
+Los mocks de edificios, aulas, carreras, materias, y clases, sirven para poder
+definir los atributos de esos objetos de manera incompleta (el código de las
+pruebas sería larguísimo si no). Las funciones make_edificios y make_carreras se
+encargan de completar la información faltante y estructurarla de manera
+correcta.
+
+También se mockea la matriz de asignaciones.
+'''
 from ortools.sat.python.cp_model import CpModel
 from dataclasses import dataclass, field
 from collections.abc import Sequence

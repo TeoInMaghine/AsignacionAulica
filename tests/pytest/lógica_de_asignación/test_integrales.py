@@ -113,12 +113,12 @@ def test_asignación_imposible_por_equipamiento_y_capacidad(edificios: Edificios
 
 @pytest.mark.edificios(
     MockEdificio(
-        nombre='este no',
+        nombre='el que preferimos no usar',
         preferir_no_usar=True,
         aulas=(MockAula(capacidad=40), MockAula(capacidad=40))
     ),
     MockEdificio(
-        nombre='este si',
+        nombre='el otro',
         preferir_no_usar=False,
         aulas=(MockAula(capacidad=40), MockAula(capacidad=40))
     )
@@ -134,6 +134,6 @@ def test_evita_edificios_no_deseables(edificios: Edificios, carreras: Carreras):
 
     # Debería minimizar el uso de edificios no deseables poniendo las dos
     # clases grandes en aulas buenas y la clase chica en un aula mala.
-    assert carreras[0].materias[0].clases[0].aula_asignada.edificio.nombre == 'este si'
-    assert carreras[0].materias[0].clases[1].aula_asignada.edificio.nombre == 'este si'
-    assert carreras[0].materias[0].clases[2].aula_asignada.edificio.nombre == 'este no'
+    assert carreras[0].materias[0].clases[2].aula_asignada.edificio.nombre == 'el que preferimos no usar'
+    assert carreras[0].materias[0].clases[1].aula_asignada.edificio.nombre == 'el otro'
+    assert carreras[0].materias[0].clases[0].aula_asignada.edificio.nombre == 'el otro'

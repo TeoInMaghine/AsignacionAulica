@@ -103,7 +103,7 @@ def carreras_generadas(
 )
 def test_stress_asignación_posible(edificios_generados: Edificios, carreras_generadas: Carreras):
     resultado = asignar(edificios_generados, carreras_generadas)
-    assert resultado.todo_ok()
+    assert len(resultado.días_sin_asignar) == 0
 
 @pytest.mark.stress_test
 @pytest.mark.parametrize(
@@ -113,4 +113,5 @@ def test_stress_asignación_posible(edificios_generados: Edificios, carreras_gen
 def test_stress_asignación_imposible(edificios_generados: Edificios, carreras_generadas: Carreras):
     resultado = asignar(edificios_generados, carreras_generadas)
     assert not resultado.todo_ok()
+    assert len(resultado.días_sin_asignar) != 0
 

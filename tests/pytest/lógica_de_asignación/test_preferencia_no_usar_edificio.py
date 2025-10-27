@@ -1,74 +1,98 @@
 from ortools.sat.python import cp_model
+from collections.abc import Sequence
 import pytest
 
+from asignacion_aulica.gestor_de_datos.entidades import Carreras, Edificios
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
 from asignacion_aulica.lógica_de_asignación import preferencias
 
-from conftest import make_aulas, make_clases, make_asignaciones
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
+    AulasPreprocesadas, ClasesPreprocesadas, preprocesar_clases
+)
+
+from mocks import (
+    MockAula, MockCarrera, MockClase, MockEdificio, MockMateria,
+    make_edificios, make_carreras, make_asignaciones
+)
 
 @pytest.mark.parametrize(
-    ('aulas_params', 'clases_params', 'asignaciones_forzadas', 'cota_esperada', 'cantidad_esperada'),
-    [
-        # Ningún edificio indeseable
+    argnames=(
+        'n_aulas_no_preferidas', 'n_aulas_preferidas',
+        'clases',
+        'asignaciones_forzadas', 'cota_esperada', 'cantidad_esperada'
+        # Los argvalues tienen este mismo layout.
+    ),
+    argvalues=[
+        # Ningún aula en edificio indeseable
         (
-            (dict(preferir_no_usar=False), dict(preferir_no_usar=False)),
-            ({}, {}),
-            {},
-            1,
-            0
+            0, 2,
+            (MockClase(), MockClase()),
+            {}, 1, 0
         ),
 
-        # Un edificio indeseable
+        # Un aula en edificio indeseable
         (
-            (dict(preferir_no_usar=False), dict(preferir_no_usar=True), dict(preferir_no_usar=False)),
-            (dict(cantidad_de_alumnos=10), dict(cantidad_de_alumnos=23)),
-            {},
-            10+23,
-            0
+            1, 2,
+            (MockClase(cantidad_de_alumnos=10), MockClase(cantidad_de_alumnos=23)),
+            {}, 10+23, 0
         ),
 
         # Un edificio indeseable, con asignación forzada
         (
-            (dict(preferir_no_usar=False), dict(preferir_no_usar=True), dict(preferir_no_usar=False)),
-            (dict(cantidad_de_alumnos=10), dict(cantidad_de_alumnos=23)),
-            {1: 1},
-            10+23,
-            23
+            1, 2,
+            (MockClase(cantidad_de_alumnos=10), MockClase(cantidad_de_alumnos=23)),
+            {1: 0}, 10+23, 23
         ),
 
         # Todos los edificios indeseables
         (
-            (dict(preferir_no_usar=True), dict(preferir_no_usar=True), dict(preferir_no_usar=True)),
-            (dict(cantidad_de_alumnos=15), dict(cantidad_de_alumnos=23)),
-            {},
-            15+23,
-            15+23
+            3, 0,
+            (MockClase(cantidad_de_alumnos=15), MockClase(cantidad_de_alumnos=23)),
+            {}, 15+23, 15+23
         ),
         
         # Algunos edificios indeseables y otros no
         (
-            (dict(preferir_no_usar=True), dict(preferir_no_usar=False), dict(preferir_no_usar=True), dict(preferir_no_usar=False)),
-            (dict(cantidad_de_alumnos=15), dict(cantidad_de_alumnos=23), dict(cantidad_de_alumnos=2)),
-            {},
-            15+23+2,
-            0
+            2, 2,
+            (MockClase(cantidad_de_alumnos=15), MockClase(cantidad_de_alumnos=23), MockClase(cantidad_de_alumnos=2)),
+            {}, 15+23+2, 0
         ),
         
         # Algunos edificios indeseables y otros no, con asignaciones forzadas
         (
-            (dict(preferir_no_usar=True), dict(preferir_no_usar=False), dict(preferir_no_usar=True), dict(preferir_no_usar=False)),
-            (dict(cantidad_de_alumnos=15), dict(cantidad_de_alumnos=23), dict(cantidad_de_alumnos=2)),
-            {0:1, 2:2},
-            23+2,
-            2
-        ),
+            2, 2,
+            (MockClase(cantidad_de_alumnos=15), MockClase(cantidad_de_alumnos=23), MockClase(cantidad_de_alumnos=2)),
+            {0:2, 2:1}, 23+2, 2
+        )
     ]
 )
-def test_cantidad_de_alumnos_en_aulas_indeseables_y_su_cota_superior(aulas_params, clases_params, asignaciones_forzadas, cota_esperada, cantidad_esperada, modelo):
-    aulas = make_aulas(aulas_params)
-    clases = make_clases(clases_params)
-    asignaciones = make_asignaciones(clases, aulas, modelo, asignaciones_forzadas)
+def test_cantidad_de_alumnos_en_aulas_indeseables_y_su_cota_superior(
+    n_aulas_no_preferidas: int,
+    n_aulas_preferidas: int,
+    clases: Sequence[MockClase],
+    asignaciones_forzadas: dict[int, int],
+    cota_esperada: int,
+    cantidad_esperada: int,
+    modelo: cp_model.CpModel
+):
+    edificios: Edificios = make_edificios((
+        MockEdificio(nombre='no preferido', preferir_no_usar=True, aulas=(MockAula(),)*n_aulas_no_preferidas),
+        MockEdificio(nombre='preferido',   preferir_no_usar=False, aulas=(MockAula(),)*n_aulas_preferidas)
+    ))
+    aulas_preprocesadas = AulasPreprocesadas(edificios)
 
-    alumnos_en_edificios_indeseables, cota = preferencias.obtener_cantidad_de_alumnos_en_edificios_no_deseables(clases, aulas, modelo, asignaciones)
+    carreras: Carreras = make_carreras(
+        edificios,
+        carreras=(
+            MockCarrera(materias=(MockMateria(clases=clases),)),
+        )
+    )
+    clases_preprocesadas = preprocesar_clases(carreras, aulas_preprocesadas)
+    clases_lunes: ClasesPreprocesadas = clases_preprocesadas[Día.Lunes]
+
+    asignaciones = make_asignaciones(len(clases_lunes.clases), len(aulas_preprocesadas.aulas), modelo, asignaciones_forzadas)
+
+    alumnos_en_edificios_indeseables, cota = preferencias.cantidad_de_alumnos_en_edificios_no_deseables(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota == cota_esperada
 
     modelo.minimize(alumnos_en_edificios_indeseables)

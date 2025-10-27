@@ -1,137 +1,118 @@
 '''
-Los fixtures que se definen acá están disponibles en todos los casos de prueba.
+Los fixtures que se definen acá están disponibles en todos los casos de prueba
+de `lógica_de_asignación`.
 
 Para usar un fixture, hay que ponerlo como argumento en la función del caso de
 prueba que lo necesita.
 
 Ver https://docs.pytest.org/en/stable/how-to/fixtures.html
 '''
+from ortools.sat.python.cp_model import CpModel
+import numpy as np
 import pytest
 
-from ortools.sat.python.cp_model import CpModel
-from pandas import DataFrame
-import numpy as np
+from asignacion_aulica.gestor_de_datos.entidades import Edificios, Carreras
+from asignacion_aulica.lógica_de_asignación.preprocesamiento import (
+    ClasesPreprocesadasPorDía,
+    AulasPreprocesadas,
+    preprocesar_clases
+)
 
-from asignacion_aulica.gestor_de_datos import Día
+from mocks import (
+    MockEdificio,
+    MockCarrera,
+    MockMateria,
+    make_edificios,
+    make_carreras,
+    make_asignaciones
+)
 
 def pytest_configure(config):
     # Registrar los markers usados por las fixtures
+    config.addinivalue_line("markers", "edificios: marca para pasar parametros al fixture edificios")
     config.addinivalue_line("markers", "aulas: marca para pasar parametros al fixture aulas")
+    config.addinivalue_line("markers", "carreras: marca para pasar parametros al fixture carreras")
     config.addinivalue_line("markers", "clases: marca para pasar parametros al fixture clases")
     config.addinivalue_line("markers", "asignaciones_forzadas: marca para pasar parametros al fixture asignaciones")
 
-def make_aulas(aulas) -> DataFrame:
+@pytest.fixture
+def edificios(request: pytest.FixtureRequest) -> Edificios:
     '''
-    Recibe datos de las aulas (posiblemente incompletos) y los rellena con valores por defecto.
+    Recibe datos (posiblemente incompletos) de edificios y/o aulas. Rellena esos
+    datos con valores por defecto.
 
-    :param aulas: Tupla de diccionarios con datos (posiblemente incompletos) de aulas.
-    :return: Un DataFrame con el formato esperado por lógica_de_asignación.
+    Puede recibir en el marker "edificios" una tupla de `MockEdificio`s, o en el
+    marker "aulas" una tupla de `MockAula`s. No se pueden usar los dos markers a
+    la vez.
+
+    :return: La secuencia de edificios esperada por lógica_de_asignación.
     '''
-    default_values = {
-        'edificio': 'edificio',
-        'nombre': 'aula',
-        'capacidad': 1,
-        'equipamiento': set(),
-        'preferir_no_usar': False,
-        'horarios': {
-            Día.Lunes:     (0, 24),
-            Día.Martes:    (0, 24),
-            Día.Miércoles: (0, 24),
-            Día.Jueves:    (0, 24),
-            Día.Viernes:   (0, 24),
-            Día.Sábado:    (0, 24),
-            Día.Domingo:   (0, 24)
-        }
-    }
+    marker_edificios = request.node.get_closest_marker('edificios')
+    marker_aulas = request.node.get_closest_marker('aulas')
+    edificios: tuple[MockEdificio, ...]
 
-    return DataFrame.from_records(default_values | explicit_values for explicit_values in aulas)
-
-def make_clases(clases) -> DataFrame:
-    '''
-    Recibe datos de las clases (posiblemente incompletos) y los rellena con valores por defecto.
-
-    :param clases: Tupla de diccionarios con datos (posiblemente incompletos) de clases.
-    :return: Un DataFrame con el formato esperado por lógica_de_asignación.
-    '''
-    default_values = {
-        'nombre': 'materia',
-        'día': Día.Lunes,
-        'horario_inicio': 10,
-        'horario_fin': 11,
-        'cantidad_de_alumnos': 1,
-        'equipamiento_necesario': set(),
-        'edificio_preferido': 'edificio',
-        'aula_asignada': None
-    }
-
-    data = {
-        columna: [clase.get(columna, default) for clase in clases]
-        for columna, default in default_values.items()
-    }
-
-    return DataFrame(data, dtype=object)
-
-def make_asignaciones(
-        clases: DataFrame,
-        aulas: DataFrame,
-        modelo: CpModel,
-        asignaciones_forzadas: dict[int, int] = {}
-    ) -> np.ndarray:
-    '''
-    Genera una matriz con las variables de asignación. No hay constantes, todas
-    son variables que se agregan al modelo, a menos que se especifiquen
-    asignaciones forzadas, en cuyo caso se colocan los ceros donde corresponda
-    (no unos, para simular como ocurriría en la asignación real).
-
-    También se agregan restricciones para que cada clase se asigne exactamente a
-    un aula.
-
-    :param clases: Tabla con los datos de las clases.
-    :param aulas: Tabla con los datos de las aulas.
-    :param modelo: El modelo que usar para generar variables.
-    :param asignaciones_forzadas: Diccionario de índices de clases a índices de
-    aulas.
-    :return: Matriz con los datos de asignaciones.
-    '''
-    asignaciones = np.empty(shape=(len(clases), len(aulas)), dtype=object)
+    if marker_edificios and marker_aulas:
+        raise RuntimeError('No se pueden usar a la misma vez los markers "edificios" y "aulas".')
+    elif marker_edificios:
+        edificios = marker_edificios.args
+    elif marker_aulas:
+        edificios = (
+            MockEdificio(
+                aulas=marker_aulas.args
+            ),
+        )
+    else:
+        edificios = tuple()
     
-    for clase, aula in np.ndindex(asignaciones.shape):
-        if clase not in asignaciones_forzadas or asignaciones_forzadas[clase] == aula:
-            asignaciones[clase, aula] = modelo.new_bool_var(f'clase_{clase}_asignada_al_aula_{aula}')
-        else:
-            asignaciones[clase, aula] = 0
-    
-    # Asegurar que cada clase se asigna a exactamente un aula
-    for clase in clases.index:
-        modelo.add_exactly_one(asignaciones[clase,:])
-    
-    return asignaciones
+    return make_edificios(edificios)
 
 @pytest.fixture
-def aulas(request) -> DataFrame:
-    '''
-    Recibe en el marker "aulas" una tupla de diccionarios con datos
-    (posiblemente incompletos) de aulas.
-
-    Rellena esos datos con valores por defecto.
-
-    :return: Un DataFrame con el formato esperado por lógica_de_asignación.
-    '''
-    data = request.node.get_closest_marker('aulas').args
-    return make_aulas(data)
+def aulas_preprocesadas(edificios: Edificios) -> AulasPreprocesadas:
+    return AulasPreprocesadas(edificios)
 
 @pytest.fixture
-def clases(request) -> DataFrame:
+def carreras(request, edificios: Edificios) -> Carreras:
     '''
-    Recibe en el marker "clases" una tupla de diccionarios con datos
-    (posiblemente incompletos) de clases.
+    Recibe datos (posiblemente incompletos) de carreras/materias/clases. Rellena
+    esos datos con valores por defecto.
 
-    Rellena esos datos con valores por defecto.
-    
-    :return: Un DataFrame con el formato esperado por lógica_de_asignación.
+    Puede recibir en el marker "carreras" una tupla de `Mockcarreras`s, o en el
+    marker "clases" una tupla de `MockClases`s. No se pueden usar los dos
+    markers a la vez.
+
+    :return: La secuencia de carreras esperada por lógica_de_asignación.
     '''
-    clases = request.node.get_closest_marker('clases').args
-    return make_clases(clases)
+    marker_carreras = request.node.get_closest_marker('carreras')
+    marker_clases = request.node.get_closest_marker('clases')
+    carreras: tuple[MockCarrera, ...]
+
+    if marker_carreras and marker_clases:
+        raise RuntimeError('No se pueden usar a la misma vez los markers "carreras" y "clases".')
+    elif marker_carreras:
+        carreras = marker_carreras.args
+    elif marker_clases:
+        carreras = (
+            MockCarrera(
+                materias=(
+                    MockMateria(clases=marker_clases.args),
+                )
+            ),
+        )
+    else:
+        carreras = tuple()
+    
+    return make_carreras(edificios, carreras)
+
+@pytest.fixture
+def clases_preprocesadas(
+    carreras: Carreras,
+    aulas_preprocesadas: AulasPreprocesadas
+) -> ClasesPreprocesadasPorDía:
+    '''
+    :return: El resultado de preprocesar las carreras obtenidas del
+    correspondiente fixture.
+    '''
+    return preprocesar_clases(carreras, aulas_preprocesadas)
 
 @pytest.fixture
 def modelo() -> CpModel:
@@ -140,11 +121,11 @@ def modelo() -> CpModel:
 
 @pytest.fixture
 def asignaciones(
-        request,
-        clases: DataFrame,
-        aulas: DataFrame,
-        modelo: CpModel
-    ) -> np.ndarray:
+    request,
+    aulas_preprocesadas: AulasPreprocesadas,
+    clases_preprocesadas: ClasesPreprocesadasPorDía,
+    modelo: CpModel
+) -> np.ndarray:
     '''
     Genera una matriz con las variables de asignación. No hay constantes, todas
     son variables que se agregan al modelo, a menos que se especifiquen
@@ -158,9 +139,15 @@ def asignaciones(
     que si está presente tiene que tener un diccionario que mapea índices de
     clases a índices de aulas.
 
+    La matriz tiene filas para todas las clases, sin separar por días, así que
+    este fixture sólo es correcto cuando ``clases`` contiene clases en un único
+    día.
+
     :return: Matriz con los datos de asignaciones.
     '''
     marker = request.node.get_closest_marker('asignaciones_forzadas')
     asignaciones_forzadas: dict[int, int] = marker.args[0] if marker else dict()
+    
+    n_clases = max(len(día.clases) for día in clases_preprocesadas)
 
-    return make_asignaciones(clases, aulas, modelo, asignaciones_forzadas)
+    return make_asignaciones(n_clases, len(aulas_preprocesadas.aulas), modelo, asignaciones_forzadas)

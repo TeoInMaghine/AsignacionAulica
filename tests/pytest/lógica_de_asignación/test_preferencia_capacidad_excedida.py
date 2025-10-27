@@ -27,7 +27,7 @@ def test_algunas_clases_exceden_capacidad(
     asignaciones: np.ndarray
 ):
     clases_lunes = clases_preprocesadas[Día.Lunes]
-    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
+    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_que_no_entran_en_el_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (31 - 30 + 50 - 40 + 100 - 25)
 
     # Resolver
@@ -56,7 +56,7 @@ def test_ninguna_clase_excede_capacidad(
     asignaciones: np.ndarray
 ):
     clases_lunes = clases_preprocesadas[Día.Lunes]
-    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
+    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_que_no_entran_en_el_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     # La cota superior sería 0, pero en cambio se devuelve 1 porque si no
     # fallaría al normalizar, siendo que debe dividir por la cota superior
     assert cota_superior == 1
@@ -93,7 +93,7 @@ def test_entran_justito(
             modelo.add( asignaciones[i_clase1, i_aula] + asignaciones[i_clase2, i_aula] <= 1 )
 
     # Minimizar capacidad excedida
-    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
+    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_que_no_entran_en_el_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (10 - 10 + 20 - 10 + 30 - 10)
 
     # Resolver
@@ -141,7 +141,7 @@ def test_minimiza_capacidad_excedida(
             modelo.add( asignaciones[i_clase1, i_aula] + asignaciones[i_clase2, i_aula] <= 1 )
 
     # Minimizar capacidad excedida
-    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_fuera_del_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
+    cantidad_excedida, cota_superior = preferencias.cantidad_de_alumnos_que_no_entran_en_el_aula(clases_lunes, aulas_preprocesadas, modelo, asignaciones)
     assert cota_superior == (31 - 10 + 21 - 10 + 11 - 10)
 
     # Resolver

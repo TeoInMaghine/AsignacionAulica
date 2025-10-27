@@ -77,7 +77,7 @@ def cantidad_de_clases_fuera_del_edificio_preferido(
 
     return cantidad_de_clases_fuera_del_edificio_preferido, cota_superior
 
-def cantidad_de_alumnos_fuera_del_aula(
+def cantidad_de_alumnos_que_no_entran_en_el_aula(
     clases: ClasesPreprocesadas,
     aulas: AulasPreprocesadas,
     modelo: CpModel,
@@ -85,8 +85,6 @@ def cantidad_de_alumnos_fuera_del_aula(
 ) -> tuple[LinearExpr|int, int]:
     '''
     La cantidad de alumnos que exceden la capacidad del aula asignada a su clase.
-
-    TODO: cambiar nombre a cantidad_de_alumnos_que_no_entran_en_el_aula
     '''
     mínima_capacidad = min(aula.capacidad for aula in aulas.aulas)
 
@@ -185,7 +183,7 @@ def cantidad_de_alumnos_en_edificios_no_deseables(
     return cantidad_de_alumnos_en_edificios_no_deseables, cota_superior
 
 todas_las_penalizaciones: Sequence[tuple[int, función_de_penalización]] = (
-    (1000, cantidad_de_alumnos_fuera_del_aula),
+    (1000, cantidad_de_alumnos_que_no_entran_en_el_aula),
     (100,  cantidad_de_clases_fuera_del_edificio_preferido),
     (10,   cantidad_de_alumnos_en_edificios_no_deseables),
     (1,    capacidad_sobrante)

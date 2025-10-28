@@ -33,7 +33,7 @@ class GestorDeDatos:
     def cantidad_de_edificios(self) -> int:
         pass
 
-    def get_edificio(self, edificio: int, campo: int) -> Any:
+    def get_from_edificio(self, edificio: int, campo: int) -> Any:
         '''
         :param edificio: El índice de un edificio.
         :param campo: El índice de un campo.
@@ -49,7 +49,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_edificio(self, edificio: int, campo: int, valor: Any):
+    def set_in_edificio(self, edificio: int, campo: int, valor: Any):
         '''
         Actualizar el valor de un campo de un edificio existente.
 
@@ -95,7 +95,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def get_aula(self, edificio: int, índice: int, campo: int) -> Any:
+    def get_from_aula(self, edificio: int, índice: int, campo: int) -> Any:
         '''
         :param edificio: El índice del edificio.
         :param índice: El índice del aula.
@@ -105,7 +105,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_aula(self, edificio: int, índice: int, campo: int, valor: Any):
+    def set_in_aula(self, edificio: int, índice: int, campo: int, valor: Any):
         '''
         Actualizar el valor de un campo de un aula existente.
 
@@ -163,7 +163,7 @@ class GestorDeDatos:
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
         pass
 
-    def get_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Any:
+    def get_from_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Any:
         '''
         :param edificio: El índice del edificio.
         :param aula_doble: El índice del aula doble.
@@ -173,7 +173,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_aula_doble(self, edificio: int, aula_doble: int, campo: int, valor: Any):
+    def set_in_aula_doble(self, edificio: int, aula_doble: int, campo: int, valor: Any):
         '''
         Actualizar el valor de un campo de un aula doble existente.
 
@@ -272,7 +272,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def get_materia(self, carrera: int, materia: int, campo: int) -> Any:
+    def get_from_materia(self, carrera: int, materia: int, campo: int) -> Any:
         '''
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
@@ -293,7 +293,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_materia(self, carrera: int, materia: int, campo: int, valor: Any):
+    def set_in_materia(self, carrera: int, materia: int, campo: int, valor: Any):
         '''
         Actualizar el valor de un campo de un materia existente.
 
@@ -347,7 +347,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def get_clase(self, carrera: int, materia: int, clase: int, campo: int) -> Any:
+    def get_from_clase(self, carrera: int, materia: int, clase: int, campo: int) -> Any:
         '''
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
@@ -370,7 +370,7 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_clase(self, carrera: int, materia: int, clase: int, campo: int, valor: Any):
+    def set_in_clase(self, carrera: int, materia: int, clase: int, campo: int, valor: Any):
         '''
         Actualizar el valor de un campo de una clase existente.
 

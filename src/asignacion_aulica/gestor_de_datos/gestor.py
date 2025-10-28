@@ -10,15 +10,16 @@ class GestorDeDatos:
     Internamente usa una base de datos para almacenar los datos de manera
     persistente.
 
-    Los miembros de las entidades se representan con números, los cuales se
-    corresponden con el orden de los miembros en cada entidad y los mal llamados
+    Los campos de las entidades se identifican con números, los cuales se
+    corresponden con el orden de los campos en cada entidad y los mal llamados
     roles de la UI.
     '''
 
-    def __init__(self, path_base_de_datos: str):
+    def __init__(self, path_base_de_datos: str|None = None):
         '''
         :param path_base_de_datos: El path absoluto del archivo de la base de
-        datos. Si el archivo no existe, es creado.
+        datos. Si el archivo no existe, es creado. ``None`` para no guardar
+        datos.
         '''
         pass
 
@@ -32,12 +33,12 @@ class GestorDeDatos:
     def cantidad_de_edificios(self) -> int:
         pass
 
-    def get_edificio(self, edificio: int, miembro: int) -> Any:
+    def get_edificio(self, edificio: int, campo: int) -> Any:
         '''
         :param edificio: El índice de un edificio.
-        :param miembro: El índice de un miembro.
-        :return: El valor del miembro especificado.
-        :raise IndexError: Si el índice o el miembro están fuera de rango.
+        :param campo: El índice de un campo.
+        :return: El valor del campo especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
@@ -48,16 +49,16 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_edificio(self, edificio: int, miembro: int, valor: Any):
+    def set_edificio(self, edificio: int, campo: int, valor: Any):
         '''
-        Actualizar el valor de un miembro de un edificio existente.
+        Actualizar el valor de un campo de un edificio existente.
 
         El valor dado se asume como válido.
 
         :param edificio: El índice del edificio.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
-        :raise IndexError: Si el índice o el miembro están fuera de rango.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
@@ -94,26 +95,26 @@ class GestorDeDatos:
         '''
         pass
 
-    def get_aula(self, edificio: int, índice: int, miembro: int) -> Any:
+    def get_aula(self, edificio: int, índice: int, campo: int) -> Any:
         '''
         :param edificio: El índice del edificio.
         :param índice: El índice del aula.
-        :param miembro: El índice del miembro.
-        :return: El valor del miembro especificado.
+        :param campo: El índice del campo.
+        :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def set_aula(self, edificio: int, índice: int, miembro: int, valor: Any):
+    def set_aula(self, edificio: int, índice: int, campo: int, valor: Any):
         '''
-        Actualizar el valor de un miembro de un aula existente.
+        Actualizar el valor de un campo de un aula existente.
 
         El valor dado se asume como válido.
 
         :param edificio: El índice del edificio.
         :param índice: El índice del aula.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
@@ -162,26 +163,26 @@ class GestorDeDatos:
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
         pass
 
-    def get_aula_doble(self, edificio: int, aula_doble: int, miembro: int) -> Any:
+    def get_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Any:
         '''
         :param edificio: El índice del edificio.
         :param aula_doble: El índice del aula doble.
-        :param miembro: El índice del miembro.
-        :return: El valor del miembro especificado.
+        :param campo: El índice del campo.
+        :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
 
-    def set_aula_doble(self, edificio: int, aula_doble: int, miembro: int, valor: Any):
+    def set_aula_doble(self, edificio: int, aula_doble: int, campo: int, valor: Any):
         '''
-        Actualizar el valor de un miembro de un aula doble existente.
+        Actualizar el valor de un campo de un aula doble existente.
 
         El valor dado se asume como válido.
 
         :param edificio: El índice del edificio.
         :param aula_doble: El índice del aula doble.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
@@ -271,12 +272,12 @@ class GestorDeDatos:
         '''
         pass
 
-    def get_materia(self, carrera: int, materia: int, miembro: int) -> Any:
+    def get_materia(self, carrera: int, materia: int, campo: int) -> Any:
         '''
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :param miembro: El índice del miembro.
-        :return: El valor del miembro especificado.
+        :param campo: El índice del campo.
+        :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
@@ -292,16 +293,16 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_materia(self, carrera: int, materia: int, miembro: int, valor: Any):
+    def set_materia(self, carrera: int, materia: int, campo: int, valor: Any):
         '''
-        Actualizar el valor de un miembro de un materia existente.
+        Actualizar el valor de un campo de un materia existente.
 
         El valor dado se asume como válido.
 
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
@@ -346,13 +347,13 @@ class GestorDeDatos:
         '''
         pass
 
-    def get_clase(self, carrera: int, materia: int, clase: int, miembro: int) -> Any:
+    def get_clase(self, carrera: int, materia: int, clase: int, campo: int) -> Any:
         '''
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
         :param clase: El índice de la clase.
-        :param miembro: El índice del miembro.
-        :return: El valor del miembro especificado.
+        :param campo: El índice del campo.
+        :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass
@@ -369,17 +370,17 @@ class GestorDeDatos:
         '''
         pass
 
-    def set_clase(self, carrera: int, materia: int, clase: int, miembro: int, valor: Any):
+    def set_clase(self, carrera: int, materia: int, clase: int, campo: int, valor: Any):
         '''
-        Actualizar el valor de un miembro de una clase existente.
+        Actualizar el valor de un campo de una clase existente.
 
         El valor dado se asume como válido.
 
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
         :param clase: El índice de la clase.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         pass

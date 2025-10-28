@@ -1,4 +1,4 @@
-from asignacion_aulica.gestor_de_datos import GestorDeDatos
+from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.GUI.modelos.list_model import ListAulas
 from asignacion_aulica.GUI.modelos.equipamiento_model import ListEquipamientos
 from PyQt6.QtQml import qmlRegisterType

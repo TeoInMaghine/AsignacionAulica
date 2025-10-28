@@ -2,7 +2,8 @@ from dataclasses import fields, asdict
 from typing import Any
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
 
-from asignacion_aulica.gestor_de_datos import GestorDeDatos, Aula, Edificio
+from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
+from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio
 
 class ListAulas(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):

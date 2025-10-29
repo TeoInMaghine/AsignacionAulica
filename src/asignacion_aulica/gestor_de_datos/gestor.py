@@ -86,7 +86,13 @@ class GestorDeDatos:
         Se inicializa con valores por defecto, asegurando que tenga un nombre
         único.
         '''
-        self._edificios.append(Edificio('sin nombre'))
+        nombres_existentes = [edificio.nombre for edificio in self._edificios]
+        nombre_propuesto = 'Edificio sin nombre'
+        i = 0
+        while nombre_propuesto in nombres_existentes:
+            i += 1
+            nombre_propuesto = f'Edificio sin nombre {i}'
+        self._edificios.append(Edificio(nombre_propuesto))
 
     def borrar_edificio(self, índice: int):
         '''

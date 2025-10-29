@@ -52,6 +52,20 @@ def test_add_edificio_valores_deafult(gestor: GestorDeDatos):
     assert gestor.get_from_edificio(0, campo_Edificio['horarios']) == crear_horarios_semanales()
     assert gestor.get_from_edificio(0, campo_Edificio['preferir_no_usar']) == False
 
+def test_add_edificios_nombres_distintos(gestor: GestorDeDatos):
+    '''
+    Probar que si se agregan varios edificios, todos se agregan con nombres
+    distintos y todos dicen 'sin nombre'.
+    '''
+    for _ in range(10):
+        gestor.add_edificio()
+    
+    nombres = gestor.get_edificios()
+    
+    assert len(nombres) == 10
+    assert all('sin nombre' in nombre for nombre in nombres)
+    assert len(nombres) == len(set(nombres)) # No hay repetidos
+
 def test_get_set_edificio_existente(gestor: GestorDeDatos):
     nombre = 'nombresito'
     preferir_no_usar = True

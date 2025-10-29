@@ -1,8 +1,22 @@
 from datetime import time
-from asignacion_aulica.gestor_de_datos.días_y_horarios import HorariosSemanales, RangoHorario, crear_horarios_semanales
+import pytest
+
+from asignacion_aulica.gestor_de_datos.días_y_horarios import (
+    HorariosSemanales, RangoHorario, crear_horarios_semanales
+)
+from asignacion_aulica.gestor_de_datos.entidades import (
+    fieldnames_Aula, fieldnames_AulaDoble, fieldnames_Carrera, fieldnames_Clase,
+    fieldnames_Edificio, fieldnames_Materia
+)
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 
-import pytest
+# Índices de los campos, en diccionarios para más legibilidad:
+campo_Edificio:  dict[str, int] = {nombre: índice for índice, nombre in enumerate(fieldnames_Edificio)}
+campo_Aula:      dict[str, int] = {nombre: índice for índice, nombre in enumerate(fieldnames_Aula)}
+campo_AulaDoble: dict[str, int] = {nombre: índice for índice, nombre in enumerate(fieldnames_AulaDoble)}
+campo_Carrera:   dict[str, int] = {nombre: índice for índice, nombre in enumerate(fieldnames_Carrera)}
+campo_Materia:   dict[str, int] = {nombre: índice for índice, nombre in enumerate(fieldnames_Materia)}
+campo_Clase:     dict[str, int] = {nombre: índice for índice, nombre in enumerate(fieldnames_Clase)}
 
 @pytest.fixture
 def gestor() -> GestorDeDatos:
@@ -20,10 +34,10 @@ def test_edificio_no_existe(gestor: GestorDeDatos):
 
 def test_get_set_edificio_inexistente(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
-        gestor.get_from_edificio(0, 0)
+        gestor.get_from_edificio(0, campo_Edificio['nombre'])
     
     with pytest.raises(IndexError):
-        gestor.set_in_edificio(0, 0, None)
+        gestor.set_in_edificio(0, campo_Edificio['nombre'], None)
 
 def test_add_edificio_valores_deafult(gestor: GestorDeDatos):
     gestor.add_edificio()
@@ -32,28 +46,38 @@ def test_add_edificio_valores_deafult(gestor: GestorDeDatos):
     assert len(gestor.get_edificios()) == 1
     assert 'sin nombre' in gestor.get_edificios()[0]
 
-    assert 'sin nombre' in gestor.get_from_edificio(0, 0) # Nombre
-    assert gestor.get_from_edificio(0, 1) == [] # Aulas
-    assert gestor.get_from_edificio(0, 2) == [] # Aulas dobles
-    assert gestor.get_from_edificio(0, 3) == crear_horarios_semanales() # Horarios
-    assert gestor.get_from_edificio(0, 4) == False # Preferir no usar
+    assert 'sin nombre' in gestor.get_from_edificio(0, campo_Edificio['nombre'])
+    assert gestor.get_from_edificio(0, campo_Edificio['aulas']) == []
+    assert gestor.get_from_edificio(0, campo_Edificio['aulas_dobles']) == []
+    assert gestor.get_from_edificio(0, campo_Edificio['horarios']) == crear_horarios_semanales()
+    assert gestor.get_from_edificio(0, campo_Edificio['preferir_no_usar']) == False
 
 def test_get_set_edificio_existente(gestor: GestorDeDatos):
-    horarios = HorariosSemanales(RangoHorario(time(i), time(i+1)) for i in range(7))
     nombre = 'nombresito'
     preferir_no_usar = True
+    horarios = HorariosSemanales(RangoHorario(time(i), time(i+1)) for i in range(7))
 
     gestor.add_edificio()
-    gestor.set_in_edificio(0, 0, nombre)
-    gestor.set_in_edificio(0, 3, horarios)
-    gestor.set_in_edificio(0, 4, preferir_no_usar)
+    gestor.set_in_edificio(0, campo_Edificio['nombre'], nombre)
+    gestor.set_in_edificio(0, campo_Edificio['horarios'], horarios)
+    gestor.set_in_edificio(0, campo_Edificio['preferir_no_usar'], preferir_no_usar)
 
     assert gestor.cantidad_de_edificios() == 1
     assert len(gestor.get_edificios()) == 1
     assert nombre in gestor.get_edificios()[0]
 
-    assert gestor.get_from_edificio(0, 0) == nombre
-    assert gestor.get_from_edificio(0, 1) == [] # Aulas
-    assert gestor.get_from_edificio(0, 2) == [] # Aulas dobles
-    assert gestor.get_from_edificio(0, 3) == horarios
-    assert gestor.get_from_edificio(0, 4) == preferir_no_usar
+    assert gestor.get_from_edificio(0, campo_Edificio['nombre']) == nombre
+    assert gestor.get_from_edificio(0, campo_Edificio['aulas']) == []
+    assert gestor.get_from_edificio(0, campo_Edificio['aulas_dobles']) == []
+    assert gestor.get_from_edificio(0, campo_Edificio['horarios']) == horarios
+    assert gestor.get_from_edificio(0, campo_Edificio['preferir_no_usar']) == preferir_no_usar
+
+def test_get_edificios_orden_afabético(gestor: GestorDeDatos):
+    gestor.add_edificio()
+    gestor.set_in_edificio(0, campo_Edificio['nombre'], 'b')
+    gestor.add_edificio()
+    gestor.set_in_edificio(1, campo_Edificio['nombre'], 'a')
+    gestor.add_edificio()
+    gestor.set_in_edificio(2, campo_Edificio['nombre'], 'd')
+
+    assert gestor.get_edificios() == ['a', 'b', 'd']

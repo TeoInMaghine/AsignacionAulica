@@ -1,6 +1,12 @@
 from typing import Callable, Any
+from collections import Counter
 
-from asignacion_aulica.gestor_de_datos.entidades import Carrera
+from asignacion_aulica.gestor_de_datos.entidades import (
+    Carrera,
+    Edificio,
+    fieldnames_Edificio,
+    fieldtypes_Edificio
+)
 
 class GestorDeDatos:
     '''
@@ -21,17 +27,21 @@ class GestorDeDatos:
         datos. Si el archivo no existe, es creado. ``None`` para no guardar
         datos.
         '''
-        pass
+        self._edificios: list[Edificio] = []
+        self._carreras: list[Carrera] = []
+        self._equipamientos: Counter[str] = Counter()
 
     def get_edificios(self) -> list[str]:
         '''
         :return: Los nombres de todos los edificios en la base de datos,
         ordenados alfabéticamente.
         '''
-        pass
+        nombres = [edificio.nombre for edificio in self._edificios]
+        nombres.sort()
+        return nombres
 
     def cantidad_de_edificios(self) -> int:
-        pass
+        return len(self._edificios)
 
     def get_from_edificio(self, edificio: int, campo: int) -> Any:
         '''
@@ -40,7 +50,8 @@ class GestorDeDatos:
         :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        field_name: str = fieldnames_Edificio[campo]
+        return getattr(self._edificios[edificio], field_name)
 
     def existe_edificio(self, nombre: str) -> bool:
         '''
@@ -60,7 +71,13 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        el_edificio = self._edificios[edificio]
+        field_name: str = fieldnames_Edificio[campo]
+        expected_type = fieldtypes_Edificio[campo]
+        if not isinstance(valor, expected_type):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
+        else:
+            setattr(el_edificio, field_name, valor)
 
     def add_edificio(self):
         '''
@@ -69,7 +86,7 @@ class GestorDeDatos:
         Se inicializa con valores por defecto, asegurando que tenga un nombre
         único.
         '''
-        pass
+        self._edificios.append(Edificio('sin nombre'))
 
     def borrar_edificio(self, índice: int):
         '''

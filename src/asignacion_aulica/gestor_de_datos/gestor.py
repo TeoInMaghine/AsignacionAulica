@@ -3,13 +3,20 @@ from collections import Counter
 
 from asignacion_aulica.gestor_de_datos.entidades import (
     Aula,
+    AulaDoble,
     Carrera,
     Edificio,
     fieldnames_Aula,
+    fieldnames_AulaDoble,
     fieldnames_Edificio,
     fieldtypes_Aula,
     fieldtypes_Edificio
 )
+
+aula_no_seleccionada: Aula = Aula(nombre='Seleccionar', edificio=None, capacidad=0)
+'''
+Aula dummy usada para inicializar las aulas dobles.
+'''
 
 class GestorDeDatos:
     '''
@@ -216,7 +223,11 @@ class GestorDeDatos:
         self._edificios[edificio].aulas.sort(key=lambda aula: aula.nombre)
 
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
-        pass
+        '''
+        :return: La cantidad de aulas dobles de un edificio en la base de datos.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
+        '''
+        return len(self._edificios[edificio].aulas_dobles)
 
     def get_from_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Any:
         '''
@@ -226,9 +237,10 @@ class GestorDeDatos:
         :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        fieldname = fieldnames_AulaDoble[campo]
+        return getattr(self._edificios[edificio].aulas_dobles[aula_doble], fieldname)
 
-    def set_in_aula_doble(self, edificio: int, aula_doble: int, campo: int, valor: Any):
+    def set_in_aula_doble(self, edificio: int, aula_doble: int, campo: int, valor: Aula):
         '''
         Actualizar el valor de un campo de un aula doble existente.
 
@@ -239,8 +251,14 @@ class GestorDeDatos:
         :param campo: El índice del campo.
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
+        :raise TypeError: Si el tipo de ``valor`` no es correcto.
         '''
-        pass
+        el_aula_doble = self._edificios[edificio].aulas_dobles[aula_doble]
+        field_name: str = fieldnames_AulaDoble[campo]
+        if isinstance(valor, Aula):
+            setattr(el_aula_doble, field_name, valor)
+        else:
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "AulaDoble.{field_name}" de tipo {expected_type}')
 
     def add_aula_doble(self, edificio: int):
         '''
@@ -250,7 +268,9 @@ class GestorDeDatos:
         :param edificio: El índice del edificio.
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        self._edificios[edificio].aulas_dobles.append(AulaDoble(
+            aula_no_seleccionada, aula_no_seleccionada, aula_no_seleccionada
+        ))
 
     def borrar_aula_doble(self, edificio: int, índice: int):
         '''
@@ -260,7 +280,7 @@ class GestorDeDatos:
         :param índice: El índice del aula doble.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        del self._edificios[edificio].aulas_dobles[índice]
 
     def ordenar_aulas_dobles(self, edificio: int):
         '''
@@ -269,6 +289,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
+        self._edificios[edificio].aulas_dobles.sort(key=lambda aula_doble: aula_doble.aula_grande.nombre)
 
     def get_carreras(self) -> list[str]:
         '''

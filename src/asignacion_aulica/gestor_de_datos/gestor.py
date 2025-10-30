@@ -2,9 +2,12 @@ from typing import Callable, Any
 from collections import Counter
 
 from asignacion_aulica.gestor_de_datos.entidades import (
+    Aula,
     Carrera,
     Edificio,
+    fieldnames_Aula,
     fieldnames_Edificio,
+    fieldtypes_Aula,
     fieldtypes_Edificio
 )
 
@@ -58,7 +61,7 @@ class GestorDeDatos:
         :return: `True` si hay un edificio con ese nombre en la base de datos,
         `False` si no.
         '''
-        pass
+        return any(edificio.nombre == nombre for edificio in self._edificios)
 
     def set_in_edificio(self, edificio: int, campo: int, valor: Any):
         '''
@@ -70,14 +73,15 @@ class GestorDeDatos:
         :param campo: El índice del campo.
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
+        :raise TypeError: Si el tipo de ``valor`` no es correcto.
         '''
         el_edificio = self._edificios[edificio]
         field_name: str = fieldnames_Edificio[campo]
         expected_type = fieldtypes_Edificio[campo]
-        if not isinstance(valor, expected_type):
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
-        else:
+        if isinstance(valor, expected_type):
             setattr(el_edificio, field_name, valor)
+        else:
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
 
     def add_edificio(self):
         '''
@@ -100,23 +104,30 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice está fuera de rango.
         '''
-        pass
+        del self._edificios[índice]
 
     def ordenar_edificios(self):
         '''
         Ordena los edificios alfabéticamente.
         '''
-        pass
+        self._edificios.sort(key=lambda edificio: edificio.nombre)
 
     def cantidad_de_aulas(self, edificio: int) -> int:
-        pass
+        '''
+        :return: La cantidad de aulas de un edificio en la base de datos.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
+        '''
+        return len(self._edificios[edificio].aulas)
 
     def get_aulas(self, edificio: int) -> list[str]:
         '''
         :return: Los nombres de todas las aulas de un edificio en la base de
         datos, ordenados alfabéticamente.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        nombres = [aula.nombre for aula in self._edificios[edificio].aulas]
+        nombres.sort()
+        return nombres
 
     def get_from_aula(self, edificio: int, índice: int, campo: int) -> Any:
         '''
@@ -126,7 +137,8 @@ class GestorDeDatos:
         :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        fieldname = fieldnames_Aula[campo]
+        return getattr(self._edificios[edificio].aulas[índice], fieldname)
 
     def set_in_aula(self, edificio: int, índice: int, campo: int, valor: Any):
         '''
@@ -139,8 +151,15 @@ class GestorDeDatos:
         :param campo: El índice del campo.
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
+        :raise TypeError: Si el tipo de ``valor`` no es correcto.
         '''
-        pass
+        el_aula = self._edificios[edificio].aulas[índice]
+        field_name: str = fieldnames_Aula[campo]
+        expected_type = fieldtypes_Aula[campo]
+        if isinstance(valor, expected_type):
+            setattr(el_aula, field_name, valor)
+        else:
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Aula.{field_name}" de tipo {expected_type}')
 
     def add_aula(self, edificio: int):
         '''
@@ -152,7 +171,19 @@ class GestorDeDatos:
         :param edificio: El índice del edificio.
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        el_edificio = self._edificios[edificio]
+        nombres_existentes = [aula.nombre for aula in el_edificio.aulas]
+        nombre_propuesto = 'Aula sin nombre'
+        i = 0
+        while nombre_propuesto in nombres_existentes:
+            i += 1
+            nombre_propuesto = f'Aula sin nombre {i}'
+        
+        el_edificio.aulas.append(Aula(
+            nombre = nombre_propuesto,
+            edificio = el_edificio,
+            capacidad = 1
+        ))
 
     def existe_aula(self, edificio: int, nombre: str) -> bool:
         '''
@@ -163,7 +194,8 @@ class GestorDeDatos:
         :param nombre: El nombre del aula.
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        el_edificio = self._edificios[edificio]
+        return any(aula.nombre == nombre for aula in el_edificio.aulas)
 
     def borrar_aula(self, edificio: int, índice: int):
         '''

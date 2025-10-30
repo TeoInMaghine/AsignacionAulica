@@ -5,11 +5,21 @@ import ModelosAsignaciónÁulica
 import QML.ComponentesUI
 
 ListView {
-    anchors.fill: parent
-    spacing: headerItem.spacing
-    clip: true
+    // TODO: linkear esto al modelo
+    required property var edificio
 
-    model: ListAulas { id: aulas }
+    Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+    Layout.preferredHeight: contentHeight
+    spacing: headerItem.spacing
+
+    /*
+    TODO: fix (creo que no se va a poder scrollear horizontalmente sin esto)
+    clip: true
+    Layout.fillWidth: true // Con esto + clip: true queda raro pero al menos
+                           // visible, ni idea qué está pasando
+    */
+
+    model: ListAulas { id: aulas; indexEdificio: edificio.index }
 
     property int widthHorario: 100 // Hardcodeado porque no encontré una forma mejor
 
@@ -83,6 +93,7 @@ ListView {
         // animaciones y eso sean todas iguales)
         Button {
             text: "delete"
+            highlighted: hovered
             onClicked: {
                 aulas.removeRow(index)
             }
@@ -95,6 +106,8 @@ ListView {
             Layout.leftMargin: headerItem.leftPadding
 
             text: "add"
+            highlighted: hovered
+
             onClicked: {
                 aulas.insertRow(aulas.rowCount())
             }

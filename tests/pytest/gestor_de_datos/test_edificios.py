@@ -66,7 +66,7 @@ def test_get_set_edificio_existente(gestor: GestorDeDatos):
 
     assert gestor.cantidad_de_edificios() == 1
     assert len(gestor.get_edificios()) == 1
-    assert nombre in gestor.get_edificios()[0]
+    assert gestor.get_edificios() == [nombre]
 
     assert gestor.get_from_edificio(0, campo_Edificio['nombre']) == nombre
     assert gestor.get_from_edificio(0, campo_Edificio['aulas']) == []

@@ -205,7 +205,7 @@ class GestorDeDatos:
         :param índice: El índice del aula.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        del self._edificios[edificio].aulas[índice]
 
     def ordenar_aulas(self, edificio: int):
         '''
@@ -213,7 +213,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        self._edificios[edificio].aulas.sort(key=lambda aula: aula.nombre)
 
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
         pass

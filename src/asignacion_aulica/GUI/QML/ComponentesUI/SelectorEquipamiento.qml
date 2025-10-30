@@ -35,7 +35,7 @@ ComboBox {
             LayoutMirroring.enabled: true
 
             text: model.nombre
-            highlighted: comboBox.highlightedIndex == index
+            highlighted: comboBox.highlightedIndex == index || hovered
 
             checked: model.seleccionado
             onToggled: {
@@ -76,6 +76,8 @@ ComboBox {
                     Layout.preferredWidth: 50
 
                     text: "add"
+                    highlighted: hovered
+
                     onClicked: {
                         if (equipamientos.appendEquipamiento(editorNuevoEquipamiento.text)) {
                             editorNuevoEquipamiento.clear()

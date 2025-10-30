@@ -1,3 +1,4 @@
 module QML.Aulas
-Aulas Aulas.qml
+Edificios Edificios.qml
+internal Aulas Aulas.qml
 internal HeaderAulas HeaderAulas.qml

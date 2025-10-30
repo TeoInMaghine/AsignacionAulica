@@ -41,7 +41,7 @@ Window {
 
     Component {
         id: pestañaAulas
-        Aulas { }
+        Edificios { }
     }
 
     Component {

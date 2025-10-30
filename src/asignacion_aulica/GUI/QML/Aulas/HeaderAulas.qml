@@ -55,6 +55,7 @@ RowLayout {
 
     Button {
         text: "Ordenar"
+        highlighted: hovered
         onClicked: {
             aulas.ordenar()
         }

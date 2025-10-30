@@ -1,3 +1,4 @@
+from itertools import filterfalse
 from typing import Callable, Any
 from collections import Counter
 
@@ -212,7 +213,16 @@ class GestorDeDatos:
         :param índice: El índice del aula.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        del self._edificios[edificio].aulas[índice]
+        el_edificio = self._edificios[edificio]
+
+        # Sacar el aula de la lista
+        aula = el_edificio.aulas.pop(índice)
+        
+        # Borrar aulas dobles que usen este aula
+        el_edificio.aulas_dobles[:] = filterfalse(
+            lambda ad: ad.aula_grande is aula or ad.aula_chica_1 is aula or ad.aula_chica_2 is aula,
+            el_edificio.aulas_dobles
+        )
 
     def ordenar_aulas(self, edificio: int):
         '''

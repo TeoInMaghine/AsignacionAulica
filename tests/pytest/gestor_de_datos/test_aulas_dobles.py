@@ -141,3 +141,38 @@ def test_borrar_aula_doble(gestor: GestorDeDatos):
         gestor.borrar_aula_doble(0, 2)
     with pytest.raises(IndexError):
         gestor.borrar_aula_doble(1, 0)
+
+def test_borrar_aula_borra_aulas_dobles_que_usan_ese_aula(gestor: GestorDeDatos):
+    gestor.add_edificio()
+    for i in range(7):
+        gestor.add_aula(0)
+        gestor.set_in_aula(0, i, campo_Aula['nombre'], str(i))
+    
+    # Crear aulas dobles con el aula 0 en las tres posiciones:
+    aulas: list[Aula] = gestor.get_from_edificio(0, campo_Edificio['aulas'])
+    gestor.add_aula_doble(0)
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])
+    gestor.add_aula_doble(0)
+    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_grande'], aulas[3])
+    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_chica_1'], aulas[0])
+    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_chica_2'], aulas[4])
+    gestor.add_aula_doble(0)
+    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_grande'], aulas[5])
+    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_chica_1'], aulas[6])
+    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_chica_2'], aulas[0])
+
+    # Y un aula doble que no tiene a la 0:
+    gestor.add_aula_doble(0)
+    gestor.set_in_aula_doble(0, 3, campo_AulaDoble['aula_grande'], aulas[4])
+    gestor.set_in_aula_doble(0, 3, campo_AulaDoble['aula_chica_1'], aulas[6])
+    gestor.set_in_aula_doble(0, 3, campo_AulaDoble['aula_chica_2'], aulas[2])
+
+    # Borrar el aula 0 y ver que se borren las aulas dobles correspondientes:
+    gestor.borrar_aula(0, 0)
+
+    assert gestor.cantidad_de_aulas_dobles(0) == 1
+    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_grande']) is not aulas[0]
+    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_chica_1']) is not aulas[0]
+    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_chica_2']) is not aulas[0]

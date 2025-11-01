@@ -71,8 +71,11 @@ class GestorDeDatos:
         '''
         :return: `True` si hay un edificio con ese nombre en la base de datos,
         `False` si no.
+
+        No se distinguen mayúsculas de minúsculas.
         '''
-        return any(edificio.nombre == nombre for edificio in self._edificios)
+        nombre = nombre.lower().strip()
+        return any(edificio.nombre.lower() == nombre for edificio in self._edificios)
 
     def set_in_edificio(self, edificio: int, campo: int, valor: Any):
         '''
@@ -89,6 +92,11 @@ class GestorDeDatos:
         el_edificio = self._edificios[edificio]
         field_name: str = fieldnames_Edificio[campo]
         expected_type = fieldtypes_Edificio[campo]
+
+        # Si el valor es string, borrar espacios al principio y final
+        if isinstance(valor, str):
+            valor = valor.strip()
+
         if isinstance(valor, expected_type):
             setattr(el_edificio, field_name, valor)
         else:
@@ -173,6 +181,11 @@ class GestorDeDatos:
         el_aula = self._edificios[edificio].aulas[índice]
         field_name: str = fieldnames_Aula[campo]
         expected_type = fieldtypes_Aula[campo]
+
+        # Si el valor es string, borrar espacios al principio y final
+        if isinstance(valor, str):
+            valor = valor.strip()
+        
         if isinstance(valor, expected_type):
             setattr(el_aula, field_name, valor)
         else:
@@ -207,12 +220,15 @@ class GestorDeDatos:
         :return: `True` si el aula especificada existe en la base de datos,
         `False` si no.
 
+        No se distinguen mayúsculas de minúsculas.
+
         :param edificio: El índice del edificio.
         :param nombre: El nombre del aula.
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
+        nombre = nombre.lower().strip()
         el_edificio = self._edificios[edificio]
-        return any(aula.nombre == nombre for aula in el_edificio.aulas)
+        return any(aula.nombre.lower() == nombre for aula in el_edificio.aulas)
 
     def borrar_aula(self, edificio: int, índice: int):
         '''
@@ -344,8 +360,11 @@ class GestorDeDatos:
     def existe_carrera(self, nombre: str) -> bool:
         '''
         :return: `True` si hay una carrera con ese nombre, `False` si no.
+
+        No se distinguen mayúsculas de minúsculas.
         '''
-        return any(carrera.nombre == nombre for carrera in self._carreras)
+        nombre = nombre.lower().strip()
+        return any(carrera.nombre.lower() == nombre for carrera in self._carreras)
 
     def set_carrera_nombre(self, índice: int, nombre: str) -> int:
         '''
@@ -356,6 +375,7 @@ class GestorDeDatos:
         :raise ValueError: Si ya existe una carrera con el nombre dado, o si el
         nombre dado es un string vacío.
         '''
+        nombre = nombre.strip()
         if len(nombre) == 0:
             raise ValueError('El nombre de la carrera no puede estar vacío.')
         elif nombre in (carrera.nombre for carrera in self._carreras):

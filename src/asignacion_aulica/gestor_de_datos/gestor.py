@@ -30,6 +30,9 @@ class GestorDeDatos:
     Los campos de las entidades se identifican con números, los cuales se
     corresponden con el orden de los campos en cada entidad y los mal llamados
     roles de la UI.
+
+    La lista de carreras se mantiene ordenada alfabéticamente, pero la de
+    edificios sólo se ordena a pedido.
     '''
 
     def __init__(self, path_base_de_datos: str|None = None):
@@ -48,7 +51,7 @@ class GestorDeDatos:
         ordenados alfabéticamente.
         '''
         nombres = [edificio.nombre for edificio in self._edificios]
-        nombres.sort()
+        nombres.sort(key=lambda nombre: nombre.lower())
         return nombres
 
     def cantidad_de_edificios(self) -> int:
@@ -112,13 +115,19 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice está fuera de rango.
         '''
-        del self._edificios[índice]
+        # Sacar el edificio de la lista
+        el_edificio = self._edificios.pop(índice)
+        
+        # Sacar el edificio de las carreras que lo tienen como preferido
+        for carrera in self._carreras:
+            if carrera.edificio_preferido is el_edificio:
+                carrera.edificio_preferido = None
 
     def ordenar_edificios(self):
         '''
         Ordena los edificios alfabéticamente.
         '''
-        self._edificios.sort(key=lambda edificio: edificio.nombre)
+        self._edificios.sort(key=lambda edificio: edificio.nombre.lower())
 
     def cantidad_de_aulas(self, edificio: int) -> int:
         '''
@@ -134,7 +143,7 @@ class GestorDeDatos:
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
         nombres = [aula.nombre for aula in self._edificios[edificio].aulas]
-        nombres.sort()
+        nombres.sort(key=lambda nombre: nombre.lower())
         return nombres
 
     def get_from_aula(self, edificio: int, índice: int, campo: int) -> Any:
@@ -230,7 +239,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        self._edificios[edificio].aulas.sort(key=lambda aula: aula.nombre)
+        self._edificios[edificio].aulas.sort(key=lambda aula: aula.nombre.lower())
 
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
         '''
@@ -299,27 +308,44 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        self._edificios[edificio].aulas_dobles.sort(key=lambda aula_doble: aula_doble.aula_grande.nombre)
+        self._edificios[edificio].aulas_dobles.sort(key=lambda aula_doble: aula_doble.aula_grande.nombre.lower())
 
     def get_carreras(self) -> list[str]:
         '''
         :return: Los nombres de todas las carreras en la base de
         datos, ordenadas alfabéticamente.
         '''
-        pass
+        nombres = [carrera.nombre for carrera in self._carreras]
+        return nombres
 
     def get_carrera(self, índice: int) -> Carrera:
         '''
         :return: La carrera con el índice dado.
         :raise IndexError: Si el índice está fuera de rango.
         '''
-        pass
+        return self._carreras[índice]
+
+    def add_carrera(self):
+        '''
+        Añadir al edificio una nueva carrera, después del último índice
+        existente.
+
+        Se inicializa con valores por defecto, asegurando que tenga un nombre
+        único.
+        '''
+        nombres_existentes = [carrera.nombre for carrera in self._carreras]
+        nombre_propuesto = 'Carrera sin nombre'
+        i = 0
+        while nombre_propuesto in nombres_existentes:
+            i += 1
+            nombre_propuesto = f'Carrera sin nombre {i}'
+        self._carreras.append(Carrera(nombre_propuesto))
     
     def existe_carrera(self, nombre: str) -> bool:
         '''
         :return: `True` si hay una carrera con ese nombre, `False` si no.
         '''
-        pass
+        return any(carrera.nombre == nombre for carrera in self._carreras)
 
     def set_carrera_nombre(self, índice: int, nombre: str) -> int:
         '''
@@ -327,9 +353,19 @@ class GestorDeDatos:
 
         :return: El nuevo índice de la carrera.
         :raise IndexError: Si el índice está fuera de rango.
-        :raise ValueError: Si ya existe una carrera con el nombre dado.
+        :raise ValueError: Si ya existe una carrera con el nombre dado, o si el
+        nombre dado es un string vacío.
         '''
-        pass
+        if len(nombre) == 0:
+            raise ValueError('El nombre de la carrera no puede estar vacío.')
+        elif nombre in (carrera.nombre for carrera in self._carreras):
+            raise ValueError(f'Ya existe una carrera llamada "{nombre}"')
+        else:
+            la_carrera = self._carreras[índice]
+            la_carrera.nombre = nombre
+            self._carreras.sort(key=lambda carrera: carrera.nombre.lower())
+            nuevo_índice = self._carreras.index(la_carrera)
+            return nuevo_índice
 
     def set_carrera_edificio_preferido(self, índice: int, edificio: str|None):
         '''
@@ -342,7 +378,15 @@ class GestorDeDatos:
         :raise IndexError: Si el índice está fuera de rango.
         :raise ValueError: Si no existe un edificio con el nombre dado.
         '''
-        pass
+        if edificio is None:
+            el_edificio = None
+        else:
+            # copiado de https://stackoverflow.com/a/2364277
+            el_edificio = next((ed for ed in self._edificios if ed.nombre==edificio), None)
+            if el_edificio is None:
+                raise ValueError(f'No existe ningún edificio llamado "{edificio}".')
+        
+        self._carreras[índice].edificio_preferido = el_edificio
 
     def borrar_carrera(self, índice: int):
         '''
@@ -350,7 +394,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice está fuera de rango.
         '''
-        pass
+        del self._carreras[índice]
 
     def cantidad_de_materias(self, carrera: int) -> int:
         '''

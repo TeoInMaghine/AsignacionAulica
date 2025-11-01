@@ -2,11 +2,13 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 // import ModelosAsignaciónÁulica
-// import QML.ComponentesUI
+import QML.ComponentesUI
 
 // TODO: reemplazar números mágicos de padding y spacing por propiedades que se
 // definan en un solo lugar (igual que hice antes en Aulas básicamente)
 ListView {
+    id: view
+
     anchors.fill: parent
     clip: true
 
@@ -36,18 +38,6 @@ ListView {
 
         property alias edificio : editorDeEdificio.model
 
-        /*
-        property var rolesDeHorarios: [
-            "horario_lunes",
-            "horario_martes",
-            "horario_miércoles",
-            "horario_jueves",
-            "horario_viernes",
-            "horario_sábado",
-            "horario_domingo"
-        ]
-        */
-
         RowLayout {
             Layout.topMargin: 20 // Cumple la función de topPadding
 
@@ -58,7 +48,7 @@ ListView {
                 }
             }
 
-            // TODO: Agregar horarios
+            EditorHorariosSemanales { }
 
             CheckDelegate {
                 LayoutMirroring.enabled: true

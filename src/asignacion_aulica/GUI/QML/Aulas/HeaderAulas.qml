@@ -1,13 +1,13 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
+import QML.ComponentesUI
 
 RowLayout {
     id: visualHeader
 
     required property int leftPadding
     required property int verticalPadding
-    required property int widthHeaderHorario
 
     property alias widthNombre : headerNombre.width
     property alias widthCapacidad : headerCapacidad.width
@@ -33,9 +33,17 @@ RowLayout {
     Item { } // Espacio vacío de 2 * spacing de ancho
 
     Repeater {
-        model: ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+        model: [
+            "Lunes",
+            "Martes",
+            "Miércoles",
+            "Jueves",
+            "Viernes",
+            "Sábado",
+            "Domingo"
+        ]
         Label {
-            Layout.preferredWidth: widthHeaderHorario
+            Layout.preferredWidth: Constantes.width_columna_horario
             horizontalAlignment: Text.AlignHCenter
 
             required property string modelData

@@ -1,4 +1,6 @@
 module QML.ComponentesUI
 SelectorEquipamiento SelectorEquipamiento.qml
+EditorHorariosSemanales EditorHorariosSemanales.qml
 EditorRangoHorario EditorRangoHorario.qml
 EditorHorario EditorHorario.qml
+singleton Constantes Constantes.qml

@@ -1,3 +1,4 @@
+from collections.abc import Sequence
 from itertools import filterfalse
 from typing import Callable, Any
 from collections import Counter
@@ -110,12 +111,8 @@ class GestorDeDatos:
         único.
         '''
         nombres_existentes = [edificio.nombre for edificio in self._edificios]
-        nombre_propuesto = 'Edificio sin nombre'
-        i = 0
-        while nombre_propuesto in nombres_existentes:
-            i += 1
-            nombre_propuesto = f'Edificio sin nombre {i}'
-        self._edificios.append(Edificio(nombre_propuesto))
+        nombre_nuevo = _generar_nombre_no_existente('Edificio sin nombre', nombres_existentes)
+        self._edificios.append(Edificio(nombre_nuevo))
 
     def borrar_edificio(self, índice: int):
         '''
@@ -203,14 +200,10 @@ class GestorDeDatos:
         '''
         el_edificio = self._edificios[edificio]
         nombres_existentes = [aula.nombre for aula in el_edificio.aulas]
-        nombre_propuesto = 'Aula sin nombre'
-        i = 0
-        while nombre_propuesto in nombres_existentes:
-            i += 1
-            nombre_propuesto = f'Aula sin nombre {i}'
+        nombre_nuevo = _generar_nombre_no_existente('Aula sin nombre', nombres_existentes)
         
         el_edificio.aulas.append(Aula(
-            nombre = nombre_propuesto,
+            nombre = nombre_nuevo,
             edificio = el_edificio,
             capacidad = 1
         ))
@@ -350,12 +343,8 @@ class GestorDeDatos:
         único.
         '''
         nombres_existentes = [carrera.nombre for carrera in self._carreras]
-        nombre_propuesto = 'Carrera sin nombre'
-        i = 0
-        while nombre_propuesto in nombres_existentes:
-            i += 1
-            nombre_propuesto = f'Carrera sin nombre {i}'
-        self._carreras.append(Carrera(nombre_propuesto))
+        nombre_nuevo = _generar_nombre_no_existente('Carrera sin nombre', nombres_existentes)
+        self._carreras.append(Carrera(nombre_nuevo))
     
     def existe_carrera(self, nombre: str) -> bool:
         '''
@@ -659,3 +648,16 @@ class GestorDeDatos:
         # Nota: Este método debería llamar a archivos_excel.cronograma.exportar.
         # (El módulo archivos_excel todavía no existe, ver Issue #75)
         pass
+
+def _generar_nombre_no_existente(base: str, nombres_existentes: Sequence[str]) -> str:
+    '''
+    :return: Un nombre que contenga `base` y que no esté en la lista de nombres
+    existentes.
+    '''
+    nombre_propuesto: str = base
+    i = 0
+    while nombre_propuesto in nombres_existentes:
+        i += 1
+        nombre_propuesto = f'{base} {i}'
+    
+    return nombre_propuesto

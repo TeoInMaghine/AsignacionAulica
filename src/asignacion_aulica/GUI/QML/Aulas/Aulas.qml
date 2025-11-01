@@ -5,8 +5,11 @@ import ModelosAsignaciónÁulica
 import QML.ComponentesUI
 
 ListView {
+    id: view
+
     // TODO: linkear esto al modelo
     required property var edificio
+    model: ListAulas { id: aulas; indexEdificio: edificio.index }
 
     Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
     Layout.preferredHeight: contentHeight
@@ -19,14 +22,9 @@ ListView {
                            // visible, ni idea qué está pasando
     */
 
-    model: ListAulas { id: aulas; indexEdificio: edificio.index }
-
-    property int widthHorario: 100 // Hardcodeado porque no encontré una forma mejor
-
     header: HeaderAulas {
         leftPadding: 20
         verticalPadding: 5
-        widthHeaderHorario: widthHorario
     }
 
     delegate: RowLayout {
@@ -39,16 +37,6 @@ ListView {
         required property var index
 
         property alias aula : editorDeAula.model
-
-        property var rolesDeHorarios: [
-            "horario_lunes",
-            "horario_martes",
-            "horario_miércoles",
-            "horario_jueves",
-            "horario_viernes",
-            "horario_sábado",
-            "horario_domingo"
-        ]
 
         TextField {
             Layout.leftMargin: headerItem.leftPadding // Cumple la función de leftPadding
@@ -70,17 +58,7 @@ ListView {
 
         Item { } // Espacio vacío de 2 * spacing de ancho
 
-        Repeater {
-            model: rolesDeHorarios
-
-            EditorRangoHorario {
-                // Este modelData es del Repeater, no del model de ListView...
-                required property string modelData
-                rolDeHorario: modelData
-                Layout.preferredWidth: widthHorario
-                Layout.alignment: Qt.AlignCenter
-            }
-        }
+        EditorHorariosSemanales { }
 
         Item { } // Espacio vacío de 2 * spacing de ancho
 

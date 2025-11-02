@@ -6,23 +6,18 @@ import QML.ComponentesUI
 RowLayout {
     id: visualHeader
 
-    required property int leftPadding
-    required property int verticalPadding
-
-    property alias widthNombre : headerNombre.width
-    property alias widthCapacidad : headerCapacidad.width
-    property alias widthEquipamiento : headerEquipamiento.width
+    property alias widthNombre: headerNombre.width
+    property alias widthCapacidad: headerCapacidad.width
+    property alias widthEquipamiento: headerEquipamiento.width
 
     Layout.alignment: Qt.AlignHCenter
-    Layout.topMargin: verticalPadding
-    Layout.bottomMargin: verticalPadding
 
     Label {
         id: headerNombre
-        // Tiene que aplicarse acá el "leftPadding" en vez de en el RowLayout en sí
-        Layout.leftMargin: parent.leftPadding
+        leftPadding: 25
+        rightPadding: 25
         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-        text: "Nombre"
+        text: "Aula"
     }
     Label {
         id: headerCapacidad

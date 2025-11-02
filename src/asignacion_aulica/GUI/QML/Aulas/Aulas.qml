@@ -7,24 +7,32 @@ import QML.ComponentesUI
 ListView {
     id: view
 
-    // TODO: linkear esto al modelo
     required property var edificio
     model: ListAulas { id: aulas; indexEdificio: edificio.index }
 
-    Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-    Layout.preferredHeight: contentHeight
+    readonly property int padding: 20
+    leftMargin: padding
+    rightMargin: padding
+    topMargin: padding
+    bottomMargin: padding
+    width: contentItem.childrenRect.width + 2 * padding
+    height: contentHeight + 2 * padding
+
     spacing: headerItem.spacing
-
-    /*
-    TODO: fix (creo que no se va a poder scrollear horizontalmente sin esto)
     clip: true
-    Layout.fillWidth: true // Con esto + clip: true queda raro pero al menos
-                           // visible, ni idea qué está pasando
-    */
 
-    header: HeaderAulas {
-        leftPadding: 20
-        verticalPadding: 5
+    header: Item {
+        property alias spacing: headerAulas.spacing
+        property alias widthNombre: headerAulas.widthNombre
+        property alias widthCapacidad: headerAulas.widthCapacidad
+        property alias widthEquipamiento: headerAulas.widthEquipamiento
+        height: headerAulas.height + view.spacing
+        width: headerAulas.width
+
+        HeaderAulas {
+            id: headerAulas
+            anchors.top: parent.top
+        }
     }
 
     delegate: RowLayout {
@@ -39,7 +47,6 @@ ListView {
         property alias aula : editorDeAula.model
 
         TextField {
-            Layout.leftMargin: headerItem.leftPadding // Cumple la función de leftPadding
             Layout.preferredWidth: headerItem.widthNombre
 
             text: aula.nombre
@@ -70,7 +77,7 @@ ListView {
         // TODO: crear un componente de botón reusable custom (para que las
         // animaciones y eso sean todas iguales)
         Button {
-            text: "delete"
+            text: "borrar"
             highlighted: hovered
             onClicked: {
                 aulas.removeRow(index)
@@ -78,14 +85,17 @@ ListView {
         }
     }
 
-    footer: RowLayout {
+    footer: Item {
+        height: footerAulas.height + view.spacing
+        width: footerAulas.width
+
         Button {
-            Layout.topMargin: headerItem.verticalPadding
-            Layout.leftMargin: headerItem.leftPadding
+            id: footerAulas
+            anchors.bottom: parent.bottom
+            width: headerItem.widthNombre
 
-            text: "add"
+            text: "añadir"
             highlighted: hovered
-
             onClicked: {
                 aulas.insertRow(aulas.rowCount())
             }

@@ -29,6 +29,7 @@ class ListAulas(QAbstractListModel):
         self.aulas.sort(key=lambda x: x.nombre)
         self.layoutChanged.emit()
 
+    # TODO: Usar indexEdificio en obtención/edición de datos
     @pyqtProperty(int)
     def indexEdificio(self) -> int:
         return self._indexAula

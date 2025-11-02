@@ -31,6 +31,8 @@ ListView {
 
     delegate: ColumnLayout {
         id: editorDeEdificio
+
+        width: parent.width
         spacing: 5
 
         required property var model
@@ -39,7 +41,7 @@ ListView {
         property alias edificio : editorDeEdificio.model
 
         RowLayout {
-            Layout.topMargin: 20 // Cumple la función de topPadding
+            Layout.topMargin: 10 // Cumple la función de topPadding
 
             TextField {
                 text: edificio.nombre
@@ -62,15 +64,30 @@ ListView {
                 }
             }
         }
-        Aulas {
-            edificio: parent.edificio
+        Item {
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+            Layout.preferredHeight: editorDeAula.height
+            Layout.preferredWidth: editorDeAula.width
+            Layout.leftMargin: 10
+
+            Rectangle {
+                id: background
+                anchors.fill: parent
+
+                color: "#F0F0F0"
+                border.width: 1
+                border.color: "lightgray"
+            }
+            Aulas {
+                id: editorDeAula
+                edificio: editorDeEdificio.edificio
+            }
         }
     }
 
     footer: RowLayout {
         Button {
-            Layout.topMargin: 20
-
+            Layout.topMargin: 10
             text: "add"
             highlighted: hovered
 

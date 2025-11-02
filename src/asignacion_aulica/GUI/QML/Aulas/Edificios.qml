@@ -10,6 +10,15 @@ ListView {
     id: view
 
     anchors.fill: parent
+    spacing: 10
+
+    width: parent.width
+    contentWidth: contentItem.childrenRect.width + 2 * anchors.margins
+    // TODO: esto no funciona completamente al achicar la ventana
+    ScrollBar.horizontal: ScrollBar { id: hbar; active: vbar.active }
+    ScrollBar.vertical: ScrollBar { id: vbar; active: hbar.active }
+    flickableDirection: Flickable.HorizontalAndVerticalFlick
+
     clip: true
 
     // model: ListEdificios { id: edificios }
@@ -32,8 +41,7 @@ ListView {
     delegate: ColumnLayout {
         id: editorDeEdificio
 
-        width: parent.width
-        spacing: 5
+        width: view.width
 
         required property var model
         required property var index
@@ -41,8 +49,6 @@ ListView {
         property alias edificio : editorDeEdificio.model
 
         RowLayout {
-            Layout.topMargin: 10 // Cumple la función de topPadding
-
             TextField {
                 text: edificio.nombre
                 onEditingFinished: {
@@ -68,7 +74,7 @@ ListView {
             Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
             Layout.preferredHeight: editorDeAula.height
             Layout.preferredWidth: editorDeAula.width
-            Layout.leftMargin: 10
+            Layout.leftMargin: 20 // "Indentación de anidado"
 
             Rectangle {
                 id: background
@@ -85,18 +91,20 @@ ListView {
         }
     }
 
-    footer: RowLayout {
-        Button {
-            Layout.topMargin: 10
-            text: "add"
-            highlighted: hovered
+    footer: Item {
+        height: footerEdificios.height + view.spacing
+        width: footerEdificios.width
 
+        Button {
+            id: footerEdificios
+            anchors.bottom: parent.bottom
+            width: 200
+
+            text: "añadir"
+            highlighted: hovered
             onClicked: {
                 edificios.insertRow(edificios.rowCount())
             }
         }
     }
-
-    ScrollBar.vertical: ScrollBar { }
-    // TODO: esto no funciona todavía: ScrollBar.horizontal: ScrollBar { }
 }

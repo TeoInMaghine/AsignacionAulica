@@ -8,18 +8,24 @@ ListView {
     id: view
 
     required property var edificio
-    model: ListAulas { id: aulas; indexEdificio: edificio.index }
-
     readonly property int padding: 20
+
+    spacing: headerItem.spacing
     leftMargin: padding
     rightMargin: padding
     topMargin: padding
     bottomMargin: padding
+
     width: contentItem.childrenRect.width + 2 * padding
     height: contentHeight + 2 * padding
+    // TODO: esto no funciona completamente al achicar la ventana
+    ScrollBar.horizontal: ScrollBar { id: hbar; active: vbar.active }
+    ScrollBar.vertical: ScrollBar { id: vbar; active: hbar.active }
+    flickableDirection: Flickable.HorizontalAndVerticalFlick
 
-    spacing: headerItem.spacing
     clip: true
+
+    model: ListAulas { id: aulas; indexEdificio: edificio.index }
 
     header: Item {
         property alias spacing: headerAulas.spacing
@@ -101,7 +107,4 @@ ListView {
             }
         }
     }
-
-    ScrollBar.vertical: ScrollBar { }
-    // TODO: esto no funciona todavía: ScrollBar.horizontal: ScrollBar { }
 }

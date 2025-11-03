@@ -1,4 +1,5 @@
 module QML.ComponentesUI
+Colapsador Colapsador.qml
 SelectorEquipamiento SelectorEquipamiento.qml
 EditorHorariosSemanales EditorHorariosSemanales.qml
 EditorRangoHorario EditorRangoHorario.qml

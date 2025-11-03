@@ -49,9 +49,7 @@ ListView {
         property alias edificio : editorDeEdificio.model
 
         RowLayout {
-            Switch {
-                id: colapsador
-
+            Colapsador {
                 onClicked: {
                     editorDetallesDeEdificio.visible = checked
                     fondoYEditorDeAulas.visible = checked

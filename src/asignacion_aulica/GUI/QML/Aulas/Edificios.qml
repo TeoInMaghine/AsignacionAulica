@@ -49,13 +49,24 @@ ListView {
         property alias edificio : editorDeEdificio.model
 
         RowLayout {
+            Switch {
+                id: colapsador
+
+                onClicked: {
+                    editorDetallesDeEdificio.visible = checked
+                    fondoYEditorDeAulas.visible = checked
+                }
+            }
             TextField {
                 text: edificio.nombre
                 onEditingFinished: {
                     edificio.nombre = text
                 }
             }
-
+        }
+        RowLayout {
+            id: editorDetallesDeEdificio
+            visible: false
             EditorHorariosSemanales { }
 
             CheckDelegate {
@@ -71,13 +82,15 @@ ListView {
             }
         }
         Item {
+            id: fondoYEditorDeAulas
+            visible: false
             Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-            Layout.preferredHeight: editorDeAula.height
-            Layout.preferredWidth: editorDeAula.width
+            Layout.preferredHeight: editorDeAulas.height
+            Layout.preferredWidth: editorDeAulas.width
             Layout.leftMargin: 20 // "Indentación de anidado"
 
             Rectangle {
-                id: background
+                id: fondo
                 anchors.fill: parent
 
                 color: "#F0F0F0"
@@ -85,7 +98,7 @@ ListView {
                 border.color: "lightgray"
             }
             Aulas {
-                id: editorDeAula
+                id: editorDeAulas
                 edificio: editorDeEdificio.edificio
             }
         }

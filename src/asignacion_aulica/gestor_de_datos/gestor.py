@@ -14,6 +14,7 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     fieldtypes_Aula,
     fieldtypes_Edificio
 )
+from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
 
 aula_no_seleccionada: Aula = Aula(nombre='Seleccionar', edificio=None, capacidad=0)
 '''
@@ -98,7 +99,7 @@ class GestorDeDatos:
         if isinstance(valor, str):
             valor = valor.strip()
 
-        if isinstance(valor, expected_type):
+        if is_instance_of_type(valor, expected_type):
             setattr(el_edificio, field_name, valor)
         else:
             raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
@@ -183,7 +184,7 @@ class GestorDeDatos:
         if isinstance(valor, str):
             valor = valor.strip()
         
-        if isinstance(valor, expected_type):
+        if is_instance_of_type(valor, expected_type):
             setattr(el_aula, field_name, valor)
         else:
             raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Aula.{field_name}" de tipo {expected_type}')

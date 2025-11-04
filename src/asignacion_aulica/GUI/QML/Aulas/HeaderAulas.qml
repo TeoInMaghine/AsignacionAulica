@@ -27,24 +27,7 @@ RowLayout {
 
     Item { } // Espacio vacío de 2 * spacing de ancho
 
-    Repeater {
-        model: [
-            "Lunes",
-            "Martes",
-            "Miércoles",
-            "Jueves",
-            "Viernes",
-            "Sábado",
-            "Domingo"
-        ]
-        Label {
-            Layout.preferredWidth: Constantes.width_columna_horario
-            horizontalAlignment: Text.AlignHCenter
-
-            required property string modelData
-            text: modelData
-        }
-    }
+    HeaderHorariosSemanales { }
 
     Item { } // Espacio vacío de 2 * spacing de ancho
 

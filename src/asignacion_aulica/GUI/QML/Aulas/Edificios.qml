@@ -49,7 +49,13 @@ ListView {
         property alias edificio : editorDeEdificio.model
 
         RowLayout {
+            id: editorSiempreVisibleDeEdificio
+
             Colapsador {
+                Component.onCompleted: {
+                    editorDetallesDeEdificio.visible = false
+                    fondoYEditorDeAulas.visible = false
+                }
                 onClicked: {
                     editorDetallesDeEdificio.visible = checked
                     fondoYEditorDeAulas.visible = checked
@@ -62,26 +68,42 @@ ListView {
                 }
             }
         }
+
         RowLayout {
             id: editorDetallesDeEdificio
-            visible: false
-            EditorHorariosSemanales { }
+            Layout.leftMargin: 20 // "Indentación de anidado"
 
-            CheckDelegate {
-                LayoutMirroring.enabled: true
+            spacing: 10
 
-                text: "Preferir no usar"
-                highlighted: hovered
+            ColumnLayout {
+                RowLayout { HeaderHorariosSemanales { } }
+                RowLayout { EditorHorariosSemanales { } }
+            }
 
-                checked: edificio.preferir_no_usar
-                onToggled: {
-                    edificio.preferir_no_usar = checked
+            ColumnLayout {
+                Label {
+                    Layout.alignment: Qt.AlignCenter
+                    horizontalAlignment: Text.AlignHCenter
+                    text: "Evitar"
+                }
+                CheckDelegate {
+                    // display: CheckDelegate.IconOnly no funciona, idk why
+                    Layout.preferredWidth: 52
+                    Layout.preferredHeight: 40
+
+                    highlighted: hovered
+
+                    checked: edificio.preferir_no_usar
+                    onToggled: {
+                        edificio.preferir_no_usar = checked
+                    }
                 }
             }
         }
+
         Item {
             id: fondoYEditorDeAulas
-            visible: false
+
             Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
             Layout.preferredHeight: editorDeAulas.height
             Layout.preferredWidth: editorDeAulas.width

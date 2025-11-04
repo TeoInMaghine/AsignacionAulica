@@ -8,11 +8,14 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     AulaDoble,
     Carrera,
     Edificio,
+    Materia,
     fieldnames_Aula,
     fieldnames_AulaDoble,
     fieldnames_Edificio,
+    fieldnames_Materia,
     fieldtypes_Aula,
-    fieldtypes_Edificio
+    fieldtypes_Edificio,
+    fieldtypes_Materia
 )
 from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
 
@@ -409,8 +412,9 @@ class GestorDeDatos:
     def cantidad_de_materias(self, carrera: int) -> int:
         '''
         :param carrera: El índice de la carrera.
+        :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
-        pass
+        return len(self._carreras[carrera].materias)
 
     def get_from_materia(self, carrera: int, materia: int, campo: int) -> Any:
         '''
@@ -420,18 +424,23 @@ class GestorDeDatos:
         :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        fieldname = fieldnames_Materia[campo]
+        return getattr(self._carreras[carrera].materias[materia], fieldname)
 
     def existe_materia(self, carrera: int, nombre: str) -> bool:
         '''
         :return: `True` si la materia especificada existe en la base de datos,
         `False` si no.
 
+        No se distinguen mayúsculas de minúsculas.
+
         :param carrera: El índice de la carrera.
         :param nombre: El nombre de la materia a buscar.
         :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
-        pass
+        nombre = nombre.lower().strip()
+        la_carrera = self._carreras[carrera]
+        return any(materia.nombre.lower() == nombre for materia in la_carrera.materias)
 
     def set_in_materia(self, carrera: int, materia: int, campo: int, valor: Any):
         '''
@@ -445,7 +454,18 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        la_materia = self._carreras[carrera].materias[materia]
+        field_name: str = fieldnames_Materia[campo]
+        expected_type = fieldtypes_Materia[campo]
+
+        # Si el valor es string, borrar espacios al principio y final
+        if isinstance(valor, str):
+            valor = valor.strip()
+        
+        if is_instance_of_type(valor, expected_type):
+            setattr(la_materia, field_name, valor)
+        else:
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Materia.{field_name}" de tipo {expected_type}')
 
     def add_materia(self, carrera: int):
         '''
@@ -458,7 +478,15 @@ class GestorDeDatos:
         :param carrera: El índice de la carrera.
         :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
-        pass
+        la_carrera = self._carreras[carrera]
+        nombres_existentes = [materia.nombre for materia in la_carrera.materias]
+        nombre_nuevo = _generar_nombre_no_existente('Materia sin nombre', nombres_existentes)
+        
+        la_carrera.materias.append(Materia(
+            nombre = nombre_nuevo,
+            carrera = la_carrera,
+            año = 1
+        ))
 
     def borrar_materia(self, carrera: int, materia: int):
         '''
@@ -468,7 +496,7 @@ class GestorDeDatos:
         :param materia: El índice de la materia.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        del self._carreras[carrera].materias[materia]
 
     def ordenar_materias(self, carrera: int):
         '''
@@ -476,7 +504,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
-        pass
+        self._carreras[carrera].materias.sort(key=lambda materia: materia.nombre.lower())
 
     def cantidad_de_clases(self, carrera: int, materia: int) -> int:
         '''

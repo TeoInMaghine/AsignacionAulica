@@ -10,8 +10,7 @@ Switch {
         source: imagenColapsador
         anchors.fill: imagenColapsador
         colorization: 1.0
-        colorizationColor: "#dbdbdb"
-        rotation: -90
+        brightness: hovered ? -0.2 : 0.0
 
         state: colapsador.checked ? "expandido" : "colapsado"
         states: [

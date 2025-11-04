@@ -10,8 +10,6 @@ RowLayout {
     property alias widthCapacidad: headerCapacidad.width
     property alias widthEquipamiento: headerEquipamiento.width
 
-    Layout.alignment: Qt.AlignHCenter
-
     Label {
         id: headerNombre
         leftPadding: 25

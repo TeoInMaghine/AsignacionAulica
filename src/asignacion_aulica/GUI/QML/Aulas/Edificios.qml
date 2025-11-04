@@ -4,10 +4,10 @@ import QtQuick.Layouts
 // import ModelosAsignaciónÁulica
 import QML.ComponentesUI
 
-// TODO: reemplazar números mágicos de padding y spacing por propiedades que se
-// definan en un solo lugar (igual que hice antes en Aulas básicamente)
 ListView {
     id: view
+
+    readonly property int indentaciónDeAnidado: 20
 
     anchors.fill: parent
     spacing: 10
@@ -21,6 +21,7 @@ ListView {
 
     clip: true
 
+    // TODO: reemplazar por modelo
     // model: ListEdificios { id: edificios }
     model: ListModel {
         id: edificios
@@ -71,8 +72,10 @@ ListView {
 
         RowLayout {
             id: editorDetallesDeEdificio
-            Layout.leftMargin: 20 // "Indentación de anidado"
+            Layout.leftMargin: indentaciónDeAnidado
 
+            // Espacio sutil que evita fealdad difícil de explicar entre
+            // horarios y checkbox de "Evitar"
             spacing: 10
 
             ColumnLayout {
@@ -103,11 +106,11 @@ ListView {
 
         Item {
             id: fondoYEditorDeAulas
+            Layout.leftMargin: indentaciónDeAnidado
 
             Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
             Layout.preferredHeight: editorDeAulas.height
             Layout.preferredWidth: editorDeAulas.width
-            Layout.leftMargin: 20 // "Indentación de anidado"
 
             Rectangle {
                 id: fondo
@@ -131,12 +134,18 @@ ListView {
         Button {
             id: footerEdificios
             anchors.bottom: parent.bottom
+            anchors.left: parent.left
+            anchors.leftMargin: 10
             width: 200
 
             text: "añadir"
             highlighted: hovered
             onClicked: {
-                edificios.insertRow(edificios.rowCount())
+                edificios.append({
+                    nombre: "",
+                    preferir_no_usar: false
+                })
+                // edificios.insertRow(edificios.rowCount())
             }
         }
     }

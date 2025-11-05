@@ -1,21 +1,27 @@
 from collections.abc import Sequence
+from datetime import time
 from itertools import filterfalse
 from typing import Callable, Any
 from collections import Counter
 
+from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import (
     Aula,
     AulaDoble,
     Carrera,
+    Clase,
     Edificio,
     Materia,
     fieldnames_Aula,
     fieldnames_AulaDoble,
+    fieldnames_Clase,
     fieldnames_Edificio,
     fieldnames_Materia,
     fieldtypes_Aula,
+    fieldtypes_Clase,
     fieldtypes_Edificio,
-    fieldtypes_Materia
+    fieldtypes_Materia,
+    todas_las_clases
 )
 from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
 
@@ -131,6 +137,11 @@ class GestorDeDatos:
         for carrera in self._carreras:
             if carrera.edificio_preferido is el_edificio:
                 carrera.edificio_preferido = None
+        
+        # Borrar asignaciones a este edificio
+        for clase in todas_las_clases(self._carreras):
+            if clase.aula_asignada and clase.aula_asignada.edificio is el_edificio:
+                clase.aula_asignada = None
 
     def ordenar_edificios(self):
         '''
@@ -238,13 +249,18 @@ class GestorDeDatos:
         el_edificio = self._edificios[edificio]
 
         # Sacar el aula de la lista
-        aula = el_edificio.aulas.pop(índice)
+        el_aula = el_edificio.aulas.pop(índice)
         
         # Borrar aulas dobles que usen este aula
         el_edificio.aulas_dobles[:] = filterfalse(
-            lambda ad: ad.aula_grande is aula or ad.aula_chica_1 is aula or ad.aula_chica_2 is aula,
+            lambda ad: ad.aula_grande is el_aula or ad.aula_chica_1 is el_aula or ad.aula_chica_2 is el_aula,
             el_edificio.aulas_dobles
         )
+
+        # Borrar asignaciones a este aula
+        for clase in todas_las_clases(self._carreras):
+            if clase.aula_asignada is el_aula:
+                clase.aula_asignada = None
 
     def ordenar_aulas(self, edificio: int):
         '''
@@ -513,7 +529,7 @@ class GestorDeDatos:
         :return: la cantidad de clases que tiene la materia especificada.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        return len(self._carreras[carrera].materias[materia].clases)
 
     def get_from_clase(self, carrera: int, materia: int, clase: int, campo: int) -> Any:
         '''
@@ -524,19 +540,8 @@ class GestorDeDatos:
         :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
-
-    def existe_clase(self, carrera: int, materia: int, nombre: str) -> bool:
-        '''
-        :return: `True` si la clase especificada existe en la base de datos,
-        `False` si no.
-
-        :param carrera: El índice de la carrera.
-        :param materia: El índice de la materia.
-        :param nombre: El nombre de la clase a buscar.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
-        '''
-        pass
+        fieldname = fieldnames_Clase[campo]
+        return getattr(self._carreras[carrera].materias[materia].clases[clase], fieldname)
 
     def set_in_clase(self, carrera: int, materia: int, clase: int, campo: int, valor: Any):
         '''
@@ -551,7 +556,18 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        la_clase = self._carreras[carrera].materias[materia].clases[clase]
+        field_name: str = fieldnames_Clase[campo]
+        expected_type = fieldtypes_Clase[campo]
+
+        # Si el valor es string, borrar espacios al principio y final
+        if isinstance(valor, str):
+            valor = valor.strip()
+        
+        if is_instance_of_type(valor, expected_type):
+            setattr(la_clase, field_name, valor)
+        else:
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Clase.{field_name}" de tipo {expected_type}')
 
     def add_clase(self, carrera: int, materia: int):
         '''
@@ -564,7 +580,14 @@ class GestorDeDatos:
         :param materia: El índice de la materia.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        la_materia = self._carreras[carrera].materias[materia]
+        la_materia.clases.append(Clase(
+            materia=la_materia,
+            día=Día.Lunes,
+            horario=RangoHorario(time(10), time(11)),
+            virtual=False,
+            cantidad_de_alumnos=1
+        ))
 
     def borrar_clase(self, carrera: int, materia: int, clase: int):
         '''
@@ -575,7 +598,7 @@ class GestorDeDatos:
         :param clase: El índice de la clase.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        del self._carreras[carrera].materias[materia].clases[clase]
 
     def validar_datos(self) -> str|None:
         '''

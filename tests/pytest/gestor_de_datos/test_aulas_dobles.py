@@ -144,35 +144,133 @@ def test_borrar_aula_doble(gestor: GestorDeDatos):
 
 def test_borrar_aula_borra_aulas_dobles_que_usan_ese_aula(gestor: GestorDeDatos):
     gestor.add_edificio()
-    for i in range(7):
+    for i in range(11):
         gestor.add_aula(0)
         gestor.set_in_aula(0, i, campo_Aula['nombre'], str(i))
     
-    # Crear aulas dobles con el aula 0 en las tres posiciones:
-    aulas: list[Aula] = gestor.get_from_edificio(0, campo_Edificio['aulas'])
+    aulas: list[Aula] = list(gestor.get_from_edificio(0, campo_Edificio['aulas']))
+
+    # Crear cuatro aulas dobles
     gestor.add_aula_doble(0)
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])
     gestor.add_aula_doble(0)
     gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_grande'], aulas[3])
-    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_chica_1'], aulas[0])
-    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_chica_2'], aulas[4])
+    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_chica_1'], aulas[4])
+    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_chica_2'], aulas[5])
     gestor.add_aula_doble(0)
-    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_grande'], aulas[5])
-    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_chica_1'], aulas[6])
-    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_chica_2'], aulas[0])
+    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_grande'], aulas[6])
+    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_chica_1'], aulas[7])
+    gestor.set_in_aula_doble(0, 2, campo_AulaDoble['aula_chica_2'], aulas[8])
+    gestor.add_aula_doble(0) # Esta queda con un par de aulas sin elegir
+    gestor.set_in_aula_doble(0, 3, campo_AulaDoble['aula_chica_1'], aulas[9])
+    
+    assert gestor.cantidad_de_aulas_dobles(0) == 4
 
-    # Y un aula doble que no tiene a la 0:
-    gestor.add_aula_doble(0)
-    gestor.set_in_aula_doble(0, 3, campo_AulaDoble['aula_grande'], aulas[4])
-    gestor.set_in_aula_doble(0, 3, campo_AulaDoble['aula_chica_1'], aulas[6])
-    gestor.set_in_aula_doble(0, 3, campo_AulaDoble['aula_chica_2'], aulas[2])
+    # Borrar el aula 10 y ver que no se borre ningún aula doble
+    gestor.borrar_aula(0, 10)
+    assert gestor.cantidad_de_aulas_dobles(0) == 4
 
-    # Borrar el aula 0 y ver que se borren las aulas dobles correspondientes:
+    # Borrar un aula que está siendo usada como aula grande
+    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_grande']).nombre == '0'
     gestor.borrar_aula(0, 0)
+    assert gestor.cantidad_de_aulas_dobles(0) == 3
+    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_grande']).nombre == '3' # Se borró la que inicialmente era la primer aula doble
 
+    # Borrar un aula que está siendo usada como aula chica 1
+    assert gestor.get_from_aula_doble(0, -1, campo_AulaDoble['aula_chica_1']).nombre == '9'
+    gestor.borrar_aula(0, 8)
+    assert gestor.cantidad_de_aulas_dobles(0) == 2
+    assert gestor.get_from_aula_doble(0, -1, campo_AulaDoble['aula_chica_1']).nombre == '7' # Se borró la que inicialmente era el último aula doble
+
+    # Borrar un aula que está siendo usada como aula chica 2
+    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_chica_2']).nombre == '5'
+    gestor.borrar_aula(0, 4)
     assert gestor.cantidad_de_aulas_dobles(0) == 1
-    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_grande']) is not aulas[0]
-    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_chica_1']) is not aulas[0]
-    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_chica_2']) is not aulas[0]
+    assert gestor.get_from_aula_doble(0, 0, campo_AulaDoble['aula_chica_2']).nombre == '8' # Se borró la que inicialmente era la segunda aula doble
+
+def test_setear_aulas_repetidas_en_la_misma_aula_doble(gestor: GestorDeDatos):
+    gestor.add_edificio()
+
+    for i in range(3):
+        gestor.add_aula(0)
+        gestor.set_in_aula(0, i, campo_Aula['nombre'], f'aula{i}')
+    aulas = gestor.get_from_edificio(0, campo_Edificio['aulas'])
+
+    # Valores iniciales sin repetir
+    gestor.add_aula_doble(0)
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])
+
+    # Asignar una de las aulas chicas como aula grande
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[1])
+    assert 'aula doble' in str(error)
+    assert 'aula1' in str(error)
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[2])
+    assert 'aula doble' in str(error)
+    assert 'aula2' in str(error)
+
+    # Asignar el aula grande a una de las chicas
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[0])
+    assert 'aula doble' in str(error)
+    assert 'aula0' in str(error)
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[0])
+    assert 'aula doble' in str(error)
+    assert 'aula0' in str(error)
+
+    # Asignar las aulas chicas entre sí
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[2])
+    assert 'aula doble' in str(error)
+    assert 'aula2' in str(error)
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[1])
+    assert 'aula doble' in str(error)
+    assert 'aula1' in str(error)
+
+    # ...Pero si asignás un aula a sí misma está todo bien
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])
+
+def test_setear_aulas_repetidas_en_la_distintas_aulas_dobles(gestor: GestorDeDatos):
+    gestor.add_edificio()
+
+    for i in range(6):
+        gestor.add_aula(0)
+        gestor.set_in_aula(0, i, campo_Aula['nombre'], f'aula{i}')
+    aulas = gestor.get_from_edificio(0, campo_Edificio['aulas'])
+
+    # Valores iniciales sin repetir
+    gestor.add_aula_doble(0)
+    gestor.add_aula_doble(0)
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
+    gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])
+    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_grande'], aulas[3])
+    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_chica_1'], aulas[4])
+    gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_chica_2'], aulas[5])
+
+    # Asignar el aula grande de un aula doble a otra aula doble
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[3])
+    assert 'aula doble' in str(error)
+    assert 'aula3' in str(error)
+
+    # Asignar el aula chica 1 de un aula doble a otra aula doble
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 1, campo_AulaDoble['aula_grande'], aulas[1])
+    assert 'aula doble' in str(error)
+    assert 'aula1' in str(error)
+
+    # Asignar el aula chica 2 de un aula doble a otra aula doble
+    with pytest.raises(ValueError) as error:
+        gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[5])
+    assert 'aula doble' in str(error)
+    assert 'aula5' in str(error)

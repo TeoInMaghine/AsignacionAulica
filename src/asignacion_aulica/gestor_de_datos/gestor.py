@@ -25,7 +25,7 @@ from asignacion_aulica.gestor_de_datos.entidades import (
 )
 from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
 
-aula_no_seleccionada: Aula = Aula(nombre='Seleccionar', edificio=None, capacidad=0)
+aula_no_seleccionada: Aula = Aula(nombre='Sin Seleccionar', edificio=None, capacidad=0)
 '''
 Aula dummy usada para inicializar las aulas dobles.
 '''
@@ -277,7 +277,7 @@ class GestorDeDatos:
         '''
         return len(self._edificios[edificio].aulas_dobles)
 
-    def get_from_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Any:
+    def get_from_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Aula:
         '''
         :param edificio: El índice del edificio.
         :param aula_doble: El índice del aula doble.
@@ -300,13 +300,19 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         :raise TypeError: Si el tipo de ``valor`` no es correcto.
+        :raise ValueError: Si se intenta asignar un aula que ya forma parte de
+        un aula doble.
         '''
-        el_aula_doble = self._edificios[edificio].aulas_dobles[aula_doble]
+        el_edificio = self._edificios[edificio]
+        el_aula_doble = el_edificio.aulas_dobles[aula_doble]
         field_name: str = fieldnames_AulaDoble[campo]
-        if isinstance(valor, Aula):
-            setattr(el_aula_doble, field_name, valor)
-        else:
+        
+        if not isinstance(valor, Aula):
             raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "AulaDoble.{field_name}" de tipo {expected_type}')
+        elif _aula_quedaría_repetida_en_aulas_dobles(valor, aula_doble, campo, el_edificio.aulas_dobles):
+            raise ValueError(f'El aula {valor.nombre} ya forma parte de un aula doble. Un aula común no puede aparecer más de una vez en las aulas dobles.')
+        else:
+            setattr(el_aula_doble, field_name, valor)
 
     def add_aula_doble(self, edificio: int):
         '''
@@ -610,14 +616,18 @@ class GestorDeDatos:
         validar hasta que todos los datos fueron cargados.
 
         Las validaciones que se hacen en esta función son:
-        - Que la lista de aulas dobles no tenga aulas vacías.
-        - Que ningún aula aparezca más de una vez en la lista de aulas dobles.
+        - Que la lista de aulas dobles no tenga aulas sin seleccionar.
         - (Puede ser que después se agreguen otras)
         
         :return: Un string con la descripción del primer problema, o `None` si
         no hay ningún problema.
         '''
-        pass
+        for edificio in self._edificios:
+            for aula_doble in edificio.aulas_dobles:
+                if aula_no_seleccionada in (aula_doble.aula_grande, aula_doble.aula_chica_1, aula_doble.aula_chica_2):
+                    return f'En el edificio {edificio.nombre} falta seleccionar una componente de aula doble.'
+        
+        return None
 
     def asignar_aulas(self):
         '''
@@ -713,3 +723,30 @@ def _generar_nombre_no_existente(base: str, nombres_existentes: Sequence[str]) -
         nombre_propuesto = f'{base} {i}'
     
     return nombre_propuesto
+
+def _aula_quedaría_repetida_en_aulas_dobles(aula: Aula, i_aula_doble: int, i_campo: int, aulas_dobles: Sequence[AulaDoble]) -> bool:
+    '''
+    Determinar si `aula` forma parte de algún aula doble, excepto en el campo
+    con índice `i_campo` del aula doble con índice `i_aula_doble`.
+    '''
+    el_aula_doble = aulas_dobles[i_aula_doble]
+    campo = fieldnames_AulaDoble[i_campo]
+    return(
+        any(
+            aula is aula_doble.aula_grande or aula is aula_doble.aula_chica_1 or aula is aula_doble.aula_chica_2
+            for aula_doble in aulas_dobles
+            if aula_doble is not el_aula_doble
+        )
+        or (
+            campo == 'aula_grande'
+            and aula in (el_aula_doble.aula_chica_1, el_aula_doble.aula_chica_2)
+        )
+        or (
+            campo == 'aula_chica_1'
+            and aula in (el_aula_doble.aula_grande, el_aula_doble.aula_chica_2)
+        )
+        or (
+            campo == 'aula_chica_2'
+            and aula in (el_aula_doble.aula_grande, el_aula_doble.aula_chica_1)
+        )
+    )

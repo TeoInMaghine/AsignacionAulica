@@ -99,6 +99,8 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         :raise TypeError: Si el tipo de ``valor`` no es correcto.
+
+        TODO: ¿Tirar una excepción si el campo es un nombre que ya existe?
         '''
         el_edificio = self._edificios[edificio]
         field_name: str = fieldnames_Edificio[campo]
@@ -189,6 +191,8 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         :raise TypeError: Si el tipo de ``valor`` no es correcto.
+
+        TODO: ¿Tirar una excepción si el campo es un nombre que ya existe?
         '''
         el_aula = self._edificios[edificio].aulas[índice]
         field_name: str = fieldnames_Aula[campo]
@@ -475,6 +479,8 @@ class GestorDeDatos:
         :param campo: El índice del campo.
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
+
+        TODO: ¿Tirar una excepción si el campo es un nombre que ya existe?
         '''
         la_materia = self._carreras[carrera].materias[materia]
         field_name: str = fieldnames_Materia[campo]

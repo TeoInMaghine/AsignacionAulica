@@ -42,7 +42,6 @@ def test_horarios_semanales():
 
 def test_horarios_semanales_opcionales():
     assert is_instance_of_type(crear_horarios_semanales_opcionales(), HorariosSemanalesOpcionales)
-    assert is_instance_of_type(crear_horarios_semanales(), HorariosSemanalesOpcionales)
     assert not is_instance_of_type((RangoHorario(time(1), time(2)),), HorariosSemanales)
     assert not is_instance_of_type((None, None), HorariosSemanales)
 

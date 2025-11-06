@@ -4,6 +4,8 @@ from itertools import filterfalse
 from typing import Callable, Any
 from collections import Counter
 
+from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
+from asignacion_aulica.lógica_de_asignación.asignación import asignar
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import (
     Aula,
@@ -635,18 +637,13 @@ class GestorDeDatos:
         
         return None
 
-    def asignar_aulas(self):
+    def asignar_aulas(self) -> InfoPostAsignación:
         '''
         Asignar aulas a todas las clases que no tengan una asignación forzada.
 
-        :raise AsignaciónImposibleException: Si no se pueden asignar aulas a
-        todas las clases. Al manejar esta excepción, tener en cuenta que se
-        pueden haber asignado aulas a algunas clases si y otras no (esta
-        información estará contenida en la excepción).
+        :return: Info sobre el resultado de la asignación.
         '''
-        # Nota: Este método debería llamar a lógica_de_asignación.asignar,
-        # y actualizar la base de datos con el resultado.
-        pass
+        return asignar(self._edificios, self._carreras)
 
     def importar_clases_de_excel(self, path: str, confirmación_de_sobreescritura: Callable[[list[str]], bool]):
         '''

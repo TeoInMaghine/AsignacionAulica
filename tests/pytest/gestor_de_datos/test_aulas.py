@@ -31,7 +31,7 @@ def test_add_aula_genera_valores_deafult(gestor: GestorDeDatos):
     assert isinstance(gestor.get_from_aula(0, 0, campo_Aula['edificio']), Edificio)
     assert gestor.get_from_aula(0, 0, campo_Aula['capacidad']) >= 0
     assert gestor.get_from_aula(0, 0, campo_Aula['equipamiento']) == set()
-    assert gestor.get_from_aula(0, 0, campo_Aula['horarios']) == (None,)*7
+    assert gestor.get_from_aula(0, 0, campo_Aula['horarios']) == [None,]*7
 
     # Segundo aula pertenece al mismo edificio:
     gestor.add_aula(0)

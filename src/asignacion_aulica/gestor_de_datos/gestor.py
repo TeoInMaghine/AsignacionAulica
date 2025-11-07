@@ -614,6 +614,79 @@ class GestorDeDatos:
         '''
         del self._carreras[carrera].materias[materia].clases[clase]
 
+    def get_equipamientos_existentes(self) -> list[str]:
+        '''
+        :return: Una lista de los equipamientos existentes en aulas y clases, en
+        orden alfabético.
+        '''
+        # Esto borra los equipamientos con contadores en 0
+        self._equipamientos = +self._equipamientos
+
+        nombres = list(self._equipamientos.keys())
+        nombres.sort(key=lambda nombre: nombre.lower())
+        return nombres
+    
+    def argregar_equipamiento_a_aula(self, edificio: int, aula: int, equipamiento: str):
+        '''
+        Agrega un equipamiento a un aula.
+
+        El nombre del equipamiento se normaliza para evitar diferencias de
+        minúsculas/mayúsculas y de espacios invisibles.
+
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula.
+        :param equipamiento: El nombre de un equipamiento.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        # Borrar espacios y unificar mayúsculas/minúsculas
+        equipamiento = equipamiento.strip().title()
+
+        self._edificios[edificio].aulas[aula].equipamiento.add(equipamiento)
+        self._equipamientos[equipamiento] += 1
+    
+    def borrar_equipamiento_de_aula(self, edificio: int, aula: int, equipamiento: str):
+        '''
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula.
+        :param equipamiento: El nombre de un equipamiento.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        el_aula = self._edificios[edificio].aulas[aula]
+        if equipamiento in el_aula.equipamiento:
+            el_aula.equipamiento.discard(equipamiento)
+            self._equipamientos[equipamiento] -= 1
+        
+    def argregar_equipamiento_a_clase(self, carrera: int, materia: int, clase: int, equipamiento: str):
+        '''
+        Agrega un equipamiento necesario en una clase.
+
+        El nombre del equipamiento se normaliza para evitar diferencias de
+        minúsculas/mayúsculas y de espacios invisibles.
+        
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :param clase: El índice de la clase.
+        :param equipamiento: El nombre de un equipamiento.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        # Borrar espacios y unificar mayúsculas/minúsculas
+        equipamiento = equipamiento.strip().title()
+
+        self._carreras[carrera].materias[materia].clases[clase].equipamiento_necesario.add(equipamiento)
+        self._equipamientos[equipamiento] += 1
+
+    def borrar_equipamiento_de_clase(self, carrera: int, materia: int, clase: int, equipamiento: str):
+        '''
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :param clase: El índice de la clase.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        la_clase = self._carreras[carrera].materias[materia].clases[clase]
+        if equipamiento in la_clase.equipamiento_necesario:
+            la_clase.equipamiento_necesario.discard(equipamiento)
+            self._equipamientos[equipamiento] -= 1
+
     def validar_datos(self) -> str|None:
         '''
         Verificar que los datos contenidos en la base de datos sean válidos y

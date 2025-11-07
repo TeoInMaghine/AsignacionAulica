@@ -54,8 +54,10 @@ ListView {
 
             Colapsador {
                 Component.onCompleted: {
-                    editorDetallesDeEdificio.visible = false
-                    fondoYEditorDeAulas.visible = false
+                    // Descomentar para facilitar debugging:
+                    // checked = true
+                    editorDetallesDeEdificio.visible = checked
+                    fondoYEditorDeAulas.visible = checked
                 }
                 onClicked: {
                     editorDetallesDeEdificio.visible = checked

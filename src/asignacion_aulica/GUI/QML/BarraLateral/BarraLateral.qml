@@ -9,7 +9,7 @@ Rectangle {
     Layout.fillHeight: true
     color: Constantes.rojo_unrn
 
-    property string pestaña_actual: "Aulas"
+    property string pestaña_actual: "Edificios"
 
     ColumnLayout {
         anchors.fill: parent
@@ -39,7 +39,7 @@ Rectangle {
 
         // Botones de las pestañas
         BotónPestaña {
-            nombre: "Aulas"
+            nombre: "Edificios"
             onClicked: () => pestaña_actual = nombre
         }
         BotónPestaña {

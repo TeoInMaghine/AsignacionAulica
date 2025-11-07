@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Layouts
-import QML.Aulas
+import QML.Edificios
 import QML.BarraLateral
 
 Window {
@@ -31,16 +31,16 @@ Window {
 
             sourceComponent: {
                 switch(sidebar.pestaña_actual) {
-                    case "Aulas": return pestañaAulas
+                    case "Edificios": return pestañaEdificios
                     case "Materias": return pestañaMaterias
-                    default: return pestañaAulas
+                    default: return pestañaEdificios
                 }
             }
         }
     }
 
     Component {
-        id: pestañaAulas
+        id: pestañaEdificios
         Edificios { }
     }
 

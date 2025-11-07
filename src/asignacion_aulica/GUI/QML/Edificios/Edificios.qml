@@ -39,17 +39,6 @@ ListView {
         }
     }
 
-    header: RowLayout {
-        width: 300
-        Label {
-            Layout.alignment: Qt.AlignCenter
-            Layout.margins: 10
-
-            font.pixelSize: 24
-            text: "Edificios"
-        }
-    }
-
     delegate: ColumnLayout {
         id: editorDeEdificio
 

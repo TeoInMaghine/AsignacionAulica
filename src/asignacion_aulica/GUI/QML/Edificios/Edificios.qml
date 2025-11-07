@@ -7,8 +7,6 @@ import QML.ComponentesUI
 ListView {
     id: view
 
-    readonly property int indentaciónDeAnidado: 20
-
     anchors.fill: parent
     spacing: 10
 
@@ -44,6 +42,8 @@ ListView {
 
         width: view.width
 
+        readonly property int indentaciónDeAnidado: colapsador.width + 5
+
         required property var model
         required property var index
 
@@ -53,15 +53,14 @@ ListView {
             id: editorSiempreVisibleDeEdificio
 
             Colapsador {
+                id: colapsador
                 Component.onCompleted: {
                     // Descomentar para facilitar debugging:
-                    // checked = true
+                    checked = true
                     editorDetallesDeEdificio.visible = checked
-                    fondoYEditorDeAulas.visible = checked
                 }
                 onClicked: {
                     editorDetallesDeEdificio.visible = checked
-                    fondoYEditorDeAulas.visible = checked
                 }
             }
             TextField {
@@ -94,29 +93,30 @@ ListView {
                 RowLayout { HeaderHorariosSemanales { } }
                 RowLayout { EditorHorariosSemanales { } }
             }
+
+            Item {
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                Layout.preferredHeight: editorDeAulas.height
+                Layout.preferredWidth: editorDeAulas.width
+
+                Rectangle {
+                    id: fondo
+                    anchors.fill: parent
+
+                    color: "#F0F0F0"
+                    border.width: 1
+                    border.color: "lightgray"
+                }
+                Aulas {
+                    id: editorDeAulas
+                    edificio: editorDeEdificio.edificio
+                }
+            }
+
+            // Espacio separador (sólo cuando los edificios están expandidos)
+            Item { height: 50 }
         }
 
-        Item {
-            id: fondoYEditorDeAulas
-            Layout.leftMargin: indentaciónDeAnidado
-
-            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-            Layout.preferredHeight: editorDeAulas.height
-            Layout.preferredWidth: editorDeAulas.width
-
-            Rectangle {
-                id: fondo
-                anchors.fill: parent
-
-                color: "#F0F0F0"
-                border.width: 1
-                border.color: "lightgray"
-            }
-            Aulas {
-                id: editorDeAulas
-                edificio: editorDeEdificio.edificio
-            }
-        }
     }
 
     footer: Item {

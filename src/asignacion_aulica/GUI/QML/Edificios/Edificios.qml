@@ -72,37 +72,27 @@ ListView {
             }
         }
 
-        RowLayout {
+        ColumnLayout {
             id: editorDetallesDeEdificio
             Layout.leftMargin: indentaciónDeAnidado
 
-            // Espacio sutil que evita fealdad difícil de explicar entre
-            // horarios y checkbox de "Evitar"
             spacing: 10
 
+            CheckDelegate {
+                text: "Preferir no usar"
+                // TODO: Descomentar si espejado queda mejor, si no borrar.
+                // LayoutMirroring.enabled: true
+
+                highlighted: hovered
+
+                checked: edificio.preferir_no_usar
+                onToggled: {
+                    edificio.preferir_no_usar = checked
+                }
+            }
             ColumnLayout {
                 RowLayout { HeaderHorariosSemanales { } }
                 RowLayout { EditorHorariosSemanales { } }
-            }
-
-            ColumnLayout {
-                Label {
-                    Layout.alignment: Qt.AlignCenter
-                    horizontalAlignment: Text.AlignHCenter
-                    text: "Preferir no usar"
-                }
-                CheckDelegate {
-                    // display: CheckDelegate.IconOnly no funciona, idk why
-                    Layout.preferredWidth: 52
-                    Layout.preferredHeight: 40
-
-                    highlighted: hovered
-
-                    checked: edificio.preferir_no_usar
-                    onToggled: {
-                        edificio.preferir_no_usar = checked
-                    }
-                }
             }
         }
 

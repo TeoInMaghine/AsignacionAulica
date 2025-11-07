@@ -42,7 +42,7 @@ ListView {
 
         width: view.width
 
-        readonly property int indentaciónDeAnidado: colapsador.width + 5
+        readonly property alias indentaciónDeAnidado: colapsador.width
 
         required property var model
         required property var index
@@ -51,12 +51,13 @@ ListView {
 
         RowLayout {
             id: editorSiempreVisibleDeEdificio
+            spacing: 0
 
             Colapsador {
                 id: colapsador
                 Component.onCompleted: {
                     // Descomentar para facilitar debugging:
-                    checked = true
+                    // checked = true
                     editorDetallesDeEdificio.visible = checked
                 }
                 onClicked: {

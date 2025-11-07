@@ -44,7 +44,7 @@ Switch {
         id: imagenColapsador
         visible: false // Para renderizar solo el MultiEffect
 
-        width: 32
+        width: 24
         anchors.centerIn: parent
         fillMode: Image.PreserveAspectFit
         sourceSize.width: width

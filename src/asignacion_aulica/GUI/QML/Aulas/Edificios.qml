@@ -98,7 +98,7 @@ ListView {
                 Label {
                     Layout.alignment: Qt.AlignCenter
                     horizontalAlignment: Text.AlignHCenter
-                    text: "Evitar"
+                    text: "Preferir no usar"
                 }
                 CheckDelegate {
                     // display: CheckDelegate.IconOnly no funciona, idk why

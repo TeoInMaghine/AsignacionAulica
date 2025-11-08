@@ -57,7 +57,7 @@ ListView {
                 id: colapsador
                 Component.onCompleted: {
                     // Descomentar para facilitar debugging:
-                    // checked = true
+                    checked = true
                     editorDetallesDeEdificio.visible = checked
                 }
                 onClicked: {
@@ -80,8 +80,6 @@ ListView {
 
             CheckDelegate {
                 text: "Preferir no usar"
-                // TODO: Descomentar si espejado queda mejor, si no borrar.
-                // LayoutMirroring.enabled: true
 
                 highlighted: hovered
 
@@ -124,15 +122,14 @@ ListView {
         height: footerEdificios.height + view.spacing
         width: footerEdificios.width
 
-        Button {
+        BotónAñadir {
             id: footerEdificios
             anchors.bottom: parent.bottom
             anchors.left: parent.left
             anchors.leftMargin: 10
             width: 200
 
-            text: "añadir"
-            highlighted: hovered
+            text: "+"
             onClicked: {
                 edificios.append({
                     nombre: "",

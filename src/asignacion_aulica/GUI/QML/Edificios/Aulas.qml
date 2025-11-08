@@ -95,13 +95,11 @@ ListView {
         height: footerAulas.height + view.spacing
         width: footerAulas.width
 
-        Button {
+        BotónAñadir {
             id: footerAulas
             anchors.bottom: parent.bottom
             width: headerItem.widthNombre
 
-            text: "añadir"
-            highlighted: hovered
             onClicked: {
                 aulas.insertRow(aulas.rowCount())
             }

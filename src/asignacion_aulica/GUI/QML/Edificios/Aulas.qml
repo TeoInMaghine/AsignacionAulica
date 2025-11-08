@@ -80,11 +80,7 @@ ListView {
             aula: parent.aula
         }
 
-        // TODO: crear un componente de botón reusable custom (para que las
-        // animaciones y eso sean todas iguales)
-        Button {
-            text: "borrar"
-            highlighted: hovered
+        BotónBorrar {
             onClicked: {
                 aulas.removeRow(index)
             }

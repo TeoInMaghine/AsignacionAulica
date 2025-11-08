@@ -56,8 +56,6 @@ ListView {
             Colapsador {
                 id: colapsador
                 Component.onCompleted: {
-                    // Descomentar para facilitar debugging:
-                    checked = true
                     editorDetallesDeEdificio.visible = checked
                 }
                 onClicked: {
@@ -68,6 +66,13 @@ ListView {
                 text: edificio.nombre
                 onEditingFinished: {
                     edificio.nombre = text
+                }
+            }
+            BotónBorrar {
+                Layout.leftMargin: 10
+                onClicked: {
+                    edificios.remove(index)
+                    // edificios.removeRow(index)
                 }
             }
         }
@@ -129,7 +134,6 @@ ListView {
             anchors.leftMargin: 10
             width: 200
 
-            text: "+"
             onClicked: {
                 edificios.append({
                     nombre: "",

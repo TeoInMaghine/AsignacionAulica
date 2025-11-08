@@ -10,12 +10,26 @@ RowLayout {
     property alias widthCapacidad: headerCapacidad.width
     property alias widthEquipamiento: headerEquipamiento.width
 
-    Label {
+    Button {
         id: headerNombre
-        leftPadding: 25
-        rightPadding: 25
-        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-        text: "Aula"
+        contentItem: RowLayout {
+            spacing: 0
+            Label {
+                Layout.alignment: Qt.AlignCenter
+                text: "Aula"
+                color: headerNombre.highlighted ? headerNombre.palette.brightText
+                                                : headerNombre.palette.buttonText
+            }
+            Image {
+                Layout.alignment: Qt.AlignCenter
+                fillMode: Image.PreserveAspectFit
+                source: assets_path + "/iconos/Ordenar.svg"
+            }
+        }
+        highlighted: hovered
+        onClicked: {
+            aulas.ordenar()
+        }
     }
     Label {
         id: headerCapacidad
@@ -35,13 +49,5 @@ RowLayout {
         rightPadding: 50
         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
         text: "Equipamiento"
-    }
-
-    Button {
-        text: "Ordenar"
-        highlighted: hovered
-        onClicked: {
-            aulas.ordenar()
-        }
     }
 }

@@ -1,4 +1,5 @@
 module QML.ComponentesUI
+BotónAñadir BotónAñadir.qml
 Colapsador Colapsador.qml
 SelectorEquipamiento SelectorEquipamiento.qml
 EditorHorariosSemanales EditorHorariosSemanales.qml

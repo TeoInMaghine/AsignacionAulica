@@ -48,6 +48,6 @@ Switch {
         anchors.centerIn: parent
         fillMode: Image.PreserveAspectFit
         sourceSize.width: width
-        source: Constantes.logo_colapsador_path
+        source: Constantes.ícono_colapsador_path
     }
 }

@@ -88,10 +88,10 @@ ListView {
                     edificio.preferir_no_usar = checked
                 }
             }
-            ColumnLayout {
-                RowLayout { HeaderHorariosSemanales { } }
-                RowLayout { EditorHorariosSemanales { } }
-            }
+
+            Label { text: "   Horarios del edificio:" }
+            RowLayout { HeaderHorariosSemanales { } }
+            RowLayout { EditorHorariosSemanales { } }
 
             Item {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft

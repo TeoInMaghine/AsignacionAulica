@@ -117,7 +117,7 @@ class GestorDeDatos:
         else:
             raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
 
-    def add_edificio(self):
+    def agregar_edificio(self):
         '''
         Añadir un nuevo edificio después del último índice existente.
 
@@ -209,7 +209,7 @@ class GestorDeDatos:
         else:
             raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Aula.{field_name}" de tipo {expected_type}')
 
-    def add_aula(self, edificio: int):
+    def agregar_aula(self, edificio: int):
         '''
         Añadir al edificio un nuevo aula, después del último índice existente.
 
@@ -320,7 +320,7 @@ class GestorDeDatos:
         else:
             setattr(el_aula_doble, field_name, valor)
 
-    def add_aula_doble(self, edificio: int):
+    def agregar_aula_doble(self, edificio: int):
         '''
         Añadir al edificio un nuevo aula doble, después del último índice
         existente.
@@ -366,7 +366,7 @@ class GestorDeDatos:
         '''
         return self._carreras[índice]
 
-    def add_carrera(self):
+    def agregar_carrera(self):
         '''
         Añadir al edificio una nueva carrera, después del último índice
         existente.
@@ -497,7 +497,7 @@ class GestorDeDatos:
         else:
             raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Materia.{field_name}" de tipo {expected_type}')
 
-    def add_materia(self, carrera: int):
+    def agregar_materia(self, carrera: int):
         '''
         Añadir a una carrera una nueva materia, después del último índice
         existente.
@@ -583,7 +583,7 @@ class GestorDeDatos:
         else:
             raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Clase.{field_name}" de tipo {expected_type}')
 
-    def add_clase(self, carrera: int, materia: int):
+    def agregar_clase(self, carrera: int, materia: int):
         '''
         Añadir una nueva clase a una carrera, después del último índice
         existente.

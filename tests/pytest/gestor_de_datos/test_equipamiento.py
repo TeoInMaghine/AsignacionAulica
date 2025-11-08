@@ -7,28 +7,28 @@ def test_empieza_todo_vacío(gestor: GestorDeDatos):
     assert gestor.get_equipamientos_existentes() == []
 
     # Agregar un aula no agrega equipamiento
-    gestor.add_edificio()
-    gestor.add_aula(0)
+    gestor.agregar_edificio()
+    gestor.agregar_aula(0)
     assert gestor.get_equipamientos_existentes() == []
 
     # Agregar una clase no agrega equipamiento
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
     assert gestor.get_equipamientos_existentes() == []
 
 def test_agregar_equipamiento_a_clase(gestor: GestorDeDatos):
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
     gestor.argregar_equipamiento_a_clase(0, 0, 0, 'Proyector')
 
     assert gestor.get_equipamientos_existentes() == ['Proyector']
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['equipamiento_necesario']) == {'Proyector'}
 
 def test_agregar_y_quitar_equipamiento_a_aula(gestor: GestorDeDatos):
-    gestor.add_edificio()
-    gestor.add_aula(0)
+    gestor.agregar_edificio()
+    gestor.agregar_aula(0)
     gestor.argregar_equipamiento_a_aula(0, 0, 'Proyector')
     gestor.argregar_equipamiento_a_aula(0, 0, 'Compus')
     assert gestor.get_from_aula(0, 0, campo_Aula['equipamiento']) == {'Proyector', 'Compus'}
@@ -39,9 +39,9 @@ def test_agregar_y_quitar_equipamiento_a_aula(gestor: GestorDeDatos):
     assert gestor.get_equipamientos_existentes() == ['Compus']
 
 def test_agregar_y_quitar_equipamiento_a_clase(gestor: GestorDeDatos):
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
     gestor.argregar_equipamiento_a_clase(0, 0, 0, 'Proyector')
     gestor.argregar_equipamiento_a_clase(0, 0, 0, 'muñeco de rcp') # Este se va a cambiar a titlecase al normalizarlo
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['equipamiento_necesario']) == {'Proyector', 'Muñeco De Rcp'}
@@ -52,16 +52,16 @@ def test_agregar_y_quitar_equipamiento_a_clase(gestor: GestorDeDatos):
     assert gestor.get_equipamientos_existentes() == ['Proyector']
 
 def test_agregar_y_quitar_equipamientos_en_varios_lugares(gestor: GestorDeDatos):
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
-    gestor.add_clase(0, 1)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
+    gestor.agregar_clase(0, 1)
 
-    gestor.add_edificio()
-    gestor.add_edificio()
-    gestor.add_aula(0)
-    gestor.add_aula(1)
+    gestor.agregar_edificio()
+    gestor.agregar_edificio()
+    gestor.agregar_aula(0)
+    gestor.agregar_aula(1)
 
     assert gestor.get_equipamientos_existentes() == []
 

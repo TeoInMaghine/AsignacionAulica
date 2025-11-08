@@ -6,13 +6,13 @@ def test_todo_ok_con_gestor_vacío(gestor: GestorDeDatos):
     assert gestor.validar_datos() is None
 
 def test_todo_ok_con_un_par_de_aulas_dobles(gestor: GestorDeDatos):
-    gestor.add_edificio()
+    gestor.agregar_edificio()
     for i in range(8):
-        gestor.add_aula(0)
+        gestor.agregar_aula(0)
     aulas = gestor.get_from_edificio(0, campo_Edificio['aulas'])
 
-    gestor.add_aula_doble(0)
-    gestor.add_aula_doble(0)
+    gestor.agregar_aula_doble(0)
+    gestor.agregar_aula_doble(0)
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])
@@ -23,13 +23,13 @@ def test_todo_ok_con_un_par_de_aulas_dobles(gestor: GestorDeDatos):
     assert gestor.validar_datos() is None
 
 def test_fata_elegir_el_aula_grande(gestor: GestorDeDatos):
-    gestor.add_edificio()
+    gestor.agregar_edificio()
     gestor.set_in_edificio(0, campo_Edificio['nombre'], 'Mitre')
     for i in range(3):
-        gestor.add_aula(0)
+        gestor.agregar_aula(0)
     aulas = gestor.get_from_edificio(0, campo_Edificio['aulas'])
 
-    gestor.add_aula_doble(0)
+    gestor.agregar_aula_doble(0)
     #gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])
@@ -40,13 +40,13 @@ def test_fata_elegir_el_aula_grande(gestor: GestorDeDatos):
     assert 'seleccionar' in mensaje
 
 def test_fata_elegir_el_aula_chica1(gestor: GestorDeDatos):
-    gestor.add_edificio()
+    gestor.agregar_edificio()
     gestor.set_in_edificio(0, campo_Edificio['nombre'], 'Mitre')
     for i in range(3):
-        gestor.add_aula(0)
+        gestor.agregar_aula(0)
     aulas = gestor.get_from_edificio(0, campo_Edificio['aulas'])
 
-    gestor.add_aula_doble(0)
+    gestor.agregar_aula_doble(0)
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
     #gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])
@@ -57,13 +57,13 @@ def test_fata_elegir_el_aula_chica1(gestor: GestorDeDatos):
     assert 'seleccionar' in mensaje
 
 def test_fata_elegir_el_aula_chica2(gestor: GestorDeDatos):
-    gestor.add_edificio()
+    gestor.agregar_edificio()
     gestor.set_in_edificio(0, campo_Edificio['nombre'], 'Mitre')
     for i in range(3):
-        gestor.add_aula(0)
+        gestor.agregar_aula(0)
     aulas = gestor.get_from_edificio(0, campo_Edificio['aulas'])
 
-    gestor.add_aula_doble(0)
+    gestor.agregar_aula_doble(0)
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_grande'], aulas[0])
     gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_1'], aulas[1])
     #gestor.set_in_aula_doble(0, 0, campo_AulaDoble['aula_chica_2'], aulas[2])

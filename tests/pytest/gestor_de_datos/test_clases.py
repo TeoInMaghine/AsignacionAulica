@@ -13,18 +13,18 @@ def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
         gestor.cantidad_de_clases(0, 0)
     
-    gestor.add_carrera()
+    gestor.agregar_carrera()
     with pytest.raises(IndexError):
         gestor.cantidad_de_clases(0, 0)
     
     # Al agregar una materia, no tiene ningún aula:
-    gestor.add_materia(0)
+    gestor.agregar_materia(0)
     assert gestor.cantidad_de_clases(0, 0) == 0
 
-def test_add_clase_genera_valores_deafult(gestor: GestorDeDatos):
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
+def test_agregar_clase_genera_valores_deafult(gestor: GestorDeDatos):
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
 
     assert gestor.cantidad_de_clases(0, 0) == 1
 
@@ -43,30 +43,30 @@ def test_add_clase_genera_valores_deafult(gestor: GestorDeDatos):
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['auxiliar']) is None
 
     # Segunda clase pertenece a la misma materia:
-    gestor.add_clase(0, 0)
+    gestor.agregar_clase(0, 0)
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['materia']) is gestor.get_from_clase(0, 0, 1, campo_Clase['materia'])
 
     # Clase en otra materia no pertenece a la misma materia:
-    gestor.add_materia(0)
-    gestor.add_clase(0, 1)
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 1)
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['materia']) is not  gestor.get_from_clase(0, 1, 0, campo_Clase['materia'])
 
 
 def test_add_varias_clases(gestor: GestorDeDatos):
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_materia(0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_materia(0)
     for _ in range(10):
-        gestor.add_clase(0, 0)
+        gestor.agregar_clase(0, 0)
     for _ in range(4):
-        gestor.add_clase(0, 1)
+        gestor.agregar_clase(0, 1)
     
     assert gestor.cantidad_de_clases(0, 0) == 10
     assert gestor.cantidad_de_clases(0, 1) == 4
 
 def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
-    gestor.add_carrera()
-    gestor.add_materia(0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
 
     with pytest.raises(IndexError):
         gestor.get_from_clase(0, 0, 0, campo_Clase['horario'])
@@ -74,13 +74,13 @@ def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
         gestor.set_in_clase(0, 0, 0, campo_Clase['virtual'], True)
     
-    gestor.add_clase(0, 0)
+    gestor.agregar_clase(0, 0)
     with pytest.raises(IndexError):
         gestor.set_in_clase(0, 0, 0, 100, None)
 
 def test_get_set_clase_existente(gestor: GestorDeDatos):
-    gestor.add_edificio()
-    gestor.add_aula(0)
+    gestor.agregar_edificio()
+    gestor.agregar_aula(0)
 
     día = Día.Martes
     horario = RangoHorario(time(5), time(20))
@@ -95,9 +95,9 @@ def test_get_set_clase_existente(gestor: GestorDeDatos):
     docente = 'nadie'
     auxiliar = 'auxilioo!'
 
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
 
     gestor.set_in_clase(0, 0, 0, campo_Clase['día'], día)
     gestor.set_in_clase(0, 0, 0, campo_Clase['horario'], horario)
@@ -129,13 +129,13 @@ def test_get_set_clase_existente(gestor: GestorDeDatos):
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['auxiliar']) == auxiliar
 
 def test_borrar_clase(gestor: GestorDeDatos):
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
     gestor.set_in_clase(0, 0, 0, campo_Clase['día'], Día.Lunes)
-    gestor.add_clase(0, 0)
+    gestor.agregar_clase(0, 0)
     gestor.set_in_clase(0, 0, 1, campo_Clase['día'], Día.Martes)
-    gestor.add_clase(0, 0)
+    gestor.agregar_clase(0, 0)
     gestor.set_in_clase(0, 0, 2, campo_Clase['día'], Día.Miércoles)
 
     # Borrar clase que existe
@@ -153,17 +153,17 @@ def test_borrar_clase(gestor: GestorDeDatos):
         gestor.borrar_clase(1, 0,  0)
 
 def test_borrar_aula_borra_asignación_de_clases_que_tenían_ese_aula(gestor: GestorDeDatos):
-    gestor.add_edificio()
-    gestor.add_aula(0)
-    gestor.add_aula(0)
+    gestor.agregar_edificio()
+    gestor.agregar_aula(0)
+    gestor.agregar_aula(0)
     aula0, aula1 = gestor.get_from_edificio(0, campo_Edificio['aulas'])
 
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
-    gestor.add_clase(0, 0)
-    gestor.add_clase(0, 0)
-    gestor.add_clase(0, 0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
+    gestor.agregar_clase(0, 0)
+    gestor.agregar_clase(0, 0)
+    gestor.agregar_clase(0, 0)
 
     gestor.set_in_clase(0, 0, 0, campo_Clase['aula_asignada'], aula1)
     gestor.set_in_clase(0, 0, 1, campo_Clase['aula_asignada'], aula0)
@@ -182,19 +182,19 @@ def test_borrar_aula_borra_asignación_de_clases_que_tenían_ese_aula(gestor: Ge
     assert gestor.get_from_clase(0, 0, 3, campo_Clase['aula_asignada']) is None
 
 def test_borrar_edificio_borra_asignación_de_clases_que_tenían_aula_en_ese_edificio(gestor: GestorDeDatos):
-    gestor.add_edificio()
-    gestor.add_edificio()
-    gestor.add_aula(0)
-    gestor.add_aula(1)
+    gestor.agregar_edificio()
+    gestor.agregar_edificio()
+    gestor.agregar_aula(0)
+    gestor.agregar_aula(1)
     aula0 = gestor.get_from_edificio(0, campo_Edificio['aulas'])[0]
     aula1 = gestor.get_from_edificio(1, campo_Edificio['aulas'])[0]
 
-    gestor.add_carrera()
-    gestor.add_materia(0)
-    gestor.add_clase(0, 0)
-    gestor.add_clase(0, 0)
-    gestor.add_clase(0, 0)
-    gestor.add_clase(0, 0)
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.agregar_clase(0, 0)
+    gestor.agregar_clase(0, 0)
+    gestor.agregar_clase(0, 0)
+    gestor.agregar_clase(0, 0)
 
     gestor.set_in_clase(0, 0, 0, campo_Clase['aula_asignada'], aula1)
     gestor.set_in_clase(0, 0, 1, campo_Clase['aula_asignada'], aula0)

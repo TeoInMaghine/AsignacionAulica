@@ -84,6 +84,7 @@ ListView {
             spacing: 10
 
             CheckDelegate {
+                id: checkboxPreferirNoUsar
                 text: "Preferir no usar"
 
                 highlighted: hovered
@@ -94,7 +95,11 @@ ListView {
                 }
             }
 
-            Label { text: "   Horarios del edificio:" }
+            Label {
+                // Alinear con el checkbox de preferir no usar
+                leftPadding: checkboxPreferirNoUsar.leftPadding
+                text: "Horarios del edificio:"
+            }
             RowLayout { HeaderHorariosSemanales { } }
             RowLayout { EditorHorariosSemanales { } }
 
@@ -118,7 +123,7 @@ ListView {
             }
 
             // Espacio separador (sólo cuando los edificios están expandidos)
-            Item { height: 50 }
+            Item { height: 10 }
         }
 
     }

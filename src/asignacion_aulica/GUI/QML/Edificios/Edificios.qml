@@ -37,6 +37,10 @@ ListView {
         }
     }
 
+    // Se evita usar los "anchor margins" para dar espacios, para que esos
+    // espacios se "incluyan" en los scroll bars (por eso usamos el header acá)
+    header: Item { height: 10 }
+
     delegate: ColumnLayout {
         id: editorDeEdificio
 

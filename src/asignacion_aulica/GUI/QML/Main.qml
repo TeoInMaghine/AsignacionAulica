@@ -31,16 +31,16 @@ Window {
 
             sourceComponent: {
                 switch(sidebar.pestaña_actual) {
-                    case "Edificios": return pestañaEdificios
+                    case "Aulas": return pestañaAulas
                     case "Materias": return pestañaMaterias
-                    default: return pestañaEdificios
+                    default: return pestañaAulas
                 }
             }
         }
     }
 
     Component {
-        id: pestañaEdificios
+        id: pestañaAulas
         Edificios { }
     }
 

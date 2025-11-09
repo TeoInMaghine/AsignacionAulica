@@ -51,20 +51,12 @@ class ListEquipamientos(QAbstractListModel):
         if not index.isValid(): return False
 
         if role == Qt.ItemDataRole.UserRole + 1: # nombre
-            # No hay capacidad de renombrar equipamientos existentes. Si
-            # quisieramos, podríamos:
-            # - Tener un dataclass Equipamiento que wrappee el string del
-            #   nombre, así es mutable
-            # - En Aula y Clase usar listas en vez de sets de equipamiento; porque si algo es
-            #   mutable no es hasheable de forma segura
+            # No tiene sentido renombrar equipamientos existentes
             return False
         elif role == Qt.ItemDataRole.UserRole + 2: # seleccionado
             if value:
                 self.aula.equipamiento.add(self.equipamientos[index.row()])
             else:
-                # TODO: el gestor de datos borraría el equipamiento de la lista
-                # general si no se usa en ningún aula (probablemente conviene
-                # tener contadores de uso de equipamiento)
                 self.aula.equipamiento.discard(self.equipamientos[index.row()])
 
             self.seleccionadosTextChanged.emit()
@@ -77,8 +69,10 @@ class ListEquipamientos(QAbstractListModel):
     # (es necesaria esta funcionalidad al no poder renombrar)
     @pyqtSlot(str, result=bool)
     def appendEquipamiento(self, name: str) -> bool:
-        # TODO: validar (chequeos básicos y que no exista un equipamiento con
-        # el mismo nombre)
+        # TODO: más validaciones (en el gestor de datos directamente, creo)
+        if not name:
+            return False
+
         row_at_the_end = len(self.equipamientos)
         self.beginInsertRows(QModelIndex(), row_at_the_end, row_at_the_end)
         self.equipamientos.insert(row_at_the_end, name)

@@ -619,9 +619,6 @@ class GestorDeDatos:
         :return: Una lista de los equipamientos existentes en aulas y clases, en
         orden alfabético.
         '''
-        # Esto borra los equipamientos con contadores en 0
-        self._equipamientos = +self._equipamientos
-
         nombres = list(self._equipamientos.keys())
         nombres.sort(key=lambda nombre: nombre.lower())
         return nombres
@@ -655,6 +652,8 @@ class GestorDeDatos:
         if equipamiento in el_aula.equipamiento:
             el_aula.equipamiento.discard(equipamiento)
             self._equipamientos[equipamiento] -= 1
+            # Esto borra los equipamientos con contadores en 0
+            self._equipamientos = +self._equipamientos
         
     def agregar_equipamiento_a_clase(self, carrera: int, materia: int, clase: int, equipamiento: str):
         '''
@@ -686,6 +685,8 @@ class GestorDeDatos:
         if equipamiento in la_clase.equipamiento_necesario:
             la_clase.equipamiento_necesario.discard(equipamiento)
             self._equipamientos[equipamiento] -= 1
+            # Esto borra los equipamientos con contadores en 0
+            self._equipamientos = +self._equipamientos
 
     def validar_datos(self) -> str|None:
         '''

@@ -638,8 +638,11 @@ class GestorDeDatos:
         # Borrar espacios y unificar mayúsculas/minúsculas
         equipamiento = equipamiento.strip().title()
 
-        self._edificios[edificio].aulas[aula].equipamiento.add(equipamiento)
-        self._equipamientos[equipamiento] += 1
+        equipamientos_del_aula = self._edificios[edificio].aulas[aula].equipamiento
+
+        if equipamiento not in equipamientos_del_aula:
+            equipamientos_del_aula.add(equipamiento)
+            self._equipamientos[equipamiento] += 1
     
     def borrar_equipamiento_de_aula(self, edificio: int, aula: int, equipamiento: str):
         '''
@@ -671,8 +674,10 @@ class GestorDeDatos:
         # Borrar espacios y unificar mayúsculas/minúsculas
         equipamiento = equipamiento.strip().title()
 
-        self._carreras[carrera].materias[materia].clases[clase].equipamiento_necesario.add(equipamiento)
-        self._equipamientos[equipamiento] += 1
+        equipamientos_de_la_clase = self._carreras[carrera].materias[materia].clases[clase].equipamiento_necesario
+        if equipamiento not in equipamientos_de_la_clase:
+            equipamientos_de_la_clase.add(equipamiento)
+            self._equipamientos[equipamiento] += 1
 
     def borrar_equipamiento_de_clase(self, carrera: int, materia: int, clase: int, equipamiento: str):
         '''

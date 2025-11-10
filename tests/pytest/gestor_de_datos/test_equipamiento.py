@@ -21,7 +21,7 @@ def test_agregar_equipamiento_a_clase(gestor: GestorDeDatos):
     gestor.agregar_carrera()
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
-    gestor.argregar_equipamiento_a_clase(0, 0, 0, 'Proyector')
+    gestor.agregar_equipamiento_a_clase(0, 0, 0, 'Proyector')
 
     assert gestor.get_equipamientos_existentes() == ['Proyector']
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['equipamiento_necesario']) == {'Proyector'}
@@ -29,8 +29,8 @@ def test_agregar_equipamiento_a_clase(gestor: GestorDeDatos):
 def test_agregar_y_quitar_equipamiento_a_aula(gestor: GestorDeDatos):
     gestor.agregar_edificio()
     gestor.agregar_aula(0)
-    gestor.argregar_equipamiento_a_aula(0, 0, 'Proyector')
-    gestor.argregar_equipamiento_a_aula(0, 0, 'Compus')
+    gestor.agregar_equipamiento_a_aula(0, 0, 'Proyector')
+    gestor.agregar_equipamiento_a_aula(0, 0, 'Compus')
     assert gestor.get_from_aula(0, 0, campo_Aula['equipamiento']) == {'Proyector', 'Compus'}
     assert gestor.get_equipamientos_existentes() == ['Compus', 'Proyector'] # Los ordenó alfabéticamente
 
@@ -42,8 +42,8 @@ def test_agregar_y_quitar_equipamiento_a_clase(gestor: GestorDeDatos):
     gestor.agregar_carrera()
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
-    gestor.argregar_equipamiento_a_clase(0, 0, 0, 'Proyector')
-    gestor.argregar_equipamiento_a_clase(0, 0, 0, 'muñeco de rcp') # Este se va a cambiar a titlecase al normalizarlo
+    gestor.agregar_equipamiento_a_clase(0, 0, 0, 'Proyector')
+    gestor.agregar_equipamiento_a_clase(0, 0, 0, 'muñeco de rcp') # Este se va a cambiar a titlecase al normalizarlo
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['equipamiento_necesario']) == {'Proyector', 'Muñeco De Rcp'}
     assert gestor.get_equipamientos_existentes() == ['Muñeco De Rcp', 'Proyector'] # Los ordenó alfabéticamente
 
@@ -65,16 +65,16 @@ def test_agregar_y_quitar_equipamientos_en_varios_lugares(gestor: GestorDeDatos)
 
     assert gestor.get_equipamientos_existentes() == []
 
-    gestor.argregar_equipamiento_a_aula(1, 0, 'A')
+    gestor.agregar_equipamiento_a_aula(1, 0, 'A')
     assert gestor.get_from_aula(1, 0, campo_Aula['equipamiento']) == {'A'}
     assert gestor.get_equipamientos_existentes() == ['A']
 
-    gestor.argregar_equipamiento_a_clase(0, 0, 0, 'B')
-    gestor.argregar_equipamiento_a_clase(0, 0, 0, 'A')
+    gestor.agregar_equipamiento_a_clase(0, 0, 0, 'B')
+    gestor.agregar_equipamiento_a_clase(0, 0, 0, 'A')
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['equipamiento_necesario']) == {'A', 'B'}
     assert gestor.get_equipamientos_existentes() == ['A', 'B']
 
-    gestor.argregar_equipamiento_a_aula(0, 0, 'C')
+    gestor.agregar_equipamiento_a_aula(0, 0, 'C')
     assert gestor.get_from_aula(0, 0, campo_Aula['equipamiento']) == {'C'}
     assert gestor.get_equipamientos_existentes() == ['A', 'B', 'C']
 

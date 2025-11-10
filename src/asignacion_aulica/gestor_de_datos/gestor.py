@@ -626,7 +626,7 @@ class GestorDeDatos:
         nombres.sort(key=lambda nombre: nombre.lower())
         return nombres
     
-    def argregar_equipamiento_a_aula(self, edificio: int, aula: int, equipamiento: str):
+    def agregar_equipamiento_a_aula(self, edificio: int, aula: int, equipamiento: str):
         '''
         Agrega un equipamiento a un aula.
 
@@ -656,7 +656,7 @@ class GestorDeDatos:
             el_aula.equipamiento.discard(equipamiento)
             self._equipamientos[equipamiento] -= 1
         
-    def argregar_equipamiento_a_clase(self, carrera: int, materia: int, clase: int, equipamiento: str):
+    def agregar_equipamiento_a_clase(self, carrera: int, materia: int, clase: int, equipamiento: str):
         '''
         Agrega un equipamiento necesario en una clase.
 

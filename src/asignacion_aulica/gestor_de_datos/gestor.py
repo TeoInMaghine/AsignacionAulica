@@ -803,8 +803,14 @@ def _generar_nombre_no_existente(base: str, nombres_existentes: Sequence[str]) -
 
 def _aula_quedaría_repetida_en_aulas_dobles(aula: Aula, i_aula_doble: int, i_campo: int, aulas_dobles: Sequence[AulaDoble]) -> bool:
     '''
-    Determinar si `aula` forma parte de algún aula doble, excepto en el campo
-    con índice `i_campo` del aula doble con índice `i_aula_doble`.
+    Determinar si `aula` ya forma parte de algún aula doble, excepto en el campo
+    al que se quiere asignar.
+
+    :param aula: Un aula que se quiere agregar a un aula doble.
+    :param i_aula_doble: El índice del aula doble.
+    :param i_campo: El índice del campo del aula doble al que se quiere asignar
+    el aula.
+    :param aulas_dobles: La lista de aulas dobles del edificio correspondiente.
     '''
     el_aula_doble = aulas_dobles[i_aula_doble]
     campo = fieldnames_AulaDoble[i_campo]

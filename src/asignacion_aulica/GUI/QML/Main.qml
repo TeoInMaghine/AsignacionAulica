@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Window
 import QtQuick.Layouts
-import QML.Aulas
+import QML.Edificios
 import QML.BarraLateral
 
 Window {
@@ -41,7 +41,7 @@ Window {
 
     Component {
         id: pestañaAulas
-        Aulas { }
+        Edificios { }
     }
 
     Component {

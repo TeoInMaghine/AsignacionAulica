@@ -1,6 +1,6 @@
 from dataclasses import fields, asdict
 from typing import Any
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio
@@ -28,6 +28,15 @@ class ListAulas(QAbstractListModel):
         self.layoutAboutToBeChanged.emit()
         self.aulas.sort(key=lambda x: x.nombre)
         self.layoutChanged.emit()
+
+    # TODO: Usar indexEdificio en obtención/edición de datos
+    @pyqtProperty(int)
+    def indexEdificio(self) -> int:
+        return self._indexAula
+
+    @indexEdificio.setter
+    def indexEdificio(self, indexEdificio: int):
+        self._indexEdificio = indexEdificio
 
     # Constante
     def roleNames(self) -> dict[int, QByteArray]:

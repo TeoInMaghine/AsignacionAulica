@@ -1,0 +1,161 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+// import ModelosAsignaciónÁulica
+import QML.ComponentesUI
+
+ListView {
+    id: view
+
+    anchors.fill: parent
+    spacing: 10
+    // Se evita usar los "anchor margins" para dar espacios, para que esos
+    // espacios se "incluyan" en los scroll bars (por eso en cambio usamos el
+    // header y el footer para dar esos márgenes)
+    readonly property int topMargin: 10
+    readonly property int bottomMargin: 10
+
+    width: parent.width
+    contentWidth: contentItem.childrenRect.width + 2 * anchors.margins
+    // TODO: scroll horizontal no funciona completamente al achicar la ventana
+    ScrollBar.horizontal: ScrollBar { id: hbar; active: vbar.active }
+    ScrollBar.vertical: ScrollBar { id: vbar; active: hbar.active }
+    flickableDirection: Flickable.HorizontalAndVerticalFlick
+    boundsBehavior: Flickable.StopAtBounds
+    acceptedButtons: Qt.NoButton // Que no se pueda arrastrar a lo touch screen
+
+    clip: true
+
+    // TODO: reemplazar por modelo
+    // model: ListEdificios { id: edificios }
+    model: ListModel {
+        id: edificios
+        ListElement {
+            nombre: "Anasagasti I"
+            preferir_no_usar: false
+        }
+        ListElement {
+            nombre: "Anasagasti II"
+            preferir_no_usar: false
+        }
+        ListElement {
+            nombre: "Tacuarí"
+            preferir_no_usar: true
+        }
+    }
+
+    header: Item { height: topMargin }
+
+    delegate: ColumnLayout {
+        id: editorDeEdificio
+
+        width: view.width
+
+        readonly property alias indentaciónDeAnidado: colapsador.width
+
+        required property var model
+        required property var index
+
+        property alias edificio : editorDeEdificio.model
+
+        RowLayout {
+            id: editorSiempreVisibleDeEdificio
+            spacing: 0
+
+            Colapsador {
+                id: colapsador
+                Component.onCompleted: {
+                    editorDetallesDeEdificio.visible = checked
+                }
+                onClicked: {
+                    editorDetallesDeEdificio.visible = checked
+                }
+            }
+            TextField {
+                text: edificio.nombre
+                onEditingFinished: {
+                    edificio.nombre = text
+                }
+            }
+            BotónBorrar {
+                Layout.leftMargin: 10
+                onClicked: {
+                    edificios.remove(index)
+                    // edificios.removeRow(index)
+                }
+            }
+        }
+
+        ColumnLayout {
+            id: editorDetallesDeEdificio
+            Layout.leftMargin: indentaciónDeAnidado
+
+            spacing: 10
+
+            CheckDelegate {
+                id: checkboxPreferirNoUsar
+                text: "Preferir no usar"
+
+                highlighted: hovered
+
+                checked: edificio.preferir_no_usar
+                onToggled: {
+                    edificio.preferir_no_usar = checked
+                }
+            }
+
+            Label {
+                // Alinear con el checkbox de preferir no usar
+                leftPadding: checkboxPreferirNoUsar.leftPadding
+                text: "Horarios del edificio:"
+            }
+            RowLayout { HeaderHorariosSemanales { } }
+            RowLayout { EditorHorariosSemanales { } }
+
+            Item {
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                Layout.preferredHeight: editorDeAulas.height
+                Layout.preferredWidth: editorDeAulas.width
+
+                Rectangle {
+                    id: fondo
+                    anchors.fill: parent
+
+                    color: "#F0F0F0"
+                    border.width: 1
+                    border.color: "lightgray"
+                }
+                Aulas {
+                    id: editorDeAulas
+                    edificio: editorDeEdificio.edificio
+                }
+            }
+
+            // Espacio separador (sólo cuando los edificios están expandidos)
+            Item { height: 10 }
+        }
+
+    }
+
+    footer: Item {
+        height: footerEdificios.height + view.spacing + bottomMargin
+        width: footerEdificios.width
+
+        BotónAñadir {
+            id: footerEdificios
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.topMargin: view.spacing
+            anchors.leftMargin: 10
+            width: 200
+
+            onClicked: {
+                edificios.append({
+                    nombre: "",
+                    preferir_no_usar: false
+                })
+                // edificios.insertRow(edificios.rowCount())
+            }
+        }
+    }
+}

@@ -35,7 +35,7 @@ ComboBox {
             LayoutMirroring.enabled: true
 
             text: model.nombre
-            highlighted: comboBox.highlightedIndex == index
+            highlighted: comboBox.highlightedIndex == index || hovered
 
             checked: model.seleccionado
             onToggled: {
@@ -70,12 +70,16 @@ ComboBox {
 
             footer: RowLayout {
                 width: parent.width
-                spacing: 0
+                spacing: 5
+                readonly property int leftMargin: 8
+                readonly property int rightMargin: 5
+                readonly property int bottomMargin: 5
 
-                Button {
-                    Layout.preferredWidth: 50
+                BotónAñadir {
+                    Layout.leftMargin: leftMargin
+                    Layout.bottomMargin: bottomMargin
+                    Layout.alignment: Qt.AlignVCenter
 
-                    text: "add"
                     onClicked: {
                         if (equipamientos.appendEquipamiento(editorNuevoEquipamiento.text)) {
                             editorNuevoEquipamiento.clear()
@@ -84,10 +88,10 @@ ComboBox {
                 }
                 TextField {
                     id: editorNuevoEquipamiento
+                    Layout.rightMargin: rightMargin
+                    Layout.bottomMargin: bottomMargin
                     Layout.fillWidth: true
 
-                    // TOC, para que quede alineado con los check delegates
-                    rightPadding: 12
                     horizontalAlignment: TextInput.AlignRight
 
                     placeholderText: "Nuevo"

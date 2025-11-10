@@ -422,7 +422,8 @@ class GestorDeDatos:
         if edificio is None:
             el_edificio = None
         else:
-            # copiado de https://stackoverflow.com/a/2364277
+            # Buscar el primer edificio con el nombre especificado, si existe.
+            # Copiado de https://stackoverflow.com/a/2364277.
             el_edificio = next((ed for ed in self._edificios if ed.nombre==edificio), None)
             if el_edificio is None:
                 raise ValueError(f'No existe ningún edificio llamado "{edificio}".')

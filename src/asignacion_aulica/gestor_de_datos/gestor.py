@@ -314,7 +314,7 @@ class GestorDeDatos:
         field_name: str = fieldnames_AulaDoble[campo]
         
         if not isinstance(valor, Aula):
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "AulaDoble.{field_name}" de tipo {expected_type}')
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "AulaDoble.{field_name}" de tipo Aula.')
         elif _aula_quedaría_repetida_en_aulas_dobles(valor, aula_doble, campo, el_edificio.aulas_dobles):
             raise ValueError(f'El aula {valor.nombre} ya forma parte de un aula doble. Un aula común no puede aparecer más de una vez en las aulas dobles.')
         else:

@@ -3,6 +3,10 @@
 Este es el software de asignación áulica desarrollado como proyecto de la
 materia "Ingeniería de Software".
 
+## Créditos
+
+Algunos [íconos](/assets/iconos/) fueron creados a partir del [Simple Design System](https://www.figma.com/community/file/1380235722331273046) de [Figma](https://www.figma.com/), licenciado bajo [CC BY 4.0](http://creativecommons.org/licenses/by/4.0/).
+
 # Ambiente de Desarrollo
 
 Para desarrollar y probar este software es conveniente usar un ambiente virtual

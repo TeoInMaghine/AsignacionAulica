@@ -113,6 +113,24 @@ def test_get_set_aula_existente(gestor: GestorDeDatos):
     assert gestor.get_from_aula(0,0, campo_Aula['equipamiento']) == equipamiento
     assert gestor.get_from_aula(0,0, campo_Aula['horarios']) == horarios
 
+def test_set_nombre_repetido(gestor: GestorDeDatos):
+    '''
+    Verificar que el gestor de datos no permite nombres de aulas repetidos.
+    '''
+    gestor.agregar_edificio()
+    gestor.agregar_aula(0)
+    gestor.set_in_aula(0, 0, campo_Aula['nombre'], 'A')
+    gestor.agregar_aula(0)
+    gestor.set_in_aula(0, 1, campo_Aula['nombre'], 'B')
+    gestor.agregar_aula(0)
+    gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'C')
+
+    # Setear el mismo nombre que ya tiene está bien
+    gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'C')
+
+    with pytest.raises(ValueError):
+        gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'b')
+
 def test_get_aulas_orden_afabético(gestor: GestorDeDatos):
     gestor.agregar_edificio()
     gestor.agregar_aula(0)

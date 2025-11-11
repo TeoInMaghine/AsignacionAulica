@@ -107,6 +107,24 @@ def test_get_set_materia_existente(gestor: GestorDeDatos):
     assert gestor.get_from_materia(0,0, campo_Materia['año']) == año
     assert gestor.get_from_materia(0,0, campo_Materia['cuatrimestral_o_anual']) == cuatrimestral_o_anual
 
+def test_set_nombre_repetido(gestor: GestorDeDatos):
+    '''
+    Verificar que el gestor de datos no permite nombres de materias repetidos.
+    '''
+    gestor.agregar_carrera()
+    gestor.agregar_materia(0)
+    gestor.set_in_materia(0, 0, campo_Materia['nombre'], 'A')
+    gestor.agregar_materia(0)
+    gestor.set_in_materia(0, 1, campo_Materia['nombre'], 'B')
+    gestor.agregar_materia(0)
+    gestor.set_in_materia(0, 2, campo_Materia['nombre'], 'C')
+
+    # Setear el mismo nombre que ya tiene está bien
+    gestor.set_in_materia(0, 2, campo_Materia['nombre'], 'C')
+
+    with pytest.raises(ValueError):
+        gestor.set_in_materia(0, 2, campo_Materia['nombre'], 'b')
+
 def test_ordenar_materias(gestor: GestorDeDatos):
     gestor.agregar_carrera()
 

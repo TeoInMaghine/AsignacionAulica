@@ -101,21 +101,28 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         :raise TypeError: Si el tipo de ``valor`` no es correcto.
-
-        TODO: ¿Tirar una excepción si el campo es un nombre que ya existe?
+        :raise ValueError: Si se intenta cambiar el nombre del edificio a un
+        nombre que ya existe.
         '''
         el_edificio = self._edificios[edificio]
         field_name: str = fieldnames_Edificio[campo]
         expected_type = fieldtypes_Edificio[campo]
 
+        if not is_instance_of_type(valor, expected_type):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
+        
         # Si el valor es string, borrar espacios al principio y final
         if isinstance(valor, str):
             valor = valor.strip()
+        
+        # Si el campo es el nombre, chequear que no esté repetido
+        if field_name == 'nombre':
+            nombre_lower = valor.lower()
+            ya_existe = any(edificio.nombre.lower() == nombre_lower for edificio in self._edificios if edificio is not el_edificio)
+            if ya_existe:
+                raise ValueError(f'Ya existe un edificio llamado {valor}.')
 
-        if is_instance_of_type(valor, expected_type):
-            setattr(el_edificio, field_name, valor)
-        else:
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
+        setattr(el_edificio, field_name, valor)
 
     def agregar_edificio(self):
         '''
@@ -193,21 +200,28 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         :raise TypeError: Si el tipo de ``valor`` no es correcto.
-
-        TODO: ¿Tirar una excepción si el campo es un nombre que ya existe?
+        :raise ValueError: Si se intenta cambiar el nombre del aula a un nombre
+        que ya existe.
         '''
         el_aula = self._edificios[edificio].aulas[índice]
         field_name: str = fieldnames_Aula[campo]
         expected_type = fieldtypes_Aula[campo]
+        
+        if not is_instance_of_type(valor, expected_type):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Aula.{field_name}" de tipo {expected_type}.')
 
         # Si el valor es string, borrar espacios al principio y final
         if isinstance(valor, str):
             valor = valor.strip()
         
-        if is_instance_of_type(valor, expected_type):
-            setattr(el_aula, field_name, valor)
-        else:
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Aula.{field_name}" de tipo {expected_type}')
+        # Si el campo es el nombre, chequear que no esté repetido
+        if field_name == 'nombre':
+            nombre_lower = valor.lower()
+            ya_existe = any(aula.nombre.lower() == nombre_lower for aula in self._edificios[edificio].aulas if aula is not el_aula)
+            if ya_existe:
+                raise ValueError(f'Ya existe un aula llamada {valor} en el edificio {el_aula.edificio.nombre}.')
+        
+        setattr(el_aula, field_name, valor)
 
     def agregar_aula(self, edificio: int):
         '''
@@ -399,8 +413,8 @@ class GestorDeDatos:
         nombre = nombre.strip()
         if len(nombre) == 0:
             raise ValueError('El nombre de la carrera no puede estar vacío.')
-        elif nombre in (carrera.nombre for carrera in self._carreras):
-            raise ValueError(f'Ya existe una carrera llamada "{nombre}"')
+        elif nombre.lower() in (carrera.nombre.lower() for carrera in self._carreras):
+            raise ValueError(f'Ya existe una carrera llamada "{nombre}".')
         else:
             la_carrera = self._carreras[índice]
             la_carrera.nombre = nombre
@@ -482,21 +496,28 @@ class GestorDeDatos:
         :param campo: El índice del campo.
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
-
-        TODO: ¿Tirar una excepción si el campo es un nombre que ya existe?
+        :raise ValueError: Si se intenta cambiar el nombre de la materia a un
+        nombre que ya existe en la misma carrera.
         '''
         la_materia = self._carreras[carrera].materias[materia]
         field_name: str = fieldnames_Materia[campo]
         expected_type = fieldtypes_Materia[campo]
+        
+        if not is_instance_of_type(valor, expected_type):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Materia.{field_name}" de tipo {expected_type}.')
 
         # Si el valor es string, borrar espacios al principio y final
         if isinstance(valor, str):
             valor = valor.strip()
         
-        if is_instance_of_type(valor, expected_type):
-            setattr(la_materia, field_name, valor)
-        else:
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Materia.{field_name}" de tipo {expected_type}')
+        # Si el campo es el nombre, chequear que no esté repetido
+        if field_name == 'nombre':
+            nombre_lower = valor.lower()
+            ya_existe = any(materia.nombre.lower() == nombre_lower for materia in self._carreras[carrera].materias if materia is not la_materia)
+            if ya_existe:
+                raise ValueError(f'Ya existe una materia llamada {valor} en la carrera {la_materia.carrera.nombre}.')
+        
+        setattr(la_materia, field_name, valor)
 
     def agregar_materia(self, carrera: int):
         '''

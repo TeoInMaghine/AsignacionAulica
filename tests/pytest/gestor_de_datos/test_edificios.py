@@ -89,6 +89,23 @@ def test_agregar_edificios_nombres_distintos(gestor: GestorDeDatos):
     assert all('sin nombre' in nombre for nombre in nombres)
     assert len(nombres) == len(set(nombres)) # No hay repetidos
 
+def test_set_nombre_repetido(gestor: GestorDeDatos):
+    '''
+    Verificar que el gestor de datos no permite nombres de edificios repetidos.
+    '''
+    gestor.agregar_edificio()
+    gestor.set_in_edificio(0, campo_Edificio['nombre'], 'A')
+    gestor.agregar_edificio()
+    gestor.set_in_edificio(1, campo_Edificio['nombre'], 'B')
+    gestor.agregar_edificio()
+    gestor.set_in_edificio(2, campo_Edificio['nombre'], 'C')
+
+    # Setear el mismo nombre que ya tiene está bien
+    gestor.set_in_edificio(2, campo_Edificio['nombre'], 'C')
+
+    with pytest.raises(ValueError):
+        gestor.set_in_edificio(2, campo_Edificio['nombre'], 'A')
+
 def test_get_edificios_orden_afabético(gestor: GestorDeDatos):
     gestor.agregar_edificio()
     gestor.set_in_edificio(0, campo_Edificio['nombre'], 'b')

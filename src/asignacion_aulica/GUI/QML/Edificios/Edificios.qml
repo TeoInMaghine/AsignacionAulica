@@ -64,8 +64,7 @@ ListView {
             BotónBorrar {
                 Layout.leftMargin: 10
                 onClicked: {
-                    edificios.remove(index)
-                    // edificios.removeRow(index)
+                    edificios.removeRow(index)
                 }
             }
         }
@@ -134,11 +133,7 @@ ListView {
             width: 200
 
             onClicked: {
-                edificios.append({
-                    nombre: "",
-                    preferir_no_usar: false
-                })
-                // edificios.insertRow(edificios.rowCount())
+                edificios.insertRow(edificios.rowCount())
             }
         }
     }

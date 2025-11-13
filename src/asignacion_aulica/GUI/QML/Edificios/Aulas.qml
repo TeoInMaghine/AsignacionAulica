@@ -67,7 +67,7 @@ ListView {
 
             text: aula.capacidad
             onEditingFinished: {
-                aula.capacidad = parseInt(text)
+                aula.capacidad = text
             }
         }
 

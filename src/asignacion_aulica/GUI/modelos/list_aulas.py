@@ -58,14 +58,16 @@ class ListAulas(QAbstractListModel):
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
         if not index.isValid(): return False
+        if role not in NOMBRES_DE_ROLES: return False
 
-        if role in NOMBRES_DE_ROLES:
-            # TODO: validar value
-            self.gestor.set_in_aula(self.i_edificio, index.row(), rol_a_índice(role), value)
-            self.dataChanged.emit(index, index, [role])
-            return True
-        else:
-            return False
+        # TODO: validar value
+        if NOMBRES_DE_ROLES[role] == 'capacidad':
+            if not value.isdigit(): return False
+            value = int(value)
+
+        self.gestor.set_in_aula(self.i_edificio, index.row(), rol_a_índice(role), value)
+        self.dataChanged.emit(index, index, [role])
+        return True
 
     @override
     def removeRows(self, row: int, count: int, parent: QModelIndex|None = None) -> bool:

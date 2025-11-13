@@ -1,80 +1,92 @@
-from dataclasses import fields, asdict
-from typing import Any
+from dataclasses import asdict
+from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio
+from asignacion_aulica.gestor_de_datos.entidades import Aula, fieldnames_Aula
+
+NOMBRES_DE_ROLES: dict[int, QByteArray] = {
+    # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt
+    i + Qt.ItemDataRole.UserRole + 1: QByteArray(campo.encode()) for i, campo in enumerate(fieldnames_Aula)
+}
+
+def rol_a_índice(rol: int) -> int:
+    return rol - Qt.ItemDataRole.UserRole - 1
 
 class ListAulas(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
-        atributos_aulas = [field.name for field in fields(Aula)]
-        self.nombres_de_roles = {
-            # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt
-            i + Qt.ItemDataRole.UserRole + 1: atributo for i, atributo in enumerate(atributos_aulas)
-        }
-        # TODO: Esto es placeholder, falta usar el gestor de datos
-        self.edificio = Edificio('Anasagasti 1')
-        self.aulas = [
-            Aula('B101', self.edificio, 45),
-            Aula('B102', self.edificio, 45),
-            Aula('B201', self.edificio, 45)
-        ]
+        self.gestor: GestorDeDatos = gestor
+        self.i_edificio: int = 0 # Seteado por QT
 
     # TODO: Mover ordenamiento al nivel de elemento de lista de edificios
     # (para que al ordenar también se actualizen los índices de las aulas dobles)
     @pyqtSlot()
     def ordenar(self):
         self.layoutAboutToBeChanged.emit()
-        self.aulas.sort(key=lambda x: x.nombre)
+        self.gestor.ordenar_aulas(self.i_edificio)
         self.layoutChanged.emit()
 
-    # TODO: Usar indexEdificio en obtención/edición de datos
     @pyqtProperty(int)
     def indexEdificio(self) -> int:
-        return self._indexAula
+        return self.i_edificio
 
     @indexEdificio.setter
     def indexEdificio(self, indexEdificio: int):
-        self._indexEdificio = indexEdificio
+        self.i_edificio = indexEdificio
 
-    # Constante
+    @override
     def roleNames(self) -> dict[int, QByteArray]:
-        return {i: nombre.encode() for i, nombre in self.nombres_de_roles.items()}
+        return NOMBRES_DE_ROLES
 
-    def rowCount(self, _parent: QModelIndex) -> int:
-        return len(self.aulas)
+    @override
+    def rowCount(self, parent: QModelIndex|None = None) -> int:
+        return self.gestor.cantidad_de_aulas(self.i_edificio)
 
-    def data(self, index: QModelIndex, role: int) -> Any:
-        if not index.isValid(): return
+    @override
+    def data(self, index: QModelIndex, role: int = 0) -> Any:
+        if not index.isValid(): return None
 
-        if role in self.nombres_de_roles:
-            aula = self.aulas[index.row()]
-            return asdict(aula)[self.nombres_de_roles[role]]
+        if role in NOMBRES_DE_ROLES:
+            return self.gestor.get_from_aula(self.i_edificio, index.row(), rol_a_índice(role))
+        else:
+            return None
 
-    def setData(self, index: QModelIndex, value: Any, role: int) -> bool:
+    @override
+    def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
         if not index.isValid(): return False
 
-        if role in self.nombres_de_roles:
+        if role in NOMBRES_DE_ROLES:
             # TODO: validar value
-            setattr(self.aulas[index.row()], self.nombres_de_roles[role], value)
+            self.gestor.set_in_aula(self.i_edificio, index.row(), rol_a_índice(role), value)
             self.dataChanged.emit(index, index, [role])
             return True
+        else:
+            return False
 
-        return False
+    @override
+    def removeRows(self, row: int, count: int, parent: QModelIndex|None = None) -> bool:
+        '''Borra un solo elemento aún cuando count > 1.'''
+        if parent is None: return False
 
-    def removeRows(self, row: int, count: int, _parent: QModelIndex) -> bool:
-        # Borra un solo elemento aún cuando count > 1
-        self.beginRemoveRows(_parent, row, row)
-        self.aulas.pop(row)
+        self.beginRemoveRows(parent, row, row)
+        self.gestor.borrar_aula(self.i_edificio, row)
         self.endRemoveRows()
         return True
 
-    def insertRows(self, row: int, count: int, _parent: QModelIndex) -> bool:
-        # Inserta un solo elemento aún cuando count > 1
-        self.beginInsertRows(_parent, row, row)
+    @override
+    def insertRows(self, row: int, count: int, parent: QModelIndex|None = None) -> bool:
+        '''
+        Insertar aula "sin rellenar".
+
+        Inserta un solo elemento aún cuando count > 1, y lo inserta siempre al
+        final independientemente del valor de row.
+        '''
+        if parent is None: return False
+
+        actual_row = self.gestor.cantidad_de_aulas(self.i_edificio)
+        self.beginInsertRows(parent, actual_row, actual_row)
         # TODO: validar value (ej.: no dejar insertar si ya hay un aula "sin rellenar")
-        # Insertar aula "sin rellenar"
-        self.aulas.insert(row, Aula('', self.edificio, 0))
+        self.gestor.agregar_aula(self.i_edificio)
         self.endInsertRows()
         return True

@@ -3,6 +3,7 @@ from datetime import time
 from itertools import filterfalse
 from typing import Callable, Any
 from collections import Counter
+import logging
 
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
@@ -26,6 +27,8 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     todas_las_clases
 )
 from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
+
+logger = logging.getLogger(__name__)
 
 aula_no_seleccionada: Aula = Aula(nombre='Sin Seleccionar', edificio=None, capacidad=0)
 '''
@@ -54,6 +57,8 @@ class GestorDeDatos:
         datos. Si el archivo no existe, es creado. ``None`` para no guardar
         datos.
         '''
+        logger.info('Creando gestor de datos con path_base_de_datos=%s', path_base_de_datos)
+
         self._edificios: list[Edificio] = []
         self._carreras: list[Carrera] = []
         self._equipamientos: Counter[str] = Counter()
@@ -134,6 +139,7 @@ class GestorDeDatos:
         nombres_existentes = [edificio.nombre for edificio in self._edificios]
         nombre_nuevo = _generar_nombre_no_existente('Edificio sin nombre', nombres_existentes)
         self._edificios.append(Edificio(nombre_nuevo))
+        logger.debug('Se agregó edificio con nombre %s', nombre_nuevo)
 
     def borrar_edificio(self, índice: int):
         '''

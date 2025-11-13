@@ -1,9 +1,11 @@
-from dataclasses import asdict
+import logging
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.entidades import Aula, fieldnames_Aula
+from asignacion_aulica.gestor_de_datos.entidades import fieldnames_Aula
+
+logger = logging.getLogger(__name__)
 
 NOMBRES_DE_ROLES: dict[int, QByteArray] = {
     # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt
@@ -33,6 +35,7 @@ class ListAulas(QAbstractListModel):
 
     @indexEdificio.setter
     def indexEdificio(self, indexEdificio: int):
+        logger.info('Set indexEdificio: %s', indexEdificio)
         self.i_edificio = indexEdificio
 
     @override

@@ -1,6 +1,36 @@
+from collections.abc import Sequence
+from datetime import time
+from itertools import filterfalse
 from typing import Callable, Any
+from collections import Counter
 
-from asignacion_aulica.gestor_de_datos.entidades import Carrera
+from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
+from asignacion_aulica.lógica_de_asignación.asignación import asignar
+from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
+from asignacion_aulica.gestor_de_datos.entidades import (
+    Aula,
+    AulaDoble,
+    Carrera,
+    Clase,
+    Edificio,
+    Materia,
+    fieldnames_Aula,
+    fieldnames_AulaDoble,
+    fieldnames_Clase,
+    fieldnames_Edificio,
+    fieldnames_Materia,
+    fieldtypes_Aula,
+    fieldtypes_Clase,
+    fieldtypes_Edificio,
+    fieldtypes_Materia,
+    todas_las_clases
+)
+from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
+
+aula_no_seleccionada: Aula = Aula(nombre='Sin Seleccionar', edificio=None, capacidad=0)
+'''
+Aula dummy usada para inicializar las aulas dobles.
+'''
 
 class GestorDeDatos:
     '''
@@ -10,65 +40,100 @@ class GestorDeDatos:
     Internamente usa una base de datos para almacenar los datos de manera
     persistente.
 
-    Los miembros de las entidades se representan con números, los cuales se
-    corresponden con el orden de los miembros en cada entidad y los mal llamados
+    Los campos de las entidades se identifican con números, los cuales se
+    corresponden con el orden de los campos en cada entidad y los mal llamados
     roles de la UI.
+
+    La lista de carreras se mantiene ordenada alfabéticamente, pero la de
+    edificios sólo se ordena a pedido.
     '''
 
-    def __init__(self, path_base_de_datos: str):
+    def __init__(self, path_base_de_datos: str|None = None):
         '''
         :param path_base_de_datos: El path absoluto del archivo de la base de
-        datos. Si el archivo no existe, es creado.
+        datos. Si el archivo no existe, es creado. ``None`` para no guardar
+        datos.
         '''
-        pass
+        self._edificios: list[Edificio] = []
+        self._carreras: list[Carrera] = []
+        self._equipamientos: Counter[str] = Counter()
 
     def get_edificios(self) -> list[str]:
         '''
         :return: Los nombres de todos los edificios en la base de datos,
         ordenados alfabéticamente.
         '''
-        pass
+        nombres = [edificio.nombre for edificio in self._edificios]
+        nombres.sort(key=lambda nombre: nombre.lower())
+        return nombres
 
     def cantidad_de_edificios(self) -> int:
-        pass
+        return len(self._edificios)
 
-    def get_edificio(self, edificio: int, miembro: int) -> Any:
+    def get_from_edificio(self, edificio: int, campo: int) -> Any:
         '''
         :param edificio: El índice de un edificio.
-        :param miembro: El índice de un miembro.
-        :return: El valor del miembro especificado.
-        :raise IndexError: Si el índice o el miembro están fuera de rango.
+        :param campo: El índice de un campo.
+        :return: El valor del campo especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        field_name: str = fieldnames_Edificio[campo]
+        return getattr(self._edificios[edificio], field_name)
 
     def existe_edificio(self, nombre: str) -> bool:
         '''
         :return: `True` si hay un edificio con ese nombre en la base de datos,
         `False` si no.
-        '''
-        pass
 
-    def set_edificio(self, edificio: int, miembro: int, valor: Any):
+        No se distinguen mayúsculas de minúsculas.
         '''
-        Actualizar el valor de un miembro de un edificio existente.
+        nombre = nombre.lower().strip()
+        return any(edificio.nombre.lower() == nombre for edificio in self._edificios)
+
+    def set_in_edificio(self, edificio: int, campo: int, valor: Any):
+        '''
+        Actualizar el valor de un campo de un edificio existente.
 
         El valor dado se asume como válido.
 
         :param edificio: El índice del edificio.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
-        :raise IndexError: Si el índice o el miembro están fuera de rango.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        :raise TypeError: Si el tipo de ``valor`` no es correcto.
+        :raise ValueError: Si se intenta cambiar el nombre del edificio a un
+        nombre que ya existe.
         '''
-        pass
+        el_edificio = self._edificios[edificio]
+        field_name: str = fieldnames_Edificio[campo]
+        expected_type = fieldtypes_Edificio[campo]
 
-    def add_edificio(self):
+        if not is_instance_of_type(valor, expected_type):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
+        
+        # Si el valor es string, borrar espacios al principio y final
+        if isinstance(valor, str):
+            valor = valor.strip()
+        
+        # Si el campo es el nombre, chequear que no esté repetido
+        if field_name == 'nombre':
+            nombre_lower = valor.lower()
+            ya_existe = any(edificio.nombre.lower() == nombre_lower for edificio in self._edificios if edificio is not el_edificio)
+            if ya_existe:
+                raise ValueError(f'Ya existe un edificio llamado {valor}.')
+
+        setattr(el_edificio, field_name, valor)
+
+    def agregar_edificio(self):
         '''
         Añadir un nuevo edificio después del último índice existente.
 
         Se inicializa con valores por defecto, asegurando que tenga un nombre
         único.
         '''
-        pass
+        nombres_existentes = [edificio.nombre for edificio in self._edificios]
+        nombre_nuevo = _generar_nombre_no_existente('Edificio sin nombre', nombres_existentes)
+        self._edificios.append(Edificio(nombre_nuevo))
 
     def borrar_edificio(self, índice: int):
         '''
@@ -76,49 +141,89 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice está fuera de rango.
         '''
-        pass
+        # Sacar el edificio de la lista
+        el_edificio = self._edificios.pop(índice)
+        
+        # Sacar el edificio de las carreras que lo tienen como preferido
+        for carrera in self._carreras:
+            if carrera.edificio_preferido is el_edificio:
+                carrera.edificio_preferido = None
+        
+        # Borrar asignaciones a este edificio
+        for clase in todas_las_clases(self._carreras):
+            if clase.aula_asignada and clase.aula_asignada.edificio is el_edificio:
+                clase.aula_asignada = None
 
     def ordenar_edificios(self):
         '''
         Ordena los edificios alfabéticamente.
         '''
-        pass
+        self._edificios.sort(key=lambda edificio: edificio.nombre.lower())
 
     def cantidad_de_aulas(self, edificio: int) -> int:
-        pass
+        '''
+        :return: La cantidad de aulas de un edificio en la base de datos.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
+        '''
+        return len(self._edificios[edificio].aulas)
 
     def get_aulas(self, edificio: int) -> list[str]:
         '''
         :return: Los nombres de todas las aulas de un edificio en la base de
         datos, ordenados alfabéticamente.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        nombres = [aula.nombre for aula in self._edificios[edificio].aulas]
+        nombres.sort(key=lambda nombre: nombre.lower())
+        return nombres
 
-    def get_aula(self, edificio: int, índice: int, miembro: int) -> Any:
+    def get_from_aula(self, edificio: int, índice: int, campo: int) -> Any:
         '''
         :param edificio: El índice del edificio.
         :param índice: El índice del aula.
-        :param miembro: El índice del miembro.
-        :return: El valor del miembro especificado.
+        :param campo: El índice del campo.
+        :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        fieldname = fieldnames_Aula[campo]
+        return getattr(self._edificios[edificio].aulas[índice], fieldname)
 
-    def set_aula(self, edificio: int, índice: int, miembro: int, valor: Any):
+    def set_in_aula(self, edificio: int, índice: int, campo: int, valor: Any):
         '''
-        Actualizar el valor de un miembro de un aula existente.
+        Actualizar el valor de un campo de un aula existente.
 
         El valor dado se asume como válido.
 
         :param edificio: El índice del edificio.
         :param índice: El índice del aula.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
+        :raise TypeError: Si el tipo de ``valor`` no es correcto.
+        :raise ValueError: Si se intenta cambiar el nombre del aula a un nombre
+        que ya existe.
         '''
-        pass
+        el_aula = self._edificios[edificio].aulas[índice]
+        field_name: str = fieldnames_Aula[campo]
+        expected_type = fieldtypes_Aula[campo]
+        
+        if not is_instance_of_type(valor, expected_type):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Aula.{field_name}" de tipo {expected_type}.')
 
-    def add_aula(self, edificio: int):
+        # Si el valor es string, borrar espacios al principio y final
+        if isinstance(valor, str):
+            valor = valor.strip()
+        
+        # Si el campo es el nombre, chequear que no esté repetido
+        if field_name == 'nombre':
+            nombre_lower = valor.lower()
+            ya_existe = any(aula.nombre.lower() == nombre_lower for aula in self._edificios[edificio].aulas if aula is not el_aula)
+            if ya_existe:
+                raise ValueError(f'Ya existe un aula llamada {valor} en el edificio {el_aula.edificio.nombre}.')
+        
+        setattr(el_aula, field_name, valor)
+
+    def agregar_aula(self, edificio: int):
         '''
         Añadir al edificio un nuevo aula, después del último índice existente.
 
@@ -128,18 +233,30 @@ class GestorDeDatos:
         :param edificio: El índice del edificio.
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        el_edificio = self._edificios[edificio]
+        nombres_existentes = [aula.nombre for aula in el_edificio.aulas]
+        nombre_nuevo = _generar_nombre_no_existente('Aula sin nombre', nombres_existentes)
+        
+        el_edificio.aulas.append(Aula(
+            nombre = nombre_nuevo,
+            edificio = el_edificio,
+            capacidad = 1
+        ))
 
     def existe_aula(self, edificio: int, nombre: str) -> bool:
         '''
         :return: `True` si el aula especificada existe en la base de datos,
         `False` si no.
 
+        No se distinguen mayúsculas de minúsculas.
+
         :param edificio: El índice del edificio.
         :param nombre: El nombre del aula.
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        nombre = nombre.lower().strip()
+        el_edificio = self._edificios[edificio]
+        return any(aula.nombre.lower() == nombre for aula in el_edificio.aulas)
 
     def borrar_aula(self, edificio: int, índice: int):
         '''
@@ -149,7 +266,21 @@ class GestorDeDatos:
         :param índice: El índice del aula.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        el_edificio = self._edificios[edificio]
+
+        # Sacar el aula de la lista
+        el_aula = el_edificio.aulas.pop(índice)
+        
+        # Borrar aulas dobles que usen este aula
+        el_edificio.aulas_dobles[:] = filterfalse(
+            lambda ad: ad.aula_grande is el_aula or ad.aula_chica_1 is el_aula or ad.aula_chica_2 is el_aula,
+            el_edificio.aulas_dobles
+        )
+
+        # Borrar asignaciones a este aula
+        for clase in todas_las_clases(self._carreras):
+            if clase.aula_asignada is el_aula:
+                clase.aula_asignada = None
 
     def ordenar_aulas(self, edificio: int):
         '''
@@ -157,36 +288,53 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        self._edificios[edificio].aulas.sort(key=lambda aula: aula.nombre.lower())
 
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
-        pass
+        '''
+        :return: La cantidad de aulas dobles de un edificio en la base de datos.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
+        '''
+        return len(self._edificios[edificio].aulas_dobles)
 
-    def get_aula_doble(self, edificio: int, aula_doble: int, miembro: int) -> Any:
+    def get_from_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Aula:
         '''
         :param edificio: El índice del edificio.
         :param aula_doble: El índice del aula doble.
-        :param miembro: El índice del miembro.
-        :return: El valor del miembro especificado.
+        :param campo: El índice del campo.
+        :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        fieldname = fieldnames_AulaDoble[campo]
+        return getattr(self._edificios[edificio].aulas_dobles[aula_doble], fieldname)
 
-    def set_aula_doble(self, edificio: int, aula_doble: int, miembro: int, valor: Any):
+    def set_in_aula_doble(self, edificio: int, aula_doble: int, campo: int, valor: Aula):
         '''
-        Actualizar el valor de un miembro de un aula doble existente.
+        Actualizar el valor de un campo de un aula doble existente.
 
         El valor dado se asume como válido.
 
         :param edificio: El índice del edificio.
         :param aula_doble: El índice del aula doble.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
+        :raise TypeError: Si el tipo de ``valor`` no es correcto.
+        :raise ValueError: Si se intenta asignar un aula que ya forma parte de
+        un aula doble.
         '''
-        pass
+        el_edificio = self._edificios[edificio]
+        el_aula_doble = el_edificio.aulas_dobles[aula_doble]
+        field_name: str = fieldnames_AulaDoble[campo]
+        
+        if not isinstance(valor, Aula):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "AulaDoble.{field_name}" de tipo Aula.')
+        elif _aula_quedaría_repetida_en_aulas_dobles(valor, aula_doble, campo, el_edificio.aulas_dobles):
+            raise ValueError(f'El aula {valor.nombre} ya forma parte de un aula doble. Un aula común no puede aparecer más de una vez en las aulas dobles.')
+        else:
+            setattr(el_aula_doble, field_name, valor)
 
-    def add_aula_doble(self, edificio: int):
+    def agregar_aula_doble(self, edificio: int):
         '''
         Añadir al edificio un nuevo aula doble, después del último índice
         existente.
@@ -194,7 +342,9 @@ class GestorDeDatos:
         :param edificio: El índice del edificio.
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        pass
+        self._edificios[edificio].aulas_dobles.append(AulaDoble(
+            aula_no_seleccionada, aula_no_seleccionada, aula_no_seleccionada
+        ))
 
     def borrar_aula_doble(self, edificio: int, índice: int):
         '''
@@ -204,7 +354,7 @@ class GestorDeDatos:
         :param índice: El índice del aula doble.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        del self._edificios[edificio].aulas_dobles[índice]
 
     def ordenar_aulas_dobles(self, edificio: int):
         '''
@@ -213,26 +363,43 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
+        self._edificios[edificio].aulas_dobles.sort(key=lambda aula_doble: aula_doble.aula_grande.nombre.lower())
 
     def get_carreras(self) -> list[str]:
         '''
         :return: Los nombres de todas las carreras en la base de
         datos, ordenadas alfabéticamente.
         '''
-        pass
+        nombres = [carrera.nombre for carrera in self._carreras]
+        return nombres
 
     def get_carrera(self, índice: int) -> Carrera:
         '''
         :return: La carrera con el índice dado.
         :raise IndexError: Si el índice está fuera de rango.
         '''
-        pass
+        return self._carreras[índice]
+
+    def agregar_carrera(self):
+        '''
+        Añadir al edificio una nueva carrera, después del último índice
+        existente.
+
+        Se inicializa con valores por defecto, asegurando que tenga un nombre
+        único.
+        '''
+        nombres_existentes = [carrera.nombre for carrera in self._carreras]
+        nombre_nuevo = _generar_nombre_no_existente('Carrera sin nombre', nombres_existentes)
+        self._carreras.append(Carrera(nombre_nuevo))
     
     def existe_carrera(self, nombre: str) -> bool:
         '''
         :return: `True` si hay una carrera con ese nombre, `False` si no.
+
+        No se distinguen mayúsculas de minúsculas.
         '''
-        pass
+        nombre = nombre.lower().strip()
+        return any(carrera.nombre.lower() == nombre for carrera in self._carreras)
 
     def set_carrera_nombre(self, índice: int, nombre: str) -> int:
         '''
@@ -240,9 +407,20 @@ class GestorDeDatos:
 
         :return: El nuevo índice de la carrera.
         :raise IndexError: Si el índice está fuera de rango.
-        :raise ValueError: Si ya existe una carrera con el nombre dado.
+        :raise ValueError: Si ya existe una carrera con el nombre dado, o si el
+        nombre dado es un string vacío.
         '''
-        pass
+        nombre = nombre.strip()
+        if len(nombre) == 0:
+            raise ValueError('El nombre de la carrera no puede estar vacío.')
+        elif nombre.lower() in (carrera.nombre.lower() for carrera in self._carreras):
+            raise ValueError(f'Ya existe una carrera llamada "{nombre}".')
+        else:
+            la_carrera = self._carreras[índice]
+            la_carrera.nombre = nombre
+            self._carreras.sort(key=lambda carrera: carrera.nombre.lower())
+            nuevo_índice = self._carreras.index(la_carrera)
+            return nuevo_índice
 
     def set_carrera_edificio_preferido(self, índice: int, edificio: str|None):
         '''
@@ -255,7 +433,16 @@ class GestorDeDatos:
         :raise IndexError: Si el índice está fuera de rango.
         :raise ValueError: Si no existe un edificio con el nombre dado.
         '''
-        pass
+        if edificio is None:
+            el_edificio = None
+        else:
+            # Buscar el primer edificio con el nombre especificado, si existe.
+            # Copiado de https://stackoverflow.com/a/2364277.
+            el_edificio = next((ed for ed in self._edificios if ed.nombre==edificio), None)
+            if el_edificio is None:
+                raise ValueError(f'No existe ningún edificio llamado "{edificio}".')
+        
+        self._carreras[índice].edificio_preferido = el_edificio
 
     def borrar_carrera(self, índice: int):
         '''
@@ -263,50 +450,76 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice está fuera de rango.
         '''
-        pass
+        del self._carreras[índice]
 
     def cantidad_de_materias(self, carrera: int) -> int:
         '''
         :param carrera: El índice de la carrera.
+        :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
-        pass
+        return len(self._carreras[carrera].materias)
 
-    def get_materia(self, carrera: int, materia: int, miembro: int) -> Any:
+    def get_from_materia(self, carrera: int, materia: int, campo: int) -> Any:
         '''
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :param miembro: El índice del miembro.
-        :return: El valor del miembro especificado.
+        :param campo: El índice del campo.
+        :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        fieldname = fieldnames_Materia[campo]
+        return getattr(self._carreras[carrera].materias[materia], fieldname)
 
     def existe_materia(self, carrera: int, nombre: str) -> bool:
         '''
         :return: `True` si la materia especificada existe en la base de datos,
         `False` si no.
 
+        No se distinguen mayúsculas de minúsculas.
+
         :param carrera: El índice de la carrera.
         :param nombre: El nombre de la materia a buscar.
         :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
-        pass
+        nombre = nombre.lower().strip()
+        la_carrera = self._carreras[carrera]
+        return any(materia.nombre.lower() == nombre for materia in la_carrera.materias)
 
-    def set_materia(self, carrera: int, materia: int, miembro: int, valor: Any):
+    def set_in_materia(self, carrera: int, materia: int, campo: int, valor: Any):
         '''
-        Actualizar el valor de un miembro de un materia existente.
+        Actualizar el valor de un campo de un materia existente.
 
         El valor dado se asume como válido.
 
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
+        :raise ValueError: Si se intenta cambiar el nombre de la materia a un
+        nombre que ya existe en la misma carrera.
         '''
-        pass
+        la_materia = self._carreras[carrera].materias[materia]
+        field_name: str = fieldnames_Materia[campo]
+        expected_type = fieldtypes_Materia[campo]
+        
+        if not is_instance_of_type(valor, expected_type):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Materia.{field_name}" de tipo {expected_type}.')
 
-    def add_materia(self, carrera: int):
+        # Si el valor es string, borrar espacios al principio y final
+        if isinstance(valor, str):
+            valor = valor.strip()
+        
+        # Si el campo es el nombre, chequear que no esté repetido
+        if field_name == 'nombre':
+            nombre_lower = valor.lower()
+            ya_existe = any(materia.nombre.lower() == nombre_lower for materia in self._carreras[carrera].materias if materia is not la_materia)
+            if ya_existe:
+                raise ValueError(f'Ya existe una materia llamada {valor} en la carrera {la_materia.carrera.nombre}.')
+        
+        setattr(la_materia, field_name, valor)
+
+    def agregar_materia(self, carrera: int):
         '''
         Añadir a una carrera una nueva materia, después del último índice
         existente.
@@ -317,7 +530,15 @@ class GestorDeDatos:
         :param carrera: El índice de la carrera.
         :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
-        pass
+        la_carrera = self._carreras[carrera]
+        nombres_existentes = [materia.nombre for materia in la_carrera.materias]
+        nombre_nuevo = _generar_nombre_no_existente('Materia sin nombre', nombres_existentes)
+        
+        la_carrera.materias.append(Materia(
+            nombre = nombre_nuevo,
+            carrera = la_carrera,
+            año = 1
+        ))
 
     def borrar_materia(self, carrera: int, materia: int):
         '''
@@ -327,7 +548,7 @@ class GestorDeDatos:
         :param materia: El índice de la materia.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        del self._carreras[carrera].materias[materia]
 
     def ordenar_materias(self, carrera: int):
         '''
@@ -335,7 +556,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice de la carrera está fuera de rango.
         '''
-        pass
+        self._carreras[carrera].materias.sort(key=lambda materia: materia.nombre.lower())
 
     def cantidad_de_clases(self, carrera: int, materia: int) -> int:
         '''
@@ -344,47 +565,47 @@ class GestorDeDatos:
         :return: la cantidad de clases que tiene la materia especificada.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        return len(self._carreras[carrera].materias[materia].clases)
 
-    def get_clase(self, carrera: int, materia: int, clase: int, miembro: int) -> Any:
+    def get_from_clase(self, carrera: int, materia: int, clase: int, campo: int) -> Any:
         '''
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
         :param clase: El índice de la clase.
-        :param miembro: El índice del miembro.
-        :return: El valor del miembro especificado.
+        :param campo: El índice del campo.
+        :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        fieldname = fieldnames_Clase[campo]
+        return getattr(self._carreras[carrera].materias[materia].clases[clase], fieldname)
 
-    def existe_clase(self, carrera: int, materia: int, nombre: str) -> bool:
+    def set_in_clase(self, carrera: int, materia: int, clase: int, campo: int, valor: Any):
         '''
-        :return: `True` si la clase especificada existe en la base de datos,
-        `False` si no.
-
-        :param carrera: El índice de la carrera.
-        :param materia: El índice de la materia.
-        :param nombre: El nombre de la clase a buscar.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
-        '''
-        pass
-
-    def set_clase(self, carrera: int, materia: int, clase: int, miembro: int, valor: Any):
-        '''
-        Actualizar el valor de un miembro de una clase existente.
+        Actualizar el valor de un campo de una clase existente.
 
         El valor dado se asume como válido.
 
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
         :param clase: El índice de la clase.
-        :param miembro: El índice del miembro.
-        :param valor: El nuevo valor del miembro especificado.
+        :param campo: El índice del campo.
+        :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        la_clase = self._carreras[carrera].materias[materia].clases[clase]
+        field_name: str = fieldnames_Clase[campo]
+        expected_type = fieldtypes_Clase[campo]
 
-    def add_clase(self, carrera: int, materia: int):
+        # Si el valor es string, borrar espacios al principio y final
+        if isinstance(valor, str):
+            valor = valor.strip()
+        
+        if is_instance_of_type(valor, expected_type):
+            setattr(la_clase, field_name, valor)
+        else:
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Clase.{field_name}" de tipo {expected_type}')
+
+    def agregar_clase(self, carrera: int, materia: int):
         '''
         Añadir una nueva clase a una carrera, después del último índice
         existente.
@@ -395,7 +616,14 @@ class GestorDeDatos:
         :param materia: El índice de la materia.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        la_materia = self._carreras[carrera].materias[materia]
+        la_materia.clases.append(Clase(
+            materia=la_materia,
+            día=Día.Lunes,
+            horario=RangoHorario(time(10), time(11)),
+            virtual=False,
+            cantidad_de_alumnos=1
+        ))
 
     def borrar_clase(self, carrera: int, materia: int, clase: int):
         '''
@@ -406,7 +634,86 @@ class GestorDeDatos:
         :param clase: El índice de la clase.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        pass
+        del self._carreras[carrera].materias[materia].clases[clase]
+
+    def get_equipamientos_existentes(self) -> list[str]:
+        '''
+        :return: Una lista de los equipamientos existentes en aulas y clases, en
+        orden alfabético.
+        '''
+        nombres = list(self._equipamientos.keys())
+        nombres.sort(key=lambda nombre: nombre.lower())
+        return nombres
+    
+    def agregar_equipamiento_a_aula(self, edificio: int, aula: int, equipamiento: str):
+        '''
+        Agrega un equipamiento a un aula.
+
+        El nombre del equipamiento se normaliza para evitar diferencias de
+        minúsculas/mayúsculas y de espacios invisibles.
+
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula.
+        :param equipamiento: El nombre de un equipamiento.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        # Borrar espacios y unificar mayúsculas/minúsculas
+        equipamiento = equipamiento.strip().title()
+
+        equipamientos_del_aula = self._edificios[edificio].aulas[aula].equipamiento
+
+        if equipamiento not in equipamientos_del_aula:
+            equipamientos_del_aula.add(equipamiento)
+            self._equipamientos[equipamiento] += 1
+    
+    def borrar_equipamiento_de_aula(self, edificio: int, aula: int, equipamiento: str):
+        '''
+        :param edificio: El índice del edificio.
+        :param índice: El índice del aula.
+        :param equipamiento: El nombre de un equipamiento.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        el_aula = self._edificios[edificio].aulas[aula]
+        if equipamiento in el_aula.equipamiento:
+            el_aula.equipamiento.discard(equipamiento)
+            self._equipamientos[equipamiento] -= 1
+            # Esto borra los equipamientos con contadores en 0
+            self._equipamientos = +self._equipamientos
+        
+    def agregar_equipamiento_a_clase(self, carrera: int, materia: int, clase: int, equipamiento: str):
+        '''
+        Agrega un equipamiento necesario en una clase.
+
+        El nombre del equipamiento se normaliza para evitar diferencias de
+        minúsculas/mayúsculas y de espacios invisibles.
+        
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :param clase: El índice de la clase.
+        :param equipamiento: El nombre de un equipamiento.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        # Borrar espacios y unificar mayúsculas/minúsculas
+        equipamiento = equipamiento.strip().title()
+
+        equipamientos_de_la_clase = self._carreras[carrera].materias[materia].clases[clase].equipamiento_necesario
+        if equipamiento not in equipamientos_de_la_clase:
+            equipamientos_de_la_clase.add(equipamiento)
+            self._equipamientos[equipamiento] += 1
+
+    def borrar_equipamiento_de_clase(self, carrera: int, materia: int, clase: int, equipamiento: str):
+        '''
+        :param carrera: El índice de la carrera.
+        :param materia: El índice de la materia.
+        :param clase: El índice de la clase.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        la_clase = self._carreras[carrera].materias[materia].clases[clase]
+        if equipamiento in la_clase.equipamiento_necesario:
+            la_clase.equipamiento_necesario.discard(equipamiento)
+            self._equipamientos[equipamiento] -= 1
+            # Esto borra los equipamientos con contadores en 0
+            self._equipamientos = +self._equipamientos
 
     def validar_datos(self) -> str|None:
         '''
@@ -418,27 +725,26 @@ class GestorDeDatos:
         validar hasta que todos los datos fueron cargados.
 
         Las validaciones que se hacen en esta función son:
-        - Que la lista de aulas dobles no tenga aulas vacías.
-        - Que ningún aula aparezca más de una vez en la lista de aulas dobles.
+        - Que la lista de aulas dobles no tenga aulas sin seleccionar.
         - (Puede ser que después se agreguen otras)
         
         :return: Un string con la descripción del primer problema, o `None` si
         no hay ningún problema.
         '''
-        pass
+        for edificio in self._edificios:
+            for aula_doble in edificio.aulas_dobles:
+                if aula_no_seleccionada in (aula_doble.aula_grande, aula_doble.aula_chica_1, aula_doble.aula_chica_2):
+                    return f'En el edificio {edificio.nombre} falta seleccionar una componente de aula doble.'
+        
+        return None
 
-    def asignar_aulas(self):
+    def asignar_aulas(self) -> InfoPostAsignación:
         '''
         Asignar aulas a todas las clases que no tengan una asignación forzada.
 
-        :raise AsignaciónImposibleException: Si no se pueden asignar aulas a
-        todas las clases. Al manejar esta excepción, tener en cuenta que se
-        pueden haber asignado aulas a algunas clases si y otras no (esta
-        información estará contenida en la excepción).
+        :return: Info sobre el resultado de la asignación.
         '''
-        # Nota: Este método debería llamar a lógica_de_asignación.asignar,
-        # y actualizar la base de datos con el resultado.
-        pass
+        return asignar(self._edificios, self._carreras)
 
     def importar_clases_de_excel(self, path: str, confirmación_de_sobreescritura: Callable[[list[str]], bool]):
         '''
@@ -508,3 +814,49 @@ class GestorDeDatos:
         # Nota: Este método debería llamar a archivos_excel.cronograma.exportar.
         # (El módulo archivos_excel todavía no existe, ver Issue #75)
         pass
+
+def _generar_nombre_no_existente(base: str, nombres_existentes: Sequence[str]) -> str:
+    '''
+    :return: Un nombre que contenga `base` y que no esté en la lista de nombres
+    existentes.
+    '''
+    nombre_propuesto: str = base
+    i = 0
+    while nombre_propuesto in nombres_existentes:
+        i += 1
+        nombre_propuesto = f'{base} {i}'
+    
+    return nombre_propuesto
+
+def _aula_quedaría_repetida_en_aulas_dobles(aula: Aula, i_aula_doble: int, i_campo: int, aulas_dobles: Sequence[AulaDoble]) -> bool:
+    '''
+    Determinar si `aula` ya forma parte de algún aula doble, excepto en el campo
+    al que se quiere asignar.
+
+    :param aula: Un aula que se quiere agregar a un aula doble.
+    :param i_aula_doble: El índice del aula doble.
+    :param i_campo: El índice del campo del aula doble al que se quiere asignar
+    el aula.
+    :param aulas_dobles: La lista de aulas dobles del edificio correspondiente.
+    '''
+    el_aula_doble = aulas_dobles[i_aula_doble]
+    campo = fieldnames_AulaDoble[i_campo]
+    return(
+        any(
+            aula is aula_doble.aula_grande or aula is aula_doble.aula_chica_1 or aula is aula_doble.aula_chica_2
+            for aula_doble in aulas_dobles
+            if aula_doble is not el_aula_doble
+        )
+        or (
+            campo == 'aula_grande'
+            and aula in (el_aula_doble.aula_chica_1, el_aula_doble.aula_chica_2)
+        )
+        or (
+            campo == 'aula_chica_1'
+            and aula in (el_aula_doble.aula_grande, el_aula_doble.aula_chica_2)
+        )
+        or (
+            campo == 'aula_chica_2'
+            and aula in (el_aula_doble.aula_grande, el_aula_doble.aula_chica_1)
+        )
+    )

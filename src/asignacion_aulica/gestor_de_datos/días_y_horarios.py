@@ -36,10 +36,7 @@ HorariosSemanales: TypeAlias = tuple[
 Tupla con un RangoHorario para cada día de la semana.
 '''
 
-HorariosSemanalesOpcionales: TypeAlias = tuple[
-    RangoHorario|None, RangoHorario|None, RangoHorario|None, RangoHorario|None,
-    RangoHorario|None, RangoHorario|None, RangoHorario|None
-]
+HorariosSemanalesOpcionales: TypeAlias = list[RangoHorario|None] # El largo debe ser 7.
 '''
 Tupla con un RangoHorario o None para cada día de la semana.
 '''
@@ -48,4 +45,4 @@ def crear_horarios_semanales() -> HorariosSemanales:
     return HorariosSemanales(RangoHorario.cerrado() for _ in range(len(Día)))
 
 def crear_horarios_semanales_opcionales() -> HorariosSemanalesOpcionales:
-    return HorariosSemanalesOpcionales((None,)*len(Día))
+    return HorariosSemanalesOpcionales([None,]*len(Día))

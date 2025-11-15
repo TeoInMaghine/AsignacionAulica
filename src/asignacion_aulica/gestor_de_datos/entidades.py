@@ -1,7 +1,6 @@
 from __future__ import annotations  # Para soportar referencias circulares en los type hints
-from dataclasses import dataclass, field
-from collections.abc import Iterable
-from collections.abc import Sequence
+from dataclasses import dataclass, field, fields
+from collections.abc import Iterable, Sequence
 from typing import TypeAlias
 import itertools
 
@@ -87,3 +86,26 @@ class Clase:
 
 def todas_las_clases(carreras: Iterable[Carrera]) -> Iterable[Clase]:
     return itertools.chain.from_iterable(materia.clases for carrera in carreras for materia in carrera.materias)
+
+
+# Definimos mapeos para acceder por índice a los campos de las entidades.
+# Hacemos esto porque en los modelos de QT los campos se identifican con índices
+# (llamados "roles").
+
+fieldnames_Edificio:  tuple[str, ...] = tuple(f.name for f in fields(Edificio))
+fieldnames_Aula:      tuple[str, ...] = tuple(f.name for f in fields(Aula))
+fieldnames_AulaDoble: tuple[str, ...] = tuple(f.name for f in fields(AulaDoble))
+fieldnames_Carrera:   tuple[str, ...] = tuple(f.name for f in fields(Carrera))
+fieldnames_Materia:   tuple[str, ...] = tuple(f.name for f in fields(Materia))
+fieldnames_Clase:     tuple[str, ...] = tuple(f.name for f in fields(Clase))
+
+# Tipos de dato (sin parametrizar) de los campos.
+# Usamos esto para chequear que los tipos de dato que llegan de QT son correctos
+# para el campo al que van dirigidos (porlas).
+# Usamos `eval` porque los tipos de dato están guardados como strings.
+fieldtypes_Edificio:  tuple[type, ...] = tuple(eval(f.type) for f in fields(Edificio))
+fieldtypes_Aula:      tuple[type, ...] = tuple(eval(f.type) for f in fields(Aula))
+fieldtypes_AulaDoble: tuple[type, ...] = tuple(eval(f.type) for f in fields(AulaDoble))
+fieldtypes_Carrera:   tuple[type, ...] = tuple(eval(f.type) for f in fields(Carrera))
+fieldtypes_Materia:   tuple[type, ...] = tuple(eval(f.type) for f in fields(Materia))
+fieldtypes_Clase:     tuple[type, ...] = tuple(eval(f.type) for f in fields(Clase))

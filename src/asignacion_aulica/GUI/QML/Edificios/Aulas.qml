@@ -66,8 +66,12 @@ ListView {
             Layout.preferredWidth: headerItem.widthCapacidad
 
             text: aula.capacidad
+            validator: RegularExpressionValidator {
+                // Permitir números positivos o string vacío
+                regularExpression: /^[0-9]*$/
+            }
             onEditingFinished: {
-                aula.capacidad = parseInt(text)
+                aula.capacidad = text
             }
         }
 

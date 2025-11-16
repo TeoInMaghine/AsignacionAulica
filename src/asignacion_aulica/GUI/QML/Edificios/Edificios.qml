@@ -1,7 +1,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-// import ModelosAsignaciónÁulica
+import ModelosAsignaciónÁulica
 import QML.ComponentesUI
 
 ListView {
@@ -26,23 +26,7 @@ ListView {
 
     clip: true
 
-    // TODO: reemplazar por modelo
-    // model: ListEdificios { id: edificios }
-    model: ListModel {
-        id: edificios
-        ListElement {
-            nombre: "Anasagasti I"
-            preferir_no_usar: false
-        }
-        ListElement {
-            nombre: "Anasagasti II"
-            preferir_no_usar: false
-        }
-        ListElement {
-            nombre: "Tacuarí"
-            preferir_no_usar: true
-        }
-    }
+    model: ListEdificios { id: edificios }
 
     header: Item { height: topMargin }
 
@@ -80,8 +64,7 @@ ListView {
             BotónBorrar {
                 Layout.leftMargin: 10
                 onClicked: {
-                    edificios.remove(index)
-                    // edificios.removeRow(index)
+                    edificios.removeRow(index)
                 }
             }
         }
@@ -150,11 +133,7 @@ ListView {
             width: 200
 
             onClicked: {
-                edificios.append({
-                    nombre: "",
-                    preferir_no_usar: false
-                })
-                // edificios.insertRow(edificios.rowCount())
+                edificios.insertRow(edificios.rowCount())
             }
         }
     }

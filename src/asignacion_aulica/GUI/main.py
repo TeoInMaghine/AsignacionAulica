@@ -1,4 +1,4 @@
-import sys, os
+import sys, os, logging
 from pathlib import Path
 
 from PyQt6.QtGui import QGuiApplication, QFontDatabase, QIcon
@@ -7,6 +7,8 @@ from PyQt6.QtQml import QQmlApplicationEngine
 from asignacion_aulica.GUI.modelos.registrador_de_modelos import registrar_modelos_qml
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica import assets
+
+logger = logging.getLogger(__name__)
 
 def configurar_fuente_por_defecto():
     fonts_path = assets.get_path('fonts')

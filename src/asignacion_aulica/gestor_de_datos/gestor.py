@@ -3,6 +3,7 @@ from datetime import time
 from itertools import filterfalse
 from typing import Callable, Any
 from collections import Counter
+import logging
 
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
@@ -26,6 +27,8 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     todas_las_clases
 )
 from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
+
+logger = logging.getLogger(__name__)
 
 aula_no_seleccionada: Aula = Aula(nombre='Sin Seleccionar', edificio=None, capacidad=0)
 '''
@@ -54,6 +57,8 @@ class GestorDeDatos:
         datos. Si el archivo no existe, es creado. ``None`` para no guardar
         datos.
         '''
+        logger.info('Creando gestor de datos con path_base_de_datos=%s', path_base_de_datos)
+
         self._edificios: list[Edificio] = []
         self._carreras: list[Carrera] = []
         self._equipamientos: Counter[str] = Counter()
@@ -104,6 +109,8 @@ class GestorDeDatos:
         :raise ValueError: Si se intenta cambiar el nombre del edificio a un
         nombre que ya existe.
         '''
+        logger.debug('set_in_edificio - edificio=%s campo=%s valor=%s', edificio, campo, valor)
+
         el_edificio = self._edificios[edificio]
         field_name: str = fieldnames_Edificio[campo]
         expected_type = fieldtypes_Edificio[campo]
@@ -134,6 +141,7 @@ class GestorDeDatos:
         nombres_existentes = [edificio.nombre for edificio in self._edificios]
         nombre_nuevo = _generar_nombre_no_existente('Edificio sin nombre', nombres_existentes)
         self._edificios.append(Edificio(nombre_nuevo))
+        logger.debug('Se agregó edificio con nombre %s', nombre_nuevo)
 
     def borrar_edificio(self, índice: int):
         '''
@@ -141,6 +149,8 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice está fuera de rango.
         '''
+        logger.debug('borrar_edificio %s', índice)
+
         # Sacar el edificio de la lista
         el_edificio = self._edificios.pop(índice)
         
@@ -158,6 +168,7 @@ class GestorDeDatos:
         '''
         Ordena los edificios alfabéticamente.
         '''
+        logger.debug('ordenar_edificios')
         self._edificios.sort(key=lambda edificio: edificio.nombre.lower())
 
     def cantidad_de_aulas(self, edificio: int) -> int:
@@ -203,6 +214,8 @@ class GestorDeDatos:
         :raise ValueError: Si se intenta cambiar el nombre del aula a un nombre
         que ya existe.
         '''
+        logger.debug('set_in_aula - edificio=%s índice=%s campo=%s valor=%s', edificio, índice, campo, valor)
+        
         el_aula = self._edificios[edificio].aulas[índice]
         field_name: str = fieldnames_Aula[campo]
         expected_type = fieldtypes_Aula[campo]
@@ -243,6 +256,8 @@ class GestorDeDatos:
             capacidad = 1
         ))
 
+        logger.debug('agregar_aula - edificio=%s nombre=%s', edificio, nombre_nuevo)
+
     def existe_aula(self, edificio: int, nombre: str) -> bool:
         '''
         :return: `True` si el aula especificada existe en la base de datos,
@@ -266,6 +281,8 @@ class GestorDeDatos:
         :param índice: El índice del aula.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
+        logger.debug('borrar_aula - edificio=%s índice=%s', edificio, índice)
+
         el_edificio = self._edificios[edificio]
 
         # Sacar el aula de la lista
@@ -288,6 +305,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
+        logger.debug('ordenar_aulas - edificio=%s', edificio)
         self._edificios[edificio].aulas.sort(key=lambda aula: aula.nombre.lower())
 
     def cantidad_de_aulas_dobles(self, edificio: int) -> int:
@@ -323,6 +341,8 @@ class GestorDeDatos:
         :raise ValueError: Si se intenta asignar un aula que ya forma parte de
         un aula doble.
         '''
+        logger.debug('set_in_aula_doble - edificio=%s aula_doble=%s campo=%s valor=%s', edificio, aula_doble, campo, valor)
+        
         el_edificio = self._edificios[edificio]
         el_aula_doble = el_edificio.aulas_dobles[aula_doble]
         field_name: str = fieldnames_AulaDoble[campo]
@@ -342,6 +362,7 @@ class GestorDeDatos:
         :param edificio: El índice del edificio.
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
+        logger.debug('agregar_aula_doble - edificio=%s', edificio)
         self._edificios[edificio].aulas_dobles.append(AulaDoble(
             aula_no_seleccionada, aula_no_seleccionada, aula_no_seleccionada
         ))
@@ -354,6 +375,7 @@ class GestorDeDatos:
         :param índice: El índice del aula doble.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
+        logger.debug('borrar_aula_doble - edificio=%s, índice=%s', edificio, índice)
         del self._edificios[edificio].aulas_dobles[índice]
 
     def ordenar_aulas_dobles(self, edificio: int):
@@ -363,6 +385,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
+        logger.debug('ordenar_aulas_dobles - edificio=%s', edificio)
         self._edificios[edificio].aulas_dobles.sort(key=lambda aula_doble: aula_doble.aula_grande.nombre.lower())
 
     def get_carreras(self) -> list[str]:
@@ -499,6 +522,8 @@ class GestorDeDatos:
         :raise ValueError: Si se intenta cambiar el nombre de la materia a un
         nombre que ya existe en la misma carrera.
         '''
+        logger.debug('set_in_materia - carrera=%s materia=%s campo=%s valor=%s', carrera, materia, campo, valor)
+
         la_materia = self._carreras[carrera].materias[materia]
         field_name: str = fieldnames_Materia[campo]
         expected_type = fieldtypes_Materia[campo]
@@ -592,6 +617,8 @@ class GestorDeDatos:
         :param valor: El nuevo valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
+        logger.debug('set_in_clase - carrera=%s materia=%s clase=%s campo=%s valor=%s', carrera, materia, clase, campo, valor)
+
         la_clase = self._carreras[carrera].materias[materia].clases[clase]
         field_name: str = fieldnames_Clase[campo]
         expected_type = fieldtypes_Clase[campo]

@@ -46,8 +46,7 @@ Window {
         ScrollView{
             width: parent.width
             height: parent.height
-            ScrollBar.horizontal.policy: ScrollBar.AlwaysOn
-            ScrollBar.vertical.policy: ScrollBar.AlwaysOn
+            
             Edificios { }
         }
     }

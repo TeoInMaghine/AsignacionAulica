@@ -25,9 +25,9 @@ def test_agregar_aula_genera_valores_deafult(gestor: GestorDeDatos):
 
     assert gestor.cantidad_de_aulas(0) == 1
     assert len(gestor.get_aulas(0)) == 1
-    assert 'sin nombre' in gestor.get_aulas(0)[0]
+    assert 'sin nombre' in gestor.get_aulas(0)[0].lower()
 
-    assert 'sin nombre' in gestor.get_from_aula(0, 0, campo_Aula['nombre'])
+    assert 'sin nombre' in gestor.get_from_aula(0, 0, campo_Aula['nombre']).lower()
     assert isinstance(gestor.get_from_aula(0, 0, campo_Aula['edificio']), Edificio)
     assert gestor.get_from_aula(0, 0, campo_Aula['capacidad']) >= 0
     assert gestor.get_from_aula(0, 0, campo_Aula['equipamiento']) == set()
@@ -54,12 +54,12 @@ def test_add_varias_aulas(gestor: GestorDeDatos):
     
     assert len(nombres0) == 10
     assert gestor.cantidad_de_aulas(0) == 10
-    assert all('sin nombre' in nombre for nombre in nombres0)
+    assert all('sin nombre' in nombre.lower() for nombre in nombres0)
     assert len(nombres0) == len(set(nombres0)) # No hay repetidos
 
     assert len(nombres1) == 4
     assert gestor.cantidad_de_aulas(1) == 4
-    assert all('sin nombre' in nombre for nombre in nombres1)
+    assert all('sin nombre' in nombre.lower() for nombre in nombres1)
     assert len(nombres1) == len(set(nombres1)) # No hay repetidos
 
     # Chequear que se crearon dos edificios

@@ -11,41 +11,38 @@ RowLayout {
     property alias widthCapacidad: headerCapacidad.width
     property alias widthEquipamiento: headerEquipamiento.width
 
-    RowLayout {
+    Button {
         id: headerNombre
-        spacing: 2
-        Label {
-            Layout.alignment: Qt.AlignCenter
-            leftPadding: 5
-            text: "Aula"
+        Layout.preferredWidth: 120 // Para que entre el texto "Sin nombre 1"
+
+        contentItem: MultiEffect {
+            source: label_con_ícono
+            anchors.fill: label_con_ícono
+            brightness: highlighted ? 1.0 : 0.1
         }
-        Button {
-            id: botónOrdenar
 
-            Layout.preferredWidth: 20
-            Layout.preferredHeight: 30
+        RowLayout {
+            id: label_con_ícono
+            visible: false // Para renderizar solo el MultiEffect
+            anchors.centerIn: parent
+            spacing: 2
 
-            contentItem: MultiEffect {
-                source: imagenOrdenar
-                anchors.fill: imagenOrdenar
-                brightness: botónOrdenar.highlighted ? 1.0 : 0.1
+            Label {
+                Layout.alignment: Qt.AlignCenter
+                leftPadding: 5
+                text: "Aula"
             }
-
             Image {
-                id: imagenOrdenar
-                visible: false // Para renderizar solo el MultiEffect
-
                 width: 12
-                anchors.centerIn: parent
                 fillMode: Image.PreserveAspectFit
                 sourceSize.width: width
                 source: assets_path + "/iconos/Ordenar.svg"
             }
+        }
 
-            highlighted: hovered
-            onClicked: {
-                aulas.ordenar()
-            }
+        highlighted: hovered
+        onClicked: {
+            aulas.ordenar()
         }
     }
     Label {

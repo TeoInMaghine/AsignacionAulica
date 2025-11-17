@@ -1,69 +1,93 @@
-from typing import Any
+from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSignal, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio
+
+CAMPO_AULA_EQUIPAMIENTO: int = 3
+
+ROL_NOMBRE: int = Qt.ItemDataRole.UserRole + 1
+ROL_SELECCIONADO: int = Qt.ItemDataRole.UserRole + 2
+ROLE_NAMES: dict[int, QByteArray] = {
+    ROL_NOMBRE: QByteArray("nombre".encode()),
+    ROL_SELECCIONADO: QByteArray("seleccionado".encode())
+}
 
 class ListEquipamientos(QAbstractListModel):
     seleccionadosTextChanged: pyqtSignal = pyqtSignal()
 
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
-        # TODO: Esto es placeholder, falta usar el gestor de datos
-        self.aula = Aula('B101', Edificio('Anasagasti'), 45)
-        self.equipamientos = ["Proyector", "Computadoras", "No sé lol"]
+        self.gestor: GestorDeDatos = gestor
+
+        # Cosas seteadas desde QT:
+        self.i_edificio: int = 0
+        self.i_aula: int = 0
+        self.equipamientos_seleccionados: set[str] = set()
+
+        self.equipamientos_posibles: list[str]
+        self._actualizar_equipamientos_posibles()
 
     @pyqtProperty(str, notify=seleccionadosTextChanged)
     def seleccionadosText(self) -> str:
-        if len(self.aula.equipamiento) == 0:
+        if len(self.equipamientos_seleccionados) == 0:
             return "Ninguno"
-
-        return ",".join(self.aula.equipamiento)
+        else:
+            return ", ".join(self.equipamientos_seleccionados)
 
     @pyqtProperty(int)
+    def indexEdificio(self) -> int:
+        return self.i_edificio
+
+    @indexEdificio.setter
+    def indexEdificio(self, indexEdificio: int):
+        self.i_edificio = indexEdificio
+    
+    @pyqtProperty(int)
     def indexAula(self) -> int:
-        return self._indexAula
+        return self.i_aula
 
     @indexAula.setter
     def indexAula(self, indexAula: int):
-        self._indexAula = indexAula
+        self.i_aula = indexAula
+        self.equipamientos_seleccionados = self.gestor.get_from_aula(self.i_edificio, self.i_aula, CAMPO_AULA_EQUIPAMIENTO)
 
-    # Constante
+    @override
     def roleNames(self) -> dict[int, QByteArray]:
-        return {
-            Qt.ItemDataRole.UserRole + 1: "nombre".encode(),
-            Qt.ItemDataRole.UserRole + 2: "seleccionado".encode()
-        }
+        return ROLE_NAMES
 
-    def rowCount(self, _parent: QModelIndex) -> int:
-        return len(self.equipamientos)
+    @override
+    def rowCount(self, parent: QModelIndex|None = None) -> int:
+        return len(self.equipamientos_posibles)
 
-    def data(self, index: QModelIndex, role: int) -> Any:
-        if not index.isValid(): return
+    @override
+    def data(self, index: QModelIndex, role: int = 0) -> Any:
+        if not index.isValid(): return None
 
-        if role == Qt.ItemDataRole.UserRole + 1: # nombre
-            return self.equipamientos[index.row()]
-        elif role == Qt.ItemDataRole.UserRole + 2: # seleccionado
-            # TODO: Esto tendría que ser basado en el índice del aula y usar el gestor, obvio
-            return self.equipamientos[index.row()] in self.aula.equipamiento
+        if role == ROL_NOMBRE:
+            return self.equipamientos_posibles[index.row()]
+        elif role == ROL_SELECCIONADO:
+            return self.equipamientos_posibles[index.row()] in self.equipamientos_seleccionados
+        else:
+            return None
 
-    def setData(self, index: QModelIndex, value: Any, role: int) -> bool:
+    @override
+    def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
         if not index.isValid(): return False
 
-        if role == Qt.ItemDataRole.UserRole + 1: # nombre
+        if role == ROL_NOMBRE:
             # No tiene sentido renombrar equipamientos existentes
             return False
-        elif role == Qt.ItemDataRole.UserRole + 2: # seleccionado
+        elif role == ROL_SELECCIONADO:
+            equipamiento = self.equipamientos_posibles[index.row()]
             if value:
-                self.aula.equipamiento.add(self.equipamientos[index.row()])
+                self.gestor.agregar_equipamiento_a_aula(self.i_edificio, self.i_aula, equipamiento)
             else:
-                self.aula.equipamiento.discard(self.equipamientos[index.row()])
+                self.gestor.borrar_equipamiento_de_aula(self.i_edificio, self.i_aula, equipamiento)
 
             self.seleccionadosTextChanged.emit()
-
             return True
-
-        return False
+        else:
+            return False
 
     # Función custom (en vez de insertRows) para poder poner un nombre
     # (es necesaria esta funcionalidad al no poder renombrar)
@@ -78,3 +102,6 @@ class ListEquipamientos(QAbstractListModel):
         self.equipamientos.insert(row_at_the_end, name)
         self.endInsertRows()
         return True
+
+    def _actualizar_equipamientos_posibles(self):
+        self.equipamientos_posibles = self.gestor.get_equipamientos_existentes()

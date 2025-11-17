@@ -9,22 +9,14 @@ ListView {
 
     anchors.fill: parent
     spacing: 10
+
     // Se evita usar los "anchor margins" para dar espacios, para que esos
     // espacios se "incluyan" en los scroll bars (por eso en cambio usamos el
     // header y el footer para dar esos márgenes)
     readonly property int topMargin: 10
     readonly property int bottomMargin: 10
-
-    width: parent.width
+    
     contentWidth: contentItem.childrenRect.width + 2 * anchors.margins
-    // TODO: scroll horizontal no funciona completamente al achicar la ventana
-    ScrollBar.horizontal: ScrollBar { id: hbar; active: vbar.active }
-    ScrollBar.vertical: ScrollBar { id: vbar; active: hbar.active }
-    flickableDirection: Flickable.HorizontalAndVerticalFlick
-    boundsBehavior: Flickable.StopAtBounds
-    acceptedButtons: Qt.NoButton // Que no se pueda arrastrar a lo touch screen
-
-    clip: true
 
     model: ListEdificios { id: edificios }
 

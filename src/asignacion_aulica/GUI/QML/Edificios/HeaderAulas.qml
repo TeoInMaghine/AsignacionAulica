@@ -56,15 +56,15 @@ RowLayout {
 
     Item { } // Espacio vacío de 2 * spacing de ancho
 
-    HeaderHorariosSemanales { }
-
-    Item { } // Espacio vacío de 2 * spacing de ancho
-
     Label {
         id: headerEquipamiento
-        leftPadding: 50
-        rightPadding: 50
+        leftPadding: 40
+        rightPadding: 40
         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
         text: "Equipamiento"
     }
+
+    Item { } // Espacio vacío de 2 * spacing de ancho
+
+    HeaderHorariosSemanales { }
 }

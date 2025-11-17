@@ -77,14 +77,14 @@ ListView {
 
         Item { } // Espacio vacío de 2 * spacing de ancho
 
-        EditorHorariosSemanales { }
-
-        Item { } // Espacio vacío de 2 * spacing de ancho
-
         SelectorEquipamiento {
             Layout.preferredWidth: headerItem.widthEquipamiento
             aula: parent.aula
         }
+
+        Item { } // Espacio vacío de 2 * spacing de ancho
+
+        EditorHorariosSemanales { }
 
         BotónBorrar {
             onClicked: {

@@ -18,7 +18,7 @@ RowLayout {
         contentItem: MultiEffect {
             source: label_con_ícono
             anchors.fill: label_con_ícono
-            brightness: highlighted ? 1.0 : 0.1
+            brightness: headerNombre.highlighted ? 1.0 : 0.1
         }
 
         RowLayout {

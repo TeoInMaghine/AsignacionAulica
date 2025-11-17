@@ -8,24 +8,16 @@ ListView {
     id: view
 
     anchors.fill: parent
+    anchors.margins: 15
     spacing: 10
-
-    // Se evita usar los "anchor margins" para dar espacios, para que esos
-    // espacios se "incluyan" en los scroll bars (por eso en cambio usamos el
-    // header y el footer para dar esos márgenes)
-    readonly property int topMargin: 10
-    readonly property int bottomMargin: 10
+    clip: true
     
     contentWidth: contentItem.childrenRect.width + 2 * anchors.margins
 
     model: ListEdificios { id: edificios }
 
-    header: Item { height: topMargin }
-
     delegate: ColumnLayout {
         id: editorDeEdificio
-
-        width: view.width
 
         readonly property alias indentaciónDeAnidado: colapsador.width
 
@@ -113,7 +105,7 @@ ListView {
     }
 
     footer: Item {
-        height: footerEdificios.height + view.spacing + bottomMargin
+        height: footerEdificios.height + view.spacing
         width: footerEdificios.width
 
         BotónAñadir {

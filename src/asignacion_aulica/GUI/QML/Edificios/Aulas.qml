@@ -31,7 +31,13 @@ ListView {
 
         HeaderAulas {
             id: headerAulas
-            anchors.top: parent.top
+            visible: view.count != 0
+        }
+        Label {
+            Layout.margins: 10
+            text: "Todavía no hay aulas registradas"
+            visible: view.count === 0
+            font.pixelSize: 18
         }
     }
 

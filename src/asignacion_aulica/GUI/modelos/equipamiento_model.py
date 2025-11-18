@@ -108,12 +108,16 @@ class ListEquipamientosDeAula(QAbstractListModel):
         if not name:
             return False
 
-        self.beginResetModel()
         self.gestor.agregar_equipamiento_a_aula(self.i_edificio, self.i_aula, name)
-        self._actualizar_equipamientos_posibles()
-        self.endResetModel()
+        self.actualizarLista()
         self.seleccionadosTextChanged.emit()
         return True
+    
+    @pyqtSlot()
+    def actualizarLista(self):
+        self.beginResetModel()
+        self._actualizar_equipamientos_posibles()
+        self.endResetModel()
 
     def _actualizar_equipamientos_posibles(self):
         self.equipamientos_posibles = self.gestor.get_equipamientos_existentes()

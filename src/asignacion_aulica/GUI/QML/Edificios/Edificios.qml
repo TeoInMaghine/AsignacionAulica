@@ -121,7 +121,7 @@ ListView {
             anchors.left: parent.left
             anchors.topMargin: view.spacing
             anchors.leftMargin: 10
-            width: 200
+            width: 100
 
             onClicked: {
                 edificios.insertRow(edificios.rowCount())

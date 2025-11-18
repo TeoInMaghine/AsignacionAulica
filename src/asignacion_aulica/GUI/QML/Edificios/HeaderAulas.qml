@@ -33,7 +33,7 @@ RowLayout {
                 text: "Aula"
             }
             Image {
-                width: 15
+                width: 17
                 fillMode: Image.PreserveAspectFit
                 sourceSize.width: width
                 source: assets_path + "/iconos/ordenar.png"

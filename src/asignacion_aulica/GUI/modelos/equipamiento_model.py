@@ -12,7 +12,7 @@ ROLE_NAMES: dict[int, QByteArray] = {
     ROL_SELECCIONADO: QByteArray("seleccionado".encode())
 }
 
-class ListEquipamientos(QAbstractListModel):
+class ListEquipamientosDeAula(QAbstractListModel):
     seleccionadosTextChanged: pyqtSignal = pyqtSignal()
 
     def __init__(self, parent, gestor: GestorDeDatos):

@@ -13,7 +13,7 @@ ComboBox {
 
     displayText: equipamientos.seleccionadosText
 
-    model: ListEquipamientos {
+    model: ListEquipamientosDeAula {
         id: equipamientos
         indexAula: aula.index
     }

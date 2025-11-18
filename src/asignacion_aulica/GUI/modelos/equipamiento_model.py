@@ -35,9 +35,14 @@ class ListEquipamientosDeAula(QAbstractListModel):
         # Cosas seteadas desde QT:
         self.i_edificio: int = 0
         self.i_aula: int = 0
+        
+        # Referencia directa al set de equipamientos del aula
+        # se mantiene sincronizado sin que hagamos nada
         self.equipamientos_seleccionados: set[str]
         self._set_equipamientos_seleccionados()
 
+        # Cache para no estar pidiéndole al gestor que ordene los datos todo el
+        # tiempo. Acordarse de actualizarla cuando puede haber cambios.
         self.equipamientos_posibles: list[str]
         self._actualizar_equipamientos_posibles()
 

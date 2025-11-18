@@ -98,7 +98,7 @@ ListView {
         BotónAñadir {
             id: footerAulas
             anchors.bottom: parent.bottom
-            width: 100
+            width: 75
 
             onClicked: {
                 aulas.insertRow(aulas.rowCount())

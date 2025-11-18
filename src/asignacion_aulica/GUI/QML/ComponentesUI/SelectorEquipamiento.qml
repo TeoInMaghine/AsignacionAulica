@@ -9,12 +9,14 @@ import ModelosAsignaciónÁulica
 ComboBox {
     id: comboBox
 
+    required property var edificio
     required property var aula
 
     displayText: equipamientos.seleccionadosText
 
     model: ListEquipamientosDeAula {
         id: equipamientos
+        indexEdificio: edificio.index
         indexAula: aula.index
     }
 

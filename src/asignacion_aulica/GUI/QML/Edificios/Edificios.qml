@@ -16,6 +16,13 @@ ListView {
 
     model: ListEdificios { id: edificios }
 
+    // Mostrar un mensaje cuando no hay ningún edificio
+    header: Label {
+        text: "Todavía no hay edificios registrados"
+        visible: view.count === 0
+        font.pixelSize: 20
+    }
+
     delegate: ColumnLayout {
         id: editorDeEdificio
 

@@ -17,6 +17,15 @@ ROLE_NAMES: dict[int, QByteArray] = {
 }
 
 class ListEquipamientosDeAula(QAbstractListModel):
+    '''
+    Esta clase conecta el selector de equipamientos de las aulas en la GUI con
+    el gestor datos.
+
+    En la GUI los equipamientos existentes se muestran en orden alfabético, pero
+    en el gestor de datos se guardan en una estructura que no tiene orden, así
+    que para no estar ordenándolos todo el rato esta clase se encarga de
+    mantener una copia ordenada y sincronizada de esos datos.
+    '''
     seleccionadosTextChanged: pyqtSignal = pyqtSignal() #TODO: Esto no debería ser compartido entre instancias.
 
     def __init__(self, parent, gestor: GestorDeDatos):

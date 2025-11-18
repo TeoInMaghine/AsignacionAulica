@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
 import QML.Edificios
@@ -41,7 +42,13 @@ Window {
 
     Component {
         id: pestañaAulas
-        Edificios { }
+        
+        ScrollView{
+            width: parent.width
+            height: parent.height
+            
+            Edificios { }
+        }
     }
 
     Component {

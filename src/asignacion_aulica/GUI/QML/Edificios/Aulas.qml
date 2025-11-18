@@ -18,14 +18,6 @@ ListView {
 
     width: contentItem.childrenRect.width + 2 * padding
     height: contentHeight + 2 * padding
-    // TODO: scroll horizontal no funciona completamente al achicar la ventana
-    ScrollBar.horizontal: ScrollBar { id: hbar; active: vbar.active }
-    ScrollBar.vertical: ScrollBar { id: vbar; active: hbar.active }
-    flickableDirection: Flickable.HorizontalAndVerticalFlick
-    boundsBehavior: Flickable.StopAtBounds
-    acceptedButtons: Qt.NoButton // Que no se pueda arrastrar a lo touch screen
-
-    clip: true
 
     model: ListAulas { id: aulas; indexEdificio: edificio.index }
 

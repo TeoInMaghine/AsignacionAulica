@@ -25,7 +25,7 @@ RowLayout {
             id: label_con_ícono
             visible: false // Para renderizar solo el MultiEffect
             anchors.centerIn: parent
-            spacing: 2
+            spacing: 6
 
             Label {
                 Layout.alignment: Qt.AlignCenter
@@ -33,10 +33,10 @@ RowLayout {
                 text: "Aula"
             }
             Image {
-                width: 12
+                width: 17
                 fillMode: Image.PreserveAspectFit
                 sourceSize.width: width
-                source: assets_path + "/iconos/Ordenar.svg"
+                source: assets_path + "/iconos/ordenar.png"
             }
         }
 

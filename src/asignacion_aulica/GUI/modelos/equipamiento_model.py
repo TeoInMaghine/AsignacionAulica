@@ -1,9 +1,13 @@
+import logging
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSignal, pyqtSlot
 
+from asignacion_aulica.gestor_de_datos.entidades import fieldnames_Aula
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 
-CAMPO_AULA_EQUIPAMIENTO: int = 3
+logger = logging.getLogger(__name__)
+
+CAMPO_AULA_EQUIPAMIENTO: int = fieldnames_Aula.index('equipamiento')
 
 ROL_NOMBRE: int = Qt.ItemDataRole.UserRole + 1
 ROL_SELECCIONADO: int = Qt.ItemDataRole.UserRole + 2
@@ -13,7 +17,7 @@ ROLE_NAMES: dict[int, QByteArray] = {
 }
 
 class ListEquipamientosDeAula(QAbstractListModel):
-    seleccionadosTextChanged: pyqtSignal = pyqtSignal()
+    seleccionadosTextChanged: pyqtSignal = pyqtSignal() #TODO: Esto no debería ser compartido entre instancias.
 
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
@@ -22,7 +26,8 @@ class ListEquipamientosDeAula(QAbstractListModel):
         # Cosas seteadas desde QT:
         self.i_edificio: int = 0
         self.i_aula: int = 0
-        self.equipamientos_seleccionados: set[str] = set()
+        self.equipamientos_seleccionados: set[str]
+        self._set_equipamientos_seleccionados()
 
         self.equipamientos_posibles: list[str]
         self._actualizar_equipamientos_posibles()
@@ -32,7 +37,9 @@ class ListEquipamientosDeAula(QAbstractListModel):
         if len(self.equipamientos_seleccionados) == 0:
             return "Ninguno"
         else:
-            return ", ".join(self.equipamientos_seleccionados)
+            seleccionados_en_orden_alfabético = list(self.equipamientos_seleccionados)
+            seleccionados_en_orden_alfabético.sort()
+            return ", ".join(seleccionados_en_orden_alfabético)
 
     @pyqtProperty(int)
     def indexEdificio(self) -> int:
@@ -41,6 +48,8 @@ class ListEquipamientosDeAula(QAbstractListModel):
     @indexEdificio.setter
     def indexEdificio(self, indexEdificio: int):
         self.i_edificio = indexEdificio
+        self._set_equipamientos_seleccionados()
+        self.seleccionadosTextChanged.emit()
     
     @pyqtProperty(int)
     def indexAula(self) -> int:
@@ -49,8 +58,9 @@ class ListEquipamientosDeAula(QAbstractListModel):
     @indexAula.setter
     def indexAula(self, indexAula: int):
         self.i_aula = indexAula
-        self.equipamientos_seleccionados = self.gestor.get_from_aula(self.i_edificio, self.i_aula, CAMPO_AULA_EQUIPAMIENTO)
-
+        self._set_equipamientos_seleccionados()
+        self.seleccionadosTextChanged.emit()
+        
     @override
     def roleNames(self) -> dict[int, QByteArray]:
         return ROLE_NAMES
@@ -89,19 +99,24 @@ class ListEquipamientosDeAula(QAbstractListModel):
         else:
             return False
 
-    # Función custom (en vez de insertRows) para poder poner un nombre
-    # (es necesaria esta funcionalidad al no poder renombrar)
     @pyqtSlot(str, result=bool)
-    def appendEquipamiento(self, name: str) -> bool:
-        # TODO: más validaciones (en el gestor de datos directamente, creo)
+    def agregarEquipamiento(self, name: str) -> bool:
+        '''
+        Agregar un equipamiento que no está en la lista.
+        '''
+        name = name.strip()
         if not name:
             return False
 
-        row_at_the_end = len(self.equipamientos)
-        self.beginInsertRows(QModelIndex(), row_at_the_end, row_at_the_end)
-        self.equipamientos.insert(row_at_the_end, name)
-        self.endInsertRows()
+        self.beginResetModel()
+        self.gestor.agregar_equipamiento_a_aula(self.i_edificio, self.i_aula, name)
+        self._actualizar_equipamientos_posibles()
+        self.endResetModel()
+        self.seleccionadosTextChanged.emit()
         return True
 
     def _actualizar_equipamientos_posibles(self):
         self.equipamientos_posibles = self.gestor.get_equipamientos_existentes()
+    
+    def _set_equipamientos_seleccionados(self):
+        self.equipamientos_seleccionados = self.gestor.get_from_aula(self.i_edificio, self.i_aula, CAMPO_AULA_EQUIPAMIENTO)

@@ -248,7 +248,7 @@ class GestorDeDatos:
         '''
         el_edificio = self._edificios[edificio]
         nombres_existentes = [aula.nombre for aula in el_edificio.aulas]
-        nombre_nuevo = _generar_nombre_no_existente('Aula sin nombre', nombres_existentes)
+        nombre_nuevo = _generar_nombre_no_existente('Sin nombre', nombres_existentes)
         
         el_edificio.aulas.append(Aula(
             nombre = nombre_nuevo,

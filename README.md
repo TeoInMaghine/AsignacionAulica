@@ -70,3 +70,4 @@ El programa se empaqueta en dos pasos:
 
 Hay una GitHub action que ejecuta los dos pasos. El paso 1 también se puede
 ejecutar en el entorno virtual (ver comando en el archivo de la GitHub Action).
+

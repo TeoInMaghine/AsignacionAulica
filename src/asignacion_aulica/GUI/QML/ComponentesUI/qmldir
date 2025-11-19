@@ -4,6 +4,7 @@ BotónAgregar BotónAgregar.qml
 BotónRedondeadoConTexto BotónRedondeadoConTexto.qml
 BotónRedondeadoConTextoColorUNRN BotónRedondeadoConTextoColorUNRN.qml
 Colapsador Colapsador.qml
+Candado Candado.qml
 EditorHorario EditorHorario.qml
 EditorHorariosSemanales EditorHorariosSemanales.qml
 EditorRangoHorario EditorRangoHorario.qml

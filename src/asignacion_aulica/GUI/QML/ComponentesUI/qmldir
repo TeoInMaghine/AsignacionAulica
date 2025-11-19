@@ -2,6 +2,7 @@ module QML.ComponentesUI
 BotónAñadir BotónAñadir.qml
 BotónBorrar BotónBorrar.qml
 Colapsador Colapsador.qml
+Candado Candado.qml
 SelectorEquipamiento SelectorEquipamiento.qml
 EditorHorariosSemanales EditorHorariosSemanales.qml
 HeaderHorariosSemanales HeaderHorariosSemanales.qml

@@ -41,4 +41,18 @@ RowLayout {
             horarioFin = text
         }
     }
+    Candado {
+        checked: horarioInicio == horarioFin
+        onClicked: {
+            if (checked) {
+                // Cerrar
+                horarioInicio = "00:00"
+                horarioFin = "00:00"
+            } else {
+                // Abrir
+                horarioInicio = "00:00"
+                horarioFin = "24:00"
+            }
+        }
+    }
 }

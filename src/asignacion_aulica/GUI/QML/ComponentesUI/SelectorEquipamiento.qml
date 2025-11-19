@@ -19,7 +19,7 @@ ComboBox {
         indexEdificio: edificio.index
         indexAula: aula.index
     }
-    onPressedChanged: equipamientos.actualizarLista()
+    onPressedChanged: if (pressed && !popup.visible) equipamientos.actualizarLista()
 
     // ComboBox cierra el popup cuando sus items (si heredan de AbstractButton)
     // son activados. Wrappear el delegate es lo que previene que eso pase.

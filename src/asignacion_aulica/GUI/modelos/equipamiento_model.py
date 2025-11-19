@@ -129,6 +129,7 @@ class ListEquipamientosDeAula(QAbstractListModel):
     
     @pyqtSlot()
     def actualizarLista(self):
+        logger.debug('Actualizando lista')
         self.beginResetModel()
         self._actualizar_equipamientos_posibles()
         self.endResetModel()

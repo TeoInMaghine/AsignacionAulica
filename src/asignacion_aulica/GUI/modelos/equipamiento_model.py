@@ -116,7 +116,7 @@ class ListEquipamientosDeAula(QAbstractListModel):
     @pyqtSlot(str, result=bool)
     def agregarEquipamiento(self, name: str) -> bool:
         '''
-        Agregar un equipamiento que no está en la lista.
+        Agregar un equipamiento nuevo a la lista.
         '''
         name = name.strip()
         if not name:

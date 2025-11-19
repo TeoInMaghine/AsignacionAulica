@@ -95,6 +95,13 @@ ComboBox {
                     horizontalAlignment: TextInput.AlignRight
 
                     placeholderText: "Nuevo"
+
+                    onAccepted: {
+                        if (equipamientos.appendEquipamiento(editorNuevoEquipamiento.text)) {
+                            editorNuevoEquipamiento.clear()
+                        }
+                        editorNuevoEquipamiento.focus = false
+                    }
                 }
             }
 

@@ -3,7 +3,7 @@ import QtQuick.Controls
 
 // Referencia:
 // https://doc.qt.io/qt-6/qml-qtquick-textinput.html#inputMask-prop
-TextField {
+TextFieldConEnter {
     // Define qué caracteres "deja pasar". Hace la edición más fluída, ya
     // que hace avanzar el cursor cuando corresponde (por ejemplo, al
     // ingresar un dígito o para saltear el ":").

@@ -52,7 +52,7 @@ ListView {
 
         property alias aula : editorDeAula.model
 
-        TextField {
+        TextFieldConEnter {
             Layout.preferredWidth: headerItem.widthNombre
 
             text: aula.nombre
@@ -60,7 +60,7 @@ ListView {
                 aula.nombre = text
             }
         }
-        TextField {
+        TextFieldConEnter {
             Layout.preferredWidth: headerItem.widthCapacidad
 
             text: aula.capacidad

@@ -39,6 +39,7 @@ class ListEdificios(QAbstractListModel):
         if not index.isValid(): return None
 
         if role in NOMBRES_DE_ROLES:
+            logger.debug(f"Obteniendo {NOMBRES_DE_ROLES[role]}")
             return self.gestor.get_from_edificio(index.row(), rol_a_índice(role))
         else:
             return None
@@ -48,6 +49,7 @@ class ListEdificios(QAbstractListModel):
         if not index.isValid(): return False
 
         if role in NOMBRES_DE_ROLES:
+            logger.debug(f"Editando {NOMBRES_DE_ROLES[role]}")
             # TODO: validar value
             self.gestor.set_in_edificio(index.row(), rol_a_índice(role), value)
             self.dataChanged.emit(index, index, [role])

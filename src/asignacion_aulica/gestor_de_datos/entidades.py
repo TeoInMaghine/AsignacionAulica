@@ -92,7 +92,28 @@ def todas_las_clases(carreras: Iterable[Carrera]) -> Iterable[Clase]:
 # Hacemos esto porque en los modelos de QT los campos se identifican con índices
 # (llamados "roles").
 
-fieldnames_Edificio:  tuple[str, ...] = tuple(f.name for f in fields(Edificio))
+_just_some_debugging_list_man = []
+for f in fields(Edificio):
+    if f.name != "horarios":
+        _just_some_debugging_list_man.append(f.name)
+    else:
+        _just_some_debugging_list_man.extend([
+            "horario_inicio_lunes",
+            "horario_fin_lunes",
+            "horario_inicio_martes",
+            "horario_fin_martes",
+            "horario_inicio_miércoles",
+            "horario_fin_miércoles",
+            "horario_inicio_jueves",
+            "horario_fin_jueves",
+            "horario_inicio_viernes",
+            "horario_fin_viernes",
+            "horario_inicio_sábado",
+            "horario_fin_sábado",
+            "horario_inicio_domingo",
+            "horario_fin_domingo"
+        ])
+fieldnames_Edificio:  tuple[str, ...] = tuple(_just_some_debugging_list_man)
 fieldnames_Aula:      tuple[str, ...] = tuple(f.name for f in fields(Aula))
 fieldnames_AulaDoble: tuple[str, ...] = tuple(f.name for f in fields(AulaDoble))
 fieldnames_Carrera:   tuple[str, ...] = tuple(f.name for f in fields(Carrera))

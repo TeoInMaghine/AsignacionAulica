@@ -3,7 +3,13 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 RowLayout {
-    required property string rolDeHorario
+    required property var entidad
+    required property string díaDeLaSemana
+
+    readonly property string rolDeHorarioInicio:
+        "horario_inicio_" + díaDeLaSemana
+    readonly property string rolDeHorarioFin:
+        "horario_fin_" + díaDeLaSemana
 
     readonly property int textFieldWidth : 45
     readonly property int textFieldPadding : 2
@@ -14,10 +20,6 @@ RowLayout {
     // en la lista de clases) para resetear el horario al del edificio (por
     // ejemplo con un ícono tipo 🔄), solo interactuable si el usuario cambió
     // el horario.
-    // property string horarioInicio : aula[rolDeHorario][0]
-    // property string horarioFin : aula[rolDeHorario][1]
-    property string horarioInicio : "00:00"
-    property string horarioFin : "24:00"
 
     EditorHorario {
         Layout.preferredWidth: textFieldWidth
@@ -25,9 +27,9 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: horarioInicio
+        text: entidad[rolDeHorarioInicio]
         onEditingFinished: {
-            horarioInicio = text
+            entidad[rolDeHorarioInicio] = text
         }
     }
     EditorHorario {
@@ -36,9 +38,9 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: horarioFin
+        text: entidad[rolDeHorarioFin]
         onEditingFinished: {
-            horarioFin = text
+            entidad[rolDeHorarioFin] = text
         }
     }
 }

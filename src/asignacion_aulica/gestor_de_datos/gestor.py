@@ -1,5 +1,5 @@
 from collections.abc import Sequence
-from datetime import time, datetime
+from datetime import time
 from itertools import filterfalse
 from typing import Callable, Any
 from collections import Counter
@@ -18,7 +18,10 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     fieldnames_Aula,
     fieldnames_AulaDoble,
     fieldnames_Clase,
-    fieldnames_Edificio,
+    rolenames_Edificio,
+    es_campo_horario_Edificio,
+    campo_horario_a_índice_día_Edificio,
+    campo_es_horario_de_inicio_Edificio,
     fieldnames_Materia,
     fieldtypes_Aula,
     fieldtypes_Clase,
@@ -82,23 +85,20 @@ class GestorDeDatos:
         :return: El valor del campo especificado.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        field_name: str = fieldnames_Edificio[campo]
+        el_edificio: Edificio = self._edificios[edificio]
 
-        # Ugh
-        if field_name.startswith("horario_"):
-            rango_horario: RangoHorario = self._edificios[edificio].horarios[
-                (campo - fieldnames_Edificio.index("horario_inicio_lunes")) // 2
-            ]
-            horario: time
-            if field_name.startswith("horario_inicio_"):
-                horario = rango_horario.inicio
+        # Obtener los valores de horarios por separado, ya que no tienen
+        # correspondencia directa con los miembros de un Edificio
+        if es_campo_horario_Edificio[campo]:
+            índice_día: int = campo_horario_a_índice_día_Edificio[campo]
+            rango_horario: RangoHorario = el_edificio.horarios[índice_día]
+            if campo_es_horario_de_inicio_Edificio[campo]:
+                return rango_horario.inicio
             else:
-                horario = rango_horario.fin
-            # TODO: Manejar horario opcional en el getter de aula, no?
-            if horario == time(23, 59, 59): return "24:00"
-            return horario.strftime("%H:%M")
+                return rango_horario.fin
 
-        return getattr(self._edificios[edificio], field_name)
+        rolename: str = rolenames_Edificio[campo]
+        return getattr(el_edificio, rolename)
 
     def existe_edificio(self, nombre: str) -> bool:
         '''
@@ -127,37 +127,35 @@ class GestorDeDatos:
         logger.debug('set_in_edificio - edificio=%s campo=%s valor=%s', edificio, campo, valor)
 
         el_edificio = self._edificios[edificio]
-        field_name: str = fieldnames_Edificio[campo]
-        ### DEBUG
-        # expected_type = fieldtypes_Edificio[campo]
-        # if not is_instance_of_type(valor, expected_type):
-        #     raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
+        rolename: str = rolenames_Edificio[campo]
+        expected_type = fieldtypes_Edificio[campo]
+
+        if not is_instance_of_type(valor, expected_type):
+            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{rolename}" de tipo {expected_type}')
         
         # Si el valor es string, borrar espacios al principio y final
         if isinstance(valor, str):
             valor = valor.strip()
         
         # Si el campo es el nombre, chequear que no esté repetido
-        if field_name == 'nombre':
+        if rolename == 'nombre':
             nombre_lower = valor.lower()
             ya_existe = any(edificio.nombre.lower() == nombre_lower for edificio in self._edificios if edificio is not el_edificio)
             if ya_existe:
                 raise ValueError(f'Ya existe un edificio llamado {valor}.')
 
-        if field_name.startswith("horario_"):
-            rango_horario: RangoHorario = el_edificio.horarios[
-                (campo - fieldnames_Edificio.index("horario_inicio_lunes")) // 2
-            ]
-            valor_parseado: time = datetime.strptime(valor, "%H:%M").time() \
-                                   if valor != "24:00" else \
-                                   time(23, 59, 59)
-            if field_name.startswith("horario_inicio_"):
-                rango_horario.inicio = valor_parseado
+        # Editar los valores de horarios por separado, ya que no tienen
+        # correspondencia directa con los miembros de un Edificio
+        if es_campo_horario_Edificio[campo]:
+            índice_día: int = campo_horario_a_índice_día_Edificio[campo]
+            rango_horario: RangoHorario = el_edificio.horarios[índice_día]
+            if campo_es_horario_de_inicio_Edificio[campo]:
+                rango_horario.inicio = valor
             else:
-                rango_horario.fin = valor_parseado
+                rango_horario.fin = valor
             return
 
-        setattr(el_edificio, field_name, valor)
+        setattr(el_edificio, rolename, valor)
 
     def agregar_edificio(self):
         '''

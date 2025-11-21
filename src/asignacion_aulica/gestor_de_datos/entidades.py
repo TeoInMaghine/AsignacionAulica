@@ -1,7 +1,8 @@
 from __future__ import annotations  # Para soportar referencias circulares en los type hints
 from dataclasses import dataclass, field, fields
+from datetime import time
 from collections.abc import Iterable, Sequence
-from typing import TypeAlias
+from typing import TypeAlias, get_type_hints
 import itertools
 
 from asignacion_aulica.gestor_de_datos.días_y_horarios import (
@@ -92,39 +93,57 @@ def todas_las_clases(carreras: Iterable[Carrera]) -> Iterable[Clase]:
 # Hacemos esto porque en los modelos de QT los campos se identifican con índices
 # (llamados "roles").
 
-_just_some_debugging_list_man = []
+rolenames_Edificio = []
 for f in fields(Edificio):
-    if f.name != "horarios":
-        _just_some_debugging_list_man.append(f.name)
+    if f.name != 'horarios':
+        rolenames_Edificio.append(f.name)
     else:
-        _just_some_debugging_list_man.extend([
-            "horario_inicio_lunes",
-            "horario_fin_lunes",
-            "horario_inicio_martes",
-            "horario_fin_martes",
-            "horario_inicio_miércoles",
-            "horario_fin_miércoles",
-            "horario_inicio_jueves",
-            "horario_fin_jueves",
-            "horario_inicio_viernes",
-            "horario_fin_viernes",
-            "horario_inicio_sábado",
-            "horario_fin_sábado",
-            "horario_inicio_domingo",
-            "horario_fin_domingo"
+        rolenames_Edificio.extend([
+            'horario_inicio_lunes',
+            'horario_fin_lunes',
+            'horario_inicio_martes',
+            'horario_fin_martes',
+            'horario_inicio_miércoles',
+            'horario_fin_miércoles',
+            'horario_inicio_jueves',
+            'horario_fin_jueves',
+            'horario_inicio_viernes',
+            'horario_fin_viernes',
+            'horario_inicio_sábado',
+            'horario_fin_sábado',
+            'horario_inicio_domingo',
+            'horario_fin_domingo'
         ])
-fieldnames_Edificio:  tuple[str, ...] = tuple(_just_some_debugging_list_man)
+rolenames_Edificio:   tuple[str, ...] = tuple(rolenames_Edificio)
 fieldnames_Aula:      tuple[str, ...] = tuple(f.name for f in fields(Aula))
 fieldnames_AulaDoble: tuple[str, ...] = tuple(f.name for f in fields(AulaDoble))
 fieldnames_Carrera:   tuple[str, ...] = tuple(f.name for f in fields(Carrera))
 fieldnames_Materia:   tuple[str, ...] = tuple(f.name for f in fields(Materia))
 fieldnames_Clase:     tuple[str, ...] = tuple(f.name for f in fields(Clase))
 
+# Lookup tables para tratar con los campos y roles de horarios
+es_campo_horario_Edificio: tuple[bool, ...] = tuple(
+    rolename.startswith('horario') for rolename in rolenames_Edificio
+)
+campo_horario_inicio_lunes_Edificio = rolenames_Edificio.index('horario_inicio_lunes')
+campo_horario_a_índice_día_Edificio: tuple[int, ...] = tuple(
+    # Ojo: tiene valores raros para campos que no son horarios
+    (campo - campo_horario_inicio_lunes_Edificio) // 2
+    for campo in range(len(rolenames_Edificio))
+)
+campo_es_horario_de_inicio_Edificio: tuple[bool, ...] = tuple(
+    rolename.startswith('horario_inicio') for rolename in rolenames_Edificio
+)
+
 # Tipos de dato (sin parametrizar) de los campos.
 # Usamos esto para chequear que los tipos de dato que llegan de QT son correctos
 # para el campo al que van dirigidos (porlas).
 # Usamos `eval` porque los tipos de dato están guardados como strings.
-fieldtypes_Edificio:  tuple[type, ...] = tuple(eval(f.type) for f in fields(Edificio))
+fieldtypes_Edificio: tuple[type, ...] = tuple(
+    time if es_campo_horario_Edificio[campo] else
+    get_type_hints(Edificio).get(rolename)
+    for campo, rolename in enumerate(rolenames_Edificio)
+)
 fieldtypes_Aula:      tuple[type, ...] = tuple(eval(f.type) for f in fields(Aula))
 fieldtypes_AulaDoble: tuple[type, ...] = tuple(eval(f.type) for f in fields(AulaDoble))
 fieldtypes_Carrera:   tuple[type, ...] = tuple(eval(f.type) for f in fields(Carrera))

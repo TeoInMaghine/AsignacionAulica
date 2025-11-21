@@ -1,18 +1,25 @@
 import logging
+from datetime import time, datetime
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.entidades import fieldnames_Edificio
+from asignacion_aulica.gestor_de_datos.entidades import (
+    rolenames_Edificio,
+    es_campo_horario_Edificio as es_campo_horario
+)
 
 logger = logging.getLogger(__name__)
 
 NOMBRES_DE_ROLES: dict[int, QByteArray] = {
     # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt
-    i + Qt.ItemDataRole.UserRole + 1: QByteArray(campo.encode()) for i, campo in enumerate(fieldnames_Edificio)
+    campo + Qt.ItemDataRole.UserRole + 1: QByteArray(rolename.encode()) \
+        for campo, rolename in enumerate(rolenames_Edificio)
 }
 
-def rol_a_índice(rol: int) -> int:
+EQUIVALENTE_24_HORAS = time(23, 59, 59)
+
+def rol_a_campo(rol: int) -> int:
     return rol - Qt.ItemDataRole.UserRole - 1
 
 class ListEdificios(QAbstractListModel):
@@ -38,9 +45,21 @@ class ListEdificios(QAbstractListModel):
     def data(self, index: QModelIndex, role: int = 0) -> Any:
         if not index.isValid(): return None
 
+
         if role in NOMBRES_DE_ROLES:
             logger.debug(f"Obteniendo {NOMBRES_DE_ROLES[role]}")
-            return self.gestor.get_from_edificio(index.row(), rol_a_índice(role))
+            campo: int = rol_a_campo(role)
+            valor_obtenido = self.gestor.get_from_edificio(index.row(), campo)
+
+            # Transformar time a string con formato HH:MM
+            if es_campo_horario[campo]:
+                horario: time = valor_obtenido
+                if horario == EQUIVALENTE_24_HORAS:
+                    valor_obtenido = '24:00'
+                else:
+                    valor_obtenido = horario.strftime('%H:%M')
+
+            return valor_obtenido
         else:
             return None
 
@@ -50,8 +69,16 @@ class ListEdificios(QAbstractListModel):
 
         if role in NOMBRES_DE_ROLES:
             logger.debug(f"Editando {NOMBRES_DE_ROLES[role]}")
-            # TODO: validar value
-            self.gestor.set_in_edificio(index.row(), rol_a_índice(role), value)
+            campo: int = rol_a_campo(role)
+
+            # Transformar string con formato HH:MM a time
+            if es_campo_horario[campo]:
+                if value == '24:00':
+                    value = EQUIVALENTE_24_HORAS
+                else:
+                    value = datetime.strptime(value, "%H:%M").time()
+
+            self.gestor.set_in_edificio(index.row(), campo, value)
             self.dataChanged.emit(index, index, [role])
             return True
         else:

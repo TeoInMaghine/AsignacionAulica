@@ -20,7 +20,7 @@ Repeater {
         // Este modelData es del Repeater, no del model de ListView...
         required property string modelData
         entidad: repeater.entidad
-        díaDeLaSemana: modelData
+        sufijoRol: modelData
 
         Layout.preferredWidth: Constantes.width_columna_horario
         Layout.alignment: Qt.AlignCenter

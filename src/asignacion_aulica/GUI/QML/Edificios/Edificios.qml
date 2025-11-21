@@ -11,7 +11,7 @@ ListView {
     anchors.margins: 15
     spacing: 10
     clip: true
-    
+
     contentWidth: contentItem.childrenRect.width + 2 * anchors.margins
 
     model: ListEdificios { id: edificios }
@@ -46,7 +46,7 @@ ListView {
                     editorDetallesDeEdificio.visible = checked
                 }
             }
-            TextField {
+            TextFieldConEnter {
                 text: edificio.nombre
                 onEditingFinished: {
                     edificio.nombre = text

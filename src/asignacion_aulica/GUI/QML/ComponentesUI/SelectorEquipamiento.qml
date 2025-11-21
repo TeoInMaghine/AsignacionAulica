@@ -80,11 +80,7 @@ ComboBox {
                     Layout.bottomMargin: bottomMargin
                     Layout.alignment: Qt.AlignVCenter
 
-                    onClicked: {
-                        if (equipamientos.appendEquipamiento(editorNuevoEquipamiento.text)) {
-                            editorNuevoEquipamiento.clear()
-                        }
-                    }
+                    onClicked: editorNuevoEquipamiento.accepted()
                 }
                 TextField {
                     id: editorNuevoEquipamiento
@@ -95,6 +91,13 @@ ComboBox {
                     horizontalAlignment: TextInput.AlignRight
 
                     placeholderText: "Nuevo"
+
+                    onAccepted: {
+                        if (equipamientos.appendEquipamiento(editorNuevoEquipamiento.text)) {
+                            editorNuevoEquipamiento.clear()
+                        }
+                        editorNuevoEquipamiento.focus = false
+                    }
                 }
             }
 

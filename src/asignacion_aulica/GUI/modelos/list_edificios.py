@@ -62,7 +62,7 @@ def hay_type_mismatch(value: Any, tipo_esperado: Type) -> bool:
         return False
 
     logger.debug(f'Se esperaba asignar un valor de tipo {tipo_esperado}, pero'
-                 f'en cambio se recibió uno de tipo {type(value)}')
+                 f' en cambio se recibió uno de tipo {type(value)}')
     return True
 
 class ListEdificios(QAbstractListModel):

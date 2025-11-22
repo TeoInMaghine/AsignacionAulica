@@ -12,7 +12,6 @@ RowLayout {
     readonly property int textFieldPadding : 2
     spacing: 2
 
-    // TODO: Fix. También, horario de edificio si el del aula == None (y engrisar también).
     // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
     // en la lista de clases) para resetear el horario al del edificio (por
     // ejemplo con un ícono tipo 🔄), solo interactuable si el usuario cambió
@@ -24,6 +23,9 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
+        // Des-enfatizar texto cuando se usa el horario de la entidad padre
+        color: entidad[rolDeHorarioInicio] ? palette.dark : palette.mid
+        // Si no se especifica el horario, mostrar el de la entidad padre
         text: entidad[rolDeHorarioInicio] ?
               entidad[rolDeHorarioInicio] :
               entidad_padre[rolDeHorarioInicio]
@@ -37,6 +39,9 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
+        // Des-enfatizar texto cuando se usa el horario de la entidad padre
+        color: entidad[rolDeHorarioFin] ? palette.dark : palette.mid
+        // Si la no se especifica el horario, mostrar el de la entidad padre
         text: entidad[rolDeHorarioFin] ?
               entidad[rolDeHorarioFin] :
               entidad_padre[rolDeHorarioFin]

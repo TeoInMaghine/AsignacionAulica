@@ -63,7 +63,7 @@ def hay_type_mismatch(value: Any, tipo_esperado: Type) -> bool:
         return False
 
     logger.debug(f'Se esperaba asignar un valor de tipo {tipo_esperado}, pero'
-                 f'en cambio se recibió uno de tipo {type(value)}')
+                 f' en cambio se recibió uno de tipo {type(value)}')
     return True
 
 class ListAulas(QAbstractListModel):
@@ -132,6 +132,7 @@ class ListAulas(QAbstractListModel):
         if role not in ROLES_A_NOMBRES_QT: return False
 
         aula: Aula = self.gestor.get_aula(self.i_edificio, index.row())
+        roles_actualizados: list[int] = [role]
 
         if role == ROL_NOMBRE:
             if hay_type_mismatch(value, str):
@@ -167,6 +168,10 @@ class ListAulas(QAbstractListModel):
             if not rango_horario:
                 rango_horario = copy(aula.edificio.horarios[índice_semanal])
                 aula.horarios[índice_semanal] = rango_horario
+                # Actualizar el rol del otro extremo del rango horario
+                roles_actualizados.append(
+                    role+1 if es_rol_horario_inicio(role) else role-1
+                )
 
             # Transformar string con formato HH:MM a time
             if value == '24:00':
@@ -179,7 +184,7 @@ class ListAulas(QAbstractListModel):
             else:
                 rango_horario.fin = value
 
-        self.dataChanged.emit(index, index, [role])
+        self.dataChanged.emit(index, index, roles_actualizados)
         return True
 
     @override

@@ -78,10 +78,12 @@ ComboBox {
                 readonly property int rightMargin: 5
                 readonly property int bottomMargin: 5
 
-                BotónAñadir {
+                BotónRedondeadoConTexto {
                     Layout.leftMargin: leftMargin
                     Layout.bottomMargin: bottomMargin
                     Layout.alignment: Qt.AlignVCenter
+
+                    text: "+"
 
                     onClicked: editorNuevoEquipamiento.accepted()
                 }

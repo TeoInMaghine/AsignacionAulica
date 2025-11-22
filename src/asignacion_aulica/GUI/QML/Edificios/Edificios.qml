@@ -115,13 +115,13 @@ ListView {
         height: footerEdificios.height + view.spacing
         width: footerEdificios.width
 
-        BotónAñadir {
+        BotónRedondeadoConTexto {
             id: footerEdificios
+            text: "+ Edificio"
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.topMargin: view.spacing
             anchors.leftMargin: 10
-            width: 75
 
             onClicked: {
                 edificios.insertRow(edificios.rowCount())

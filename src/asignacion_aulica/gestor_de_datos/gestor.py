@@ -15,21 +15,8 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     Clase,
     Edificio,
     Materia,
-    fieldnames_Aula,
-    fieldnames_AulaDoble,
-    fieldnames_Clase,
-    rolenames_Edificio,
-    es_campo_horario_Edificio,
-    campo_horario_a_índice_día_Edificio,
-    campo_es_horario_de_inicio_Edificio,
-    fieldnames_Materia,
-    fieldtypes_Aula,
-    fieldtypes_Clase,
-    fieldtypes_Edificio,
-    fieldtypes_Materia,
     todas_las_clases
 )
-from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
 
 logger = logging.getLogger(__name__)
 
@@ -78,84 +65,29 @@ class GestorDeDatos:
     def cantidad_de_edificios(self) -> int:
         return len(self._edificios)
 
-    def get_from_edificio(self, edificio: int, campo: int) -> Any:
+    def get_edificio(self, edificio: int) -> Edificio:
         '''
+        Obtiene un edificio, el cual puede inspeccionarse o modificarse.
+
         :param edificio: El índice de un edificio.
-        :param campo: El índice de un campo.
-        :return: El valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
+        :return: El edificio en el índice dado.
+        :raise IndexError: Si el índice está fuera de rango.
         '''
-        el_edificio: Edificio = self._edificios[edificio]
-
-        # Obtener los valores de horarios por separado, ya que no tienen
-        # correspondencia directa con los miembros de un Edificio
-        if es_campo_horario_Edificio[campo]:
-            índice_día: int = campo_horario_a_índice_día_Edificio[campo]
-            rango_horario: RangoHorario = el_edificio.horarios[índice_día]
-            if campo_es_horario_de_inicio_Edificio[campo]:
-                return rango_horario.inicio
-            else:
-                return rango_horario.fin
-
-        rolename: str = rolenames_Edificio[campo]
-        return getattr(el_edificio, rolename)
+        return self._edificios[edificio]
 
     def existe_edificio(self, nombre: str) -> bool:
         '''
+        :param nombre: Nombre a buscar en la lista de edificios.
         :return: `True` si hay un edificio con ese nombre en la base de datos,
         `False` si no.
 
         No se distinguen mayúsculas de minúsculas.
         '''
         nombre = nombre.lower().strip()
-        return any(edificio.nombre.lower() == nombre for edificio in self._edificios)
-
-    def set_in_edificio(self, edificio: int, campo: int, valor: Any):
-        '''
-        Actualizar el valor de un campo de un edificio existente.
-
-        El valor dado se asume como válido.
-
-        :param edificio: El índice del edificio.
-        :param campo: El índice del campo.
-        :param valor: El nuevo valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
-        :raise TypeError: Si el tipo de ``valor`` no es correcto.
-        :raise ValueError: Si se intenta cambiar el nombre del edificio a un
-        nombre que ya existe.
-        '''
-        logger.debug('set_in_edificio - edificio=%s campo=%s valor=%s', edificio, campo, valor)
-
-        el_edificio = self._edificios[edificio]
-        rolename: str = rolenames_Edificio[campo]
-        expected_type = fieldtypes_Edificio[campo]
-
-        if not is_instance_of_type(valor, expected_type):
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{rolename}" de tipo {expected_type}')
-        
-        # Si el valor es string, borrar espacios al principio y final
-        if isinstance(valor, str):
-            valor = valor.strip()
-        
-        # Si el campo es el nombre, chequear que no esté repetido
-        if rolename == 'nombre':
-            nombre_lower = valor.lower()
-            ya_existe = any(edificio.nombre.lower() == nombre_lower for edificio in self._edificios if edificio is not el_edificio)
-            if ya_existe:
-                raise ValueError(f'Ya existe un edificio llamado {valor}.')
-
-        # Editar los valores de horarios por separado, ya que no tienen
-        # correspondencia directa con los miembros de un Edificio
-        if es_campo_horario_Edificio[campo]:
-            índice_día: int = campo_horario_a_índice_día_Edificio[campo]
-            rango_horario: RangoHorario = el_edificio.horarios[índice_día]
-            if campo_es_horario_de_inicio_Edificio[campo]:
-                rango_horario.inicio = valor
-            else:
-                rango_horario.fin = valor
-            return
-
-        setattr(el_edificio, rolename, valor)
+        return any(
+            edificio.nombre.lower() == nombre
+            for edificio in self._edificios
+        )
 
     def agregar_edificio(self):
         '''

@@ -57,8 +57,10 @@ class ListEquipamientosDeAula(QAbstractListModel):
 
     @indexEdificio.setter
     def indexEdificio(self, indexEdificio: int):
-        self.i_edificio = indexEdificio
-        self.seleccionadosTextChanged.emit()
+        if indexEdificio > 0: # Ignorar cuando QT setea -1
+            logger.debug('Set indexEdificio=%d', indexEdificio)
+            self.i_edificio = indexEdificio
+            self.seleccionadosTextChanged.emit()
     
     @pyqtProperty(int)
     def indexAula(self) -> int:
@@ -66,8 +68,10 @@ class ListEquipamientosDeAula(QAbstractListModel):
 
     @indexAula.setter
     def indexAula(self, indexAula: int):
-        self.i_aula = indexAula
-        self.seleccionadosTextChanged.emit()
+        if indexAula > 0: # Ignorar cuando QT setea -1
+            logger.debug('Set indexAula=%d', indexAula)
+            self.i_aula = indexAula
+            self.seleccionadosTextChanged.emit()
         
     @override
     def roleNames(self) -> dict[int, QByteArray]:

@@ -6,11 +6,13 @@ RoundButton {
     Layout.preferredWidth: 35
     Layout.preferredHeight: 35
 
-    padding: 0
-    bottomPadding: 3
+    //padding: 10
+    bottomPadding: 0
+    topPadding: 0
+    leftPadding: 13
+    rightPadding: 13
 
-    text: "+"
-    font.pointSize: 20
+    font.pointSize: 13
     font.bold: true
 
     highlighted: hovered

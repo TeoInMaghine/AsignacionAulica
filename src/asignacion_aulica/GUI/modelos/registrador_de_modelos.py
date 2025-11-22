@@ -1,7 +1,7 @@
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
-from asignacion_aulica.GUI.modelos.equipamiento_model import ListEquipamientos
+from asignacion_aulica.GUI.modelos.equipamiento_model import ListEquipamientosDeAula
 from PyQt6.QtQml import qmlRegisterType
 
 
@@ -29,12 +29,12 @@ def registrar_modelos_qml(gestor_de_datos: GestorDeDatos):
     # Esta línea es para que el GC no piense que puede limpiar las clases
     # wrapper cuando sale de este scope. Literal python crashea si no.
     # *Achievement unlocked: use after free error in python.*
-    global _ListAulas, _ListEquipamientos, _ListEdificios
+    global _ListAulas, _ListEquipamientosDeAula, _ListEdificios
 
     _ListEdificios = agregar_defaults_al_constructor(ListEdificios, gestor=gestor_de_datos)
     _ListAulas = agregar_defaults_al_constructor(ListAulas, gestor=gestor_de_datos)
-    _ListEquipamientos = agregar_defaults_al_constructor(ListEquipamientos, gestor=gestor_de_datos)
+    _ListEquipamientosDeAula = agregar_defaults_al_constructor(ListEquipamientosDeAula, gestor=gestor_de_datos)
 
     qmlRegisterType(_ListEdificios, 'ModelosAsignaciónÁulica'.encode(), 1, 0, 'ListEdificios')
     qmlRegisterType(_ListAulas, 'ModelosAsignaciónÁulica'.encode(), 1, 0, 'ListAulas')
-    qmlRegisterType(_ListEquipamientos, 'ModelosAsignaciónÁulica'.encode(), 1, 0, 'ListEquipamientos')
+    qmlRegisterType(_ListEquipamientosDeAula, 'ModelosAsignaciónÁulica'.encode(), 1, 0, 'ListEquipamientosDeAula')

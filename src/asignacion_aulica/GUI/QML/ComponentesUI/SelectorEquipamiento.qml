@@ -9,14 +9,17 @@ import ModelosAsignaciónÁulica
 ComboBox {
     id: comboBox
 
+    required property var edificio
     required property var aula
 
     displayText: equipamientos.seleccionadosText
 
-    model: ListEquipamientos {
+    model: ListEquipamientosDeAula {
         id: equipamientos
+        indexEdificio: edificio.index
         indexAula: aula.index
     }
+    onPressedChanged: if (pressed && !popup.visible) equipamientos.actualizarLista()
 
     // ComboBox cierra el popup cuando sus items (si heredan de AbstractButton)
     // son activados. Wrappear el delegate es lo que previene que eso pase.

@@ -35,8 +35,9 @@ class ListAulas(QAbstractListModel):
 
     @indexEdificio.setter
     def indexEdificio(self, indexEdificio: int):
-        logger.info('Set indexEdificio: %s', indexEdificio)
-        self.i_edificio = indexEdificio
+        if indexEdificio > 0: # Ignorar cuando QT setea -1
+            logger.info('Set indexEdificio: %s', indexEdificio)
+            self.i_edificio = indexEdificio
 
     @override
     def roleNames(self) -> dict[int, QByteArray]:

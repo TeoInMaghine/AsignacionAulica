@@ -1,80 +1,136 @@
-from typing import Any
+import logging
+from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSignal, pyqtSlot
 
+from asignacion_aulica.gestor_de_datos.entidades import fieldnames_Aula
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio
 
-class ListEquipamientos(QAbstractListModel):
-    seleccionadosTextChanged: pyqtSignal = pyqtSignal()
+logger = logging.getLogger(__name__)
+
+CAMPO_AULA_EQUIPAMIENTO: int = fieldnames_Aula.index('equipamiento')
+
+ROL_NOMBRE: int = Qt.ItemDataRole.UserRole + 1
+ROL_SELECCIONADO: int = Qt.ItemDataRole.UserRole + 2
+ROLE_NAMES: dict[int, QByteArray] = {
+    ROL_NOMBRE: QByteArray("nombre".encode()),
+    ROL_SELECCIONADO: QByteArray("seleccionado".encode())
+}
+
+class ListEquipamientosDeAula(QAbstractListModel):
+    '''
+    Esta clase conecta el selector de equipamientos de las aulas en la GUI con
+    el gestor datos.
+
+    En la GUI los equipamientos existentes se muestran en orden alfabético, pero
+    en el gestor de datos se guardan en una estructura que no tiene orden, así
+    que para no estar ordenándolos todo el rato esta clase se encarga de
+    mantener una copia ordenada y sincronizada de esos datos.
+    '''
+    seleccionadosTextChanged: pyqtSignal = pyqtSignal() #TODO: Esto no debería ser compartido entre instancias.
 
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
-        # TODO: Esto es placeholder, falta usar el gestor de datos
-        self.aula = Aula('B101', Edificio('Anasagasti'), 45)
-        self.equipamientos = ["Proyector", "Computadoras", "No sé lol"]
+        self.gestor: GestorDeDatos = gestor
+
+        # Cosas seteadas desde QT:
+        self.i_edificio: int = 0
+        self.i_aula: int = 0
+
+        # Cache para no estar pidiéndole al gestor que ordene los datos todo el
+        # tiempo. Acordarse de actualizarla cuando puede haber cambios.
+        self.equipamientos_posibles: list[str]
+        self.actualizarLista()
 
     @pyqtProperty(str, notify=seleccionadosTextChanged)
     def seleccionadosText(self) -> str:
-        if len(self.aula.equipamiento) == 0:
+        seleccionados = self._get_equipamientos_seleccionados()
+        if len(seleccionados) == 0:
             return "Ninguno"
-
-        return ",".join(self.aula.equipamiento)
+        else:
+            seleccionados_en_orden_alfabético = list(seleccionados)
+            seleccionados_en_orden_alfabético.sort()
+            return ", ".join(seleccionados_en_orden_alfabético)
 
     @pyqtProperty(int)
+    def indexEdificio(self) -> int:
+        return self.i_edificio
+
+    @indexEdificio.setter
+    def indexEdificio(self, indexEdificio: int):
+        if indexEdificio > 0: # Ignorar cuando QT setea -1
+            logger.debug('Set indexEdificio=%d', indexEdificio)
+            self.i_edificio = indexEdificio
+            self.seleccionadosTextChanged.emit()
+    
+    @pyqtProperty(int)
     def indexAula(self) -> int:
-        return self._indexAula
+        return self.i_aula
 
     @indexAula.setter
     def indexAula(self, indexAula: int):
-        self._indexAula = indexAula
-
-    # Constante
+        if indexAula > 0: # Ignorar cuando QT setea -1
+            logger.debug('Set indexAula=%d', indexAula)
+            self.i_aula = indexAula
+            self.seleccionadosTextChanged.emit()
+        
+    @override
     def roleNames(self) -> dict[int, QByteArray]:
-        return {
-            Qt.ItemDataRole.UserRole + 1: "nombre".encode(),
-            Qt.ItemDataRole.UserRole + 2: "seleccionado".encode()
-        }
+        return ROLE_NAMES
 
-    def rowCount(self, _parent: QModelIndex) -> int:
-        return len(self.equipamientos)
+    @override
+    def rowCount(self, parent: QModelIndex|None = None) -> int:
+        return len(self.equipamientos_posibles)
 
-    def data(self, index: QModelIndex, role: int) -> Any:
-        if not index.isValid(): return
+    @override
+    def data(self, index: QModelIndex, role: int = 0) -> Any:
+        if not index.isValid(): return None
 
-        if role == Qt.ItemDataRole.UserRole + 1: # nombre
-            return self.equipamientos[index.row()]
-        elif role == Qt.ItemDataRole.UserRole + 2: # seleccionado
-            # TODO: Esto tendría que ser basado en el índice del aula y usar el gestor, obvio
-            return self.equipamientos[index.row()] in self.aula.equipamiento
+        if role == ROL_NOMBRE:
+            return self.equipamientos_posibles[index.row()]
+        elif role == ROL_SELECCIONADO:
+            return self.equipamientos_posibles[index.row()] in self._get_equipamientos_seleccionados()
+        else:
+            return None
 
-    def setData(self, index: QModelIndex, value: Any, role: int) -> bool:
+    @override
+    def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
         if not index.isValid(): return False
 
-        if role == Qt.ItemDataRole.UserRole + 1: # nombre
+        if role == ROL_NOMBRE:
             # No tiene sentido renombrar equipamientos existentes
             return False
-        elif role == Qt.ItemDataRole.UserRole + 2: # seleccionado
+        elif role == ROL_SELECCIONADO:
+            equipamiento = self.equipamientos_posibles[index.row()]
             if value:
-                self.aula.equipamiento.add(self.equipamientos[index.row()])
+                self.gestor.agregar_equipamiento_a_aula(self.i_edificio, self.i_aula, equipamiento)
             else:
-                self.aula.equipamiento.discard(self.equipamientos[index.row()])
+                self.gestor.borrar_equipamiento_de_aula(self.i_edificio, self.i_aula, equipamiento)
 
             self.seleccionadosTextChanged.emit()
-
             return True
+        else:
+            return False
 
-        return False
-
-    # Función custom (en vez de insertRows) para poder poner un nombre
-    # (es necesaria esta funcionalidad al no poder renombrar)
     @pyqtSlot(str, result=bool)
-    def appendEquipamiento(self, name: str) -> bool:
-        # TODO: más validaciones (en el gestor de datos directamente, creo)
+    def agregarEquipamiento(self, name: str) -> bool:
+        '''
+        Agregar un equipamiento nuevo a la lista.
+        '''
+        name = name.strip()
         if not name:
             return False
 
-        row_at_the_end = len(self.equipamientos)
-        self.beginInsertRows(QModelIndex(), row_at_the_end, row_at_the_end)
-        self.equipamientos.insert(row_at_the_end, name)
-        self.endInsertRows()
+        self.gestor.agregar_equipamiento_a_aula(self.i_edificio, self.i_aula, name)
+        self.actualizarLista()
+        self.seleccionadosTextChanged.emit()
         return True
+    
+    @pyqtSlot()
+    def actualizarLista(self):
+        logger.debug('Actualizando lista')
+        self.beginResetModel()
+        self.equipamientos_posibles = self.gestor.get_equipamientos_existentes()
+        self.endResetModel()
+    
+    def _get_equipamientos_seleccionados(self) -> set[str]:
+        return self.gestor.get_from_aula(self.i_edificio, self.i_aula, CAMPO_AULA_EQUIPAMIENTO)

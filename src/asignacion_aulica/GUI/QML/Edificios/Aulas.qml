@@ -77,6 +77,7 @@ ListView {
 
         SelectorEquipamiento {
             Layout.preferredWidth: headerItem.widthEquipamiento
+            edificio: view.edificio
             aula: parent.aula
         }
 

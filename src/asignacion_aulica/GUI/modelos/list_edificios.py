@@ -52,7 +52,7 @@ ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
         for i, rolename in enumerate(NOMBRES_DE_ROLES)
 }
 
-EQUIVALENTE_24_HORAS = time.max
+EQUIVALENTE_24_HORAS: time = time.max
 '''
 '24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
 '''
@@ -89,7 +89,6 @@ class ListEdificios(QAbstractListModel):
         if not index.isValid(): return None
         if role not in ROLES_A_NOMBRES_QT: return None
 
-        logger.debug(f'Obteniendo {ROLES_A_NOMBRES_QT[role]}')
         # TODO: Sandboxear llamadas al gestor? Está bueno crashear cuando
         # debugeamos pero en release quizás querríamos impedir eso
         edificio: Edificio = self.gestor.get_edificio(index.row())
@@ -116,7 +115,6 @@ class ListEdificios(QAbstractListModel):
         if not index.isValid(): return False
         if role not in ROLES_A_NOMBRES_QT: return False
 
-        logger.debug(f'Editando {ROLES_A_NOMBRES_QT[role]}')
         edificio: Edificio = self.gestor.get_edificio(index.row())
 
         if role == ROL_NOMBRE:
@@ -126,6 +124,7 @@ class ListEdificios(QAbstractListModel):
             # Enter; lo ignoramos en vez de loguearlo
             if value == edificio.nombre:
                 return False
+
             if self.gestor.existe_edificio(value):
                 logger.debug(f'No se puede asignar el nombre "{value}", porque'
                               ' ya existe un edificio con el mismo nombre')

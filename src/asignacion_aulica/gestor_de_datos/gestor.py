@@ -129,13 +129,6 @@ class GestorDeDatos:
         logger.debug('ordenar_edificios')
         self._edificios.sort(key=lambda edificio: edificio.nombre.lower())
 
-    def cantidad_de_aulas(self, edificio: int) -> int:
-        '''
-        :return: La cantidad de aulas de un edificio en la base de datos.
-        :raise IndexError: Si el índice del edificio está fuera de rango.
-        '''
-        return len(self._edificios[edificio].aulas)
-
     def get_aulas(self, edificio: int) -> list[str]:
         '''
         :return: Los nombres de todas las aulas de un edificio en la base de
@@ -146,53 +139,23 @@ class GestorDeDatos:
         nombres.sort(key=lambda nombre: nombre.lower())
         return nombres
 
-    def get_from_aula(self, edificio: int, índice: int, campo: int) -> Any:
+    def cantidad_de_aulas(self, edificio: int) -> int:
         '''
-        :param edificio: El índice del edificio.
-        :param índice: El índice del aula.
-        :param campo: El índice del campo.
-        :return: El valor del campo especificado.
+        :return: La cantidad de aulas de un edificio en la base de datos.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
+        '''
+        return len(self._edificios[edificio].aulas)
+
+    def get_aula(self, edificio: int, aula: int) -> Aula:
+        '''
+        Obtiene un aula, el cual puede inspeccionarse o modificarse.
+
+        :param edificio: El índice de un edificio.
+        :param aula: El índice de un aula.
+        :return: El aula en los índices dados.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        fieldname = fieldnames_Aula[campo]
-        return getattr(self._edificios[edificio].aulas[índice], fieldname)
-
-    def set_in_aula(self, edificio: int, índice: int, campo: int, valor: Any):
-        '''
-        Actualizar el valor de un campo de un aula existente.
-
-        El valor dado se asume como válido.
-
-        :param edificio: El índice del edificio.
-        :param índice: El índice del aula.
-        :param campo: El índice del campo.
-        :param valor: El nuevo valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
-        :raise TypeError: Si el tipo de ``valor`` no es correcto.
-        :raise ValueError: Si se intenta cambiar el nombre del aula a un nombre
-        que ya existe.
-        '''
-        logger.debug('set_in_aula - edificio=%s índice=%s campo=%s valor=%s', edificio, índice, campo, valor)
-        
-        el_aula = self._edificios[edificio].aulas[índice]
-        field_name: str = fieldnames_Aula[campo]
-        expected_type = fieldtypes_Aula[campo]
-        
-        if not is_instance_of_type(valor, expected_type):
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Aula.{field_name}" de tipo {expected_type}.')
-
-        # Si el valor es string, borrar espacios al principio y final
-        if isinstance(valor, str):
-            valor = valor.strip()
-        
-        # Si el campo es el nombre, chequear que no esté repetido
-        if field_name == 'nombre':
-            nombre_lower = valor.lower()
-            ya_existe = any(aula.nombre.lower() == nombre_lower for aula in self._edificios[edificio].aulas if aula is not el_aula)
-            if ya_existe:
-                raise ValueError(f'Ya existe un aula llamada {valor} en el edificio {el_aula.edificio.nombre}.')
-        
-        setattr(el_aula, field_name, valor)
+        return self._edificios[edificio].aulas[aula]
 
     def agregar_aula(self, edificio: int):
         '''

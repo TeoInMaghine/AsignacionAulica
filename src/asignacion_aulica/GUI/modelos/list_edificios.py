@@ -122,7 +122,7 @@ class ListEdificios(QAbstractListModel):
                 return False
             # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
             # Enter; lo ignoramos en vez de loguearlo
-            if value == edificio.nombre:
+            if value.lower().strip() == edificio.nombre.lower():
                 return False
 
             if self.gestor.existe_edificio(value):

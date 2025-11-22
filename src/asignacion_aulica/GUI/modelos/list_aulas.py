@@ -139,7 +139,7 @@ class ListAulas(QAbstractListModel):
                 return False
             # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
             # Enter; lo ignoramos en vez de loguearlo
-            if value == aula.nombre:
+            if value.lower().strip() == aula.nombre.lower():
                 return False
 
             if self.gestor.existe_aula(value):

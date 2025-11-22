@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 RowLayout {
+    property var entidad_padre
     required property var entidad
     required property string rolDeHorarioInicio
     required property string rolDeHorarioFin
@@ -23,7 +24,9 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: entidad[rolDeHorarioInicio]
+        text: entidad[rolDeHorarioInicio] ?
+              entidad[rolDeHorarioInicio] :
+              entidad_padre[rolDeHorarioInicio]
         onEditingFinished: {
             entidad[rolDeHorarioInicio] = text
         }
@@ -34,7 +37,9 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: entidad[rolDeHorarioFin]
+        text: entidad[rolDeHorarioFin] ?
+              entidad[rolDeHorarioFin] :
+              entidad_padre[rolDeHorarioFin]
         onEditingFinished: {
             entidad[rolDeHorarioFin] = text
         }

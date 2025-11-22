@@ -1,2 +1,3 @@
 module QML.Materias
 EditorDeCarreras EditorDeCarreras.qml
+internal Botonera Botonera.qml

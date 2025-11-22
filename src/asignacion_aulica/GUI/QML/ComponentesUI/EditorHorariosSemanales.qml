@@ -19,8 +19,9 @@ Repeater {
     EditorRangoHorario {
         // Este modelData es del Repeater, no del model de ListView...
         required property string modelData
+        rolDeHorarioInicio: "horario_inicio_" + modelData
+        rolDeHorarioFin: "horario_fin_" + modelData
         entidad: repeater.entidad
-        sufijoRol: modelData
 
         Layout.preferredWidth: Constantes.width_columna_horario
         Layout.alignment: Qt.AlignCenter

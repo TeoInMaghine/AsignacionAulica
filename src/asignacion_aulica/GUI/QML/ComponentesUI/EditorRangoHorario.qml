@@ -4,12 +4,8 @@ import QtQuick.Layouts
 
 RowLayout {
     required property var entidad
-    required property string sufijoRol
-
-    readonly property string rolDeHorarioInicio:
-        "horario_inicio_" + sufijoRol
-    readonly property string rolDeHorarioFin:
-        "horario_fin_" + sufijoRol
+    required property string rolDeHorarioInicio
+    required property string rolDeHorarioFin
 
     readonly property int textFieldWidth : 45
     readonly property int textFieldPadding : 2

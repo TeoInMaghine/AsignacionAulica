@@ -1,6 +1,7 @@
 module QML.ComponentesUI
 BotónBorrar BotónBorrar.qml
 BotónRedondeadoConTexto BotónRedondeadoConTexto.qml
+BotónRedondeadoConTextoColorUNRN BotónRedondeadoConTextoColorUNRN.qml
 Colapsador Colapsador.qml
 SelectorEquipamiento SelectorEquipamiento.qml
 EditorHorariosSemanales EditorHorariosSemanales.qml

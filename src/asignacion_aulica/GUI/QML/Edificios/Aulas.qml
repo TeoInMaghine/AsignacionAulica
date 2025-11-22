@@ -31,7 +31,13 @@ ListView {
 
         HeaderAulas {
             id: headerAulas
-            anchors.top: parent.top
+            visible: view.count != 0
+        }
+        Label {
+            Layout.margins: 10
+            text: "Todavía no hay aulas registradas"
+            visible: view.count === 0
+            font.pixelSize: 18
         }
     }
 
@@ -46,7 +52,7 @@ ListView {
 
         property alias aula : editorDeAula.model
 
-        TextField {
+        TextFieldConEnter {
             Layout.preferredWidth: headerItem.widthNombre
 
             text: aula.nombre
@@ -54,7 +60,7 @@ ListView {
                 aula.nombre = text
             }
         }
-        TextField {
+        TextFieldConEnter {
             Layout.preferredWidth: headerItem.widthCapacidad
 
             text: aula.capacidad
@@ -93,7 +99,7 @@ ListView {
         BotónAñadir {
             id: footerAulas
             anchors.bottom: parent.bottom
-            width: headerItem.widthNombre
+            width: 75
 
             onClicked: {
                 aulas.insertRow(aulas.rowCount())

@@ -11,10 +11,17 @@ ListView {
     anchors.margins: 15
     spacing: 10
     clip: true
-    
+
     contentWidth: contentItem.childrenRect.width + 2 * anchors.margins
 
     model: ListEdificios { id: edificios }
+
+    // Mostrar un mensaje cuando no hay ningún edificio
+    header: Label {
+        text: "Todavía no hay edificios registrados"
+        visible: view.count === 0
+        font.pixelSize: 20
+    }
 
     delegate: ColumnLayout {
         id: editorDeEdificio
@@ -39,7 +46,7 @@ ListView {
                     editorDetallesDeEdificio.visible = checked
                 }
             }
-            TextField {
+            TextFieldConEnter {
                 text: edificio.nombre
                 onEditingFinished: {
                     edificio.nombre = text
@@ -114,7 +121,7 @@ ListView {
             anchors.left: parent.left
             anchors.topMargin: view.spacing
             anchors.leftMargin: 10
-            width: 200
+            width: 75
 
             onClicked: {
                 edificios.insertRow(edificios.rowCount())

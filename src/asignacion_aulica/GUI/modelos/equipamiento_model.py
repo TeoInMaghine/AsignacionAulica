@@ -54,7 +54,7 @@ class ListEquipamientosDeAula(QAbstractListModel):
 
     @indexEdificio.setter
     def indexEdificio(self, indexEdificio: int):
-        if indexEdificio > 0: # Ignorar cuando QT setea -1
+        if indexEdificio >= 0: # Ignorar cuando QT setea -1
             logger.debug('Set indexEdificio=%d', indexEdificio)
             self.i_edificio = indexEdificio
             self.seleccionadosTextChanged.emit()
@@ -65,7 +65,7 @@ class ListEquipamientosDeAula(QAbstractListModel):
 
     @indexAula.setter
     def indexAula(self, indexAula: int):
-        if indexAula > 0: # Ignorar cuando QT setea -1
+        if indexAula >= 0: # Ignorar cuando QT setea -1
             logger.debug('Set indexAula=%d', indexAula)
             self.i_aula = indexAula
             self.seleccionadosTextChanged.emit()

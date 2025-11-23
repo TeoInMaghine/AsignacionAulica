@@ -5,8 +5,6 @@ from asignacion_aulica.gestor_de_datos.días_y_horarios import HorariosSemanales
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos, aula_no_seleccionada
 from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio
 
-from conftest import campo_AulaDoble, campo_Edificio, campo_Aula
-
 def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     # Al principio no hay edificio, así que no se puede preguntar por las aulas:
     with pytest.raises(IndexError):

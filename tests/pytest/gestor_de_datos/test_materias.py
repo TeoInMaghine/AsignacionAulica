@@ -3,8 +3,6 @@ import pytest
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Carrera
 
-from conftest import campo_Materia
-
 def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     # Al principio no hay carreras, así que no se puede preguntar por las materias:
     with pytest.raises(IndexError):

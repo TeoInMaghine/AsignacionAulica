@@ -6,8 +6,6 @@ from asignacion_aulica.gestor_de_datos.días_y_horarios import (
     HorariosSemanales, RangoHorario, crear_horarios_semanales
 )
 
-from conftest import campo_Aula, campo_Carrera, campo_Edificio
-
 def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     assert gestor.get_carreras() == []
 

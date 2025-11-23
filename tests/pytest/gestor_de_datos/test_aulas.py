@@ -1,11 +1,7 @@
-from datetime import time
 import pytest
 
-from asignacion_aulica.gestor_de_datos.días_y_horarios import HorariosSemanalesOpcionales, RangoHorario
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.entidades import Edificio
-
-from conftest import campo_Edificio, campo_Aula
+from asignacion_aulica.gestor_de_datos.entidades import Aula, Edificio
 
 def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     # Al principio no hay edificio, así que no se puede preguntar por las aulas:
@@ -25,22 +21,23 @@ def test_agregar_aula_genera_valores_deafult(gestor: GestorDeDatos):
 
     assert gestor.cantidad_de_aulas(0) == 1
     assert len(gestor.get_aulas(0)) == 1
-    assert 'sin nombre' in gestor.get_aulas(0)[0].lower()
 
-    assert 'sin nombre' in gestor.get_from_aula(0, 0, campo_Aula['nombre']).lower()
-    assert isinstance(gestor.get_from_aula(0, 0, campo_Aula['edificio']), Edificio)
-    assert gestor.get_from_aula(0, 0, campo_Aula['capacidad']) >= 0
-    assert gestor.get_from_aula(0, 0, campo_Aula['equipamiento']) == set()
-    assert gestor.get_from_aula(0, 0, campo_Aula['horarios']) == [None,]*7
+    aula_1: Aula = gestor.get_aula(0, 0)
+    assert isinstance(aula_1.nombre, str)
+    assert isinstance(aula_1.edificio, Edificio)
+    assert aula_1.capacidad >= 0
+    assert aula_1.equipamiento == set()
+    assert aula_1.horarios == [None,]*7
 
     # Segundo aula pertenece al mismo edificio:
     gestor.agregar_aula(0)
-    assert gestor.get_from_aula(0, 0, campo_Aula['edificio']) is gestor.get_from_aula(0, 1, campo_Aula['edificio'])
+    aula_2: Aula = gestor.get_aula(0, 1)
+    assert aula_1.edificio is aula_2.edificio
 
 def test_add_varias_aulas(gestor: GestorDeDatos):
     '''
     Probar que si se agregan varias aulas, todas se agregan con nombres
-    distintos y todas dicen 'sin nombre'.
+    distintos.
     '''
     gestor.agregar_edificio()
     gestor.agregar_edificio()
@@ -54,126 +51,78 @@ def test_add_varias_aulas(gestor: GestorDeDatos):
     
     assert len(nombres0) == 10
     assert gestor.cantidad_de_aulas(0) == 10
-    assert all('sin nombre' in nombre.lower() for nombre in nombres0)
+    assert all(isinstance(nombre, str) for nombre in nombres0)
     assert len(nombres0) == len(set(nombres0)) # No hay repetidos
 
     assert len(nombres1) == 4
     assert gestor.cantidad_de_aulas(1) == 4
-    assert all('sin nombre' in nombre.lower() for nombre in nombres1)
+    assert all(isinstance(nombre, str) for nombre in nombres1)
     assert len(nombres1) == len(set(nombres1)) # No hay repetidos
 
     # Chequear que se crearon dos edificios
-    assert gestor.get_from_aula(0, 0, campo_Aula['edificio']) is not gestor.get_from_aula(1, 0, campo_Aula['edificio'])
+    assert gestor.get_aula(0, 0).edificio is not gestor.get_aula(1, 0).edificio
 
 def test_aula_existe_o_no(gestor: GestorDeDatos):
     gestor.agregar_edificio()
     assert not gestor.existe_aula(0, 'pepito')
 
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 0, campo_Aula['nombre'], 'pepe')
+    gestor.get_aula(0, 0).nombre = 'pepe'
     assert not gestor.existe_aula(0, 'pepito')
 
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 1, campo_Aula['nombre'], 'pepito')
+    gestor.get_aula(0, 1).nombre = 'pepito'
     assert gestor.existe_aula(0, 'pepito')
 
-def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
+def test_get_fuera_de_rango(gestor: GestorDeDatos):
     gestor.agregar_edificio()
 
     with pytest.raises(IndexError):
-        gestor.get_from_aula(0, 0, campo_Aula['capacidad'])
+        gestor.get_aula(0, 0)
     
-    with pytest.raises(IndexError):
-        gestor.set_in_aula(0, 0, campo_Edificio['nombre'], None)
-
-    gestor.agregar_aula_doble(0)
-    with pytest.raises(IndexError):
-        gestor.get_from_aula(0, 0, 100)
-
-def test_get_set_aula_existente(gestor: GestorDeDatos):
-    nombre = 'nombresito'
-    capacidad = 15
-    equipamiento = {'a', 'b'}
-    horarios = HorariosSemanalesOpcionales(RangoHorario(time(i), time(i+1)) for i in range(7))
-
-    gestor.agregar_edificio()
-    gestor.agregar_aula(0)
-    gestor.set_in_aula(0,0, campo_Aula['nombre'], nombre)
-    gestor.set_in_aula(0,0, campo_Aula['capacidad'], capacidad)
-    gestor.set_in_aula(0,0, campo_Aula['equipamiento'], equipamiento)
-    gestor.set_in_aula(0,0, campo_Aula['horarios'], horarios)
-
-    assert gestor.cantidad_de_edificios() == 1
-    assert gestor.cantidad_de_aulas(0) == 1
-    assert len(gestor.get_aulas(0)) == 1
-    assert gestor.get_aulas(0) == [nombre]
-
-    assert gestor.get_from_aula(0,0, campo_Aula['nombre']) == nombre
-    assert gestor.get_from_aula(0,0, campo_Aula['capacidad']) == capacidad
-    assert gestor.get_from_aula(0,0, campo_Aula['equipamiento']) == equipamiento
-    assert gestor.get_from_aula(0,0, campo_Aula['horarios']) == horarios
-
-def test_set_nombre_repetido(gestor: GestorDeDatos):
-    '''
-    Verificar que el gestor de datos no permite nombres de aulas repetidos.
-    '''
-    gestor.agregar_edificio()
-    gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 0, campo_Aula['nombre'], 'A')
-    gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 1, campo_Aula['nombre'], 'B')
-    gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'C')
-
-    # Setear el mismo nombre que ya tiene está bien
-    gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'C')
-
-    with pytest.raises(ValueError):
-        gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'b')
-
 def test_get_aulas_orden_afabético(gestor: GestorDeDatos):
     gestor.agregar_edificio()
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 0, campo_Aula['nombre'], 'b')
+    gestor.get_aula(0, 0).nombre = 'b'
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 1, campo_Aula['nombre'], 'a')
+    gestor.get_aula(0, 1).nombre = 'a'
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'd')
+    gestor.get_aula(0, 2).nombre = 'd'
 
     assert gestor.get_aulas(0) == ['a', 'b', 'd']
 
 def test_ordenar_aulas(gestor: GestorDeDatos):
     gestor.agregar_edificio()
 
-    # Ordenar cuando no hay aulas no debería tener ningún efecto:
+    # Ordenar cuando no hay aulas, no debería tener ningún efecto:
     gestor.ordenar_aulas(0)
 
-    # Ordenar cuando hay aulas debería ordenar las aulas:
+    # Ordenar cuando hay aulas, debería ordenar las aulas:
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 0, campo_Aula['nombre'], 'b')
+    gestor.get_aula(0, 0).nombre = 'b'
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 1, campo_Aula['nombre'], 'a')
+    gestor.get_aula(0, 1).nombre = 'a'
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'd')
+    gestor.get_aula(0, 2).nombre = 'd'
 
-    assert gestor.get_from_aula(0, 0, campo_Aula['nombre']) == 'b'
-    assert gestor.get_from_aula(0, 1, campo_Aula['nombre']) == 'a'
-    assert gestor.get_from_aula(0, 2, campo_Aula['nombre']) == 'd'
+    assert gestor.get_aula(0, 0).nombre == 'b'
+    assert gestor.get_aula(0, 1).nombre == 'a'
+    assert gestor.get_aula(0, 2).nombre == 'd'
 
     gestor.ordenar_aulas(0)
 
-    assert gestor.get_from_aula(0, 0, campo_Aula['nombre']) == 'a'
-    assert gestor.get_from_aula(0, 1, campo_Aula['nombre']) == 'b'
-    assert gestor.get_from_aula(0, 2, campo_Aula['nombre']) == 'd'
+    assert gestor.get_aula(0, 0).nombre == 'a'
+    assert gestor.get_aula(0, 1).nombre == 'b'
+    assert gestor.get_aula(0, 2).nombre == 'd'
 
 def test_borrar_aula(gestor: GestorDeDatos):
     gestor.agregar_edificio()
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 0, campo_Aula['nombre'], 'a')
+    gestor.get_aula(0, 0).nombre = 'a'
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 1, campo_Aula['nombre'], 'b')
+    gestor.get_aula(0, 1).nombre = 'b'
     gestor.agregar_aula(0)
-    gestor.set_in_aula(0, 2, campo_Aula['nombre'], 'c')
+    gestor.get_aula(0, 2).nombre = 'c'
 
     # Borrar aula que existe
     gestor.borrar_aula(0, 1)

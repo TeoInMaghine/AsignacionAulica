@@ -1,7 +1,5 @@
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 
-from conftest import campo_Aula, campo_AulaDoble, campo_Edificio
-
 def test_todo_ok_con_gestor_vacío(gestor: GestorDeDatos):
     assert gestor.validar_datos() is None
 

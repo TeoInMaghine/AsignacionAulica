@@ -5,8 +5,6 @@ from asignacion_aulica.gestor_de_datos.días_y_horarios import HorariosSemanales
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Edificio, Materia
 
-from conftest import campo_Clase, campo_Edificio, campo_Aula
-
 def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     # Al principio no hay carrera ni materia, así que no se puede preguntar por
     # las clases:

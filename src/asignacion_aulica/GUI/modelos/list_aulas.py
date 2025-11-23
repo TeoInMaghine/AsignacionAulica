@@ -1,14 +1,12 @@
 import logging
 from datetime import time, datetime
 from copy import copy
-from typing import Any, Type, override
+from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.entidades import (
-    Aula,
-    RangoHorario
-)
+from asignacion_aulica.gestor_de_datos.entidades import Aula
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día, RangoHorario
 
 logger = logging.getLogger(__name__)
 
@@ -38,12 +36,8 @@ ROL_CAPACIDAD:              int = ROL_BASE + NOMBRES_DE_ROLES.index('capacidad')
 ROL_PRIMER_HORARIO:         int = ROL_BASE + NOMBRES_DE_ROLES.index('horario_inicio_lunes')
 PARIDAD_ROL_HORARIO_INICIO: int = ROL_PRIMER_HORARIO % 2
 
-def índice_semanal_de_rol_horario(rol: int) -> int:
-    '''
-    El índice semanal es 0 para el lunes y 6 para el domingo.
-    Nota: devuelve valores raros para roles no horarios.
-    '''
-    return (rol - ROL_PRIMER_HORARIO) // 2
+def día_de_rol_horario(rol: int) -> Día:
+    return Día((rol - ROL_PRIMER_HORARIO) // 2)
 
 def es_rol_horario_inicio(rol: int) -> bool:
     return (rol % 2) == PARIDAD_ROL_HORARIO_INICIO
@@ -57,14 +51,6 @@ EQUIVALENTE_24_HORAS: time = time.max
 '''
 '24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
 '''
-
-def hay_type_mismatch(value: Any, tipo_esperado: Type) -> bool:
-    if isinstance(value, tipo_esperado):
-        return False
-
-    logger.debug(f'Se esperaba asignar un valor de tipo {tipo_esperado}, pero'
-                 f' en cambio se recibió uno de tipo {type(value)}')
-    return True
 
 class ListAulas(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
@@ -110,8 +96,8 @@ class ListAulas(QAbstractListModel):
         elif role == ROL_CAPACIDAD:
             return aula.capacidad
         else: # Es un rol horario
-            índice_semanal: int = índice_semanal_de_rol_horario(role)
-            rango_horario: RangoHorario = aula.horarios[índice_semanal]
+            día: Día = día_de_rol_horario(role)
+            rango_horario: RangoHorario = aula.horarios[día]
 
             # Cuando el aula no especifica el horario, hacérselo saber a la UI
             if not rango_horario: return None
@@ -131,44 +117,62 @@ class ListAulas(QAbstractListModel):
         if not index.isValid(): return False
         if role not in ROLES_A_NOMBRES_QT: return False
 
+        logger.debug(f'Editando {NOMBRES_DE_ROLES[role - ROL_BASE]}')
         aula: Aula = self.gestor.get_aula(self.i_edificio, index.row())
         roles_actualizados: list[int] = [role]
 
         if role == ROL_NOMBRE:
-            if hay_type_mismatch(value, str):
+            if not isinstance(value, str):
+                logger.debug(
+                    f'No se puede asignar el valor "{value}" de tipo'
+                    f' {type(value)} al nombre, de tipo {str}.'
+                )
                 return False
             # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
             # Enter; lo ignoramos en vez de loguearlo
             if value.lower().strip() == aula.nombre.lower():
                 return False
 
-            if self.gestor.existe_aula(value):
+            if self.gestor.existe_aula(self.i_edificio, value):
                 logger.debug(f'No se puede asignar el nombre "{value}", porque'
-                              ' ya existe un aula con el mismo nombre')
+                              ' ya existe un aula en el mismo edificio con el'
+                              ' mismo nombre.')
                 return False
 
             aula.nombre = value
 
         elif role == ROL_CAPACIDAD:
-            if hay_type_mismatch(value, str):
-                return False
-            if not value.isdigit():
+            if not isinstance(value, str):
+                logger.debug(
+                    f'No se puede intentar parsear como capacidad un valor "{value}"'
+                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                )
                 return False
 
-            aula.capacidad = int(value)
+            if not value:
+                # Es intuitivo interpretar input vacío como 0
+                aula.capacidad = 0
+            elif not value.isdigit():
+                return False
+            else:
+                aula.capacidad = int(value)
 
         else: # Es un rol horario
-            if hay_type_mismatch(value, str):
+            if not isinstance(value, str):
+                logger.debug(
+                    f'No se puede intentar parsear como horario un valor "{value}"'
+                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                )
                 return False
 
-            índice_semanal: int = índice_semanal_de_rol_horario(role)
-            rango_horario: RangoHorario = aula.horarios[índice_semanal]
+            día: Día = día_de_rol_horario(role)
+            rango_horario: RangoHorario = aula.horarios[día]
 
             # Si antes el aula no especificaba el horario, hacer que lo haga
             if not rango_horario:
-                rango_horario = copy(aula.edificio.horarios[índice_semanal])
-                aula.horarios[índice_semanal] = rango_horario
-                # Actualizar el rol del otro extremo del rango horario
+                rango_horario = copy(aula.edificio.horarios[día])
+                aula.horarios[día] = rango_horario
+                # Actualizar el rol del extremo contrario del rango horario
                 roles_actualizados.append(
                     role+1 if es_rol_horario_inicio(role) else role-1
                 )

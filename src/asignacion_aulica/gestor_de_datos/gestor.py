@@ -67,9 +67,13 @@ class GestorDeDatos:
 
     def get_edificio(self, edificio: int) -> Edificio:
         '''
-        Obtiene un edificio, el cual puede inspeccionarse o modificarse.
+        Obtener el edificio (no una copia), el cual puede inspeccionarse, y
+        algunos de sus miembros modificarse directamente:
+        - `nombre`
+        - `preferir_no_usar`
+        - `horarios`
 
-        :param edificio: El índice de un edificio.
+        :param edificio: El índice del edificio.
         :return: El edificio en el índice dado.
         :raise IndexError: Si el índice está fuera de rango.
         '''
@@ -148,10 +152,14 @@ class GestorDeDatos:
 
     def get_aula(self, edificio: int, aula: int) -> Aula:
         '''
-        Obtiene un aula, el cual puede inspeccionarse o modificarse.
+        Obtener el aula (no una copia), la cual puede inspeccionarse, y algunos
+        de sus miembros modificarse directamente:
+        - `nombre`
+        - `capacidad`
+        - `horarios`
 
-        :param edificio: El índice de un edificio.
-        :param aula: El índice de un aula.
+        :param edificio: El índice del edificio.
+        :param aula: El índice del aula.
         :return: El aula en los índices dados.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
@@ -236,6 +244,9 @@ class GestorDeDatos:
         '''
         return len(self._edificios[edificio].aulas_dobles)
 
+    # TODO: arreglar los get_from y set_in de aulas dobles, edificios, materias
+    # y clases cuando se implementen en la UI. Basarse en lo hecho para los
+    # edificios y aulas.
     def get_from_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Aula:
         '''
         :param edificio: El índice del edificio.

@@ -28,7 +28,10 @@ class RangoHorario:
     def es_cerrado(self) -> bool:
         return self.inicio == self.fin
 
-HorariosSemanales: TypeAlias = list[RangoHorario] # El largo debe ser 7.
+HorariosSemanales: TypeAlias = tuple[
+    RangoHorario, RangoHorario, RangoHorario, RangoHorario, RangoHorario,
+    RangoHorario, RangoHorario
+]
 '''
 Tupla con un RangoHorario para cada día de la semana.
 '''

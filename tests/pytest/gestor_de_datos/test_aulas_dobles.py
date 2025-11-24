@@ -31,6 +31,9 @@ def test_add_varias_aulas_dobles(gestor: GestorDeDatos):
     assert gestor.cantidad_de_aulas_dobles(1) == 3
 
 def test_get_fuera_de_rango(gestor: GestorDeDatos):
+    with pytest.raises(IndexError):
+        gestor.get_aula_doble(0, 0)
+
     gestor.agregar_edificio()
 
     with pytest.raises(IndexError):

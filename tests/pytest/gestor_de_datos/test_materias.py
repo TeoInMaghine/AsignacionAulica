@@ -1,7 +1,7 @@
 import pytest
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.entidades import Carrera
+from asignacion_aulica.gestor_de_datos.entidades import Carrera, Materia
 
 def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     # Al principio no hay carreras, así que no se puede preguntar por las materias:
@@ -16,16 +16,18 @@ def test_agregar_materia_genera_valores_default(gestor: GestorDeDatos):
     gestor.agregar_carrera()
     gestor.agregar_materia(0)
 
+    materia_1: Materia = gestor.get_materia(0, 0)
     assert gestor.cantidad_de_materias(0) == 1
-    assert isinstance(gestor.get_materia(0, 0).nombre, str)
-    assert isinstance(gestor.get_materia(0, 0).carrera, Carrera)
-    assert gestor.get_materia(0, 0).año >= 0
-    assert gestor.get_materia(0, 0).clases == []
-    assert isinstance(gestor.get_materia(0, 0).cuatrimestral_o_anual, str)
+    assert isinstance(materia_1.nombre, str)
+    assert isinstance(materia_1.carrera, Carrera)
+    assert materia_1.año >= 0
+    assert materia_1.clases == []
+    assert isinstance(materia_1.cuatrimestral_o_anual, str)
 
     # Segunda materia pertenece a la misma carrera:
     gestor.agregar_materia(0)
-    assert gestor.get_materia(0, 0).carrera is gestor.get_materia(0, 1).carrera
+    materia_2: Materia = gestor.get_materia(0, 1)
+    assert materia_1.carrera is materia_2.carrera
 
 def test_add_varias_materias(gestor: GestorDeDatos):
     '''

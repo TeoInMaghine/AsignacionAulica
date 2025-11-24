@@ -409,7 +409,7 @@ class GestorDeDatos:
     def get_materia(self, carrera: int, materia: int) -> Clase:
         '''
         Obtener la materia (no una copia), la cual puede inspeccionarse, y
-        la algunos de sus miembros modificarse directamente:
+        algunos de sus miembros modificarse directamente:
         - `nombre`
         - `año`
         - `cuatrimestral_o_anual`

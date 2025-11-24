@@ -41,7 +41,7 @@ RowLayout {
 
         // Des-enfatizar texto cuando se usa el horario de la entidad padre
         color: entidad[rolDeHorarioFin] ? palette.dark : palette.mid
-        // Si la no se especifica el horario, mostrar el de la entidad padre
+        // Si no se especifica el horario, mostrar el de la entidad padre
         text: entidad[rolDeHorarioFin] ?
               entidad[rolDeHorarioFin] :
               entidad_padre[rolDeHorarioFin]

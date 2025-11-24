@@ -15,7 +15,7 @@ def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     assert gestor.cantidad_de_aulas(0) == 0
     assert gestor.get_aulas(0) == []
 
-def test_agregar_aula_genera_valores_deafult(gestor: GestorDeDatos):
+def test_agregar_aula_genera_valores_default(gestor: GestorDeDatos):
     gestor.agregar_edificio()
     gestor.agregar_aula(0)
 
@@ -75,6 +75,9 @@ def test_aula_existe_o_no(gestor: GestorDeDatos):
     assert gestor.existe_aula(0, 'pepito')
 
 def test_get_fuera_de_rango(gestor: GestorDeDatos):
+    with pytest.raises(IndexError):
+        gestor.get_aula(0, 0)
+
     gestor.agregar_edificio()
 
     with pytest.raises(IndexError):

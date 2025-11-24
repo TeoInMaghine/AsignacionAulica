@@ -59,7 +59,7 @@ class Materia:
     # Datos que pueden ser ingresados o no:
     # (no usamos estos datos, pero los tenemos que guardar para exportarlos)
     # (son strings con contenido libre, el usuario puede escribir cualquier cosa)
-    cuatrimestral_o_anual: str|None = None
+    cuatrimestral_o_anual: str = ''
 
 @dataclass
 class Clase:
@@ -78,11 +78,11 @@ class Clase:
     # Datos que pueden ser ingresados o no:
     # (no usamos estos datos, pero los tenemos que guardar para exportarlos)
     # (son strings con contenido libre, el usuario puede escribir cualquier cosa)
-    comisión: str|None = None
-    teórica_o_práctica: str|None = None
-    promocionable: str|None = None
-    docente: str|None = None
-    auxiliar: str|None = None
+    comisión: str = ''
+    teórica_o_práctica: str = ''
+    promocionable: str = ''
+    docente: str = ''
+    auxiliar: str = ''
 
 def todas_las_clases(carreras: Iterable[Carrera]) -> Iterable[Clase]:
     return itertools.chain.from_iterable(materia.clases for carrera in carreras for materia in carrera.materias)

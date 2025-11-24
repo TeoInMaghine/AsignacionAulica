@@ -10,7 +10,7 @@ def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     assert gestor.get_edificios() == []
     assert gestor.cantidad_de_edificios() == 0
 
-def test_agregar_edificio_genera_valores_deafult(gestor: GestorDeDatos):
+def test_agregar_edificio_genera_valores_default(gestor: GestorDeDatos):
     gestor.agregar_edificio()
 
     assert gestor.cantidad_de_edificios() == 1

@@ -15,9 +15,7 @@ Switch {
     }
 
     background: Rectangle {
-        anchors.centerIn: parent
-        width: 24
-        height: 24
+        anchors.fill: parent
         color:      hovered ? candado.palette.dark :
             candado.checked ? candado.palette.mid  :
                               candado.palette.light

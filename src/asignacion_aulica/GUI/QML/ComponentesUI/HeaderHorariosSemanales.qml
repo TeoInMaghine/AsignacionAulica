@@ -12,11 +12,19 @@ Repeater {
         "Sábado",
         "Domingo"
     ]
-    Label {
-        Layout.preferredWidth: Constantes.width_columna_horario
-        horizontalAlignment: Text.AlignHCenter
-
+    RowLayout {
         required property string modelData
-        text: modelData
+
+        Layout.preferredWidth: Constantes.width_columna_horario
+
+        Label {
+            Layout.preferredWidth: Constantes.width_columna_horario
+                                   - Constantes.width_horario_sideButtons
+                                   - Constantes.spacing_horario
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+
+            horizontalAlignment: Text.AlignHCenter
+            text: modelData
+        }
     }
 }

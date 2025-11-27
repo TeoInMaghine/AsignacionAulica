@@ -8,17 +8,16 @@ RowLayout {
     required property string rolDeHorarioInicio
     required property string rolDeHorarioFin
 
-    readonly property int textFieldWidth : 45
-    readonly property int textFieldPadding : 2
-    spacing: 2
+    spacing: Constantes.spacing_horario
 
     // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
     // en la lista de clases) para resetear el horario al del edificio (por
     // ejemplo con un ícono tipo 🔄), solo interactuable si el usuario cambió
     // el horario.
 
+    readonly property int textFieldPadding : 2
     EditorHorario {
-        Layout.preferredWidth: textFieldWidth
+        Layout.preferredWidth: Constantes.width_horario_textField
         Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
@@ -34,7 +33,7 @@ RowLayout {
         }
     }
     EditorHorario {
-        Layout.preferredWidth: textFieldWidth
+        Layout.preferredWidth: Constantes.width_horario_textField
         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
@@ -49,7 +48,12 @@ RowLayout {
             entidad[rolDeHorarioFin] = text
         }
     }
+
     Candado {
+        Layout.preferredWidth: Constantes.width_horario_sideButtons
+        Layout.preferredHeight: Constantes.width_horario_sideButtons
+        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+
         checked: horarioInicio == horarioFin
         onClicked: {
             if (checked) {

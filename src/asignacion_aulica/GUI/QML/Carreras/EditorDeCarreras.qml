@@ -8,4 +8,5 @@ ColumnLayout {
     spacing: 10
     
     Botonera { }
+    SelectorDeCarrera { }
 }

@@ -1,9 +1,8 @@
-/** Los botones de arriba de la pestaña de materias. */
-
 import QtQuick.Controls
 import QtQuick.Layouts
 import QML.ComponentesUI
 
+/** Los botones de arriba de la pestaña de materias. */
 RowLayout {
     spacing: 10
 

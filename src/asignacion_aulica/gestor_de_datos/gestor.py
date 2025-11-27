@@ -282,7 +282,7 @@ class GestorDeDatos:
         '''
         el_edificio: Edificio = self._edificios[edificio]
         el_aula: Aula = el_edificio.aulas[aula]
-        aulas_dobles: Aula = el_edificio.aulas_dobles
+        aulas_dobles: list[AulaDoble] = el_edificio.aulas_dobles
         return any(
             el_aula in (
                 aula_doble.aula_grande,

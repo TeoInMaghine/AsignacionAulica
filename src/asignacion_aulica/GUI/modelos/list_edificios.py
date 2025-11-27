@@ -35,21 +35,21 @@ ROL_PREFERIR_NO_USAR:       int = ROL_BASE + NOMBRES_DE_ROLES.index('preferir_no
 ROL_PRIMER_HORARIO:         int = ROL_BASE + NOMBRES_DE_ROLES.index('horario_inicio_lunes')
 PARIDAD_ROL_HORARIO_INICIO: int = ROL_PRIMER_HORARIO % 2
 
-def día_de_rol_horario(rol: int) -> Día:
-    return Día((rol - ROL_PRIMER_HORARIO) // 2)
-
-def es_rol_horario_inicio(rol: int) -> bool:
-    return (rol % 2) == PARIDAD_ROL_HORARIO_INICIO
-
 ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
-    i + ROL_BASE: QByteArray(rolename.encode()) \
-        for i, rolename in enumerate(NOMBRES_DE_ROLES)
+    i + ROL_BASE: QByteArray(rolename.encode())
+    for i, rolename in enumerate(NOMBRES_DE_ROLES)
 }
 
 EQUIVALENTE_24_HORAS: time = time.max
 '''
 '24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
 '''
+
+def día_de_rol_horario(rol: int) -> Día:
+    return Día((rol - ROL_PRIMER_HORARIO) // 2)
+
+def es_rol_horario_inicio(rol: int) -> bool:
+    return (rol % 2) == PARIDAD_ROL_HORARIO_INICIO
 
 class ListEdificios(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
@@ -113,15 +113,17 @@ class ListEdificios(QAbstractListModel):
                 return False
             # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
             # Enter; lo ignoramos en vez de loguearlo
-            if value.lower().strip() == edificio.nombre.lower():
+            if value.strip() == edificio.nombre:
                 return False
 
-            if self.gestor.existe_edificio(value):
+            # Aceptamos cambiar la capitalización del nombre
+            cambio_de_capitalización: bool = value.lower().strip() == edificio.nombre.lower()
+            if not cambio_de_capitalización and self.gestor.existe_edificio(value):
                 logger.debug(f'No se puede asignar el nombre "{value}", porque'
                               ' ya existe un edificio con el mismo nombre.')
                 return False
 
-            edificio.nombre = value
+            edificio.nombre = value.strip()
 
         elif role == ROL_PREFERIR_NO_USAR:
             if not isinstance(value, bool):
@@ -136,7 +138,7 @@ class ListEdificios(QAbstractListModel):
         else: # Es un rol horario
             if not isinstance(value, str):
                 logger.debug(
-                    f'No se puede intentar parsear como horario un valor "{value}"'
+                    f'No se puede parsear como horario un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
                 )
                 return False

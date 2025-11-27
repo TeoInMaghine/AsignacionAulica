@@ -13,7 +13,7 @@ def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
         gestor.cantidad_de_clases(0, 0)
     
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     with pytest.raises(IndexError):
         gestor.cantidad_de_clases(0, 0)
     
@@ -22,7 +22,7 @@ def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     assert gestor.cantidad_de_clases(0, 0) == 0
 
 def test_agregar_clase_genera_valores_deafult(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
 
@@ -53,7 +53,7 @@ def test_agregar_clase_genera_valores_deafult(gestor: GestorDeDatos):
 
 
 def test_add_varias_clases(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_materia(0)
     for _ in range(10):
@@ -65,7 +65,7 @@ def test_add_varias_clases(gestor: GestorDeDatos):
     assert gestor.cantidad_de_clases(0, 1) == 4
 
 def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
 
     with pytest.raises(IndexError):
@@ -95,7 +95,7 @@ def test_get_set_clase_existente(gestor: GestorDeDatos):
     docente = 'nadie'
     auxiliar = 'auxilioo!'
 
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
 
@@ -129,7 +129,7 @@ def test_get_set_clase_existente(gestor: GestorDeDatos):
     assert gestor.get_from_clase(0, 0, 0, campo_Clase['auxiliar']) == auxiliar
 
 def test_borrar_clase(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
     gestor.set_in_clase(0, 0, 0, campo_Clase['día'], Día.Lunes)
@@ -158,7 +158,7 @@ def test_borrar_aula_borra_asignación_de_clases_que_tenían_ese_aula(gestor: Ge
     gestor.agregar_aula(0)
     aula0, aula1 = gestor.get_from_edificio(0, campo_Edificio['aulas'])
 
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
     gestor.agregar_clase(0, 0)
@@ -189,7 +189,7 @@ def test_borrar_edificio_borra_asignación_de_clases_que_tenían_aula_en_ese_edi
     aula0 = gestor.get_from_edificio(0, campo_Edificio['aulas'])[0]
     aula1 = gestor.get_from_edificio(1, campo_Edificio['aulas'])[0]
 
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
     gestor.agregar_clase(0, 0)

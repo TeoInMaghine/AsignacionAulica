@@ -403,17 +403,19 @@ class GestorDeDatos:
         '''
         return self._carreras[índice]
 
-    def agregar_carrera(self):
+    def agregar_carrera(self, nombre: str):
         '''
-        Añadir al edificio una nueva carrera, después del último índice
-        existente.
+        Añadir una nueva carrera con el nombre dado, inicializada con valores
+        por defecto.
 
-        Se inicializa con valores por defecto, asegurando que tenga un nombre
-        único.
+        :raise ValueError: Si `nombre` está vacío.
         '''
-        nombres_existentes = [carrera.nombre for carrera in self._carreras]
-        nombre_nuevo = _generar_nombre_no_existente('Carrera sin nombre', nombres_existentes)
-        self._carreras.append(Carrera(nombre_nuevo))
+        nombre = nombre.strip()
+        if not nombre:
+            raise ValueError('No se puede agregar una carrera son nombre vacío.')
+
+        self._carreras.append(Carrera(nombre))
+        self._carreras.sort(key=lambda carrera: carrera.nombre.lower())
     
     def existe_carrera(self, nombre: str) -> bool:
         '''

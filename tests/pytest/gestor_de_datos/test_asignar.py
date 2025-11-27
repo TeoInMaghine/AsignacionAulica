@@ -15,7 +15,7 @@ def test_asignar(gestor: GestorDeDatos):
     horarios_aula[Día.Lunes] = RangoHorario(time(9), time(12))
     gestor.set_in_aula(0, 0, campo_Aula['horarios'], horarios_aula)
 
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
     gestor.set_in_clase(0, 0, 0, campo_Clase['día'], Día.Lunes)

@@ -12,44 +12,37 @@ def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     assert gestor.get_carreras() == []
 
 def test_agregar_carrera_genera_valores_deafult(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('El Nombre')
 
     assert len(gestor.get_carreras()) == 1
-    assert 'sin nombre' in gestor.get_carreras()[0]
+    assert gestor.get_carreras()[0] == 'El Nombre'
 
-    assert 'sin nombre' in gestor.get_carrera(0).nombre
+    assert gestor.get_carrera(0).nombre == 'El Nombre'
     assert gestor.get_carrera(0).edificio_preferido is None
     assert gestor.get_carrera(0).materias == []
 
 def test_add_varias_carreras(gestor: GestorDeDatos):
     '''
-    Probar que si se agregan varias carreras, todas se agregan con nombres
-    distintos y todas dicen 'sin nombre'.
+    Probar que si se agregan varias carreras, se mantiene el orden alfabético.
     '''
-    for _ in range(10):
-        gestor.agregar_carrera()
+    gestor.agregar_carrera('c')
+    gestor.agregar_carrera('d')
+    gestor.agregar_carrera('a')
+    gestor.agregar_carrera('e')
+    gestor.agregar_carrera('b')
     
-    nombres = gestor.get_carreras()
-    
-    assert len(nombres) == 10
-    assert all('sin nombre' in nombre for nombre in nombres)
-    assert len(nombres) == len(set(nombres)) # No hay repetidos
+    assert gestor.get_carreras() == ['a', 'b', 'c', 'd', 'e']
 
 def test_carrera_existe_o_no(gestor: GestorDeDatos):
     # Al principio no existe
     assert not gestor.existe_carrera('pepito')
 
-    # Al agregar una carrera sin nombre sigue sin existir
-    gestor.agregar_carrera()
-    assert not gestor.existe_carrera('pepito')
-
     # Al agregar una carrera con otro nombre sigue sin existir
-    gestor.set_carrera_nombre(0, 'pepe')
+    gestor.agregar_carrera('pepote')
     assert not gestor.existe_carrera('pepito')
 
     # Al agregar una carrera con ese nombre sí existe
-    gestor.agregar_carrera()
-    gestor.set_carrera_nombre(1, 'pepito')
+    gestor.agregar_carrera('pepito')
     assert gestor.existe_carrera('pepito')
 
 def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
@@ -62,16 +55,16 @@ def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
         gestor.set_carrera_nombre(0, 'a')
     
     # Cuando existen carreras pero el índice está fuera de rango:
-    gestor.agregar_carrera()
-    gestor.agregar_carrera()
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('a')
+    gestor.agregar_carrera('b')
+    gestor.agregar_carrera('c')
 
     with pytest.raises(IndexError):
         gestor.get_carrera(3)
     with pytest.raises(IndexError):
         gestor.set_carrera_edificio_preferido(3, None)
     with pytest.raises(IndexError):
-        gestor.set_carrera_nombre(3, 'a')
+        gestor.set_carrera_nombre(3, 'd')
 
 def test_get_set_carrera_existente(gestor: GestorDeDatos):
     nombre = 'nombresito'
@@ -82,8 +75,7 @@ def test_get_set_carrera_existente(gestor: GestorDeDatos):
     gestor.set_in_edificio(0, campo_Edificio['nombre'], edificio_preferido)
     el_edificio = gestor.get_from_aula(0, 0, campo_Aula['edificio'])
 
-    gestor.agregar_carrera()
-    gestor.set_carrera_nombre(0, nombre)
+    gestor.agregar_carrera(nombre)
     gestor.set_carrera_edificio_preferido(0, edificio_preferido)
 
     assert len(gestor.get_carreras()) == 1
@@ -93,33 +85,28 @@ def test_get_set_carrera_existente(gestor: GestorDeDatos):
     assert carrera.edificio_preferido is el_edificio
 
 def test_cambiar_nombre_mantiene_orden_afabético(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
-    nuevo_índice = gestor.set_carrera_nombre(0, 'b')
-    assert nuevo_índice == 0
+    gestor.agregar_carrera('b')
     assert gestor.get_carreras() == ['b']
 
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('z')
     nuevo_índice = gestor.set_carrera_nombre(1, 'a')
     assert nuevo_índice == 0
     assert gestor.get_carreras() == ['a', 'b']
 
-    gestor.agregar_carrera()
-    nuevo_índice = gestor.set_carrera_nombre(2, 'c')
+    gestor.agregar_carrera('asdaf')
+    nuevo_índice = gestor.set_carrera_nombre(1, 'c')
     assert nuevo_índice == 2
     assert gestor.get_carreras() == ['a', 'b', 'c']
 
-    gestor.agregar_carrera()
-    nuevo_índice = gestor.set_carrera_nombre(3, 'a2')
+    gestor.agregar_carrera('bárbara')
+    nuevo_índice = gestor.set_carrera_nombre(2, 'a2')
     assert nuevo_índice == 1
     assert gestor.get_carreras() == ['a', 'a2', 'b', 'c']
 
 def test_borrar_carrera(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
-    gestor.agregar_carrera()
-    gestor.agregar_carrera()
-    gestor.set_carrera_nombre(0, 'a')
-    gestor.set_carrera_nombre(1, 'b')
-    gestor.set_carrera_nombre(2, 'c')
+    gestor.agregar_carrera('a')
+    gestor.agregar_carrera('b')
+    gestor.agregar_carrera('c')
 
     # Borrar carrera que existe
     gestor.borrar_carrera(1)
@@ -141,8 +128,8 @@ def test_borrar_edificio_borra_edificio_preferido_de_las_carreras_que_preferían
     edificio_b = gestor.get_from_aula(1, 0, campo_Aula['edificio'])
     edificio_c = gestor.get_from_aula(2, 0, campo_Aula['edificio'])
 
-    gestor.agregar_carrera()
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
+    gestor.agregar_carrera('1')
     gestor.set_carrera_edificio_preferido(0, 'c')
     gestor.set_carrera_edificio_preferido(1, 'b')
 

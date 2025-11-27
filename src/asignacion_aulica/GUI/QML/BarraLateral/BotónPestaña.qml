@@ -21,7 +21,7 @@ Button {
         }
         Text {
             text: self.nombre
-            font.pointSize: Constantes.pestaña_texto_altura
+            font.pointSize: Constantes.pestaña_texto_tamaño_pts
             color: "white"
             horizontalAlignment: Text.AlignHLeft
             verticalAlignment: Text.AlignVCenter

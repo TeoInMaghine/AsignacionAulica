@@ -23,7 +23,7 @@ Rectangle {
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
             Layout.fillWidth: true
             Layout.topMargin: 15
-            font.pointSize: Constantes.título_tamaño
+            font.pointSize: Constantes.título_tamaño_pts
             font.bold: true
             lineHeight: 1.1
             color: "white"

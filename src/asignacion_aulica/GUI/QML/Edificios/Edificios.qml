@@ -20,7 +20,7 @@ ListView {
     header: Label {
         text: "Todavía no hay edificios registrados"
         visible: view.count === 0
-        font.pixelSize: 20
+        font.pointSize: Constantes.fontsize_pts_big
     }
 
     delegate: ColumnLayout {

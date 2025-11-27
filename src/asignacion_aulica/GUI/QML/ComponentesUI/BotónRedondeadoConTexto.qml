@@ -8,7 +8,7 @@ RoundButton {
     leftPadding: 13
     rightPadding: 13
 
-    font.pointSize: 13
+    font.pointSize: Constantes.fontsize_pts_base
     font.bold: true
 
     highlighted: hovered

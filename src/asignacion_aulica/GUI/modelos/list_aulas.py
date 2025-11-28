@@ -169,7 +169,7 @@ class ListAulas(QAbstractListModel):
                 return False
 
             día: Día = día_de_rol_horario(role)
-            rango_horario: RangoHorario = aula.horarios[día]
+            rango_horario: RangoHorario|None = aula.horarios[día]
 
             # Si antes el aula no especificaba el horario, hacer que lo haga
             if not rango_horario:

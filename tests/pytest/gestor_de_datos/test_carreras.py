@@ -1,17 +1,11 @@
-from datetime import time
 import pytest
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.gestor_de_datos.días_y_horarios import (
-    HorariosSemanales, RangoHorario, crear_horarios_semanales
-)
-
-from conftest import campo_Aula, campo_Carrera, campo_Edificio
 
 def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
     assert gestor.get_carreras() == []
 
-def test_agregar_carrera_genera_valores_deafult(gestor: GestorDeDatos):
+def test_agregar_carrera_genera_valores_default(gestor: GestorDeDatos):
     gestor.agregar_carrera()
 
     assert len(gestor.get_carreras()) == 1
@@ -79,8 +73,8 @@ def test_get_set_carrera_existente(gestor: GestorDeDatos):
 
     gestor.agregar_edificio()
     gestor.agregar_aula(0)
-    gestor.set_in_edificio(0, campo_Edificio['nombre'], edificio_preferido)
-    el_edificio = gestor.get_from_aula(0, 0, campo_Aula['edificio'])
+    gestor.get_edificio(0).nombre = edificio_preferido
+    el_edificio = gestor.get_aula(0, 0).edificio
 
     gestor.agregar_carrera()
     gestor.set_carrera_nombre(0, nombre)
@@ -133,13 +127,13 @@ def test_borrar_edificio_borra_edificio_preferido_de_las_carreras_que_preferían
     gestor.agregar_edificio()
     gestor.agregar_edificio()
     gestor.agregar_edificio()
-    gestor.set_in_edificio(0, campo_Edificio['nombre'], 'a')
-    gestor.set_in_edificio(1, campo_Edificio['nombre'], 'b')
-    gestor.set_in_edificio(2, campo_Edificio['nombre'], 'c')
+    gestor.get_edificio(0).nombre = 'a'
+    gestor.get_edificio(1).nombre = 'b'
+    gestor.get_edificio(2).nombre = 'c'
     gestor.agregar_aula(1)
     gestor.agregar_aula(2)
-    edificio_b = gestor.get_from_aula(1, 0, campo_Aula['edificio'])
-    edificio_c = gestor.get_from_aula(2, 0, campo_Aula['edificio'])
+    edificio_b = gestor.get_aula(1, 0).edificio
+    edificio_c = gestor.get_aula(2, 0).edificio
 
     gestor.agregar_carrera()
     gestor.agregar_carrera()

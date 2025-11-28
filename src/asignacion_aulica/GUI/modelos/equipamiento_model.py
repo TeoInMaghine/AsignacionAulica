@@ -2,12 +2,9 @@ import logging
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSignal, pyqtSlot
 
-from asignacion_aulica.gestor_de_datos.entidades import fieldnames_Aula
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 
 logger = logging.getLogger(__name__)
-
-CAMPO_AULA_EQUIPAMIENTO: int = fieldnames_Aula.index('equipamiento')
 
 ROL_NOMBRE: int = Qt.ItemDataRole.UserRole + 1
 ROL_SELECCIONADO: int = Qt.ItemDataRole.UserRole + 2
@@ -57,7 +54,7 @@ class ListEquipamientosDeAula(QAbstractListModel):
 
     @indexEdificio.setter
     def indexEdificio(self, indexEdificio: int):
-        if indexEdificio > 0: # Ignorar cuando QT setea -1
+        if indexEdificio >= 0: # Ignorar cuando QT setea -1
             logger.debug('Set indexEdificio=%d', indexEdificio)
             self.i_edificio = indexEdificio
             self.seleccionadosTextChanged.emit()
@@ -68,7 +65,7 @@ class ListEquipamientosDeAula(QAbstractListModel):
 
     @indexAula.setter
     def indexAula(self, indexAula: int):
-        if indexAula > 0: # Ignorar cuando QT setea -1
+        if indexAula >= 0: # Ignorar cuando QT setea -1
             logger.debug('Set indexAula=%d', indexAula)
             self.i_aula = indexAula
             self.seleccionadosTextChanged.emit()
@@ -133,4 +130,4 @@ class ListEquipamientosDeAula(QAbstractListModel):
         self.endResetModel()
     
     def _get_equipamientos_seleccionados(self) -> set[str]:
-        return self.gestor.get_from_aula(self.i_edificio, self.i_aula, CAMPO_AULA_EQUIPAMIENTO)
+        return self.gestor.get_aula(self.i_edificio, self.i_aula).equipamiento

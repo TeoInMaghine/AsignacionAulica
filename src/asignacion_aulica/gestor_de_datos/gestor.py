@@ -1,7 +1,7 @@
 from collections.abc import Sequence
 from datetime import time
 from itertools import filterfalse
-from typing import Callable, Any
+from typing import Callable
 from collections import Counter
 import logging
 
@@ -15,18 +15,8 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     Clase,
     Edificio,
     Materia,
-    fieldnames_Aula,
-    fieldnames_AulaDoble,
-    fieldnames_Clase,
-    fieldnames_Edificio,
-    fieldnames_Materia,
-    fieldtypes_Aula,
-    fieldtypes_Clase,
-    fieldtypes_Edificio,
-    fieldtypes_Materia,
     todas_las_clases
 )
-from asignacion_aulica.gestor_de_datos.type_checking import is_instance_of_type
 
 logger = logging.getLogger(__name__)
 
@@ -75,61 +65,33 @@ class GestorDeDatos:
     def cantidad_de_edificios(self) -> int:
         return len(self._edificios)
 
-    def get_from_edificio(self, edificio: int, campo: int) -> Any:
+    def get_edificio(self, edificio: int) -> Edificio:
         '''
-        :param edificio: El índice de un edificio.
-        :param campo: El índice de un campo.
-        :return: El valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
+        Obtener el edificio (no una copia), el cual puede inspeccionarse, y
+        algunos de sus miembros modificarse directamente:
+        - `nombre`
+        - `preferir_no_usar`
+        - `horarios`
+
+        :param edificio: El índice del edificio.
+        :return: El edificio en el índice dado.
+        :raise IndexError: Si el índice está fuera de rango.
         '''
-        field_name: str = fieldnames_Edificio[campo]
-        return getattr(self._edificios[edificio], field_name)
+        return self._edificios[edificio]
 
     def existe_edificio(self, nombre: str) -> bool:
         '''
+        :param nombre: Nombre a buscar en la lista de edificios.
         :return: `True` si hay un edificio con ese nombre en la base de datos,
         `False` si no.
 
         No se distinguen mayúsculas de minúsculas.
         '''
         nombre = nombre.lower().strip()
-        return any(edificio.nombre.lower() == nombre for edificio in self._edificios)
-
-    def set_in_edificio(self, edificio: int, campo: int, valor: Any):
-        '''
-        Actualizar el valor de un campo de un edificio existente.
-
-        El valor dado se asume como válido.
-
-        :param edificio: El índice del edificio.
-        :param campo: El índice del campo.
-        :param valor: El nuevo valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
-        :raise TypeError: Si el tipo de ``valor`` no es correcto.
-        :raise ValueError: Si se intenta cambiar el nombre del edificio a un
-        nombre que ya existe.
-        '''
-        logger.debug('set_in_edificio - edificio=%s campo=%s valor=%s', edificio, campo, valor)
-
-        el_edificio = self._edificios[edificio]
-        field_name: str = fieldnames_Edificio[campo]
-        expected_type = fieldtypes_Edificio[campo]
-
-        if not is_instance_of_type(valor, expected_type):
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Edificio.{field_name}" de tipo {expected_type}')
-        
-        # Si el valor es string, borrar espacios al principio y final
-        if isinstance(valor, str):
-            valor = valor.strip()
-        
-        # Si el campo es el nombre, chequear que no esté repetido
-        if field_name == 'nombre':
-            nombre_lower = valor.lower()
-            ya_existe = any(edificio.nombre.lower() == nombre_lower for edificio in self._edificios if edificio is not el_edificio)
-            if ya_existe:
-                raise ValueError(f'Ya existe un edificio llamado {valor}.')
-
-        setattr(el_edificio, field_name, valor)
+        return any(
+            edificio.nombre.lower() == nombre
+            for edificio in self._edificios
+        )
 
     def agregar_edificio(self):
         '''
@@ -171,13 +133,6 @@ class GestorDeDatos:
         logger.debug('ordenar_edificios')
         self._edificios.sort(key=lambda edificio: edificio.nombre.lower())
 
-    def cantidad_de_aulas(self, edificio: int) -> int:
-        '''
-        :return: La cantidad de aulas de un edificio en la base de datos.
-        :raise IndexError: Si el índice del edificio está fuera de rango.
-        '''
-        return len(self._edificios[edificio].aulas)
-
     def get_aulas(self, edificio: int) -> list[str]:
         '''
         :return: Los nombres de todas las aulas de un edificio en la base de
@@ -188,53 +143,27 @@ class GestorDeDatos:
         nombres.sort(key=lambda nombre: nombre.lower())
         return nombres
 
-    def get_from_aula(self, edificio: int, índice: int, campo: int) -> Any:
+    def cantidad_de_aulas(self, edificio: int) -> int:
         '''
-        :param edificio: El índice del edificio.
-        :param índice: El índice del aula.
-        :param campo: El índice del campo.
-        :return: El valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
+        :return: La cantidad de aulas de un edificio en la base de datos.
+        :raise IndexError: Si el índice del edificio está fuera de rango.
         '''
-        fieldname = fieldnames_Aula[campo]
-        return getattr(self._edificios[edificio].aulas[índice], fieldname)
+        return len(self._edificios[edificio].aulas)
 
-    def set_in_aula(self, edificio: int, índice: int, campo: int, valor: Any):
+    def get_aula(self, edificio: int, aula: int) -> Aula:
         '''
-        Actualizar el valor de un campo de un aula existente.
-
-        El valor dado se asume como válido.
+        Obtener el aula (no una copia), la cual puede inspeccionarse, y algunos
+        de sus miembros modificarse directamente:
+        - `nombre`
+        - `capacidad`
+        - `horarios`
 
         :param edificio: El índice del edificio.
-        :param índice: El índice del aula.
-        :param campo: El índice del campo.
-        :param valor: El nuevo valor del campo especificado.
+        :param aula: El índice del aula.
+        :return: El aula en los índices dados.
         :raise IndexError: Si alguno de los índices está fuera de rango.
-        :raise TypeError: Si el tipo de ``valor`` no es correcto.
-        :raise ValueError: Si se intenta cambiar el nombre del aula a un nombre
-        que ya existe.
         '''
-        logger.debug('set_in_aula - edificio=%s índice=%s campo=%s valor=%s', edificio, índice, campo, valor)
-        
-        el_aula = self._edificios[edificio].aulas[índice]
-        field_name: str = fieldnames_Aula[campo]
-        expected_type = fieldtypes_Aula[campo]
-        
-        if not is_instance_of_type(valor, expected_type):
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Aula.{field_name}" de tipo {expected_type}.')
-
-        # Si el valor es string, borrar espacios al principio y final
-        if isinstance(valor, str):
-            valor = valor.strip()
-        
-        # Si el campo es el nombre, chequear que no esté repetido
-        if field_name == 'nombre':
-            nombre_lower = valor.lower()
-            ya_existe = any(aula.nombre.lower() == nombre_lower for aula in self._edificios[edificio].aulas if aula is not el_aula)
-            if ya_existe:
-                raise ValueError(f'Ya existe un aula llamada {valor} en el edificio {el_aula.edificio.nombre}.')
-        
-        setattr(el_aula, field_name, valor)
+        return self._edificios[edificio].aulas[aula]
 
     def agregar_aula(self, edificio: int):
         '''
@@ -315,44 +244,20 @@ class GestorDeDatos:
         '''
         return len(self._edificios[edificio].aulas_dobles)
 
-    def get_from_aula_doble(self, edificio: int, aula_doble: int, campo: int) -> Aula:
+    # TODO: re-considerar la interfaz de aulas dobles cuando se implemente en
+    # la UI. Quizás es error prone el setear las aulas directamente, se podría
+    # accidentalmente asignar un aula de otro edificio por ejemplo.
+    def get_aula_doble(self, edificio: int, aula_doble: int) -> AulaDoble:
         '''
-        :param edificio: El índice del edificio.
-        :param aula_doble: El índice del aula doble.
-        :param campo: El índice del campo.
-        :return: El valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
-        '''
-        fieldname = fieldnames_AulaDoble[campo]
-        return getattr(self._edificios[edificio].aulas_dobles[aula_doble], fieldname)
-
-    def set_in_aula_doble(self, edificio: int, aula_doble: int, campo: int, valor: Aula):
-        '''
-        Actualizar el valor de un campo de un aula doble existente.
-
-        El valor dado se asume como válido.
+        Obtener el aula doble (no una copia), la cual puede inspeccionarse y
+        modificarse a qué aulas apuntan sus miembros.
 
         :param edificio: El índice del edificio.
         :param aula_doble: El índice del aula doble.
-        :param campo: El índice del campo.
-        :param valor: El nuevo valor del campo especificado.
+        :return: El aula doble en los índices dados.
         :raise IndexError: Si alguno de los índices está fuera de rango.
-        :raise TypeError: Si el tipo de ``valor`` no es correcto.
-        :raise ValueError: Si se intenta asignar un aula que ya forma parte de
-        un aula doble.
         '''
-        logger.debug('set_in_aula_doble - edificio=%s aula_doble=%s campo=%s valor=%s', edificio, aula_doble, campo, valor)
-        
-        el_edificio = self._edificios[edificio]
-        el_aula_doble = el_edificio.aulas_dobles[aula_doble]
-        field_name: str = fieldnames_AulaDoble[campo]
-        
-        if not isinstance(valor, Aula):
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "AulaDoble.{field_name}" de tipo Aula.')
-        elif _aula_quedaría_repetida_en_aulas_dobles(valor, aula_doble, campo, el_edificio.aulas_dobles):
-            raise ValueError(f'El aula {valor.nombre} ya forma parte de un aula doble. Un aula común no puede aparecer más de una vez en las aulas dobles.')
-        else:
-            setattr(el_aula_doble, field_name, valor)
+        return self._edificios[edificio].aulas_dobles[aula_doble]
 
     def agregar_aula_doble(self, edificio: int):
         '''
@@ -366,6 +271,25 @@ class GestorDeDatos:
         self._edificios[edificio].aulas_dobles.append(AulaDoble(
             aula_no_seleccionada, aula_no_seleccionada, aula_no_seleccionada
         ))
+
+    def existe_aula_en_aulas_dobles(self, edificio: int, aula: int) -> bool:
+        '''
+        :param edificio: El índice del edificio.
+        :param aula: El índice del aula.
+        :return: `True` si el aula ya forma parte de un aula doble,
+        `False` si no.
+        :raise IndexError: Si alguno de los índices está fuera de rango.
+        '''
+        el_edificio: Edificio = self._edificios[edificio]
+        el_aula: Aula = el_edificio.aulas[aula]
+        aulas_dobles: list[AulaDoble] = el_edificio.aulas_dobles
+        return any(
+            el_aula in (
+                aula_doble.aula_grande,
+                aula_doble.aula_chica_1,
+                aula_doble.aula_chica_2
+            ) for aula_doble in aulas_dobles
+        )
 
     def borrar_aula_doble(self, edificio: int, índice: int):
         '''
@@ -482,16 +406,20 @@ class GestorDeDatos:
         '''
         return len(self._carreras[carrera].materias)
 
-    def get_from_materia(self, carrera: int, materia: int, campo: int) -> Any:
+    def get_materia(self, carrera: int, materia: int) -> Clase:
         '''
+        Obtener la materia (no una copia), la cual puede inspeccionarse, y
+        algunos de sus miembros modificarse directamente:
+        - `nombre`
+        - `año`
+        - `cuatrimestral_o_anual`
+
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
-        :param campo: El índice del campo.
-        :return: El valor del campo especificado.
+        :return: La materia en los índices dados.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        fieldname = fieldnames_Materia[campo]
-        return getattr(self._carreras[carrera].materias[materia], fieldname)
+        return self._carreras[carrera].materias[materia]
 
     def existe_materia(self, carrera: int, nombre: str) -> bool:
         '''
@@ -507,42 +435,6 @@ class GestorDeDatos:
         nombre = nombre.lower().strip()
         la_carrera = self._carreras[carrera]
         return any(materia.nombre.lower() == nombre for materia in la_carrera.materias)
-
-    def set_in_materia(self, carrera: int, materia: int, campo: int, valor: Any):
-        '''
-        Actualizar el valor de un campo de un materia existente.
-
-        El valor dado se asume como válido.
-
-        :param carrera: El índice de la carrera.
-        :param materia: El índice de la materia.
-        :param campo: El índice del campo.
-        :param valor: El nuevo valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
-        :raise ValueError: Si se intenta cambiar el nombre de la materia a un
-        nombre que ya existe en la misma carrera.
-        '''
-        logger.debug('set_in_materia - carrera=%s materia=%s campo=%s valor=%s', carrera, materia, campo, valor)
-
-        la_materia = self._carreras[carrera].materias[materia]
-        field_name: str = fieldnames_Materia[campo]
-        expected_type = fieldtypes_Materia[campo]
-        
-        if not is_instance_of_type(valor, expected_type):
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Materia.{field_name}" de tipo {expected_type}.')
-
-        # Si el valor es string, borrar espacios al principio y final
-        if isinstance(valor, str):
-            valor = valor.strip()
-        
-        # Si el campo es el nombre, chequear que no esté repetido
-        if field_name == 'nombre':
-            nombre_lower = valor.lower()
-            ya_existe = any(materia.nombre.lower() == nombre_lower for materia in self._carreras[carrera].materias if materia is not la_materia)
-            if ya_existe:
-                raise ValueError(f'Ya existe una materia llamada {valor} en la carrera {la_materia.carrera.nombre}.')
-        
-        setattr(la_materia, field_name, valor)
 
     def agregar_materia(self, carrera: int):
         '''
@@ -592,45 +484,20 @@ class GestorDeDatos:
         '''
         return len(self._carreras[carrera].materias[materia].clases)
 
-    def get_from_clase(self, carrera: int, materia: int, clase: int, campo: int) -> Any:
+    def get_clase(self, carrera: int, materia: int, clase: int) -> Clase:
         '''
-        :param carrera: El índice de la carrera.
-        :param materia: El índice de la materia.
-        :param clase: El índice de la clase.
-        :param campo: El índice del campo.
-        :return: El valor del campo especificado.
-        :raise IndexError: Si alguno de los índices está fuera de rango.
-        '''
-        fieldname = fieldnames_Clase[campo]
-        return getattr(self._carreras[carrera].materias[materia].clases[clase], fieldname)
-
-    def set_in_clase(self, carrera: int, materia: int, clase: int, campo: int, valor: Any):
-        '''
-        Actualizar el valor de un campo de una clase existente.
-
-        El valor dado se asume como válido.
+        Obtener la clase (no una copia), la cual puede inspeccionarse, y
+        la mayoría de sus miembros modificarse directamente, excepto:
+        - `materia`
+        - `equipamiento_necesario`
 
         :param carrera: El índice de la carrera.
         :param materia: El índice de la materia.
         :param clase: El índice de la clase.
-        :param campo: El índice del campo.
-        :param valor: El nuevo valor del campo especificado.
+        :return: La clase en los índices dados.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
-        logger.debug('set_in_clase - carrera=%s materia=%s clase=%s campo=%s valor=%s', carrera, materia, clase, campo, valor)
-
-        la_clase = self._carreras[carrera].materias[materia].clases[clase]
-        field_name: str = fieldnames_Clase[campo]
-        expected_type = fieldtypes_Clase[campo]
-
-        # Si el valor es string, borrar espacios al principio y final
-        if isinstance(valor, str):
-            valor = valor.strip()
-        
-        if is_instance_of_type(valor, expected_type):
-            setattr(la_clase, field_name, valor)
-        else:
-            raise TypeError(f'No se puede asignar un objeto de tipo {type(valor)} al campo "Clase.{field_name}" de tipo {expected_type}')
+        return self._carreras[carrera].materias[materia].clases[clase]
 
     def agregar_clase(self, carrera: int, materia: int):
         '''
@@ -854,36 +721,3 @@ def _generar_nombre_no_existente(base: str, nombres_existentes: Sequence[str]) -
         nombre_propuesto = f'{base} {i}'
     
     return nombre_propuesto
-
-def _aula_quedaría_repetida_en_aulas_dobles(aula: Aula, i_aula_doble: int, i_campo: int, aulas_dobles: Sequence[AulaDoble]) -> bool:
-    '''
-    Determinar si `aula` ya forma parte de algún aula doble, excepto en el campo
-    al que se quiere asignar.
-
-    :param aula: Un aula que se quiere agregar a un aula doble.
-    :param i_aula_doble: El índice del aula doble.
-    :param i_campo: El índice del campo del aula doble al que se quiere asignar
-    el aula.
-    :param aulas_dobles: La lista de aulas dobles del edificio correspondiente.
-    '''
-    el_aula_doble = aulas_dobles[i_aula_doble]
-    campo = fieldnames_AulaDoble[i_campo]
-    return(
-        any(
-            aula is aula_doble.aula_grande or aula is aula_doble.aula_chica_1 or aula is aula_doble.aula_chica_2
-            for aula_doble in aulas_dobles
-            if aula_doble is not el_aula_doble
-        )
-        or (
-            campo == 'aula_grande'
-            and aula in (el_aula_doble.aula_chica_1, el_aula_doble.aula_chica_2)
-        )
-        or (
-            campo == 'aula_chica_1'
-            and aula in (el_aula_doble.aula_grande, el_aula_doble.aula_chica_2)
-        )
-        or (
-            campo == 'aula_chica_2'
-            and aula in (el_aula_doble.aula_grande, el_aula_doble.aula_chica_1)
-        )
-    )

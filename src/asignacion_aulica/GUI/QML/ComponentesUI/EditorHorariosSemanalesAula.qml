@@ -3,8 +3,8 @@ import QtQuick.Layouts
 
 Repeater {
     id: repeater
-    required property var entidad_padre
-    required property var entidad
+    required property var edificio
+    required property var aula
 
     // Días de la semana
     model: [
@@ -22,8 +22,8 @@ Repeater {
         required property string modelData
         rolDeHorarioInicio: "horario_inicio_" + modelData
         rolDeHorarioFin: "horario_fin_" + modelData
-        entidad_padre: repeater.entidad_padre
-        entidad: repeater.entidad
+        edificio: repeater.edificio
+        aula: repeater.aula
 
         Layout.preferredWidth: Constantes.width_columna_horario
         Layout.alignment: Qt.AlignCenter

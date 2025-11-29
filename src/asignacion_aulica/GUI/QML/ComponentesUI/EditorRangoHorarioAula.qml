@@ -3,8 +3,8 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 RowLayout {
-    required property var entidad_padre
-    required property var entidad
+    required property var edificio
+    required property var aula
     required property string rolDeHorarioInicio
     required property string rolDeHorarioFin
 
@@ -12,9 +12,9 @@ RowLayout {
 
     // Dependiendo de si el rango horario está abierto o cerrado, se muestran o
     // esconden ciertos elementos
-    property bool cerrado: entidad[rolDeHorarioInicio] ?
-                            entidad[rolDeHorarioInicio] == entidad[rolDeHorarioFin] :
-                            entidad_padre[rolDeHorarioInicio] == entidad_padre[rolDeHorarioFin]
+    property bool cerrado: aula[rolDeHorarioInicio] ?
+                           aula[rolDeHorarioInicio] == aula[rolDeHorarioFin] :
+                           edificio[rolDeHorarioInicio] == edificio[rolDeHorarioFin]
 
     // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
     // en la lista de clases) para resetear el horario al del edificio (por
@@ -31,14 +31,14 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        // Des-enfatizar texto cuando se usa el horario de la entidad padre
-        color: entidad[rolDeHorarioInicio] ? palette.dark : palette.mid
-        // Si no se especifica el horario, mostrar el de la entidad padre
-        text: entidad[rolDeHorarioInicio] ?
-              entidad[rolDeHorarioInicio] :
-              entidad_padre[rolDeHorarioInicio]
+        // Des-enfatizar texto cuando se usa el horario del edificio
+        color: aula[rolDeHorarioInicio] ? palette.dark : palette.mid
+        // Si no se especifica el horario, mostrar el del edificio
+        text: aula[rolDeHorarioInicio] ?
+              aula[rolDeHorarioInicio] :
+              edificio[rolDeHorarioInicio]
         onEditingFinished: {
-            entidad[rolDeHorarioInicio] = text
+            aula[rolDeHorarioInicio] = text
         }
     }
     EditorHorario {
@@ -49,14 +49,14 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        // Des-enfatizar texto cuando se usa el horario de la entidad padre
-        color: entidad[rolDeHorarioFin] ? palette.dark : palette.mid
-        // Si no se especifica el horario, mostrar el de la entidad padre
-        text: entidad[rolDeHorarioFin] ?
-              entidad[rolDeHorarioFin] :
-              entidad_padre[rolDeHorarioFin]
+        // Des-enfatizar texto cuando se usa el horario del edificio
+        color: aula[rolDeHorarioFin] ? palette.dark : palette.mid
+        // Si no se especifica el horario, mostrar el del edificio
+        text: aula[rolDeHorarioFin] ?
+              aula[rolDeHorarioFin] :
+              edificio[rolDeHorarioFin]
         onEditingFinished: {
-            entidad[rolDeHorarioFin] = text
+            aula[rolDeHorarioFin] = text
         }
     }
 
@@ -70,8 +70,8 @@ RowLayout {
 
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        // Des-enfatizar texto cuando se usa el horario de la entidad padre
-        color: entidad[rolDeHorarioInicio] ? palette.dark : palette.mid
+        // Des-enfatizar texto cuando se usa el horario del edificio
+        color: aula[rolDeHorarioInicio] ? palette.dark : palette.mid
         font.bold: true
         text: "CERRADO"
 
@@ -87,18 +87,18 @@ RowLayout {
         Layout.preferredWidth: Constantes.width_horario_sideButtons
         Layout.preferredHeight: Constantes.width_horario_sideButtons
 
-        // Des-enfatizar candado cuando se usa el horario de la entidad padre
-        opacity: entidad[rolDeHorarioInicio] ? 1.0 : 0.5
+        // Des-enfatizar candado cuando se usa el horario del edificio
+        opacity: aula[rolDeHorarioInicio] ? 1.0 : 0.5
         checked: cerrado
         onClicked: {
             if (checked) {
                 // Cerrar
-                entidad[rolDeHorarioInicio] = "00:00"
-                entidad[rolDeHorarioFin] = "00:00"
+                aula[rolDeHorarioInicio] = "00:00"
+                aula[rolDeHorarioFin] = "00:00"
             } else {
                 // Abrir
-                entidad[rolDeHorarioInicio] = "00:00"
-                entidad[rolDeHorarioFin] = "24:00"
+                aula[rolDeHorarioInicio] = "00:00"
+                aula[rolDeHorarioFin] = "24:00"
             }
         }
     }

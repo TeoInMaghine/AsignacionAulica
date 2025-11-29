@@ -83,7 +83,10 @@ ListView {
 
         Item { } // Espacio vacío de 2 * spacing de ancho
 
-        EditorHorariosSemanalesAula { entidad_padre: edificio; entidad: aula }
+        EditorHorariosSemanalesAula {
+            edificio: view.edificio
+            aula: parent.aula
+        }
 
         BotónBorrar {
             onClicked: {

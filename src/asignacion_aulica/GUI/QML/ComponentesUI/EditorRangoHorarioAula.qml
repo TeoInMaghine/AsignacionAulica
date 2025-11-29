@@ -3,11 +3,17 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 RowLayout {
+    required property var entidad_padre
     required property var entidad
     required property string rolDeHorarioInicio
     required property string rolDeHorarioFin
 
     spacing: Constantes.spacing_horario
+
+    // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
+    // en la lista de clases) para resetear el horario al del edificio (por
+    // ejemplo con un ícono tipo 🔄), solo interactuable si el usuario cambió
+    // el horario.
 
     readonly property int textFieldPadding : 2
     EditorHorario {
@@ -16,7 +22,12 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: entidad[rolDeHorarioInicio]
+        // Des-enfatizar texto cuando se usa el horario de la entidad padre
+        color: entidad[rolDeHorarioInicio] ? palette.dark : palette.mid
+        // Si no se especifica el horario, mostrar el de la entidad padre
+        text: entidad[rolDeHorarioInicio] ?
+              entidad[rolDeHorarioInicio] :
+              entidad_padre[rolDeHorarioInicio]
         onEditingFinished: {
             entidad[rolDeHorarioInicio] = text
         }
@@ -27,18 +38,27 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: entidad[rolDeHorarioFin]
+        // Des-enfatizar texto cuando se usa el horario de la entidad padre
+        color: entidad[rolDeHorarioFin] ? palette.dark : palette.mid
+        // Si no se especifica el horario, mostrar el de la entidad padre
+        text: entidad[rolDeHorarioFin] ?
+              entidad[rolDeHorarioFin] :
+              entidad_padre[rolDeHorarioFin]
         onEditingFinished: {
             entidad[rolDeHorarioFin] = text
         }
     }
 
-    property bool cerrado: entidad[rolDeHorarioInicio] == entidad[rolDeHorarioFin]
+    property bool cerrado: entidad[rolDeHorarioInicio] ?
+                            entidad[rolDeHorarioInicio] == entidad[rolDeHorarioFin] :
+                            entidad_padre[rolDeHorarioInicio] == entidad_padre[rolDeHorarioFin]
     Candado {
         Layout.preferredWidth: Constantes.width_horario_sideButtons
         Layout.preferredHeight: Constantes.width_horario_sideButtons
         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
+        // Des-enfatizar candado cuando se usa el horario de la entidad padre
+        opacity: entidad[rolDeHorarioInicio] ? 1.0 : 0.5
         checked: cerrado
         onClicked: {
             if (checked) {

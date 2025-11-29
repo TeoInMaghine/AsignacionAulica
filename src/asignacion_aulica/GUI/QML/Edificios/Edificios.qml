@@ -84,7 +84,7 @@ ListView {
                 text: "Horarios del edificio:"
             }
             RowLayout { HeaderHorariosSemanales { } }
-            RowLayout { EditorHorariosSemanales { entidad: edificio } }
+            RowLayout { EditorHorariosSemanalesEdificio { entidad: edificio } }
 
             Item {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft

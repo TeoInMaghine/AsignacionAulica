@@ -3,7 +3,7 @@ import QtQuick.Layouts
 
 Repeater {
     id: repeater
-    property var entidad_padre
+    required property var entidad_padre
     required property var entidad
 
     // Días de la semana
@@ -17,7 +17,7 @@ Repeater {
         "domingo"
     ]
 
-    EditorRangoHorario {
+    EditorRangoHorarioAula {
         // Este modelData es del Repeater, no del model de ListView...
         required property string modelData
         rolDeHorarioInicio: "horario_inicio_" + modelData

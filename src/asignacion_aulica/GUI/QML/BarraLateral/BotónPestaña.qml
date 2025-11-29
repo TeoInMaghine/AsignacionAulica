@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.VectorImage
 import QtQuick.Layouts
+import QML.ComponentesUI as ComponentesUI
 
 // El botón de una pestaña.
 Button {
@@ -21,7 +22,7 @@ Button {
         }
         Text {
             text: self.nombre
-            font.pointSize: Constantes.pestaña_texto_tamaño_pts
+            font.pointSize: ComponentesUI.FontSize.bigger
             color: "white"
             horizontalAlignment: Text.AlignHLeft
             verticalAlignment: Text.AlignVCenter

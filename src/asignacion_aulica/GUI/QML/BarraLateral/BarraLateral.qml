@@ -3,6 +3,7 @@ import QtQuick.Window
 import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Basic
+import QML.ComponentesUI as ComponentesUI
 
 Rectangle {
     Layout.preferredWidth: Constantes.ancho_de_la_barra
@@ -23,7 +24,7 @@ Rectangle {
             Layout.alignment: Qt.AlignTop | Qt.AlignHCenter
             Layout.fillWidth: true
             Layout.topMargin: 15
-            font.pointSize: Constantes.título_tamaño_pts
+            font.pointSize: ComponentesUI.FontSize.huge
             font.bold: true
             lineHeight: 1.1
             color: "white"

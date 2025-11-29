@@ -63,17 +63,18 @@ class ListCarreras(QAbstractListModel):
         return False
 
     @pyqtSlot(str, result=bool)
-    def agregar_carrera(self, nombre: str) -> bool:
+    def agregarCarrera(self, nombre: str) -> bool:
         '''
         Agregar una carrera a la lista.
         '''
         nombre = nombre.strip()
         if not nombre:
             return False
+        if self.gestor.existe_carrera(nombre):
+            return False
 
-        self.gestor.agregar_carrera(nombre)
+        self.i_carrera = self.gestor.agregar_carrera(nombre)
         self.actualizarLista()
-        self.i_carrera = self.carreras_existentes.index(nombre)
         self.carrera_seleccionada_changed.emit()
         return True
     

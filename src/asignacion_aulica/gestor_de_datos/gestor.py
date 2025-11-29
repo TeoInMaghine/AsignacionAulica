@@ -403,19 +403,27 @@ class GestorDeDatos:
         '''
         return self._carreras[índice]
 
-    def agregar_carrera(self, nombre: str):
+    def agregar_carrera(self, nombre: str) -> int:
         '''
         Añadir una nueva carrera con el nombre dado, inicializada con valores
         por defecto.
 
-        :raise ValueError: Si `nombre` está vacío.
+        :return: El índice de la nueva carrera.
+        :raise ValueError: Si `nombre` está vacío o si ya existe una carrera con
+        el mismo nombre.
         '''
+        logger.info(f'Agregando carrera: {nombre}')
+        
         nombre = nombre.strip()
         if not nombre:
             raise ValueError('No se puede agregar una carrera son nombre vacío.')
+        if self.existe_carrera(nombre):
+            raise ValueError(f'Ya existe una carrera llamada {nombre}.')
 
-        self._carreras.append(Carrera(nombre))
+        nueva = Carrera(nombre)
+        self._carreras.append(nueva)
         self._carreras.sort(key=lambda carrera: carrera.nombre.lower())
+        return self._carreras.index(nueva)
     
     def existe_carrera(self, nombre: str) -> bool:
         '''

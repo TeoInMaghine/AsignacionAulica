@@ -2,7 +2,7 @@ from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
-from asignacion_aulica.GUI.modelos.equipamiento_model import ListEquipamientosDeAula
+from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAula
 from PyQt6.QtQml import qmlRegisterType
 
 modelos_registrados: list[type] = []

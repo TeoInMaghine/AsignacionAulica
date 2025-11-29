@@ -8,6 +8,9 @@ import ModelosAsignaciónÁulica
 RowLayout {
     spacing: 10
 
+    /** Es -1 cuando no hay ninguna carrera */
+    property int índiceDeLaCarreraActual: comboBox.currentIndex
+
     Label{
         text: "Carrera: "
         font.pointSize: FontSize.big
@@ -17,7 +20,7 @@ RowLayout {
         id: comboBox
         Layout.preferredWidth: 350
 
-        displayText: lista_de_carreras.carreraSeleccionada
+        displayText: currentText ? currentText : "Ninguna"
 
         model: ListCarreras {
             id: lista_de_carreras
@@ -61,11 +64,16 @@ RowLayout {
                         placeholderText: "Nueva"
 
                         onAccepted: {
-                            if (lista_de_carreras.agregarCarrera(editorNuevaCarrera.text)) {
+                            var índice = lista_de_carreras.agregarCarrera(editorNuevaCarrera.text)
+                            if (índice >= 0) {
+                                comboBox.currentIndex = índice
                                 editorNuevaCarrera.clear()
                                 popup.close()
                             }
-                            editorNuevaCarrera.focus = false
+                            else{
+                                // TODO: reaccionar visualmente al input inválido
+                                editorNuevaCarrera.focus = false
+                            }
                         }
                     }
                     BotónAgregar {

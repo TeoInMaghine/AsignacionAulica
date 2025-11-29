@@ -8,5 +8,6 @@ ColumnLayout {
     spacing: 10
     
     Botonera { }
-    SelectorDeCarrera { }
+    SelectorDeCarrera { id: selector }
+    Label { text: "Carrera seleccionada: " + selector.índiceDeLaCarreraActual }
 }

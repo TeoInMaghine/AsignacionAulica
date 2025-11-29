@@ -9,10 +9,17 @@ RowLayout {
 
     spacing: Constantes.spacing_horario
 
+    // Dependiendo de si el rango horario está abierto o cerrado, se muestran o
+    // esconden ciertos elementos
+    property bool cerrado: entidad[rolDeHorarioInicio] == entidad[rolDeHorarioFin]
+
+    // Editores de horarios que se muestran cuando el rango horario está abierto
     readonly property int textFieldPadding : 2
     EditorHorario {
+        id: horarioInicio
+        visible: !cerrado
+
         Layout.preferredWidth: Constantes.width_horario_textField
-        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
@@ -22,8 +29,10 @@ RowLayout {
         }
     }
     EditorHorario {
+        id: horarioFin
+        visible: !cerrado
+
         Layout.preferredWidth: Constantes.width_horario_textField
-        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
@@ -33,11 +42,30 @@ RowLayout {
         }
     }
 
-    property bool cerrado: entidad[rolDeHorarioInicio] == entidad[rolDeHorarioFin]
+    // Elemento que se muestra cuando el rango horario está cerrado
+    Label {
+        visible: cerrado
+
+        // Ocupa el mismo espacio que los editores de horarios
+        Layout.preferredWidth: horarioInicio.Layout.preferredWidth + spacing + horarioFin.Layout.preferredWidth
+        Layout.preferredHeight: horarioInicio.height
+
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        font.bold: true
+        text: "CERRADO"
+
+        background: Rectangle {
+            border.width: 1
+            border.color: horarioInicio.palette.mid
+        }
+    }
+
+    // Se puede cerrar el rango horario editando los horarios para que sean
+    // iguales, pero la única forma de abrir el rango horario es con este botón
     Candado {
         Layout.preferredWidth: Constantes.width_horario_sideButtons
         Layout.preferredHeight: Constantes.width_horario_sideButtons
-        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
         checked: cerrado
         onClicked: {

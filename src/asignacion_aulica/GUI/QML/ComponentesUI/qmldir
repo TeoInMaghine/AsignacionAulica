@@ -1,5 +1,6 @@
 module QML.ComponentesUI
 BotónBorrar BotónBorrar.qml
+BotónAgregar BotónAgregar.qml
 BotónRedondeadoConTexto BotónRedondeadoConTexto.qml
 BotónRedondeadoConTextoColorUNRN BotónRedondeadoConTextoColorUNRN.qml
 Colapsador Colapsador.qml

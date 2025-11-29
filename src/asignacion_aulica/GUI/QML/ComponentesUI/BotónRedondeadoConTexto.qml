@@ -5,8 +5,8 @@ import QtQuick.Layouts
 RoundButton {
     bottomPadding: 0
     topPadding: 0
-    leftPadding: 13
-    rightPadding: 13
+    leftPadding: radius/2
+    rightPadding: radius/2
 
     font.pointSize: FontSize.base
     font.bold: true

@@ -68,7 +68,7 @@ RowLayout {
                             editorNuevaCarrera.focus = false
                         }
                     }
-                    BotónRedondeadoConTexto {
+                    BotónAgregar {
                         Layout.margins: 5
                         Layout.leftMargin: 0
                         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter

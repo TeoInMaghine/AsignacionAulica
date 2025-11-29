@@ -54,16 +54,18 @@ RowLayout {
         Layout.preferredHeight: Constantes.width_horario_sideButtons
         Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
 
-        checked: horarioInicio == horarioFin
+        checked: entidad[rolDeHorarioInicio] ?
+                 entidad[rolDeHorarioInicio] == entidad[rolDeHorarioFin] :
+                 entidad_padre[rolDeHorarioInicio] == entidad_padre[rolDeHorarioFin]
         onClicked: {
             if (checked) {
                 // Cerrar
-                horarioInicio = "00:00"
-                horarioFin = "00:00"
+                entidad[rolDeHorarioInicio] = "00:00"
+                entidad[rolDeHorarioFin] = "00:00"
             } else {
                 // Abrir
-                horarioInicio = "00:00"
-                horarioFin = "24:00"
+                entidad[rolDeHorarioInicio] = "00:00"
+                entidad[rolDeHorarioFin] = "24:00"
             }
         }
     }

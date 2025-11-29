@@ -10,7 +10,7 @@ RowLayout {
 
     Label{
         text: "Carrera: "
-        font.pointSize: Constantes.fontsize_pts_big
+        font.pointSize: FontSize.big
     }
 
     ComboBox {

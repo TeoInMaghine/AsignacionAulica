@@ -3,21 +3,19 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 RowLayout {
-    required property string rolDeHorario
+    property var entidad_padre
+    required property var entidad
+    required property string rolDeHorarioInicio
+    required property string rolDeHorarioFin
 
     readonly property int textFieldWidth : 45
     readonly property int textFieldPadding : 2
     spacing: 2
 
-    // TODO: Fix. También, horario de edificio si el del aula == None (y engrisar también).
     // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
     // en la lista de clases) para resetear el horario al del edificio (por
     // ejemplo con un ícono tipo 🔄), solo interactuable si el usuario cambió
     // el horario.
-    // property string horarioInicio : aula[rolDeHorario][0]
-    // property string horarioFin : aula[rolDeHorario][1]
-    property string horarioInicio : "00:00"
-    property string horarioFin : "24:00"
 
     EditorHorario {
         Layout.preferredWidth: textFieldWidth
@@ -25,9 +23,14 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: horarioInicio
+        // Des-enfatizar texto cuando se usa el horario de la entidad padre
+        color: entidad[rolDeHorarioInicio] ? palette.dark : palette.mid
+        // Si no se especifica el horario, mostrar el de la entidad padre
+        text: entidad[rolDeHorarioInicio] ?
+              entidad[rolDeHorarioInicio] :
+              entidad_padre[rolDeHorarioInicio]
         onEditingFinished: {
-            horarioInicio = text
+            entidad[rolDeHorarioInicio] = text
         }
     }
     EditorHorario {
@@ -36,9 +39,14 @@ RowLayout {
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: horarioFin
+        // Des-enfatizar texto cuando se usa el horario de la entidad padre
+        color: entidad[rolDeHorarioFin] ? palette.dark : palette.mid
+        // Si no se especifica el horario, mostrar el de la entidad padre
+        text: entidad[rolDeHorarioFin] ?
+              entidad[rolDeHorarioFin] :
+              entidad_padre[rolDeHorarioFin]
         onEditingFinished: {
-            horarioFin = text
+            entidad[rolDeHorarioFin] = text
         }
     }
 }

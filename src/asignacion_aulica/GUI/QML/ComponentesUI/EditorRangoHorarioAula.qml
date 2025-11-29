@@ -27,7 +27,7 @@ RowLayout {
         id: horarioInicio
         visible: !cerrado
 
-        Layout.preferredWidth: Constantes.width_horario_textField
+        Layout.preferredWidth: Constantes.width_editor_horario
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
@@ -45,7 +45,7 @@ RowLayout {
         id: horarioFin
         visible: !cerrado
 
-        Layout.preferredWidth: Constantes.width_horario_textField
+        Layout.preferredWidth: Constantes.width_editor_horario
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
@@ -65,7 +65,7 @@ RowLayout {
         visible: cerrado
 
         // Ocupa el mismo espacio que los editores de horarios
-        Layout.preferredWidth: horarioInicio.Layout.preferredWidth + spacing + horarioFin.Layout.preferredWidth
+        Layout.preferredWidth: Constantes.width_editores_horarios
         Layout.preferredHeight: horarioInicio.height
 
         horizontalAlignment: Text.AlignHCenter

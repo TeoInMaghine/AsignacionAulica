@@ -33,9 +33,9 @@ Button {
     }
     
     background: Rectangle {
-        color: self.pressed ? Constantes.rojo_unrn_oscurísimo :
+        color: self.pressed ? ComponentesUI.Constantes.rojo_unrn_oscurísimo :
             sidebar.pestaña_actual === self.nombre || self.hovered ?
-            Constantes.rojo_unrn_oscuro : Constantes.rojo_unrn
+            ComponentesUI.Constantes.rojo_unrn_oscuro : ComponentesUI.Constantes.rojo_unrn
 
         Behavior on color {
             ColorAnimation {

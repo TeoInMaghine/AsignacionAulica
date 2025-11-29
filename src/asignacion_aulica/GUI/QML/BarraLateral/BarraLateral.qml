@@ -8,7 +8,7 @@ import QML.ComponentesUI as ComponentesUI
 Rectangle {
     Layout.preferredWidth: Constantes.ancho_de_la_barra
     Layout.fillHeight: true
-    color: Constantes.rojo_unrn
+    color: ComponentesUI.Constantes.rojo_unrn
 
     property string pestaña_actual: "Aulas"
 

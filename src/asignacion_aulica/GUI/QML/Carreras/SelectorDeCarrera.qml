@@ -17,7 +17,7 @@ RowLayout {
         id: comboBox
         Layout.preferredWidth: 350
 
-        displayText: lista_de_carreras.carrera_seleccionada
+        displayText: lista_de_carreras.carreraSeleccionada
 
         model: ListCarreras {
             id: lista_de_carreras
@@ -53,7 +53,7 @@ RowLayout {
                     spacing: 0
 
                     TextField {
-                        id: editor_nueva_carrera
+                        id: editorNuevaCarrera
                         Layout.margins: 5
                         Layout.fillWidth: true
 
@@ -61,11 +61,11 @@ RowLayout {
                         placeholderText: "Nueva"
 
                         onAccepted: {
-                            if (lista_de_carreras.agregar_carrera(editor_nueva_carrera.text)) {
-                                editor_nueva_carrera.clear()
+                            if (lista_de_carreras.agregarCarrera(editorNuevaCarrera.text)) {
+                                editorNuevaCarrera.clear()
                                 popup.close()
                             }
-                            editor_nueva_carrera.focus = false
+                            editorNuevaCarrera.focus = false
                         }
                     }
                     BotónRedondeadoConTexto {
@@ -73,8 +73,7 @@ RowLayout {
                         Layout.leftMargin: 0
                         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
-                        text: "+"
-                        onClicked: editor_nueva_carrera.accepted()
+                        onClicked: editorNuevaCarrera.accepted()
                     }
                 }
 

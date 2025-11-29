@@ -29,14 +29,14 @@ class ListCarreras(QAbstractListModel):
         self.actualizarLista()
 
     @pyqtProperty(str, notify=carrera_seleccionada_changed)
-    def carrera_seleccionada(self) -> str:
+    def carreraSeleccionada(self) -> str:
         if 0 <= self.i_carrera < len(self.carreras_existentes):
             return self.carreras_existentes[self.i_carrera]
         else:
             return 'Ninguna'
     
     @pyqtProperty(int, notify=carrera_seleccionada_changed)
-    def index_carrera_seleccionada(self) -> int:
+    def indexCarreraSeleccoinada(self) -> int:
         return self.i_carrera
         
     @override
@@ -50,17 +50,11 @@ class ListCarreras(QAbstractListModel):
     @override
     def data(self, index: QModelIndex, role: int = 0) -> Any:
         if not index.isValid(): return None
-        if not 0 <= index.row() < len(self.carreras_existentes): return None
 
         if role == ROL_NOMBRE:
             return self.carreras_existentes[index.row()]
         else:
             return None
-
-    @override
-    def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
-        '''Acá no hay nada para setear'''
-        return False
 
     @pyqtSlot(str, result=bool)
     def agregarCarrera(self, nombre: str) -> bool:
@@ -71,7 +65,7 @@ class ListCarreras(QAbstractListModel):
         if not nombre:
             return False
         if self.gestor.existe_carrera(nombre):
-            return False
+            return False #TODO: Reaccionar a esto de alguna manera visible?
 
         self.i_carrera = self.gestor.agregar_carrera(nombre)
         self.actualizarLista()

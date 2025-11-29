@@ -19,8 +19,9 @@ Switch {
         color:      hovered ? candado.palette.dark :
             candado.checked ? candado.palette.mid  :
                               candado.palette.light
-        border.width: 1
-        border.color: candado.palette.mid
+        border.width: candado.activeFocus ? 2 : 1
+        border.color: candado.activeFocus ? candado.palette.highlight :
+                                            candado.palette.mid
         radius: 4
     }
 

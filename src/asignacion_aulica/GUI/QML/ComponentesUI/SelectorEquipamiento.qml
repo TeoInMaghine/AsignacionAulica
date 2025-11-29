@@ -98,7 +98,7 @@ ComboBox {
                     placeholderText: "Nuevo"
 
                     onAccepted: {
-                        if (equipamientos.appendEquipamiento(editorNuevoEquipamiento.text)) {
+                        if (equipamientos.agregarEquipamiento(editorNuevoEquipamiento.text)) {
                             editorNuevoEquipamiento.clear()
                         }
                         editorNuevoEquipamiento.focus = false

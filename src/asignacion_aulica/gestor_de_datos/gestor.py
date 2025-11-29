@@ -416,7 +416,7 @@ class GestorDeDatos:
         '''
         return len(self._carreras[carrera].materias)
 
-    def get_materia(self, carrera: int, materia: int) -> Clase:
+    def get_materia(self, carrera: int, materia: int) -> Materia:
         '''
         Obtener la materia (no una copia), la cual puede inspeccionarse, y
         algunos de sus miembros modificarse directamente:

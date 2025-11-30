@@ -58,8 +58,6 @@ RowLayout {
         }
     }
 
-    // Se puede cerrar el rango horario editando los horarios para que sean
-    // iguales, pero la única forma de abrir el rango horario es con este botón
     Candado {
         Layout.preferredWidth: Constantes.width_horario_sideButtons
         Layout.preferredHeight: Constantes.width_horario_sideButtons

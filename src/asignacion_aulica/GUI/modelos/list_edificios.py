@@ -99,7 +99,7 @@ class ListEdificios(QAbstractListModel):
             rango_horario: RangoHorario = edificio.horarios[día]
 
             if es_rol_horario_cerrado(role):
-                return rango_horario.es_cerrado()
+                return rango_horario.cerrado
 
             horario: time = rango_horario.inicio \
                             if es_rol_horario_inicio(role) else \
@@ -162,34 +162,30 @@ class ListEdificios(QAbstractListModel):
                     )
                     return False
 
-                if value:
-                    rango_horario.cerrar()
+                rango_horario.cerrado = value
+
+            else:
+                if not isinstance(value, str):
+                    logger.debug(
+                        f'No se puede parsear como horario un valor "{value}"'
+                        f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                    )
+                    return False
+
+                # Transformar string con formato HH:MM a time
+                if value == '24:00':
+                    value = EQUIVALENTE_24_HORAS
                 else:
-                    rango_horario.abrir()
+                    value = datetime.strptime(value, '%H:%M').time()
 
-                # Actualizar todos los roles de horarios de este día
-                self.dataChanged.emit(index, index, [role-2, role-1, role])
-                return True
-
-            if not isinstance(value, str):
-                logger.debug(
-                    f'No se puede parsear como horario un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
-                )
-                return False
-
-            # Transformar string con formato HH:MM a time
-            if value == '24:00':
-                value = EQUIVALENTE_24_HORAS
-            else:
-                value = datetime.strptime(value, '%H:%M').time()
-
-            # TODO: Rechazar valores inválidos (inicio >= fin)
-
-            if es_rol_horario_inicio(role):
-                rango_horario.inicio = value
-            else:
-                rango_horario.fin = value
+                # Asignar inicio o fin del rango horario si no resulta en un
+                # rango inválido (i.e.: con inicio >= fin)
+                if es_rol_horario_inicio(role):
+                    if value >= rango_horario.fin: return False
+                    rango_horario.inicio = value
+                else:
+                    if rango_horario.inicio >= value: return False
+                    rango_horario.fin = value
 
         self.dataChanged.emit(index, index, [role])
         return True

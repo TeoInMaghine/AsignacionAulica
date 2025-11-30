@@ -180,7 +180,7 @@ def test_varias_asignaciones_y_una_no_asignada(
 
 @pytest.mark.aulas(
     MockAula(),
-    MockAula(horario_viernes=RangoHorario.cerrado()),
+    MockAula(horario_viernes=RangoHorario.crearCerrado()),
     MockAula(),
     MockAula(capacidad=20, equipamiento={'pizarrón'}),
 )

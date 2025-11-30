@@ -73,7 +73,7 @@ RowLayout {
         // Des-enfatizar texto cuando se usa el horario del edificio
         color: aula[rolDeHorarioInicio] ? palette.dark : palette.mid
         font.bold: true
-        text: "CERRADO"
+        text: "Cerrado"
 
         background: Rectangle {
             border.width: 1

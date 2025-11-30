@@ -53,7 +53,7 @@ RowLayout {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         font.bold: true
-        text: "CERRADO"
+        text: "Cerrado"
 
         background: Rectangle {
             border.width: 1

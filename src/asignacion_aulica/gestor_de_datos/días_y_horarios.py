@@ -42,7 +42,11 @@ Tupla con un RangoHorario o None para cada día de la semana.
 '''
 
 def crear_horarios_semanales() -> HorariosSemanales:
-    return HorariosSemanales(RangoHorario.cerrado() for _ in range(len(Día)))
+    return HorariosSemanales(
+        RangoHorario.cerrado() if d == Día.Domingo or d == Día.Sábado
+        else RangoHorario(time(7), time(22))
+        for d in Día
+    )
 
 def crear_horarios_semanales_opcionales() -> HorariosSemanalesOpcionales:
     return HorariosSemanalesOpcionales([None,]*len(Día))

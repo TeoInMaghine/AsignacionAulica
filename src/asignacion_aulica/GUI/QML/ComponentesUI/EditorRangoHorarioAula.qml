@@ -5,16 +5,16 @@ import QtQuick.Layouts
 RowLayout {
     required property var edificio
     required property var aula
-    required property string rolDeHorarioInicio
-    required property string rolDeHorarioFin
+    required property string rolHorarioInicio
+    required property string rolHorarioFin
+    required property string rolHorarioCerrado
+    required property string rolAulaTieneHorarioPropio
+
+    readonly property bool horarioCerrado: aula[rolAulaTieneHorarioPropio] ?
+                                           aula[rolHorarioCerrado] :
+                                           edificio[rolHorarioCerrado]
 
     spacing: Constantes.spacing_horario
-
-    // Dependiendo de si el rango horario está abierto o cerrado, se muestran o
-    // esconden ciertos elementos
-    property bool cerrado: aula[rolDeHorarioInicio] ?
-                           aula[rolDeHorarioInicio] == aula[rolDeHorarioFin] :
-                           edificio[rolDeHorarioInicio] == edificio[rolDeHorarioFin]
 
     // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
     // en la lista de clases) para resetear el horario al del edificio (por
@@ -25,44 +25,44 @@ RowLayout {
     readonly property int textFieldPadding : 2
     EditorHorario {
         id: horarioInicio
-        visible: !cerrado
+        visible: !horarioCerrado
 
         Layout.preferredWidth: Constantes.width_editor_horario
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
         // Des-enfatizar texto cuando se usa el horario del edificio
-        color: aula[rolDeHorarioInicio] ? palette.dark : palette.mid
+        color: aula[rolAulaTieneHorarioPropio] ? palette.dark : palette.mid
         // Si no se especifica el horario, mostrar el del edificio
-        text: aula[rolDeHorarioInicio] ?
-              aula[rolDeHorarioInicio] :
-              edificio[rolDeHorarioInicio]
+        text: aula[rolAulaTieneHorarioPropio] ?
+              aula[rolHorarioInicio] :
+              edificio[rolHorarioInicio]
         onEditingFinished: {
-            aula[rolDeHorarioInicio] = text
+            aula[rolHorarioInicio] = text
         }
     }
     EditorHorario {
         id: horarioFin
-        visible: !cerrado
+        visible: !horarioCerrado
 
         Layout.preferredWidth: Constantes.width_editor_horario
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
         // Des-enfatizar texto cuando se usa el horario del edificio
-        color: aula[rolDeHorarioFin] ? palette.dark : palette.mid
+        color: aula[rolAulaTieneHorarioPropio] ? palette.dark : palette.mid
         // Si no se especifica el horario, mostrar el del edificio
-        text: aula[rolDeHorarioFin] ?
-              aula[rolDeHorarioFin] :
-              edificio[rolDeHorarioFin]
+        text: aula[rolAulaTieneHorarioPropio] ?
+              aula[rolHorarioFin] :
+              edificio[rolHorarioFin]
         onEditingFinished: {
-            aula[rolDeHorarioFin] = text
+            aula[rolHorarioFin] = text
         }
     }
 
     // Elemento que se muestra cuando el rango horario está cerrado
     Label {
-        visible: cerrado
+        visible: horarioCerrado
 
         // Ocupa el mismo espacio que los editores de horarios
         Layout.preferredWidth: Constantes.width_editores_horarios
@@ -71,7 +71,7 @@ RowLayout {
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         // Des-enfatizar texto cuando se usa el horario del edificio
-        color: aula[rolDeHorarioInicio] ? palette.dark : palette.mid
+        color: aula[rolAulaTieneHorarioPropio] ? palette.dark : palette.mid
         font.bold: true
         text: "Cerrado"
 
@@ -88,18 +88,8 @@ RowLayout {
         Layout.preferredHeight: Constantes.width_horario_sideButtons
 
         // Des-enfatizar candado cuando se usa el horario del edificio
-        opacity: aula[rolDeHorarioInicio] ? 1.0 : 0.5
-        checked: cerrado
-        onClicked: {
-            if (checked) {
-                // Cerrar
-                aula[rolDeHorarioInicio] = "00:00"
-                aula[rolDeHorarioFin] = "00:00"
-            } else {
-                // Abrir
-                aula[rolDeHorarioInicio] = "00:00"
-                aula[rolDeHorarioFin] = "24:00"
-            }
-        }
+        opacity: aula[rolAulaTieneHorarioPropio] ? 1.0 : 0.5
+        checked: horarioCerrado
+        onClicked: aula[rolHorarioCerrado] = checked
     }
 }

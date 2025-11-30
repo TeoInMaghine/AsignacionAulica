@@ -14,18 +14,25 @@ NOMBRES_DE_ROLES: list[str] = [
     'preferir_no_usar',
     'horario_inicio_lunes',
     'horario_fin_lunes',
+    'horario_cerrado_lunes',
     'horario_inicio_martes',
     'horario_fin_martes',
+    'horario_cerrado_martes',
     'horario_inicio_miércoles',
     'horario_fin_miércoles',
+    'horario_cerrado_miércoles',
     'horario_inicio_jueves',
     'horario_fin_jueves',
+    'horario_cerrado_jueves',
     'horario_inicio_viernes',
     'horario_fin_viernes',
+    'horario_cerrado_viernes',
     'horario_inicio_sábado',
     'horario_fin_sábado',
+    'horario_cerrado_sábado',
     'horario_inicio_domingo',
-    'horario_fin_domingo'
+    'horario_fin_domingo',
+    'horario_cerrado_domingo',
 ]
 
 # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt
@@ -33,7 +40,8 @@ ROL_BASE:                   int = Qt.ItemDataRole.UserRole + 1
 ROL_NOMBRE:                 int = ROL_BASE + NOMBRES_DE_ROLES.index('nombre')
 ROL_PREFERIR_NO_USAR:       int = ROL_BASE + NOMBRES_DE_ROLES.index('preferir_no_usar')
 ROL_PRIMER_HORARIO:         int = ROL_BASE + NOMBRES_DE_ROLES.index('horario_inicio_lunes')
-PARIDAD_ROL_HORARIO_INICIO: int = ROL_PRIMER_HORARIO % 2
+MOD_3_ROL_HORARIO_INICIO:   int = (ROL_BASE + NOMBRES_DE_ROLES.index('horario_inicio_lunes')) % 3
+MOD_3_ROL_HORARIO_CERRADO:  int = (ROL_BASE + NOMBRES_DE_ROLES.index('horario_cerrado_lunes')) % 3
 
 ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
     i + ROL_BASE: QByteArray(rolename.encode())
@@ -46,10 +54,13 @@ EQUIVALENTE_24_HORAS: time = time.max
 '''
 
 def día_de_rol_horario(rol: int) -> Día:
-    return Día((rol - ROL_PRIMER_HORARIO) // 2)
+    return Día((rol - ROL_PRIMER_HORARIO) // 3)
 
 def es_rol_horario_inicio(rol: int) -> bool:
-    return (rol % 2) == PARIDAD_ROL_HORARIO_INICIO
+    return (rol % 3) == MOD_3_ROL_HORARIO_INICIO
+
+def es_rol_horario_cerrado(rol: int) -> bool:
+    return (rol % 3) == MOD_3_ROL_HORARIO_CERRADO
 
 class ListEdificios(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
@@ -86,6 +97,10 @@ class ListEdificios(QAbstractListModel):
         else: # Es un rol horario
             día: Día = día_de_rol_horario(role)
             rango_horario: RangoHorario = edificio.horarios[día]
+
+            if es_rol_horario_cerrado(role):
+                return rango_horario.es_cerrado()
+
             horario: time = rango_horario.inicio \
                             if es_rol_horario_inicio(role) else \
                             rango_horario.fin
@@ -136,6 +151,26 @@ class ListEdificios(QAbstractListModel):
             edificio.preferir_no_usar = value
 
         else: # Es un rol horario
+            día: Día = día_de_rol_horario(role)
+            rango_horario: RangoHorario = edificio.horarios[día]
+
+            if es_rol_horario_cerrado(role):
+                if not isinstance(value, bool):
+                    logger.debug(
+                        f'No se puede asignar el valor "{value}" de tipo'
+                        f' {type(value)} a "horario cerrado", de tipo {bool}.'
+                    )
+                    return False
+
+                if value:
+                    rango_horario.cerrar()
+                else:
+                    rango_horario.abrir()
+
+                # Actualizar todos los roles de horarios de este día
+                self.dataChanged.emit(index, index, [role-2, role-1, role])
+                return True
+
             if not isinstance(value, str):
                 logger.debug(
                     f'No se puede parsear como horario un valor "{value}"'
@@ -143,14 +178,13 @@ class ListEdificios(QAbstractListModel):
                 )
                 return False
 
-            día: Día = día_de_rol_horario(role)
-            rango_horario: RangoHorario = edificio.horarios[día]
-
             # Transformar string con formato HH:MM a time
             if value == '24:00':
                 value = EQUIVALENTE_24_HORAS
             else:
                 value = datetime.strptime(value, '%H:%M').time()
+
+            # TODO: Rechazar valores inválidos (inicio >= fin)
 
             if es_rol_horario_inicio(role):
                 rango_horario.inicio = value

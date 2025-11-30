@@ -24,9 +24,21 @@ class RangoHorario:
     @staticmethod
     def cerrado()-> RangoHorario:
         return RangoHorario(time(0), time(0))
+
+    @staticmethod
+    def abierto()-> RangoHorario:
+        return RangoHorario(time(7), time(22))
     
     def es_cerrado(self) -> bool:
         return self.inicio == self.fin
+
+    def cerrar(self):
+        self.inicio = time(0)
+        self.fin = time(0)
+
+    def abrir(self):
+        self.inicio = time(7)
+        self.fin = time(22)
 
 HorariosSemanales: TypeAlias = tuple[
     RangoHorario, RangoHorario, RangoHorario, RangoHorario, RangoHorario,
@@ -43,8 +55,8 @@ Tupla con un RangoHorario o None para cada día de la semana.
 
 def crear_horarios_semanales() -> HorariosSemanales:
     return HorariosSemanales(
-        RangoHorario.cerrado() if d == Día.Domingo or d == Día.Sábado
-        else RangoHorario(time(7), time(22))
+        RangoHorario.cerrado() if d == Día.Domingo or d == Día.Sábado else
+        RangoHorario.abierto()
         for d in Día
     )
 

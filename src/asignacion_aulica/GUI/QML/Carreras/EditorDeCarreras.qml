@@ -5,9 +5,9 @@ import QML.ComponentesUI
 ColumnLayout {
     anchors.fill: parent
     anchors.margins: 15
-    spacing: 10
+    spacing: 20
     
     Botonera { }
     SelectorDeCarrera { id: selector }
-    Label { text: "Carrera seleccionada: " + selector.índiceDeLaCarreraActual }
+    EditorDeUnaCarrera { índiceDeLaCarreraActual: selector.índiceDeLaCarreraActual }
 }

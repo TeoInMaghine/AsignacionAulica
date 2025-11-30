@@ -106,9 +106,8 @@ def test_asignación_imposible_por_aula_que_abre_más_tarde(edificios: Edificios
     assert not resultado.todo_ok()
     assert resultado.días_sin_asignar == [Día.Viernes]
 
-# TODO: Arreglar este bug, que creé yo lol
 @pytest.mark.aulas( MockAula(horario_viernes=RangoHorario.crearCerrado()) )
-@pytest.mark.clases( MockClase(horario=RangoHorario(time(10), time(12)), día=Día.Viernes) )
+@pytest.mark.clases( MockClase(horario=RangoHorario(time(12), time(14)), día=Día.Viernes) )
 def test_asignación_imposible_por_aula_cerrada(edificios: Edificios, carreras: Carreras):
     resultado = asignar(edificios, carreras)
     assert not resultado.todo_ok()

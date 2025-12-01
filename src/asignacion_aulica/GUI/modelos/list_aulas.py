@@ -119,13 +119,13 @@ class ListAulas(QAbstractListModel):
             return aula.capacidad
         else: # Es un rol horario
             día: Día = día_de_rol_horario(role)
-            rango_horario: RangoHorario = aula.horarios[día]
+            rango_horario: RangoHorario|None = aula.horarios[día]
 
             if es_rol_horario_es_propio(role):
-                return bool(rango_horario)
+                return rango_horario is not None
 
             if not rango_horario:
-                logger.debug(
+                logger.warning(
                     'Esto nunca debería ocurrir, se debe verificar que el'
                     ' horario sea propio antes de acceder al mismo.'
                     f' Rol obtenido: {NOMBRES_DE_ROLES[role - ROL_BASE]}.'

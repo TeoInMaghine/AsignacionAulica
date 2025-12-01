@@ -1,5 +1,5 @@
 from __future__ import annotations  # Para soportar referencias circulares en los type hints
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from enum import IntEnum, auto
 from typing import TypeAlias
 from datetime import time
@@ -17,18 +17,10 @@ class Día(IntEnum):
 class RangoHorario:
     inicio: time
     fin: time
-    cerrado: bool = field(default=False)
+    cerrado: bool = False
 
     def se_superpone_con(self, otro: RangoHorario) -> bool:
         return self.inicio < otro.fin and otro.inicio < self.fin
-
-    @staticmethod
-    def crearCerrado() -> RangoHorario:
-        return RangoHorario(time(7), time(22), True)
-
-    @staticmethod
-    def crearAbierto() -> RangoHorario:
-        return RangoHorario(time(7), time(22), False)
 
 HorariosSemanales: TypeAlias = tuple[
     RangoHorario, RangoHorario, RangoHorario, RangoHorario, RangoHorario,
@@ -45,8 +37,7 @@ Tupla con un RangoHorario o None para cada día de la semana.
 
 def crear_horarios_semanales() -> HorariosSemanales:
     return HorariosSemanales(
-        RangoHorario.crearCerrado() if d == Día.Domingo or d == Día.Sábado else
-        RangoHorario.crearAbierto()
+        RangoHorario(time(7), time(22), d == Día.Domingo or d == Día.Sábado)
         for d in Día
     )
 

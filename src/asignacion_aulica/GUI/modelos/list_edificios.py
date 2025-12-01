@@ -1,4 +1,5 @@
 import logging
+from enum import IntEnum, auto
 from datetime import time, datetime
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
@@ -9,58 +10,53 @@ from asignacion_aulica.gestor_de_datos.días_y_horarios import Día, RangoHorari
 
 logger = logging.getLogger(__name__)
 
-NOMBRES_DE_ROLES: list[str] = [
-    'nombre',
-    'preferir_no_usar',
-    'horario_inicio_lunes',
-    'horario_fin_lunes',
-    'horario_cerrado_lunes',
-    'horario_inicio_martes',
-    'horario_fin_martes',
-    'horario_cerrado_martes',
-    'horario_inicio_miércoles',
-    'horario_fin_miércoles',
-    'horario_cerrado_miércoles',
-    'horario_inicio_jueves',
-    'horario_fin_jueves',
-    'horario_cerrado_jueves',
-    'horario_inicio_viernes',
-    'horario_fin_viernes',
-    'horario_cerrado_viernes',
-    'horario_inicio_sábado',
-    'horario_fin_sábado',
-    'horario_cerrado_sábado',
-    'horario_inicio_domingo',
-    'horario_fin_domingo',
-    'horario_cerrado_domingo',
-]
+class RolHorario(IntEnum):
+    inicio    = 0
+    fin       = auto()
+    cerrado   = auto()
 
-# No se empieza desde 0 para no colisionar con los roles ya existentes de Qt
-ROL_BASE:                   int = Qt.ItemDataRole.UserRole + 1
-ROL_NOMBRE:                 int = ROL_BASE + NOMBRES_DE_ROLES.index('nombre')
-ROL_PREFERIR_NO_USAR:       int = ROL_BASE + NOMBRES_DE_ROLES.index('preferir_no_usar')
-ROL_PRIMER_HORARIO:         int = ROL_BASE + NOMBRES_DE_ROLES.index('horario_inicio_lunes')
-MOD_3_ROL_HORARIO_INICIO:   int = (ROL_BASE + NOMBRES_DE_ROLES.index('horario_inicio_lunes')) % 3
-MOD_3_ROL_HORARIO_CERRADO:  int = (ROL_BASE + NOMBRES_DE_ROLES.index('horario_cerrado_lunes')) % 3
+class Rol(IntEnum):
+    # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt.
+    horario_inicio_lunes        = Qt.ItemDataRole.UserRole + 1
+    horario_fin_lunes           = auto()
+    horario_cerrado_lunes       = auto()
+    horario_inicio_martes       = auto()
+    horario_fin_martes          = auto()
+    horario_cerrado_martes      = auto()
+    horario_inicio_miércoles    = auto()
+    horario_fin_miércoles       = auto()
+    horario_cerrado_miércoles   = auto()
+    horario_inicio_jueves       = auto()
+    horario_fin_jueves          = auto()
+    horario_cerrado_jueves      = auto()
+    horario_inicio_viernes      = auto()
+    horario_fin_viernes         = auto()
+    horario_cerrado_viernes     = auto()
+    horario_inicio_sábado       = auto()
+    horario_fin_sábado          = auto()
+    horario_cerrado_sábado      = auto()
+    horario_inicio_domingo      = auto()
+    horario_fin_domingo         = auto()
+    horario_cerrado_domingo     = auto()
+    nombre                      = auto()
+    preferir_no_usar            = auto()
+
+    def desempacar_día_y_rol_horario(self) -> tuple[Día, RolHorario]:
+        '''Sólo válido para roles de horarios.'''
+        return (
+            Día(       (self - Rol.horario_inicio_lunes) // len(RolHorario)),
+            RolHorario((self - Rol.horario_inicio_lunes) %  len(RolHorario))
+        )
 
 ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
-    i + ROL_BASE: QByteArray(rolename.encode())
-    for i, rolename in enumerate(NOMBRES_DE_ROLES)
+    rol.value: QByteArray(rol.name.encode())
+    for rol in Rol
 }
 
 EQUIVALENTE_24_HORAS: time = time.max
 '''
 '24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
 '''
-
-def día_de_rol_horario(rol: int) -> Día:
-    return Día((rol - ROL_PRIMER_HORARIO) // 3)
-
-def es_rol_horario_inicio(rol: int) -> bool:
-    return (rol % 3) == MOD_3_ROL_HORARIO_INICIO
-
-def es_rol_horario_cerrado(rol: int) -> bool:
-    return (rol % 3) == MOD_3_ROL_HORARIO_CERRADO
 
 class ListEdificios(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
@@ -86,24 +82,26 @@ class ListEdificios(QAbstractListModel):
         if not index.isValid(): return None
         if role not in ROLES_A_NOMBRES_QT: return None
 
+        rol = Rol(role)
         # TODO: Sandboxear llamadas al gestor? Está bueno crashear cuando
         # debugeamos pero en release quizás querríamos impedir eso
         edificio: Edificio = self.gestor.get_edificio(index.row())
 
-        if role == ROL_NOMBRE:
+        if rol == Rol.nombre:
             return edificio.nombre
-        elif role == ROL_PREFERIR_NO_USAR:
+        elif rol == Rol.preferir_no_usar:
             return edificio.preferir_no_usar
         else: # Es un rol horario
-            día: Día = día_de_rol_horario(role)
+            día, rol_horario = rol.desempacar_día_y_rol_horario()
             rango_horario: RangoHorario = edificio.horarios[día]
 
-            if es_rol_horario_cerrado(role):
+            if rol_horario == RolHorario.cerrado:
                 return rango_horario.cerrado
 
-            horario: time = rango_horario.inicio \
-                            if es_rol_horario_inicio(role) else \
-                            rango_horario.fin
+            horario: time = (
+                rango_horario.inicio if rol_horario == RolHorario.inicio else
+                rango_horario.fin
+            )
 
             # Transformar time a string con formato HH:MM
             if horario == EQUIVALENTE_24_HORAS:
@@ -116,10 +114,12 @@ class ListEdificios(QAbstractListModel):
         if not index.isValid(): return False
         if role not in ROLES_A_NOMBRES_QT: return False
 
-        logger.debug(f'Editando {NOMBRES_DE_ROLES[role - ROL_BASE]}')
+        rol = Rol(role)
+        logger.debug(f'Editando {rol.name}')
+
         edificio: Edificio = self.gestor.get_edificio(index.row())
 
-        if role == ROL_NOMBRE:
+        if rol == Rol.nombre:
             if not isinstance(value, str):
                 logger.debug(
                     f'No se puede asignar el valor "{value}" de tipo'
@@ -140,7 +140,7 @@ class ListEdificios(QAbstractListModel):
 
             edificio.nombre = value.strip()
 
-        elif role == ROL_PREFERIR_NO_USAR:
+        elif rol == Rol.preferir_no_usar:
             if not isinstance(value, bool):
                 logger.debug(
                     f'No se puede asignar el valor "{value}" de tipo'
@@ -151,10 +151,10 @@ class ListEdificios(QAbstractListModel):
             edificio.preferir_no_usar = value
 
         else: # Es un rol horario
-            día: Día = día_de_rol_horario(role)
+            día, rol_horario = rol.desempacar_día_y_rol_horario()
             rango_horario: RangoHorario = edificio.horarios[día]
 
-            if es_rol_horario_cerrado(role):
+            if rol_horario == RolHorario.cerrado:
                 if not isinstance(value, bool):
                     logger.debug(
                         f'No se puede asignar el valor "{value}" de tipo'
@@ -180,7 +180,7 @@ class ListEdificios(QAbstractListModel):
 
                 # Asignar inicio o fin del rango horario si no resulta en un
                 # rango inválido (i.e.: con inicio >= fin)
-                if es_rol_horario_inicio(role):
+                if rol_horario == RolHorario.inicio:
                     if value >= rango_horario.fin: return False
                     rango_horario.inicio = value
                 else:

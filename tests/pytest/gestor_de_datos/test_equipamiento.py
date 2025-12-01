@@ -10,13 +10,13 @@ def test_empieza_todo_vacío(gestor: GestorDeDatos):
     assert gestor.get_equipamientos_existentes() == []
 
     # Agregar una clase no agrega equipamiento
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
     assert gestor.get_equipamientos_existentes() == []
 
 def test_agregar_equipamiento_a_clase(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
     gestor.agregar_equipamiento_a_clase(0, 0, 0, 'Proyector')
@@ -37,7 +37,7 @@ def test_agregar_y_quitar_equipamiento_a_aula(gestor: GestorDeDatos):
     assert gestor.get_equipamientos_existentes() == ['Compus']
 
 def test_agregar_y_quitar_equipamiento_a_clase(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
     gestor.agregar_equipamiento_a_clase(0, 0, 0, 'Proyector')
@@ -50,7 +50,7 @@ def test_agregar_y_quitar_equipamiento_a_clase(gestor: GestorDeDatos):
     assert gestor.get_equipamientos_existentes() == ['Proyector']
 
 def test_agregar_y_quitar_equipamientos_en_varios_lugares(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)

@@ -33,8 +33,9 @@ de python.
     generar las plantillas excel. Se puede omitir cualquiera de los tres extras
     si no se va a usar.
 
-4. El archivo que hay que ejecutar para usar el programa (sin empaquetar) es
-   `src/asignacion_aulica/main.py`.
+4. El programa (sin empaquetar) se puede ejecutar con el comando `asignacion-aulica`.
+
+   Alternativamente, se puede ejecutar el archivo `src/asignacion_aulica/main.py`.
 
 **Tests unitarios:**
 

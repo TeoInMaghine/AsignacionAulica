@@ -1,9 +1,17 @@
+from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
-from asignacion_aulica.GUI.modelos.equipamiento_model import ListEquipamientosDeAula
+from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAula
 from PyQt6.QtQml import qmlRegisterType
 
+modelos_registrados: list[type] = []
+'''
+Guardamos referencias a los modelos registrados para que el GC no piense que
+puede limpiar las clases wrapper cuando sale de este scope. Literal python
+crashea si no.
+*Achievement unlocked: use after free error in python.*
+'''
 
 def agregar_defaults_al_constructor(clase: type, **defaults) -> type:
     '''
@@ -26,15 +34,8 @@ def registrar_modelos_qml(gestor_de_datos: GestorDeDatos):
 
     :param gestor_de_datos: El gestor de datos a pasarle a los modelos.
     '''
-    # Esta línea es para que el GC no piense que puede limpiar las clases
-    # wrapper cuando sale de este scope. Literal python crashea si no.
-    # *Achievement unlocked: use after free error in python.*
-    global _ListAulas, _ListEquipamientosDeAula, _ListEdificios
-
-    _ListEdificios = agregar_defaults_al_constructor(ListEdificios, gestor=gestor_de_datos)
-    _ListAulas = agregar_defaults_al_constructor(ListAulas, gestor=gestor_de_datos)
-    _ListEquipamientosDeAula = agregar_defaults_al_constructor(ListEquipamientosDeAula, gestor=gestor_de_datos)
-
-    qmlRegisterType(_ListEdificios, 'ModelosAsignaciónÁulica'.encode(), 1, 0, 'ListEdificios')
-    qmlRegisterType(_ListAulas, 'ModelosAsignaciónÁulica'.encode(), 1, 0, 'ListAulas')
-    qmlRegisterType(_ListEquipamientosDeAula, 'ModelosAsignaciónÁulica'.encode(), 1, 0, 'ListEquipamientosDeAula')
+    qml_module = 'ModelosAsignaciónÁulica'.encode()
+    for modelo in (ListEdificios, ListAulas, ListEquipamientosDeAula, ListCarreras):
+        modelo_wrapeado = agregar_defaults_al_constructor(modelo, gestor=gestor_de_datos)
+        qmlRegisterType(modelo_wrapeado, qml_module, 1, 0, modelo.__name__)
+        modelos_registrados.append(modelo_wrapeado)

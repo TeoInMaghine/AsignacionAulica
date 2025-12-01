@@ -327,17 +327,27 @@ class GestorDeDatos:
         '''
         return self._carreras[índice]
 
-    def agregar_carrera(self):
+    def agregar_carrera(self, nombre: str) -> int:
         '''
-        Añadir al edificio una nueva carrera, después del último índice
-        existente.
+        Añadir una nueva carrera con el nombre dado, inicializada con valores
+        por defecto.
 
-        Se inicializa con valores por defecto, asegurando que tenga un nombre
-        único.
+        :return: El índice de la nueva carrera.
+        :raise ValueError: Si `nombre` está vacío o si ya existe una carrera con
+        el mismo nombre.
         '''
-        nombres_existentes = [carrera.nombre for carrera in self._carreras]
-        nombre_nuevo = _generar_nombre_no_existente('Carrera sin nombre', nombres_existentes)
-        self._carreras.append(Carrera(nombre_nuevo))
+        logger.info(f'Agregando carrera: {nombre}')
+        
+        nombre = nombre.strip()
+        if not nombre:
+            raise ValueError('No se puede agregar una carrera son nombre vacío.')
+        if self.existe_carrera(nombre):
+            raise ValueError(f'Ya existe una carrera llamada {nombre}.')
+
+        nueva = Carrera(nombre)
+        self._carreras.append(nueva)
+        self._carreras.sort(key=lambda carrera: carrera.nombre.lower())
+        return self._carreras.index(nueva)
     
     def existe_carrera(self, nombre: str) -> bool:
         '''
@@ -406,7 +416,7 @@ class GestorDeDatos:
         '''
         return len(self._carreras[carrera].materias)
 
-    def get_materia(self, carrera: int, materia: int) -> Clase:
+    def get_materia(self, carrera: int, materia: int) -> Materia:
         '''
         Obtener la materia (no una copia), la cual puede inspeccionarse, y
         algunos de sus miembros modificarse directamente:

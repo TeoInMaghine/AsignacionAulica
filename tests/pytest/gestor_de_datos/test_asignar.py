@@ -15,7 +15,7 @@ def test_asignar(gestor: GestorDeDatos):
     aula: Aula = gestor.get_aula(0, 0)
     aula.horarios = horarios_aula
 
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.agregar_clase(0, 0)
     clase: Clase = gestor.get_clase(0, 0, 0)

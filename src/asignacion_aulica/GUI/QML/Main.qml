@@ -3,6 +3,7 @@ import QtQuick.Controls
 import QtQuick.Window
 import QtQuick.Layouts
 import QML.Edificios
+import QML.Carreras
 import QML.BarraLateral
 
 Window {
@@ -53,12 +54,12 @@ Window {
 
     Component {
         id: pestañaMaterias
-        Rectangle {
-            Text {
-                anchors.centerIn: parent
-                text: "Materias"
-                font.pixelSize: 24
-            }
+        
+        ScrollView{
+            width: parent.width
+            height: parent.height
+            
+            EditorDeCarreras { }
         }
     }
 }

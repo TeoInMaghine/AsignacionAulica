@@ -2,6 +2,7 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.VectorImage
 import QtQuick.Layouts
+import QML.ComponentesUI as ComponentesUI
 
 // El botón de una pestaña.
 Button {
@@ -21,7 +22,7 @@ Button {
         }
         Text {
             text: self.nombre
-            font.pointSize: Constantes.pestaña_texto_altura
+            font.pointSize: ComponentesUI.FontSize.bigger
             color: "white"
             horizontalAlignment: Text.AlignHLeft
             verticalAlignment: Text.AlignVCenter
@@ -32,9 +33,9 @@ Button {
     }
     
     background: Rectangle {
-        color: self.pressed ? Constantes.rojo_unrn_oscurísimo :
+        color: self.pressed ? ComponentesUI.Constantes.rojo_unrn_oscurísimo :
             sidebar.pestaña_actual === self.nombre || self.hovered ?
-            Constantes.rojo_unrn_oscuro : Constantes.rojo_unrn
+            ComponentesUI.Constantes.rojo_unrn_oscuro : ComponentesUI.Constantes.rojo_unrn
 
         Behavior on color {
             ColorAnimation {

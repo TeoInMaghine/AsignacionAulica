@@ -37,7 +37,7 @@ ListView {
             Layout.margins: 10
             text: "Todavía no hay aulas registradas"
             visible: view.count === 0
-            font.pixelSize: 18
+            font.pointSize: FontSize.medium
         }
     }
 
@@ -96,10 +96,10 @@ ListView {
         height: footerAulas.height + view.spacing
         width: footerAulas.width
 
-        BotónAñadir {
+        BotónRedondeadoConTexto {
             id: footerAulas
+            text: "+ Aula"
             anchors.bottom: parent.bottom
-            width: 75
 
             onClicked: {
                 aulas.insertRow(aulas.rowCount())

@@ -73,26 +73,21 @@ ComboBox {
 
             footer: RowLayout {
                 width: parent.width
-                spacing: 5
-                readonly property int leftMargin: 8
-                readonly property int rightMargin: 5
-                readonly property int bottomMargin: 5
+                spacing: 0
 
-                BotónAñadir {
-                    Layout.leftMargin: leftMargin
-                    Layout.bottomMargin: bottomMargin
-                    Layout.alignment: Qt.AlignVCenter
+                BotónAgregar {
+                    Layout.margins: 5
+                    Layout.rightMargin: 0
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
                     onClicked: editorNuevoEquipamiento.accepted()
                 }
                 TextField {
                     id: editorNuevoEquipamiento
-                    Layout.rightMargin: rightMargin
-                    Layout.bottomMargin: bottomMargin
+                    Layout.margins: 5
                     Layout.fillWidth: true
 
                     horizontalAlignment: TextInput.AlignRight
-
                     placeholderText: "Nuevo"
 
                     onAccepted: {

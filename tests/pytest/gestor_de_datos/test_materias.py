@@ -9,11 +9,11 @@ def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
         gestor.cantidad_de_materias(0)
     
     # Al agregar una carrera, no tiene ninguna materia:
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     assert gestor.cantidad_de_materias(0) == 0
 
-def test_agregar_materia_genera_valores_default(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+def test_agregar_materia_genera_valores_deafult(gestor: GestorDeDatos):
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
 
     materia_1: Materia = gestor.get_materia(0, 0)
@@ -34,8 +34,8 @@ def test_add_varias_materias(gestor: GestorDeDatos):
     Probar que si se agregan varias materias, todas se agregan con nombres
     distintos.
     '''
-    gestor.agregar_carrera()
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
+    gestor.agregar_carrera('1')
     for _ in range(10):
         gestor.agregar_materia(0)
     for _ in range(4):
@@ -56,7 +56,7 @@ def test_add_varias_materias(gestor: GestorDeDatos):
     assert gestor.get_materia(0, 0).carrera is not gestor.get_materia(1, 0).carrera
 
 def test_materia_existe_o_no(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
 
     # Al principio no existe
     assert not gestor.existe_materia(0, 'pepito')
@@ -78,13 +78,13 @@ def test_get_fuera_de_rango(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
         gestor.get_materia(0, 0)
 
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('a')
 
     with pytest.raises(IndexError):
         gestor.get_materia(0, 0)
 
 def test_ordenar_materias(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
 
     # Ordenar cuando no hay materias no debería tener ningún efecto:
     gestor.ordenar_materias(0)
@@ -107,7 +107,7 @@ def test_ordenar_materias(gestor: GestorDeDatos):
     assert gestor.get_materia(0, 2).nombre == 'd'
 
 def test_borrar_materia(gestor: GestorDeDatos):
-    gestor.agregar_carrera()
+    gestor.agregar_carrera('0')
     gestor.agregar_materia(0)
     gestor.get_materia(0, 0).nombre = 'a'
     gestor.agregar_materia(0)

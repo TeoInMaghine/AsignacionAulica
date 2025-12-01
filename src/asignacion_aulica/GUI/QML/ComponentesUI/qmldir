@@ -1,11 +1,14 @@
 module QML.ComponentesUI
-BotónAñadir BotónAñadir.qml
 BotónBorrar BotónBorrar.qml
+BotónAgregar BotónAgregar.qml
+BotónRedondeadoConTexto BotónRedondeadoConTexto.qml
+BotónRedondeadoConTextoColorUNRN BotónRedondeadoConTextoColorUNRN.qml
 Colapsador Colapsador.qml
-SelectorEquipamiento SelectorEquipamiento.qml
-EditorHorariosSemanales EditorHorariosSemanales.qml
-HeaderHorariosSemanales HeaderHorariosSemanales.qml
-EditorRangoHorario EditorRangoHorario.qml
 EditorHorario EditorHorario.qml
+EditorHorariosSemanales EditorHorariosSemanales.qml
+EditorRangoHorario EditorRangoHorario.qml
+HeaderHorariosSemanales HeaderHorariosSemanales.qml
+SelectorEquipamiento SelectorEquipamiento.qml
 singleton Constantes Constantes.qml
+singleton FontSize FontSize.qml
 TextFieldConEnter TextFieldConEnter.qml

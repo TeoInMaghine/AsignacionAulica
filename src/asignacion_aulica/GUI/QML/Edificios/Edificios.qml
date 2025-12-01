@@ -20,7 +20,7 @@ ListView {
     header: Label {
         text: "Todavía no hay edificios registrados"
         visible: view.count === 0
-        font.pixelSize: 20
+        font.pointSize: FontSize.big
     }
 
     delegate: ColumnLayout {
@@ -115,13 +115,13 @@ ListView {
         height: footerEdificios.height + view.spacing
         width: footerEdificios.width
 
-        BotónAñadir {
+        BotónRedondeadoConTexto {
             id: footerEdificios
+            text: "+ Edificio"
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.topMargin: view.spacing
             anchors.leftMargin: 10
-            width: 75
 
             onClicked: {
                 edificios.insertRow(edificios.rowCount())

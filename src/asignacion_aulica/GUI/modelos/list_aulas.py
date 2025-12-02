@@ -62,6 +62,11 @@ ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
     for rol in Rol
 }
 
+ROLES_DEL_DÍA: tuple[tuple[int, ...], ...] = tuple(
+    tuple(Rol.horario_inicio_lunes + len(RolHorario) * día + i for i in RolHorario)
+    for día in Día
+)
+
 EQUIVALENTE_24_HORAS: time = time.max
 '''
 '24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
@@ -205,13 +210,7 @@ class ListAulas(QAbstractListModel):
             if not rango_horario:
                 rango_horario = copy(aula.edificio.horarios[día])
                 aula.horarios[día] = rango_horario
-                # Actualizar los roles del horario de este día
-                primer_rol_de_este_día: int = Rol.horario_inicio_lunes + len(RolHorario) * día
-                roles_del_día = list(range(
-                    primer_rol_de_este_día,
-                    primer_rol_de_este_día + len(RolHorario)
-                ))
-                self.dataChanged.emit(index, index, roles_del_día)
+                self.dataChanged.emit(index, index, ROLES_DEL_DÍA[día])
 
             if rol_horario == RolHorario.cerrado:
                 if not isinstance(value, bool):

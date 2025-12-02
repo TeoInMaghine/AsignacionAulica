@@ -3,50 +3,72 @@ import QtQuick.Controls
 import QtQuick.Layouts
 
 RowLayout {
-    property var entidad_padre
     required property var entidad
-    required property string rolDeHorarioInicio
-    required property string rolDeHorarioFin
+    required property string rolHorarioInicio
+    required property string rolHorarioFin
+    required property string rolHorarioCerrado
 
-    readonly property int textFieldWidth : 45
+    spacing: Constantes.spacing_horario
+
+    // Editores de horarios que se muestran cuando el rango horario está abierto
     readonly property int textFieldPadding : 2
-    spacing: 2
-
-    // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
-    // en la lista de clases) para resetear el horario al del edificio (por
-    // ejemplo con un ícono tipo 🔄), solo interactuable si el usuario cambió
-    // el horario.
-
     EditorHorario {
-        Layout.preferredWidth: textFieldWidth
-        Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+        id: horarioInicio
+        visible: !entidad[rolHorarioCerrado]
+
+        Layout.preferredWidth: Constantes.width_editor_horario
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        // Des-enfatizar texto cuando se usa el horario de la entidad padre
-        color: entidad[rolDeHorarioInicio] ? palette.dark : palette.mid
-        // Si no se especifica el horario, mostrar el de la entidad padre
-        text: entidad[rolDeHorarioInicio] ?
-              entidad[rolDeHorarioInicio] :
-              entidad_padre[rolDeHorarioInicio]
+        text: entidad[rolHorarioInicio]
         onEditingFinished: {
-            entidad[rolDeHorarioInicio] = text
+            entidad[rolHorarioInicio] = text
+        }
+        onChangeText: function(newText) {
+            entidad[rolHorarioInicio] = newText
         }
     }
     EditorHorario {
-        Layout.preferredWidth: textFieldWidth
-        Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+        id: horarioFin
+        visible: !entidad[rolHorarioCerrado]
+
+        Layout.preferredWidth: Constantes.width_editor_horario
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        // Des-enfatizar texto cuando se usa el horario de la entidad padre
-        color: entidad[rolDeHorarioFin] ? palette.dark : palette.mid
-        // Si no se especifica el horario, mostrar el de la entidad padre
-        text: entidad[rolDeHorarioFin] ?
-              entidad[rolDeHorarioFin] :
-              entidad_padre[rolDeHorarioFin]
+        text: entidad[rolHorarioFin]
         onEditingFinished: {
-            entidad[rolDeHorarioFin] = text
+            entidad[rolHorarioFin] = text
         }
+        onChangeText: function(newText) {
+            entidad[rolHorarioFin] = newText
+        }
+    }
+
+    // Elemento que se muestra cuando el rango horario está cerrado
+    Label {
+        visible: entidad[rolHorarioCerrado]
+
+        // Ocupa el mismo espacio que los editores de horarios
+        Layout.preferredWidth: Constantes.width_editores_horarios
+        Layout.preferredHeight: horarioInicio.height
+
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        font.bold: true
+        text: "Cerrado"
+
+        background: Rectangle {
+            border.width: 1
+            border.color: horarioInicio.palette.mid
+        }
+    }
+
+    Candado {
+        Layout.preferredWidth: Constantes.width_horario_sideButtons
+        Layout.preferredHeight: Constantes.width_horario_sideButtons
+
+        checked: entidad[rolHorarioCerrado]
+        onClicked: entidad[rolHorarioCerrado] = checked
     }
 }

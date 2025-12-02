@@ -106,7 +106,11 @@ def no_asignar_en_aula_cerrada(
     '''
     for i_clase, clase, i_aula, aula in _combinaciones_de_clases_y_aulas(clases, aulas):
         horario_aula = aula.horarios[clase.día]
-        aula_está_cerrada = horario_aula.inicio > clase.horario.inicio or horario_aula.fin < clase.horario.fin
+        aula_está_cerrada = (
+            horario_aula.cerrado
+            or horario_aula.inicio > clase.horario.inicio
+            or horario_aula.fin < clase.horario.fin
+        )
         if aula_está_cerrada:
             yield (i_clase, i_aula)
 

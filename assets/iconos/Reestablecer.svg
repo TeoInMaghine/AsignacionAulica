@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="44"
+   height="40"
+   viewBox="0 0 44 40"
+   fill="none"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="Reestablecer.svg"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#eeeeee"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="7.5572037"
+     inkscape:cx="8.5349029"
+     inkscape:cy="13.563218"
+     inkscape:window-width="1858"
+     inkscape:window-height="1057"
+     inkscape:window-x="54"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <path
+     d="M 4.1170312,5.6770684 V 16.406721 m 0,0 H 14.84672 m -10.7296888,0 8.2976258,-7.7968711 c 2.469438,-2.465289 5.673233,-4.0612407 9.12864,-4.547385 3.455317,-0.4861533 6.975102,0.1638334 10.02895,1.8520247 3.053848,1.6881913 5.476254,4.3231344 6.902319,7.5077684 1.426155,3.184751 1.778625,6.74656 1.004299,10.149034 -0.774236,3.402384 -2.633244,6.460971 -5.296979,8.71501 -2.663734,2.25395 -5.987881,3.581123 -9.471543,3.781679 -3.483572,0.200466 -6.937995,-0.736593 -9.84279,-2.670083"
+     stroke="#1E1E1E"
+     stroke-width="4"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     id="path1"
+     style="stroke:#000000;stroke-width:5.312;stroke-dasharray:none;stroke-opacity:1"
+     sodipodi:nodetypes="cccccccsccccc" />
+</svg>

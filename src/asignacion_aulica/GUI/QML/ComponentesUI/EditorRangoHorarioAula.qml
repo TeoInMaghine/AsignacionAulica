@@ -16,11 +16,6 @@ RowLayout {
 
     spacing: Constantes.spacing_horario
 
-    // TODO: Agregar botón (que se pueda deshabilitar si se usa este componente
-    // en la lista de clases) para resetear el horario al del edificio (por
-    // ejemplo con un ícono tipo 🔄), solo interactuable si el usuario cambió
-    // el horario.
-
     // Editores de horarios que se muestran cuando el rango horario está abierto
     readonly property int textFieldPadding : 2
     EditorHorario {
@@ -87,13 +82,29 @@ RowLayout {
         }
     }
 
-    Candado {
+    // Side buttons
+    ColumnLayout {
         Layout.preferredWidth: Constantes.width_horario_sideButtons
-        Layout.preferredHeight: Constantes.width_horario_sideButtons
+        spacing: Constantes.spacing_horario
 
-        // Des-enfatizar candado cuando se usa el horario del edificio
-        opacity: aula[rolAulaTieneHorarioPropio] ? 1.0 : 0.5
-        checked: horarioCerrado
-        onClicked: aula[rolHorarioCerrado] = checked
+        Reestablecer {
+            Layout.preferredWidth: Constantes.width_horario_sideButtons
+            Layout.preferredHeight: Constantes.width_horario_sideButtons
+
+            // Deshabilitar cuando ya se usa el horario del edificio
+            enabled: aula[rolAulaTieneHorarioPropio]
+            opacity: aula[rolAulaTieneHorarioPropio] ? 1.0 : 0.5
+            highlighted: aula[rolAulaTieneHorarioPropio] ? hovered : false
+            onClicked: aula[rolAulaTieneHorarioPropio] = true
+        }
+        Candado {
+            Layout.preferredWidth: Constantes.width_horario_sideButtons
+            Layout.preferredHeight: Constantes.width_horario_sideButtons
+
+            // Des-enfatizar candado cuando se usa el horario del edificio
+            opacity: aula[rolAulaTieneHorarioPropio] ? 1.0 : 0.5
+            checked: horarioCerrado
+            onClicked: aula[rolHorarioCerrado] = checked
+        }
     }
 }

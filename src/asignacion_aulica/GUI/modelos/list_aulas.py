@@ -196,15 +196,20 @@ class ListAulas(QAbstractListModel):
 
         else: # Es un rol horario
             día, rol_horario = rol.desempacar_día_y_rol_horario()
-            rango_horario: RangoHorario|None = aula.horarios[día]
 
             if rol_horario == RolHorario.es_propio:
-                # TODO: Implementar esto cuando tengamos el botón
-                # correspondiente en la UI.
-                logger.debug(
-                     f'No implementado aún; por ahora {rol.nombre} es read-only.'
-                )
-                return False
+                if value != True:
+                    logger.debug(
+                        f'El valor "{value}" de tipo {type(value)} no es '
+                        f'válido para "horario es propio", sólo admite {True}.'
+                    )
+                    return False
+
+                aula.horarios[día] = None
+                self.dataChanged.emit(index, index, [role])
+                return True
+
+            rango_horario: RangoHorario|None = aula.horarios[día]
 
             # Si antes el aula no especificaba el horario, hacer que lo haga
             if not rango_horario:

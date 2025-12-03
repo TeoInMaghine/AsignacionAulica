@@ -407,6 +407,7 @@ class GestorDeDatos:
 
         :raise IndexError: Si el índice está fuera de rango.
         '''
+        logger.info('Borrando carrera %s', self._carreras[índice].nombre)
         del self._carreras[índice]
 
     def cantidad_de_materias(self, carrera: int) -> int:

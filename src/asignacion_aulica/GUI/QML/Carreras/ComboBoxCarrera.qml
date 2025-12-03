@@ -13,15 +13,7 @@ ComboBox {
     required property var modelo_de_carreras
     property bool hayCarreraSeleccionada: comboBox.currentIndex >= 0
 
-    /** Emitir esta señal para borrar la carrera actual. */
-    signal borrar
-
     model: modelo_de_carreras
-
-    onBorrar: {
-        var nuevoÍndice = modelo_de_carreras.borrarCarrera(comboBox.currentIndex)
-        comboBox.currentIndex = nuevoÍndice
-    }
 
     Layout.preferredWidth: 350
 

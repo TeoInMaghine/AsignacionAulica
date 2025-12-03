@@ -45,6 +45,7 @@ RowLayout {
     BotónRedondeadoConTexto {
         text: "Editar Nombre"
         enabled: comboBox.hayCarreraSeleccionada
+        icon.source: assets_path + "/iconos/editar.png"
         onClicked: {
             inputEditarNombre.text = comboBox.currentText
             inputEditarNombre.focus = true
@@ -55,6 +56,7 @@ RowLayout {
     BotónRedondeadoConTexto {
         text: "Borrar Carrera"
         enabled: comboBox.hayCarreraSeleccionada
+        icon.source: assets_path + "/iconos/Borrar.svg"
         onClicked: confirmaciónBorrar.open()
     }
 

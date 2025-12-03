@@ -367,6 +367,8 @@ class GestorDeDatos:
         :raise ValueError: Si ya existe una carrera con el nombre dado, o si el
         nombre dado es un string vacío.
         '''
+        logger.info('Renombrar carrera %s a %s', self._carreras[índice].nombre, nombre)
+        
         nombre = nombre.strip()
         if len(nombre) == 0:
             raise ValueError('El nombre de la carrera no puede estar vacío.')

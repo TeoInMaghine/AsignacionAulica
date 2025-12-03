@@ -22,7 +22,7 @@ class ListCarreras(QAbstractListModel):
         # Nombres de las carreras existentes.
         # Acordarse de actualizarla cuando puede haber cambios.
         self.carreras_existentes: list[str]
-        self.actualizarLista()
+        self._actualizarLista()
         
     @override
     def roleNames(self) -> dict[int, QByteArray]:
@@ -56,20 +56,30 @@ class ListCarreras(QAbstractListModel):
             return -2
 
         índice = self.gestor.agregar_carrera(nombre)
-        self.actualizarLista()
+        self._actualizarLista()
         return índice
     
-    @pyqtSlot(int)
-    def borrarCarrera(self, índice: int):
+    @pyqtSlot(int, result=int)
+    def borrarCarrera(self, índice: int) -> int:
         '''
         Borrar una carrera del gestor de datos.
+
+        :return: El índice de la carrera que debería quedar seleccionada, 0 -1
+        si no quedan carreras.
         '''
-        if índice >= 0:
+        # Índices inválidos: dejar seleccionada la última carrera
+        # o -1 si no hay carreras.
+        if índice < 0 or índice >= len(self.carreras_existentes):
+            return len(self.carreras_existentes) - 1
+        else:
             self.gestor.borrar_carrera(índice)
-            self.actualizarLista()
-    
-    @pyqtSlot()
-    def actualizarLista(self):
+            self._actualizarLista()
+            # Mantener el mismo índice, excepto que quede fuera de rango y ahí
+            # dejamos seleccionada la última carrera de la lista o -1 si no
+            # quedó ninguna carrera.
+            return min(índice, len(self.carreras_existentes) - 1)
+
+    def _actualizarLista(self):
         logger.debug('Actualizando lista de carreras')
         self.beginResetModel()
         self.carreras_existentes = self.gestor.get_carreras()

@@ -12,14 +12,20 @@ ComboBox {
     id: comboBox
 
     property bool hayCarreraSeleccionada: comboBox.currentIndex >= 0
+
+    /** Emitir esta señal para borrar la carrera actual. */
     signal borrar
-    onBorrar: lista_de_carreras.borrarCarrera(comboBox.currentIndex)
+
+    model: ListCarreras { id: lista_de_carreras }
+
+    onBorrar: {
+        var nuevoÍndice = lista_de_carreras.borrarCarrera(comboBox.currentIndex)
+        comboBox.currentIndex = nuevoÍndice
+    }
 
     Layout.preferredWidth: 350
 
     displayText: hayCarreraSeleccionada ? currentText : "Ninguna"
-
-    model: ListCarreras { id: lista_de_carreras }
 
     popup: Popup {
         id: popup

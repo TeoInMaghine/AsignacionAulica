@@ -1,13 +1,15 @@
 import logging
 from enum import IntEnum, auto
-from datetime import time, datetime
+from datetime import time
 from copy import copy
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Aula
-from asignacion_aulica.gestor_de_datos.días_y_horarios import Día, RangoHorario
+from asignacion_aulica.gestor_de_datos.días_y_horarios import (
+    Día, RangoHorario, parse_string_horario_to_time, time_to_string_horario
+)
 
 logger = logging.getLogger(__name__)
 
@@ -66,20 +68,6 @@ ROLES_DEL_DÍA: tuple[tuple[int, ...], ...] = tuple(
     tuple(Rol.horario_inicio_lunes + len(RolHorario) * día + i for i in RolHorario)
     for día in Día
 )
-
-EQUIVALENTE_24_HORAS: time = time.max
-'''
-'24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
-'''
-
-def parse_string_horario_to_time(value: str) -> time:
-    '''
-    Transformar string con formato HH:MM a time.
-    '''
-    if value == '24:00':
-        return EQUIVALENTE_24_HORAS
-
-    return datetime.strptime(value, '%H:%M').time()
 
 
 class ListAulas(QAbstractListModel):
@@ -149,11 +137,7 @@ class ListAulas(QAbstractListModel):
                 rango_horario.fin
             )
 
-            # Transformar time a string con formato HH:MM
-            if horario == EQUIVALENTE_24_HORAS:
-                return '24:00'
-            else:
-                return horario.strftime('%H:%M')
+            return time_to_string_horario(horario)
 
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:

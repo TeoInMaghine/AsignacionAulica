@@ -59,6 +59,15 @@ class ListCarreras(QAbstractListModel):
         self.actualizarLista()
         return índice
     
+    @pyqtSlot(int)
+    def borrarCarrera(self, índice: int):
+        '''
+        Borrar una carrera del gestor de datos.
+        '''
+        if índice >= 0:
+            self.gestor.borrar_carrera(índice)
+            self.actualizarLista()
+    
     @pyqtSlot()
     def actualizarLista(self):
         logger.debug('Actualizando lista de carreras')

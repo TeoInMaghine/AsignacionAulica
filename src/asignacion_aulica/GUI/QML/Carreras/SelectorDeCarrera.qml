@@ -10,16 +10,23 @@ import ModelosAsignaciónÁulica
 RowLayout {
     spacing: 10
 
+    ListCarreras { id: modelo_de_carreras }
+
     Label{
         text: "Carrera: "
         font.pointSize: FontSize.big
     }
 
-    ComboBoxCarrera{ id: comboBox }
+    ComboBoxCarrera{
+        id: comboBox
+        modelo_de_carreras: modelo_de_carreras
+        visible: true
+    }
 
     BotónRedondeadoConTexto {
         text: "Cambiar Nombre"
         enabled: comboBox.hayCarreraSeleccionada
+        onClicked: inputEditarNombre.createObject()
     }
 
     BotónRedondeadoConTexto {
@@ -28,15 +35,15 @@ RowLayout {
         onClicked: confirmaciónBorrar.open()
     }
 
-    // Diálogo solamente visible al clickear el botón de borrar:
+    // Solamente visible al clickear el botón de borrar:
     Dialog {
         id: confirmaciónBorrar
         title: "¿Borrar la carrera?"
         standardButtons: Dialog.Ok | Dialog.Cancel
 
         onAccepted: {
-            console.log("Ok clicked")
-            comboBox.borrar()
+            var nuevoÍndice = modelo_de_carreras.borrarCarrera(comboBox.currentIndex)
+            comboBox.currentIndex = nuevoÍndice
         }
         onRejected: console.log("Cancel clicked")
 
@@ -46,6 +53,14 @@ RowLayout {
             text: "Se perderá toda la información de la carrera " + comboBox.currentText + "."
             wrapMode: Text.Wrap
             width: parent.width
+        }
+    }
+
+    // Solamente visible al clickear el botón de cambiar nombre:
+    Component {
+        id: inputEditarNombre
+        TextField {
+            anchors.fill: comboBox
         }
     }
 }

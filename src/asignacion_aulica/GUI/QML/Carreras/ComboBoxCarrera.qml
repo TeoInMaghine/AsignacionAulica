@@ -4,22 +4,22 @@ import QtQuick.Layouts
 import QML.ComponentesUI
 import ModelosAsignaciónÁulica
 
-/** Se encarga de determinar cual es la carrera actual.
- *  Eso también incluye agregar carreras, borrar carreras, y cambiar el nombre,
- *  porque esas operaciones cambian cuál es la carrera actual.
+/** Se encarga de determinar cual es la carrera actual, y de agregar carreras
+ * nuevas.
  */
 ComboBox {
     id: comboBox
 
+    required property var modelo_de_carreras
     property bool hayCarreraSeleccionada: comboBox.currentIndex >= 0
 
     /** Emitir esta señal para borrar la carrera actual. */
     signal borrar
 
-    model: ListCarreras { id: lista_de_carreras }
+    model: modelo_de_carreras
 
     onBorrar: {
-        var nuevoÍndice = lista_de_carreras.borrarCarrera(comboBox.currentIndex)
+        var nuevoÍndice = modelo_de_carreras.borrarCarrera(comboBox.currentIndex)
         comboBox.currentIndex = nuevoÍndice
     }
 
@@ -65,7 +65,7 @@ ComboBox {
                     placeholderText: "Nueva"
 
                     onAccepted: {
-                        var índice = lista_de_carreras.agregarCarrera(editorNuevaCarrera.text)
+                        var índice = modelo_de_carreras.agregarCarrera(editorNuevaCarrera.text)
                         if (índice >= 0) {
                             comboBox.currentIndex = índice
                             editorNuevaCarrera.clear()

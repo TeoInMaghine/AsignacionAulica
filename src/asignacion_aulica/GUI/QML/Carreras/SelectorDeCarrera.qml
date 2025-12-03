@@ -68,7 +68,6 @@ RowLayout {
             var nuevoÍndice = modelo_de_carreras.borrarCarrera(comboBox.currentIndex)
             comboBox.currentIndex = nuevoÍndice
         }
-        onRejected: console.log("Cancel clicked")
 
         width: 450 // Si no se define un esto, da error: QML Dialog: Binding loop detected for property "implicitWidth"
 

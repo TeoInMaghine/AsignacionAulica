@@ -4,112 +4,48 @@ import QtQuick.Layouts
 import QML.ComponentesUI
 import ModelosAsignaciónÁulica
 
-/** Dropdown para seleccionar una carrera o agregar una nueva. */
+/** Dropdown para seleccionar carrera.
+ *  También permite agregar, borrar, y cambiar nombre.
+ */
 RowLayout {
     spacing: 10
-
-    /** Es -1 cuando no hay ninguna carrera */
-    property int índiceDeLaCarreraActual: comboBox.currentIndex
 
     Label{
         text: "Carrera: "
         font.pointSize: FontSize.big
     }
 
-    ComboBox {
-        id: comboBox
-        Layout.preferredWidth: 350
+    ComboBoxCarrera{ id: comboBox }
 
-        displayText: currentText ? currentText : "Ninguna"
+    BotónRedondeadoConTexto {
+        text: "Cambiar Nombre"
+        enabled: comboBox.hayCarreraSeleccionada
+    }
 
-        model: ListCarreras {
-            id: lista_de_carreras
+    BotónRedondeadoConTexto {
+        text: "Borrar Carrera"
+        enabled: comboBox.hayCarreraSeleccionada
+        onClicked: confirmaciónBorrar.open()
+    }
+
+    // Diálogo solamente visible al clickear el botón de borrar:
+    Dialog {
+        id: confirmaciónBorrar
+        title: "¿Borrar la carrera?"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        onAccepted: {
+            console.log("Ok clicked")
+            comboBox.borrar()
         }
+        onRejected: console.log("Cancel clicked")
 
-        popup: Popup {
-            id: popup
-            y: comboBox.height - 1
-            width: comboBox.width
+        width: 450 // Si no se define un esto, da error: QML Dialog: Binding loop detected for property "implicitWidth"
 
-            // Para que el popup no se clippee con los bordes de la ventana:
-            topMargin: comboBox.height
-            bottomMargin: comboBox.height
-            height: Math.min(contentItem.implicitHeight, comboBox.Window.height - topMargin - bottomMargin)
-
-            padding: 0
-
-            contentItem: ListView {
-                clip: true
-                implicitHeight: contentHeight
-                model: comboBox.delegateModel
-                currentIndex: comboBox.highlightedIndex
-
-                Rectangle {
-                    width: parent.width
-                    height: parent.height
-                    color: "transparent"
-                    border.color: comboBox.palette.mid
-                }
-
-                footer: RowLayout {
-                    width: parent.width
-                    spacing: 0
-
-                    TextField {
-                        id: editorNuevaCarrera
-                        Layout.margins: 5
-                        Layout.fillWidth: true
-
-                        horizontalAlignment: TextInput.AlignLeft
-                        placeholderText: "Nueva"
-
-                        onAccepted: {
-                            var índice = lista_de_carreras.agregarCarrera(editorNuevaCarrera.text)
-                            if (índice >= 0) {
-                                comboBox.currentIndex = índice
-                                editorNuevaCarrera.clear()
-                                popup.close()
-                            }
-                            else{
-                                // TODO: reaccionar visualmente al input inválido
-                                editorNuevaCarrera.focus = false
-                            }
-                        }
-                    }
-                    BotónAgregar {
-                        Layout.margins: 5
-                        Layout.leftMargin: 0
-                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                        onClicked: editorNuevaCarrera.accepted()
-                    }
-                }
-
-                ScrollBar.vertical: ScrollBar { }
-            }
-
-            background: Item {
-                Rectangle {
-                    anchors.fill: parent
-                    color: comboBox.palette.window
-                }
-            }
-        }
-
-        // Override space key handling to toggle items when the popup is visible
-        Keys.onSpacePressed: (event) => {
-            if (comboBox.popup.visible) {
-                var currentItem = comboBox.popup.contentItem.currentItem
-                if (currentItem) {
-                    currentItem.toggle()
-                    event.accepted = true
-                }
-            }
-        }
-
-        Keys.onReleased: (event) => {
-            if (comboBox.popup.visible)
-                event.accepted = (event.key === Qt.Key_Space)
+        Text {
+            text: "Se perderá toda la información de la carrera " + comboBox.currentText + "."
+            wrapMode: Text.Wrap
+            width: parent.width
         }
     }
 }

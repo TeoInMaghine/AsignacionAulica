@@ -10,6 +10,8 @@ import ModelosAsignaciónÁulica
 RowLayout {
     spacing: 10
 
+    property bool estamosEditandoElNombre: false
+    
     ListCarreras { id: modelo_de_carreras }
 
     Label{
@@ -20,13 +22,34 @@ RowLayout {
     ComboBoxCarrera{
         id: comboBox
         modelo_de_carreras: modelo_de_carreras
-        visible: true
+        visible: !estamosEditandoElNombre
+    }
+
+    TextField {
+        id: inputEditarNombre
+        visible: estamosEditandoElNombre
+        Layout.preferredHeight: comboBox.height
+        Layout.preferredWidth: comboBox.Layout.preferredWidth
+
+        onAccepted: {
+            var nuevoÍndice = modelo_de_carreras.cambiarNombre(comboBox.currentIndex, inputEditarNombre.text)
+            comboBox.currentIndex = nuevoÍndice
+            estamosEditandoElNombre = false
+        }
+
+        Keys.onEscapePressed: {
+            estamosEditandoElNombre = false
+        }
     }
 
     BotónRedondeadoConTexto {
-        text: "Cambiar Nombre"
+        text: "Editar Nombre"
         enabled: comboBox.hayCarreraSeleccionada
-        onClicked: inputEditarNombre.createObject()
+        onClicked: {
+            inputEditarNombre.text = comboBox.currentText
+            inputEditarNombre.focus = true
+            estamosEditandoElNombre=true
+        }
     }
 
     BotónRedondeadoConTexto {
@@ -53,14 +76,6 @@ RowLayout {
             text: "Se perderá toda la información de la carrera " + comboBox.currentText + "."
             wrapMode: Text.Wrap
             width: parent.width
-        }
-    }
-
-    // Solamente visible al clickear el botón de cambiar nombre:
-    Component {
-        id: inputEditarNombre
-        TextField {
-            anchors.fill: comboBox
         }
     }
 }

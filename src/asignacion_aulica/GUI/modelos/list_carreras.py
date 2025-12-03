@@ -59,6 +59,27 @@ class ListCarreras(QAbstractListModel):
         self._actualizarLista()
         return índice
     
+    @pyqtSlot(int, str, result=int)
+    def cambiarNombre(self, índice: int, nuevo_nombre: str) -> int:
+        '''
+        Cambiar el nombre de una carrera existente.
+
+        :return: El nuevo índice de la carrera.
+        '''
+        # Índices inválidos: dejar seleccionada la última carrera
+        # o -1 si no hay carreras.
+        if índice < 0 or índice >= len(self.carreras_existentes):
+            return len(self.carreras_existentes) - 1
+        else:
+            try:
+                nuevo_índice = self.gestor.set_carrera_nombre(índice, nuevo_nombre)
+            except ValueError:
+                # Ignorar el error si el nuevo nombre no era válido
+                return índice
+            else:
+                self._actualizarLista()
+                return nuevo_índice
+    
     @pyqtSlot(int, result=int)
     def borrarCarrera(self, índice: int) -> int:
         '''

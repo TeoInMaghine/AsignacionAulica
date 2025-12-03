@@ -289,14 +289,13 @@ class ListAulas(QAbstractListModel):
                 return False
 
             rango_horario.inicio = horario
-            return True
-
         else:
             if horario <= rango_horario.inicio:
                 return False
 
             rango_horario.fin = horario
-            return True
+
+        return True
 
     @override
     def removeRows(self, row: int, count: int, parent: QModelIndex|None = None) -> bool:

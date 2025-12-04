@@ -1,14 +1,20 @@
+from enum import IntEnum, auto
 import logging
 from typing import Any, override
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSignal, pyqtSlot
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 
 logger = logging.getLogger(__name__)
 
-ROL_NOMBRE: int = Qt.ItemDataRole.UserRole + 1
-ROLE_NAMES: dict[int, QByteArray] = {
-    ROL_NOMBRE: QByteArray("nombre".encode())
+class Rol(IntEnum):
+    # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt.
+    nombre             = Qt.ItemDataRole.UserRole + 1
+    edificio_preferido = auto()
+
+ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
+    rol.value: QByteArray(rol.name.encode())
+    for rol in Rol
 }
 
 class ListCarreras(QAbstractListModel):
@@ -18,28 +24,45 @@ class ListCarreras(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
         self.gestor: GestorDeDatos = gestor
-
-        # Nombres de las carreras existentes.
-        # Acordarse de actualizarla cuando puede haber cambios.
-        self.carreras_existentes: list[str]
-        self._actualizarLista()
         
     @override
     def roleNames(self) -> dict[int, QByteArray]:
-        return ROLE_NAMES
+        return ROLES_A_NOMBRES_QT
 
     @override
     def rowCount(self, parent: QModelIndex|None = None) -> int:
-        return len(self.carreras_existentes)
+        return self.gestor.cantidad_de_carreras()
 
     @override
     def data(self, index: QModelIndex, role: int = 0) -> Any:
         if not index.isValid(): return None
 
-        if role == ROL_NOMBRE:
-            return self.carreras_existentes[index.row()]
-        else:
-            return None
+        la_carrera = self.gestor.get_carrera(index.row())
+
+        match role:
+            case Rol.nombre:
+                return la_carrera.nombre
+            case Rol.edificio_preferido if la_carrera.edificio_preferido is not None:
+                return la_carrera.edificio_preferido.nombre
+            case _:
+                return None
+    
+    @override
+    def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
+        if not index.isValid(): return False
+        if role not in ROLES_A_NOMBRES_QT: return False
+
+        rol = Rol(role)
+        logger.debug(f'Editando {rol.name}')
+
+        match role:
+            case Rol.nombre:
+                logger.error("El nombre se debe cambiar con cambiarNombre, no con setData.")
+                return False
+            case Rol.edificio_preferido:
+                return self._set_edificio_preferido(index.row(), value)
+            case _:
+                return False
 
     @pyqtSlot(str, result=int)
     def agregarCarrera(self, nombre: str) -> int:
@@ -66,11 +89,8 @@ class ListCarreras(QAbstractListModel):
 
         :return: El nuevo índice de la carrera.
         '''
-        # Índices inválidos: dejar seleccionada la última carrera
-        # o -1 si no hay carreras.
-        if índice < 0 or índice >= len(self.carreras_existentes):
-            return len(self.carreras_existentes) - 1
-        else:
+        n_carreras = self.rowCount()
+        if 0 <= índice < n_carreras:
             try:
                 nuevo_índice = self.gestor.set_carrera_nombre(índice, nuevo_nombre)
             except ValueError:
@@ -79,6 +99,11 @@ class ListCarreras(QAbstractListModel):
             else:
                 self._actualizarLista()
                 return nuevo_índice
+        else:
+            # Índices inválidos: dejar seleccionada la última carrera
+            # o -1 si no hay carreras.
+            return n_carreras - 1
+            
     
     @pyqtSlot(int, result=int)
     def borrarCarrera(self, índice: int) -> int:
@@ -88,20 +113,44 @@ class ListCarreras(QAbstractListModel):
         :return: El índice de la carrera que debería quedar seleccionada, 0 -1
         si no quedan carreras.
         '''
-        # Índices inválidos: dejar seleccionada la última carrera
-        # o -1 si no hay carreras.
-        if índice < 0 or índice >= len(self.carreras_existentes):
-            return len(self.carreras_existentes) - 1
-        else:
+        n_carreras = self.rowCount()
+        if 0 <= índice < n_carreras:
             self.gestor.borrar_carrera(índice)
             self._actualizarLista()
             # Mantener el mismo índice, excepto que quede fuera de rango y ahí
             # dejamos seleccionada la última carrera de la lista o -1 si no
             # quedó ninguna carrera.
-            return min(índice, len(self.carreras_existentes) - 1)
+            return min(índice, self.rowCount() - 1)
+        else:
+            # Índices inválidos: dejar seleccionada la última carrera
+            # o -1 si no hay carreras.
+            return n_carreras - 1
+    
+    def _set_edificio_preferido(self, i_carrera: int, i_edificio: int) -> bool:
+        '''
+        Setear el edificio preferido de una carrera.
+
+        :param i_carrera: El índice de la carrera.
+        :param i_edificio: El índice del nuevo edificio preferido, o -1 para
+        borrar el edificio preferido.
+
+        :return: Bandera de éxito.
+        '''
+        if not 0 <= i_carrera < self.rowCount():
+            logger.error('Set edificio preferido con carrera fuera de rango.')
+            return False
+        elif i_edificio >= self.gestor.cantidad_de_edificios():
+            logger.error('Set edificio preferido con edificio fuera de rango.')
+            return False
+        else:
+            edificio = (
+                self.gestor.get_edificio(i_edificio)
+                if i_edificio >= 0
+                else None
+            )
+            self.gestor.get_carrera(i_carrera).edificio_preferido = edificio
+            return True
 
     def _actualizarLista(self):
-        logger.debug('Actualizando lista de carreras')
         self.beginResetModel()
-        self.carreras_existentes = self.gestor.get_carreras()
         self.endResetModel()

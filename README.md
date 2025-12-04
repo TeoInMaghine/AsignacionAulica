@@ -9,6 +9,8 @@ Algunos [íconos](/assets/iconos/) fueron creados a partir del [Simple Design Sy
 
 El ícono de ordenar es [Sort az icons created by Prosymbols Premium - Flaticon](https://www.flaticon.com/free-icons/sort-az).
 
+El ícono de editar es [Write icons created by Arkinasi - Flaticon](https://www.flaticon.com/free-icons/write).
+
 # Ambiente de Desarrollo
 
 Para desarrollar y probar este software es conveniente usar un ambiente virtual

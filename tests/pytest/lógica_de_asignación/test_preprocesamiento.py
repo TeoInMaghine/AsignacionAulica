@@ -30,7 +30,7 @@ def test_rango_de_aulas_por_edificio(edificios: Edificios):
     horario_jueves =    RangoHorario(time(8), time(20)),
     horario_viernes =   RangoHorario(time(8), time(20)),
     horario_sábado =    RangoHorario(time(8), time(17)),
-    horario_domingo =   RangoHorario.cerrado(),
+    horario_domingo =   RangoHorario(time(7), time(22), cerrado=True),
     aulas=(
         MockAula(
             nombre='una',
@@ -63,7 +63,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios: Edificios):
                 RangoHorario(time(8), time(20)),
                 RangoHorario(time(8), time(20)),
                 RangoHorario(time(8), time(17)),
-                RangoHorario.cerrado()
+                RangoHorario(time(7), time(22), cerrado=True)
             ))
         ),
         AulaPreprocesada(
@@ -98,7 +98,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios: Edificios):
         horario_jueves =    RangoHorario(time(8), time(20)),
         horario_viernes =   RangoHorario(time(8), time(20)),
         horario_sábado =    RangoHorario(time(8), time(17)),
-        horario_domingo =   RangoHorario.cerrado(),
+        horario_domingo =   RangoHorario(time(7), time(22), cerrado=True),
         aulas=(
             MockAula(
                 nombre='A102',
@@ -116,7 +116,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios: Edificios):
         horario_jueves =    RangoHorario(time(8), time(20)),
         horario_viernes =   RangoHorario(time(8), time(20)),
         horario_sábado =    RangoHorario(time(8), time(17)),
-        horario_domingo =   RangoHorario.cerrado()
+        horario_domingo =   RangoHorario(time(7), time(22), cerrado=True)
         # Ningún aula en Anasagasti 2
     ),
     MockEdificio(
@@ -127,7 +127,7 @@ def test_preprocesar_aulas_un_solo_edificio(edificios: Edificios):
         horario_jueves =    RangoHorario(time(8), time(20)),
         horario_viernes =   RangoHorario(time(8), time(20)),
         horario_sábado =    RangoHorario(time(8), time(17)),
-        horario_domingo =   RangoHorario.cerrado(),
+        horario_domingo =   RangoHorario(time(7), time(22), cerrado=True),
         preferir_no_usar = True,
         aulas=(
             MockAula(
@@ -156,7 +156,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
                 RangoHorario(time(8), time(20)),
                 RangoHorario(time(8), time(20)),
                 RangoHorario(time(8), time(17)),
-                RangoHorario.cerrado()
+                RangoHorario(time(7), time(22), cerrado=True)
             ),
         ),
         AulaPreprocesada(
@@ -172,7 +172,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
                 RangoHorario(time(8), time(20)),
                 RangoHorario(time(8), time(20)),
                 RangoHorario(time(8), time(17)),
-                RangoHorario.cerrado()
+                RangoHorario(time(7), time(22), cerrado=True)
             )
         ),
         AulaPreprocesada(
@@ -188,7 +188,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
                 RangoHorario(time(8), time(20)),
                 RangoHorario(time(8), time(20)),
                 RangoHorario(time(8), time(17)),
-                RangoHorario.cerrado()
+                RangoHorario(time(7), time(22), cerrado=True)
             )
         )
     ]
@@ -208,7 +208,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
         horario_jueves =    RangoHorario(time(8), time(20)),
         horario_viernes =   RangoHorario(time(8), time(20)),
         horario_sábado =    RangoHorario(time(8), time(17)),
-        horario_domingo =   RangoHorario.cerrado(),
+        horario_domingo =   RangoHorario(time(7), time(22), cerrado=True),
         aulas = (
             MockAula(nombre='A102'),
             MockAula(nombre='A102A'),
@@ -225,7 +225,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
         horario_jueves =    RangoHorario(time(8), time(20)),
         horario_viernes =   RangoHorario(time(8), time(20)),
         horario_sábado =    RangoHorario(time(8), time(17)),
-        horario_domingo =   RangoHorario.cerrado(),
+        horario_domingo =   RangoHorario(time(7), time(22), cerrado=True),
         aulas = (
             MockAula(nombre='B102'),
             MockAula(nombre='B102A'),
@@ -247,7 +247,7 @@ def test_preprocesar_aulas_varios_edificios(edificios: Edificios):
         horario_jueves =    RangoHorario(time(8), time(20)),
         horario_viernes =   RangoHorario(time(8), time(20)),
         horario_sábado =    RangoHorario(time(8), time(17)),
-        horario_domingo =   RangoHorario.cerrado(),
+        horario_domingo =   RangoHorario(time(7), time(22), cerrado=True),
         preferir_no_usar = True,
         aulas = (
             MockAula(nombre='B202'), # No son aulas dobles, pero tienen los mismos nombres que en el otro edificio

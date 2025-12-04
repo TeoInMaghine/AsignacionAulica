@@ -101,6 +101,13 @@ def test_asignación_imposible_por_solapamiento_inevitable(edificios: Edificios,
 
 @pytest.mark.aulas( MockAula(horario_viernes=RangoHorario(time(8), time(23))) )
 @pytest.mark.clases( MockClase(horario=RangoHorario(time(7), time(9)), día=Día.Viernes) )
+def test_asignación_imposible_por_aula_que_abre_más_tarde(edificios: Edificios, carreras: Carreras):
+    resultado = asignar(edificios, carreras)
+    assert not resultado.todo_ok()
+    assert resultado.días_sin_asignar == [Día.Viernes]
+
+@pytest.mark.aulas( MockAula(horario_viernes=RangoHorario(time(7), time(22), cerrado=True)) )
+@pytest.mark.clases( MockClase(horario=RangoHorario(time(12), time(14)), día=Día.Viernes) )
 def test_asignación_imposible_por_aula_cerrada(edificios: Edificios, carreras: Carreras):
     resultado = asignar(edificios, carreras)
     assert not resultado.todo_ok()

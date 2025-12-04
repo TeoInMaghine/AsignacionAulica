@@ -4,11 +4,13 @@ BotónAgregar BotónAgregar.qml
 BotónRedondeadoConTexto BotónRedondeadoConTexto.qml
 BotónRedondeadoConTextoColorUNRN BotónRedondeadoConTextoColorUNRN.qml
 Colapsador Colapsador.qml
-EditorHorario EditorHorario.qml
-EditorHorariosSemanales EditorHorariosSemanales.qml
-EditorRangoHorario EditorRangoHorario.qml
-HeaderHorariosSemanales HeaderHorariosSemanales.qml
+Candado Candado.qml
 SelectorEquipamiento SelectorEquipamiento.qml
+EditorHorariosSemanalesEdificio EditorHorariosSemanalesEdificio.qml
+EditorHorariosSemanalesAula EditorHorariosSemanalesAula.qml
+HeaderHorariosSemanales HeaderHorariosSemanales.qml
+EditorRangoHorario EditorRangoHorario.qml
+EditorRangoHorarioAula EditorRangoHorarioAula.qml
 singleton Constantes Constantes.qml
 singleton FontSize FontSize.qml
 TextFieldConEnter TextFieldConEnter.qml

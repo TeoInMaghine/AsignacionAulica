@@ -17,16 +17,10 @@ class Día(IntEnum):
 class RangoHorario:
     inicio: time
     fin: time
+    cerrado: bool = False
 
     def se_superpone_con(self, otro: RangoHorario) -> bool:
         return self.inicio < otro.fin and otro.inicio < self.fin
-
-    @staticmethod
-    def cerrado()-> RangoHorario:
-        return RangoHorario(time(0), time(0))
-    
-    def es_cerrado(self) -> bool:
-        return self.inicio == self.fin
 
 HorariosSemanales: TypeAlias = tuple[
     RangoHorario, RangoHorario, RangoHorario, RangoHorario, RangoHorario,
@@ -42,7 +36,10 @@ Tupla con un RangoHorario o None para cada día de la semana.
 '''
 
 def crear_horarios_semanales() -> HorariosSemanales:
-    return HorariosSemanales(RangoHorario.cerrado() for _ in range(len(Día)))
+    return HorariosSemanales(
+        RangoHorario(time(7), time(22), d == Día.Domingo or d == Día.Sábado)
+        for d in Día
+    )
 
 def crear_horarios_semanales_opcionales() -> HorariosSemanalesOpcionales:
     return HorariosSemanalesOpcionales([None,]*len(Día))

@@ -1,4 +1,5 @@
 import logging
+from enum import IntEnum, auto
 from datetime import time, datetime
 from copy import copy
 from typing import Any, override
@@ -10,47 +11,66 @@ from asignacion_aulica.gestor_de_datos.días_y_horarios import Día, RangoHorari
 
 logger = logging.getLogger(__name__)
 
-NOMBRES_DE_ROLES: list[str] = [
-    'nombre',
-    'capacidad',
-    'horario_inicio_lunes',
-    'horario_fin_lunes',
-    'horario_inicio_martes',
-    'horario_fin_martes',
-    'horario_inicio_miércoles',
-    'horario_fin_miércoles',
-    'horario_inicio_jueves',
-    'horario_fin_jueves',
-    'horario_inicio_viernes',
-    'horario_fin_viernes',
-    'horario_inicio_sábado',
-    'horario_fin_sábado',
-    'horario_inicio_domingo',
-    'horario_fin_domingo'
-]
+class RolHorario(IntEnum):
+    inicio    = 0
+    fin       = auto()
+    cerrado   = auto()
+    es_propio = auto()
 
-# No se empieza desde 0 para no colisionar con los roles ya existentes de Qt
-ROL_BASE:                   int = Qt.ItemDataRole.UserRole + 1
-ROL_NOMBRE:                 int = ROL_BASE + NOMBRES_DE_ROLES.index('nombre')
-ROL_CAPACIDAD:              int = ROL_BASE + NOMBRES_DE_ROLES.index('capacidad')
-ROL_PRIMER_HORARIO:         int = ROL_BASE + NOMBRES_DE_ROLES.index('horario_inicio_lunes')
-PARIDAD_ROL_HORARIO_INICIO: int = ROL_PRIMER_HORARIO % 2
+class Rol(IntEnum):
+    # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt.
+    horario_inicio_lunes        = Qt.ItemDataRole.UserRole + 1
+    horario_fin_lunes           = auto()
+    horario_cerrado_lunes       = auto()
+    horario_es_propio_lunes     = auto()
+    horario_inicio_martes       = auto()
+    horario_fin_martes          = auto()
+    horario_cerrado_martes      = auto()
+    horario_es_propio_martes    = auto()
+    horario_inicio_miércoles    = auto()
+    horario_fin_miércoles       = auto()
+    horario_cerrado_miércoles   = auto()
+    horario_es_propio_miércoles = auto()
+    horario_inicio_jueves       = auto()
+    horario_fin_jueves          = auto()
+    horario_cerrado_jueves      = auto()
+    horario_es_propio_jueves    = auto()
+    horario_inicio_viernes      = auto()
+    horario_fin_viernes         = auto()
+    horario_cerrado_viernes     = auto()
+    horario_es_propio_viernes   = auto()
+    horario_inicio_sábado       = auto()
+    horario_fin_sábado          = auto()
+    horario_cerrado_sábado      = auto()
+    horario_es_propio_sábado    = auto()
+    horario_inicio_domingo      = auto()
+    horario_fin_domingo         = auto()
+    horario_cerrado_domingo     = auto()
+    horario_es_propio_domingo   = auto()
+    nombre                      = auto()
+    capacidad                   = auto()
+
+    def desempacar_día_y_rol_horario(self) -> tuple[Día, RolHorario]:
+        '''Sólo válido para roles de horarios.'''
+        return (
+            Día(       (self - Rol.horario_inicio_lunes) // len(RolHorario)),
+            RolHorario((self - Rol.horario_inicio_lunes) %  len(RolHorario))
+        )
 
 ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
-    i + ROL_BASE: QByteArray(rolename.encode())
-    for i, rolename in enumerate(NOMBRES_DE_ROLES)
+    rol.value: QByteArray(rol.name.encode())
+    for rol in Rol
 }
+
+ROLES_DEL_DÍA: tuple[tuple[int, ...], ...] = tuple(
+    tuple(Rol.horario_inicio_lunes + len(RolHorario) * día + i for i in RolHorario)
+    for día in Día
+)
 
 EQUIVALENTE_24_HORAS: time = time.max
 '''
 '24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
 '''
-
-def día_de_rol_horario(rol: int) -> Día:
-    return Día((rol - ROL_PRIMER_HORARIO) // 2)
-
-def es_rol_horario_inicio(rol: int) -> bool:
-    return (rol % 2) == PARIDAD_ROL_HORARIO_INICIO
 
 class ListAulas(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
@@ -89,22 +109,35 @@ class ListAulas(QAbstractListModel):
         if not index.isValid(): return None
         if role not in ROLES_A_NOMBRES_QT: return None
 
+        rol = Rol(role)
         aula: Aula = self.gestor.get_aula(self.i_edificio, index.row())
 
-        if role == ROL_NOMBRE:
+        if rol == Rol.nombre:
             return aula.nombre
-        elif role == ROL_CAPACIDAD:
+        elif rol == Rol.capacidad:
             return aula.capacidad
         else: # Es un rol horario
-            día: Día = día_de_rol_horario(role)
-            rango_horario: RangoHorario = aula.horarios[día]
+            día, rol_horario = rol.desempacar_día_y_rol_horario()
+            rango_horario: RangoHorario|None = aula.horarios[día]
 
-            # Cuando el aula no especifica el horario, hacérselo saber a la UI
-            if not rango_horario: return None
+            if rol_horario == RolHorario.es_propio:
+                return rango_horario is not None
 
-            horario: time = rango_horario.inicio \
-                            if es_rol_horario_inicio(role) else \
-                            rango_horario.fin
+            if not rango_horario:
+                logger.warning(
+                    'Esto nunca debería ocurrir, se debe verificar que el'
+                    ' horario sea propio antes de acceder al mismo.'
+                    f' Rol obtenido: {rol.name}.'
+                )
+                return None
+
+            if rol_horario == RolHorario.cerrado:
+                return rango_horario.cerrado
+
+            horario: time = (
+                rango_horario.inicio if rol_horario == RolHorario.inicio else
+                rango_horario.fin
+            )
 
             # Transformar time a string con formato HH:MM
             if horario == EQUIVALENTE_24_HORAS:
@@ -117,12 +150,13 @@ class ListAulas(QAbstractListModel):
         if not index.isValid(): return False
         if role not in ROLES_A_NOMBRES_QT: return False
 
-        logger.debug(f'Editando {NOMBRES_DE_ROLES[role - ROL_BASE]}')
+        rol = Rol(role)
+        logger.debug(f'Editando {rol.name}')
+
         aula: Aula = self.gestor.get_aula(self.i_edificio, index.row())
-        roles_actualizados: list[int] = [role]
         value_no_es_string: bool = not isinstance(value, str)
 
-        if role == ROL_NOMBRE:
+        if rol == Rol.nombre:
             if value_no_es_string:
                 logger.debug(
                     f'No se puede asignar el valor "{value}" de tipo'
@@ -144,7 +178,7 @@ class ListAulas(QAbstractListModel):
 
             aula.nombre = value.strip()
 
-        elif role == ROL_CAPACIDAD:
+        elif rol == Rol.capacidad:
             if value_no_es_string:
                 logger.debug(
                     f'No se puede parsear como capacidad un valor "{value}"'
@@ -161,37 +195,57 @@ class ListAulas(QAbstractListModel):
                 aula.capacidad = int(value)
 
         else: # Es un rol horario
-            if value_no_es_string:
+            día, rol_horario = rol.desempacar_día_y_rol_horario()
+            rango_horario: RangoHorario|None = aula.horarios[día]
+
+            if rol_horario == RolHorario.es_propio:
+                # TODO: Implementar esto cuando tengamos el botón
+                # correspondiente en la UI.
                 logger.debug(
-                    f'No se puede parsear como horario un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                     f'No implementado aún; por ahora {rol.nombre} es read-only.'
                 )
                 return False
-
-            día: Día = día_de_rol_horario(role)
-            rango_horario: RangoHorario|None = aula.horarios[día]
 
             # Si antes el aula no especificaba el horario, hacer que lo haga
             if not rango_horario:
                 rango_horario = copy(aula.edificio.horarios[día])
                 aula.horarios[día] = rango_horario
-                # Actualizar el rol del extremo contrario del rango horario
-                roles_actualizados.append(
-                    role+1 if es_rol_horario_inicio(role) else role-1
-                )
+                self.dataChanged.emit(index, index, ROLES_DEL_DÍA[día])
 
-            # Transformar string con formato HH:MM a time
-            if value == '24:00':
-                value = EQUIVALENTE_24_HORAS
+            if rol_horario == RolHorario.cerrado:
+                if not isinstance(value, bool):
+                    logger.debug(
+                        f'No se puede asignar el valor "{value}" de tipo'
+                        f' {type(value)} a "horario cerrado", de tipo {bool}.'
+                    )
+                    return False
+
+                rango_horario.cerrado = value
+
             else:
-                value = datetime.strptime(value, '%H:%M').time()
+                if value_no_es_string:
+                    logger.debug(
+                        f'No se puede parsear como horario un valor "{value}"'
+                        f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                    )
+                    return False
 
-            if es_rol_horario_inicio(role):
-                rango_horario.inicio = value
-            else:
-                rango_horario.fin = value
+                # Transformar string con formato HH:MM a time
+                if value == '24:00':
+                    value = EQUIVALENTE_24_HORAS
+                else:
+                    value = datetime.strptime(value, '%H:%M').time()
 
-        self.dataChanged.emit(index, index, roles_actualizados)
+                # Asignar inicio o fin del rango horario si no resulta en un
+                # rango inválido (i.e.: con inicio >= fin)
+                if rol_horario == RolHorario.inicio:
+                    if value >= rango_horario.fin: return False
+                    rango_horario.inicio = value
+                else:
+                    if rango_horario.inicio >= value: return False
+                    rango_horario.fin = value
+
+        self.dataChanged.emit(index, index, [role])
         return True
 
     @override

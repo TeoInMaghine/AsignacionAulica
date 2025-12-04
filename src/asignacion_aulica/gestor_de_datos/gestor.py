@@ -358,7 +358,7 @@ class GestorDeDatos:
         nombre = nombre.lower().strip()
         return any(carrera.nombre.lower() == nombre for carrera in self._carreras)
 
-    def set_carrera_nombre(self, índice: int, nombre: str) -> int:
+    def set_carrera_nombre(self, índice: int, nombre_nuevo: str) -> int:
         '''
         Renombrar una carrera existente.
 
@@ -367,14 +367,27 @@ class GestorDeDatos:
         :raise ValueError: Si ya existe una carrera con el nombre dado, o si el
         nombre dado es un string vacío.
         '''
-        nombre = nombre.strip()
-        if len(nombre) == 0:
+        nombre_nuevo = nombre_nuevo.strip()
+        nombre_actual = self._carreras[índice].nombre
+        logger.info('Renombrar carrera %s a %s', nombre_actual, nombre_nuevo)
+        
+        if len(nombre_nuevo) == 0:
             raise ValueError('El nombre de la carrera no puede estar vacío.')
-        elif nombre.lower() in (carrera.nombre.lower() for carrera in self._carreras):
-            raise ValueError(f'Ya existe una carrera llamada "{nombre}".')
+
+        # Detectar si ya existe una carrera con ese nombre, pero permitir cambio
+        # de capitalización
+        la_carrera = self._carreras[índice]
+        ya_existe: bool = \
+            nombre_nuevo.lower() in (
+                carrera.nombre.lower()
+                for carrera in self._carreras
+                if carrera is not la_carrera
+            )
+
+        if ya_existe:
+            raise ValueError(f'Ya existe una carrera llamada "{nombre_nuevo}".')
         else:
-            la_carrera = self._carreras[índice]
-            la_carrera.nombre = nombre
+            la_carrera.nombre = nombre_nuevo
             self._carreras.sort(key=lambda carrera: carrera.nombre.lower())
             nuevo_índice = self._carreras.index(la_carrera)
             return nuevo_índice

@@ -17,6 +17,7 @@ ComboBox {
 
     Layout.preferredWidth: 350
 
+    textRole: "nombre"
     displayText: hayCarreraSeleccionada ? currentText : "Ninguna"
 
     popup: Popup {

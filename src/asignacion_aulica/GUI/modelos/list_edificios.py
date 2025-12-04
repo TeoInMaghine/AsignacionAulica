@@ -165,27 +165,29 @@ class ListEdificios(QAbstractListModel):
                 rol_horario, rango_horario, value
             )
 
-        logger.warning(
+        logger.error(
             'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
         )
         return False
 
     def try_to_set_nombre(self, edificio: Edificio, value: str) -> bool:
+        nuevo_nombre: str = value.strip()
+
         # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
         # Enter; lo ignoramos en vez de loguearlo
-        if value.strip() == edificio.nombre:
+        if nuevo_nombre == edificio.nombre:
             return False
 
         # Aceptamos cambiar la capitalización del nombre
-        cambio_de_capitalización: bool = value.lower().strip() == edificio.nombre.lower()
-        if not cambio_de_capitalización and self.gestor.existe_edificio(value):
+        cambio_de_capitalización: bool = nuevo_nombre == edificio.nombre.lower()
+        if not cambio_de_capitalización and self.gestor.existe_edificio(nuevo_nombre):
             logger.debug(
-                f'No se puede asignar el nombre "{value}", porque ya'
+                f'No se puede asignar el nombre "{nuevo_nombre}", porque ya'
                 ' existe un edificio con el mismo nombre.'
             )
             return False
 
-        edificio.nombre = value.strip()
+        edificio.nombre = nuevo_nombre
         return True
 
     def try_to_set_horario_inicio_o_fin(

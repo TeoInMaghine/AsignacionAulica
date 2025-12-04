@@ -122,7 +122,7 @@ class ListAulas(QAbstractListModel):
                 return rango_horario is not None
 
             if not rango_horario:
-                logger.warning(
+                logger.error(
                     'Esto nunca debería ocurrir, se debe verificar que el'
                     ' horario sea propio antes de acceder al mismo.'
                     f' Rol obtenido: {rol.name}.'
@@ -179,10 +179,10 @@ class ListAulas(QAbstractListModel):
         día, rol_horario = rol.desempacar_día_y_rol_horario()
 
         if rol_horario == RolHorario.es_propio:
-            if value != True:
+            if value != False:
                 logger.debug(
                     f'El valor "{value}" de tipo {type(value)} no es '
-                    f'válido para "horario es propio", sólo admite {True}.'
+                    f'válido para "horario es propio", sólo admite {False}.'
                 )
                 return False
 
@@ -220,27 +220,29 @@ class ListAulas(QAbstractListModel):
                 rol_horario, rango_horario, value
             )
 
-        logger.warning(
+        logger.error(
             'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
         )
         return False
 
     def try_to_set_nombre(self, aula: Aula, value: str) -> bool:
+        nuevo_nombre: str = value.strip()
+
         # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
         # Enter; lo ignoramos en vez de loguearlo
-        if value.strip() == aula.nombre:
+        if nuevo_nombre == aula.nombre:
             return False
 
         # Aceptamos cambiar la capitalización del nombre
-        cambio_de_capitalización: bool = value.lower().strip() == aula.nombre.lower()
-        if not cambio_de_capitalización and self.gestor.existe_aula(self.i_edificio, value):
+        cambio_de_capitalización: bool = nuevo_nombre == aula.nombre.lower()
+        if not cambio_de_capitalización and self.gestor.existe_aula(self.i_edificio, nuevo_nombre):
             logger.debug(
-                f'No se puede asignar el nombre "{value}", porque ya'
+                f'No se puede asignar el nombre "{nuevo_nombre}", porque ya'
                 ' existe un aula en el mismo edificio con el mismo nombre.'
             )
             return False
 
-        aula.nombre = value.strip()
+        aula.nombre = nuevo_nombre
         return True
 
     def try_to_set_capacidad(self, aula: Aula, value: str) -> bool:

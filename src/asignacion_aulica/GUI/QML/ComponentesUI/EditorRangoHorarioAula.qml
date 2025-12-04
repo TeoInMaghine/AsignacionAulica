@@ -95,7 +95,7 @@ RowLayout {
             enabled: aula[rolAulaTieneHorarioPropio]
             opacity: aula[rolAulaTieneHorarioPropio] ? 1.0 : 0.5
             highlighted: aula[rolAulaTieneHorarioPropio] ? hovered : false
-            onClicked: aula[rolAulaTieneHorarioPropio] = true
+            onClicked: aula[rolAulaTieneHorarioPropio] = false
         }
         Candado {
             Layout.preferredWidth: Constantes.width_horario_sideButtons

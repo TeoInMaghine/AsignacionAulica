@@ -312,6 +312,9 @@ class GestorDeDatos:
         logger.debug('ordenar_aulas_dobles - edificio=%s', edificio)
         self._edificios[edificio].aulas_dobles.sort(key=lambda aula_doble: aula_doble.aula_grande.nombre.lower())
 
+    def cantidad_de_carreras(self) -> int:
+        return len(self._carreras)
+        
     def get_carreras(self) -> list[str]:
         '''
         :return: Los nombres de todas las carreras en la base de

@@ -10,6 +10,8 @@ import ModelosAsignaciónÁulica
 RowLayout {
     spacing: 10
 
+    property int índiceDeLaCarreraActual: comboBox.currentIndex
+
     property bool estamosEditandoElNombre: false
     
     ListCarreras { id: modelo_de_carreras }

@@ -1,6 +1,5 @@
 from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.GUI.modelos.interfaz_carreras import InterfazDeCarreras
 from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
 from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAula
@@ -20,8 +19,7 @@ clases_a_registrar: tuple[type, ...] = (
     ListEdificios,
     ListAulas,
     ListEquipamientosDeAula,
-    ListCarreras,
-    InterfazDeCarreras
+    ListCarreras
 )
 
 def agregar_defaults_al_constructor(clase: type, **defaults) -> type:

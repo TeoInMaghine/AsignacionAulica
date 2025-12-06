@@ -27,6 +27,7 @@ ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
     for rol in Rol
 }
 
+
 class ListClases(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
@@ -90,6 +91,11 @@ class ListClases(QAbstractListModel):
         rol = Rol(role)
         logger.debug(f'Editando {rol.name}')
 
+        was_set: bool = self.try_to_set(index, value, rol)
+        if was_set: self.dataChanged.emit(index, index, [role])
+        return was_set
+
+    def try_to_set(self, index: QModelIndex, value: Any, rol: Rol) -> bool:
         clase: Clase = self.gestor.get_clase(
             self.i_carrera, self.i_materia, index.row()
         )
@@ -103,20 +109,24 @@ class ListClases(QAbstractListModel):
                 )
                 return False
 
-            if not value:
-                # Es intuitivo interpretar input vacío como 0
-                clase.cantidad_de_alumnos = 0
-            elif not value.isdigit():
-                return False
-            else:
-                clase.cantidad_de_alumnos = int(value)
+            return self.try_to_set_cantidad_de_alumnos(clase, value)
 
-        else:
-            logger.warn('Fuck off mate')
-            return False
+        logger.error(
+            'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
+        )
+        return False
 
-        self.dataChanged.emit(index, index, [role])
-        return True
+    def try_to_set_cantidad_de_alumnos(self, clase: Clase, value: str) -> bool:
+        if value.isdigit():
+            clase.cantidad_de_alumnos = int(value)
+            return True
+
+        # Es intuitivo interpretar input vacío como 0
+        if value == '':
+            clase.cantidad_de_alumnos = 0
+            return True
+
+        return False
 
     @override
     def removeRows(self, row: int, count: int, parent: QModelIndex|None = None) -> bool:

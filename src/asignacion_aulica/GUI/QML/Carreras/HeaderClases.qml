@@ -7,6 +7,7 @@ import QML.ComponentesUI
 RowLayout {
     id: visualHeader
 
+    property alias widthVirtual: headerVirtual.width
     property alias widthCantidadDeAlumnos: headerCantidadDeAlumnos.width
     property alias widthEquipamientoNecesario: headerEquipamientoNecesario.width
 
@@ -18,20 +19,23 @@ RowLayout {
         text: "Horario"
     }
 
-    // TODO: Header "es virtual"
+    Label {
+        id: headerVirtual
+        horizontalAlignment: Text.AlignHCenter
+        text: "Virtual"
+    }
 
     Label {
         id: headerCantidadDeAlumnos
-        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
+        horizontalAlignment: Text.AlignHCenter
         text: "# Alumnos"
     }
 
     Label {
         id: headerEquipamientoNecesario
-        leftPadding: 40
-        rightPadding: 40
-        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
-        text: "Equipamiento"
+        leftPadding: 5
+        rightPadding: 5
+        text: "Equipamiento necesario"
     }
 
     // TODO: Header aula asignada

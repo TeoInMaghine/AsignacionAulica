@@ -82,6 +82,9 @@ class ListClases(QAbstractListModel):
         if rol == Rol.cantidad_de_alumnos:
             return clase.cantidad_de_alumnos
 
+        elif rol == Rol.virtual:
+            return clase.virtual
+
         elif rol == Rol.horario_inicio:
             return time_to_string_horario(clase.horario.inicio)
 
@@ -119,6 +122,17 @@ class ListClases(QAbstractListModel):
                 return False
 
             return self.try_to_set_cantidad_de_alumnos(clase, value)
+
+        if rol == Rol.virtual:
+            if not isinstance(value, bool):
+                logger.debug(
+                    f'No se puede asignar el valor "{value}" de tipo'
+                    f' {type(value)} a "virtual", de tipo {bool}.'
+                )
+                return False
+
+            clase.virtual = value
+            return True
 
         logger.error(
             'Esto nunca debería ocurrir, todos los roles deberían manejarse.'

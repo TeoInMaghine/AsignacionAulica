@@ -28,7 +28,6 @@ RowLayout {
             spacing: 6
 
             Label {
-                Layout.alignment: Qt.AlignCenter
                 leftPadding: 5
                 text: "Aula"
             }
@@ -47,7 +46,6 @@ RowLayout {
     }
     Label {
         id: headerCapacidad
-        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
         text: "Capacidad"
     }
 
@@ -57,7 +55,6 @@ RowLayout {
         id: headerEquipamiento
         leftPadding: 40
         rightPadding: 40
-        Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter
         text: "Equipamiento"
     }
 

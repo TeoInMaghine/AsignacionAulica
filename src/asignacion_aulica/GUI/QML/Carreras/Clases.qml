@@ -30,8 +30,9 @@ ListView {
 
     header: Item {
         property alias spacing: headerClases.spacing
-        property alias widthCantidadDeAlumnos: headerClases.width
-        property alias widthEquipamientoNecesario: headerClases.width
+        property alias widthVirtual: headerClases.widthVirtual
+        property alias widthCantidadDeAlumnos: headerClases.widthCantidadDeAlumnos
+        property alias widthEquipamientoNecesario: headerClases.widthEquipamientoNecesario
         // property alias widthXxxxxx: headerClases.widthXxxxxx
         // property alias widthXxxxxx: headerClases.widthXxxxxx
         // ...
@@ -71,8 +72,15 @@ ListView {
             Layout.alignment: Qt.AlignCenter
         }
 
-        // TODO: Checkbox de "es virtual". Tendría q no tener texto (q ya lo
-        // hice en algún momento, espero q esté commiteado)
+        CheckBox {
+            Layout.preferredWidth: headerItem.widthVirtual
+            id: checkboxVirtual
+
+            checked: clase.virtual
+            onToggled: {
+                clase.virtual = checked
+            }
+        }
 
         TextFieldConEnter {
             Layout.preferredWidth: headerItem.widthCantidadDeAlumnos

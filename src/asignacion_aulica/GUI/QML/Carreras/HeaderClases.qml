@@ -8,7 +8,7 @@ RowLayout {
     id: visualHeader
 
     property alias widthCantidadDeAlumnos: headerCantidadDeAlumnos.width
-    property alias widthEquipamiento: headerEquipamiento.width
+    property alias widthEquipamientoNecesario: headerEquipamientoNecesario.width
 
     // TODO: Header selector de día
 
@@ -27,7 +27,7 @@ RowLayout {
     }
 
     Label {
-        id: headerEquipamiento
+        id: headerEquipamientoNecesario
         leftPadding: 40
         rightPadding: 40
         Layout.alignment: Qt.AlignVCenter | Qt.AlignHCenter

@@ -1,7 +1,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import ModelosAsignaciónÁulica
 
 // Referencias:
 // https://forum.qt.io/topic/87306/multiselect-combobox/2
@@ -9,16 +8,9 @@ import ModelosAsignaciónÁulica
 ComboBox {
     id: comboBox
 
-    required property var edificio
-    required property var aula
+    property alias equipamientos: comboBox.model
 
     displayText: equipamientos.seleccionadosText
-
-    model: ListEquipamientosDeAula {
-        id: equipamientos
-        indexEdificio: edificio.index
-        indexAula: aula.index
-    }
     onPressedChanged: if (pressed && !popup.visible) equipamientos.actualizarLista()
 
     // ComboBox cierra el popup cuando sus items (si heredan de AbstractButton)

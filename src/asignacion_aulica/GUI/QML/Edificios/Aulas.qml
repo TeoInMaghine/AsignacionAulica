@@ -77,8 +77,11 @@ ListView {
 
         SelectorEquipamiento {
             Layout.preferredWidth: headerItem.widthEquipamiento
-            edificio: view.edificio
-            aula: parent.aula
+            model: ListEquipamientosDeAulas {
+                id: equipamientos
+                indexEdificio: edificio.index
+                indexAula: aula.index
+            }
         }
 
         Item { } // Espacio vacío de 2 * spacing de ancho

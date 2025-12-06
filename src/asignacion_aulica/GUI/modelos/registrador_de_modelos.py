@@ -1,11 +1,20 @@
+from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
+from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
 from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
 from asignacion_aulica.GUI.modelos.list_clases import ListClases
+from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAulas
+from asignacion_aulica.GUI.modelos.list_equipamientos_necesarios_clase import ListEquipamientosNecesariosDeClases
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
-from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
-from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAula
 from PyQt6.QtQml import qmlRegisterType
 
+modelos_raw: tuple[type] = (
+    ListEdificios,
+    ListAulas,
+    ListCarreras,
+    ListClases,
+    ListEquipamientosDeAulas,
+    ListEquipamientosNecesariosDeClases,
+)
 modelos_registrados: list[type] = []
 '''
 Guardamos referencias a los modelos registrados para que el GC no piense que
@@ -36,7 +45,7 @@ def registrar_modelos_qml(gestor_de_datos: GestorDeDatos):
     :param gestor_de_datos: El gestor de datos a pasarle a los modelos.
     '''
     qml_module = 'ModelosAsignaciónÁulica'.encode()
-    for modelo in (ListEdificios, ListAulas, ListEquipamientosDeAula, ListCarreras, ListClases):
+    for modelo in modelos_raw:
         modelo_wrapeado = agregar_defaults_al_constructor(modelo, gestor=gestor_de_datos)
         qmlRegisterType(modelo_wrapeado, qml_module, 1, 0, modelo.__name__)
         modelos_registrados.append(modelo_wrapeado)

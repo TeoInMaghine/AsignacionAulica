@@ -37,8 +37,9 @@ class ListClases(QAbstractListModel):
         self.i_materia: int = 0 # Seteado por QT
 
         # TODO: Placeholder, borrar eventualmente
-        gestor.agregar_carrera('Sin nombre')
-        gestor.agregar_materia(self.i_carrera)
+        if not gestor.existe_carrera('Sin nombre'):
+            gestor.agregar_carrera('Sin nombre')
+            gestor.agregar_materia(self.i_carrera)
 
     @pyqtProperty(int)
     def indexCarrera(self) -> int:

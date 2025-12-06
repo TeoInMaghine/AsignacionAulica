@@ -31,7 +31,7 @@ ListView {
     header: Item {
         property alias spacing: headerClases.spacing
         property alias widthCantidadDeAlumnos: headerClases.width
-        property alias widthEquipamiento: headerClases.width
+        property alias widthEquipamientoNecesario: headerClases.width
         // property alias widthXxxxxx: headerClases.widthXxxxxx
         // property alias widthXxxxxx: headerClases.widthXxxxxx
         // ...
@@ -87,12 +87,17 @@ ListView {
             }
         }
 
-        // TODO: Generalizar (?) SelectorEquipamiento
-        // SelectorEquipamiento {
-        //     Layout.preferredWidth: headerItem.widthEquipamiento
-        //     // edificio: view.edificio
-        //     // aula: parent.aula
-        // }
+        SelectorEquipamiento {
+            Layout.preferredWidth: headerItem.widthEquipamientoNecesario
+            model: ListEquipamientosNecesariosDeClases {
+                id: equipamientoNecesario
+                // indexCarrera: carrera.index [(?) Tal vez materia.indexCarrera?]
+                // indexMateria: materia.index
+                indexCarrera: 0
+                indexMateria: 0
+                indexClase: clase.index
+            }
+        }
 
         // TODO: Mostrar el aula asignada (en el futuro también te dejaría
         // seleccionar el aula manualmente)

@@ -8,7 +8,7 @@ def test_empieza_estando_todo_vacío(gestor: GestorDeDatos):
 def test_agregar_carrera_genera_valores_deafult(gestor: GestorDeDatos):
     gestor.agregar_carrera('El Nombre')
 
-    assert len(gestor.get_carreras()) == 1
+    assert gestor.cantidad_de_carreras() == 1
     assert gestor.get_carreras()[0] == 'El Nombre'
 
     assert gestor.get_carrera(0).nombre == 'El Nombre'
@@ -44,8 +44,6 @@ def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
         gestor.get_carrera(0)
     with pytest.raises(IndexError):
-        gestor.set_carrera_edificio_preferido(0, None)
-    with pytest.raises(IndexError):
         gestor.set_carrera_nombre(0, 'a')
     
     # Cuando existen carreras pero el índice está fuera de rango:
@@ -56,27 +54,18 @@ def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
         gestor.get_carrera(3)
     with pytest.raises(IndexError):
-        gestor.set_carrera_edificio_preferido(3, None)
-    with pytest.raises(IndexError):
         gestor.set_carrera_nombre(3, 'd')
 
-def test_get_set_carrera_existente(gestor: GestorDeDatos):
+def test_get_set_nombre_carrera_existente(gestor: GestorDeDatos):
     nombre = 'nombresito'
-    edificio_preferido = 'uno'
-
-    gestor.agregar_edificio()
-    gestor.agregar_aula(0)
-    gestor.get_edificio(0).nombre = edificio_preferido
-    el_edificio = gestor.get_aula(0, 0).edificio
-
     gestor.agregar_carrera(nombre)
-    gestor.set_carrera_edificio_preferido(0, edificio_preferido)
-
-    assert len(gestor.get_carreras()) == 1
+    assert gestor.cantidad_de_carreras() == 1
 
     carrera = gestor.get_carrera(0)
     assert carrera.nombre == nombre
-    assert carrera.edificio_preferido is el_edificio
+
+    gestor.set_carrera_nombre(0, 'otro')
+    assert carrera.nombre == 'otro'
 
 def test_cambiar_nombre_mantiene_orden_afabético(gestor: GestorDeDatos):
     gestor.agregar_carrera('b')
@@ -124,8 +113,8 @@ def test_borrar_edificio_borra_edificio_preferido_de_las_carreras_que_preferían
 
     gestor.agregar_carrera('0')
     gestor.agregar_carrera('1')
-    gestor.set_carrera_edificio_preferido(0, 'c')
-    gestor.set_carrera_edificio_preferido(1, 'b')
+    gestor.get_carrera(0).edificio_preferido = edificio_c
+    gestor.get_carrera(1).edificio_preferido = edificio_b
 
     assert gestor.get_carrera(0).edificio_preferido is edificio_c
     assert gestor.get_carrera(1).edificio_preferido is edificio_b

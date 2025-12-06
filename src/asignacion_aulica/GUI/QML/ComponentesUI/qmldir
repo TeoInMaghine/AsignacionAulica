@@ -11,6 +11,7 @@ EditorHorariosSemanalesAula EditorHorariosSemanalesAula.qml
 HeaderHorariosSemanales HeaderHorariosSemanales.qml
 EditorRangoHorario EditorRangoHorario.qml
 EditorRangoHorarioAula EditorRangoHorarioAula.qml
+SelectorEdificio SelectorEdificio.qml
 singleton Constantes Constantes.qml
 singleton FontSize FontSize.qml
 TextFieldConEnter TextFieldConEnter.qml

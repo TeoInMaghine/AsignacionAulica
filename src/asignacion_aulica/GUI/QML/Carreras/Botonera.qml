@@ -4,7 +4,7 @@ import QML.ComponentesUI
 
 /** Los botones de arriba de la pestaña de materias. */
 RowLayout {
-    spacing: 10
+    spacing: 15
 
     // Por ahora no hacen nada
     BotónRedondeadoConTextoColorUNRN {text: "Asignar Aulas"}

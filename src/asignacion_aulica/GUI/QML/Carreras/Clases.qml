@@ -33,6 +33,7 @@ ListView {
         property alias widthVirtual: headerClases.widthVirtual
         property alias widthCantidadDeAlumnos: headerClases.widthCantidadDeAlumnos
         property alias widthEquipamientoNecesario: headerClases.widthEquipamientoNecesario
+        property alias widthNoCambiarAsignación: headerClases.widthNoCambiarAsignación
         // property alias widthXxxxxx: headerClases.widthXxxxxx
         // property alias widthXxxxxx: headerClases.widthXxxxxx
         // ...
@@ -74,7 +75,6 @@ ListView {
 
         CheckBox {
             Layout.preferredWidth: headerItem.widthVirtual
-            id: checkboxVirtual
 
             checked: clase.virtual
             onToggled: {
@@ -110,7 +110,14 @@ ListView {
         // TODO: Mostrar el aula asignada (en el futuro también te dejaría
         // seleccionar el aula manualmente)
 
-        // TODO: Checkbox de "no cambiar asignación"
+        CheckBox {
+            Layout.preferredWidth: headerItem.widthNoCambiarAsignación
+
+            checked: clase.no_cambiar_asignación
+            onToggled: {
+                clase.no_cambiar_asignación = checked
+            }
+        }
 
         // Item { } // Espacio vacío de 2 * spacing de ancho
         // TODO: Considerar si dejamos ingresar los datos "opcionales"

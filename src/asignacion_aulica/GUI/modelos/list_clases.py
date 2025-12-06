@@ -85,6 +85,9 @@ class ListClases(QAbstractListModel):
         elif rol == Rol.virtual:
             return clase.virtual
 
+        if rol == Rol.no_cambiar_asignación:
+            return clase.no_cambiar_asignación
+
         elif rol == Rol.horario_inicio:
             return time_to_string_horario(clase.horario.inicio)
 
@@ -132,6 +135,17 @@ class ListClases(QAbstractListModel):
                 return False
 
             clase.virtual = value
+            return True
+
+        if rol == Rol.no_cambiar_asignación:
+            if not isinstance(value, bool):
+                logger.debug(
+                    f'No se puede asignar el valor "{value}" de tipo'
+                    f' {type(value)} a "no cambiar asignación", de tipo {bool}.'
+                )
+                return False
+
+            clase.no_cambiar_asignación = value
             return True
 
         logger.error(

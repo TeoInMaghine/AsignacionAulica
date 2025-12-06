@@ -78,7 +78,6 @@ ListView {
         SelectorEquipamiento {
             Layout.preferredWidth: headerItem.widthEquipamiento
             model: ListEquipamientosDeAulas {
-                id: equipamientos
                 indexEdificio: edificio.index
                 indexAula: aula.index
             }

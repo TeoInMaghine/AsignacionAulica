@@ -2,7 +2,7 @@ from __future__ import annotations  # Para soportar referencias circulares en lo
 from dataclasses import dataclass
 from enum import IntEnum, auto
 from typing import TypeAlias
-from datetime import time
+from datetime import datetime, time
 
 class Día(IntEnum):
     Lunes = 0
@@ -34,6 +34,29 @@ HorariosSemanalesOpcionales: TypeAlias = list[RangoHorario|None] # El largo debe
 '''
 Tupla con un RangoHorario o None para cada día de la semana.
 '''
+
+EQUIVALENTE_24_HORAS: time = time.max
+'''
+'24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
+'''
+
+def parse_string_horario_to_time(value: str) -> time:
+    '''
+    Transformar string con formato HH:MM a time.
+    '''
+    if value == '24:00':
+        return EQUIVALENTE_24_HORAS
+
+    return datetime.strptime(value, '%H:%M').time()
+
+def time_to_string_horario(horario: time) -> str:
+    '''
+    Transformar time a string con formato HH:MM.
+    '''
+    if horario == EQUIVALENTE_24_HORAS:
+        return '24:00'
+
+    return horario.strftime('%H:%M')
 
 def crear_horarios_semanales() -> HorariosSemanales:
     return HorariosSemanales(

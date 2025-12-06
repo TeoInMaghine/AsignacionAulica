@@ -1,6 +1,6 @@
 import logging
 from typing import Any, override
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot, pyqtProperty
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 
@@ -22,6 +22,17 @@ class ListSelectorDeEdificios(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
         self.gestor: GestorDeDatos = gestor
+        
+        # Seteado por QT
+        self.texto_cuando_no_seleccionado: str = ''
+    
+    @pyqtProperty(str)
+    def textoCuandoNoSeleccionado(self) -> str:
+        return self.texto_cuando_no_seleccionado
+
+    @textoCuandoNoSeleccionado.setter
+    def textoCuandoNoSeleccionado(self, texto: str):
+        self.texto_cuando_no_seleccionado = texto
 
     @pyqtSlot()
     def ordenar(self):
@@ -43,7 +54,7 @@ class ListSelectorDeEdificios(QAbstractListModel):
         if role not in ROLES_A_NOMBRES_QT: return None
 
         índice = index.row() - 1
-        if 0 <= índice < self.gestor.cantidad_de_edificios():
-            return self.gestor.get_edificio(índice).nombre
+        if índice < 0:
+            return self.texto_cuando_no_seleccionado
         else:
-            return None
+            return self.gestor.get_edificio(índice).nombre

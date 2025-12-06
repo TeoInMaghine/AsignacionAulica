@@ -8,5 +8,6 @@ ColumnLayout {
     
     spacing: 15
 
-    SelectorDeEdificioPreferido{ índiceDeLaCarreraActual: índiceDeLaCarreraActual }
+    SelectorEdificio{}
+    //SelectorDeEdificioPreferido{ índiceDeLaCarreraActual: índiceDeLaCarreraActual }
 }

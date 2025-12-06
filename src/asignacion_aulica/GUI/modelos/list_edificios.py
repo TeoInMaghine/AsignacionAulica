@@ -1,12 +1,14 @@
 import logging
 from enum import IntEnum, auto
-from datetime import time, datetime
+from datetime import time
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Edificio
-from asignacion_aulica.gestor_de_datos.días_y_horarios import Día, RangoHorario
+from asignacion_aulica.gestor_de_datos.días_y_horarios import (
+    Día, RangoHorario, parse_string_horario_to_time, time_to_string_horario
+)
 
 logger = logging.getLogger(__name__)
 
@@ -53,10 +55,6 @@ ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
     for rol in Rol
 }
 
-EQUIVALENTE_24_HORAS: time = time.max
-'''
-'24:00' no puede parsearse como time, lo tratamos como si fuera `time.max`.
-'''
 
 class ListEdificios(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
@@ -103,11 +101,7 @@ class ListEdificios(QAbstractListModel):
                 rango_horario.fin
             )
 
-            # Transformar time a string con formato HH:MM
-            if horario == EQUIVALENTE_24_HORAS:
-                return '24:00'
-            else:
-                return horario.strftime('%H:%M')
+            return time_to_string_horario(horario)
 
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
@@ -117,6 +111,11 @@ class ListEdificios(QAbstractListModel):
         rol = Rol(role)
         logger.debug(f'Editando {rol.name}')
 
+        was_set: bool = self.try_to_set(index, value, rol)
+        if was_set: self.dataChanged.emit(index, index, [role])
+        return was_set
+
+    def try_to_set(self, index: QModelIndex, value: Any, rol: Rol) -> bool:
         edificio: Edificio = self.gestor.get_edificio(index.row())
 
         if rol == Rol.nombre:
@@ -126,21 +125,10 @@ class ListEdificios(QAbstractListModel):
                     f' {type(value)} al nombre, de tipo {str}.'
                 )
                 return False
-            # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
-            # Enter; lo ignoramos en vez de loguearlo
-            if value.strip() == edificio.nombre:
-                return False
 
-            # Aceptamos cambiar la capitalización del nombre
-            cambio_de_capitalización: bool = value.lower().strip() == edificio.nombre.lower()
-            if not cambio_de_capitalización and self.gestor.existe_edificio(value):
-                logger.debug(f'No se puede asignar el nombre "{value}", porque'
-                              ' ya existe un edificio con el mismo nombre.')
-                return False
+            return self.try_to_set_nombre(edificio, value)
 
-            edificio.nombre = value.strip()
-
-        elif rol == Rol.preferir_no_usar:
+        if rol == Rol.preferir_no_usar:
             if not isinstance(value, bool):
                 logger.debug(
                     f'No se puede asignar el valor "{value}" de tipo'
@@ -149,45 +137,83 @@ class ListEdificios(QAbstractListModel):
                 return False
 
             edificio.preferir_no_usar = value
+            return True
 
-        else: # Es un rol horario
-            día, rol_horario = rol.desempacar_día_y_rol_horario()
-            rango_horario: RangoHorario = edificio.horarios[día]
+        día, rol_horario = rol.desempacar_día_y_rol_horario()
+        rango_horario: RangoHorario = edificio.horarios[día]
 
-            if rol_horario == RolHorario.cerrado:
-                if not isinstance(value, bool):
-                    logger.debug(
-                        f'No se puede asignar el valor "{value}" de tipo'
-                        f' {type(value)} a "horario cerrado", de tipo {bool}.'
-                    )
-                    return False
+        if rol_horario == RolHorario.cerrado:
+            if not isinstance(value, bool):
+                logger.debug(
+                    f'No se puede asignar el valor "{value}" de tipo'
+                    f' {type(value)} a "horario cerrado", de tipo {bool}.'
+                )
+                return False
 
-                rango_horario.cerrado = value
+            rango_horario.cerrado = value
+            return True
 
-            else:
-                if not isinstance(value, str):
-                    logger.debug(
-                        f'No se puede parsear como horario un valor "{value}"'
-                        f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
-                    )
-                    return False
+        if rol_horario == RolHorario.inicio or rol_horario == RolHorario.fin:
+            if not isinstance(value, str):
+                logger.debug(
+                    f'No se puede parsear como horario un valor "{value}"'
+                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                )
+                return False
 
-                # Transformar string con formato HH:MM a time
-                if value == '24:00':
-                    value = EQUIVALENTE_24_HORAS
-                else:
-                    value = datetime.strptime(value, '%H:%M').time()
+            return self.try_to_set_horario_inicio_o_fin(
+                rol_horario, rango_horario, value
+            )
 
-                # Asignar inicio o fin del rango horario si no resulta en un
-                # rango inválido (i.e.: con inicio >= fin)
-                if rol_horario == RolHorario.inicio:
-                    if value >= rango_horario.fin: return False
-                    rango_horario.inicio = value
-                else:
-                    if rango_horario.inicio >= value: return False
-                    rango_horario.fin = value
+        logger.error(
+            'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
+        )
+        return False
 
-        self.dataChanged.emit(index, index, [role])
+    def try_to_set_nombre(self, edificio: Edificio, value: str) -> bool:
+        nuevo_nombre: str = value.strip()
+
+        # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
+        # Enter; lo ignoramos en vez de loguearlo
+        if nuevo_nombre == edificio.nombre:
+            return False
+
+        # Aceptamos cambiar la capitalización del nombre
+        cambio_de_capitalización: bool = nuevo_nombre == edificio.nombre.lower()
+        if not cambio_de_capitalización and self.gestor.existe_edificio(nuevo_nombre):
+            logger.debug(
+                f'No se puede asignar el nombre "{nuevo_nombre}", porque ya'
+                ' existe un edificio con el mismo nombre.'
+            )
+            return False
+
+        edificio.nombre = nuevo_nombre
+        return True
+
+    def try_to_set_horario_inicio_o_fin(
+            self,
+            rol_horario: RolHorario,
+            rango_horario: RangoHorario,
+            value: str
+        ) -> bool:
+        '''
+        Asignar inicio o fin del rango horario si no resulta en un rango
+        inválido (i.e.: con inicio >= fin).
+        '''
+
+        horario: time = parse_string_horario_to_time(value)
+
+        if rol_horario == RolHorario.inicio:
+            if horario >= rango_horario.fin:
+                return False
+
+            rango_horario.inicio = horario
+        else:
+            if rango_horario.inicio >= horario:
+                return False
+
+            rango_horario.fin = horario
+
         return True
 
     @override

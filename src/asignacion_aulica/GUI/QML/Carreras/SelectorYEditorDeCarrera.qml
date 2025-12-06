@@ -17,10 +17,6 @@ import ModelosAsignaciónÁulica
 RowLayout {
     spacing: 10
 
-    property int índiceDeLaCarreraActual: comboBox.currentIndex
-
-    property bool estamosEditandoElNombre: false
-    
     ListCarreras { id: modelo_de_carreras }
 
     Label{
@@ -31,23 +27,24 @@ RowLayout {
     ComboBoxCarrera{
         id: comboBox
         modelo_de_carreras: modelo_de_carreras
-        visible: !estamosEditandoElNombre
+        visible: !inputEditarNombre.focus
     }
 
     TextField {
         id: inputEditarNombre
-        visible: estamosEditandoElNombre
+        visible: inputEditarNombre.focus
         Layout.preferredHeight: comboBox.height
         Layout.preferredWidth: comboBox.Layout.preferredWidth
 
+        text: comboBox.currentText
         onAccepted: {
             var nuevoÍndice = modelo_de_carreras.cambiarNombre(comboBox.currentIndex, inputEditarNombre.text)
             comboBox.currentIndex = nuevoÍndice
-            estamosEditandoElNombre = false
+            inputEditarNombre.focus = false
         }
 
         Keys.onEscapePressed: {
-            estamosEditandoElNombre = false
+            inputEditarNombre.focus = false
         }
     }
 
@@ -56,9 +53,7 @@ RowLayout {
         enabled: comboBox.hayCarreraSeleccionada
         icon.source: assets_path + "/iconos/editar.png"
         onClicked: {
-            inputEditarNombre.text = comboBox.currentText
             inputEditarNombre.focus = true
-            estamosEditandoElNombre=true
         }
     }
 

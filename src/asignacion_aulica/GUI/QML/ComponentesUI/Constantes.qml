@@ -20,4 +20,6 @@ QtObject {
         assets_path + "/iconos/CandadoCerrado.svg"
     readonly property string ícono_candado_abierto_path:
         assets_path + "/iconos/CandadoAbierto.svg"
+    readonly property string ícono_reestablecer_path:
+        assets_path + "/iconos/Reestablecer.svg"
 }

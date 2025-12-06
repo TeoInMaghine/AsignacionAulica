@@ -1,6 +1,7 @@
 import QtQuick.Controls
 import QtQuick.Layouts
 import QML.ComponentesUI
+import ModelosAsignaciónÁulica
 
 ColumnLayout {
     anchors.fill: parent
@@ -8,6 +9,7 @@ ColumnLayout {
     spacing: 20
     
     Botonera { }
-    SelectorDeCarrera { id: selector }
-    EditorDeUnaCarrera { índiceDeLaCarreraActual: selector.índiceDeLaCarreraActual }
+    SelectorYEditorDeCarrera {
+        id: selector
+    }
 }

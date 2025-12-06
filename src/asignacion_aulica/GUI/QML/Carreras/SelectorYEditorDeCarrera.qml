@@ -4,8 +4,15 @@ import QtQuick.Layouts
 import QML.ComponentesUI
 import ModelosAsignaciónÁulica
 
-/** Dropdown para seleccionar carrera.
- *  También permite agregar, borrar, y cambiar nombre.
+/** 
+ * Se encarga de:
+ * - Seleccionar la carrera que se está editando actualmente
+ * - Agregar y borrar carreras
+ * - Editar el nombre de la carrera seleccionada
+ * - Editar propiedades de la carrera seleccionada
+ *   (actualmente la única propiedad es el edificio preferido)
+ * 
+ * No se encargar de editar las materias y clases de la carrera.
  */
 RowLayout {
     spacing: 10

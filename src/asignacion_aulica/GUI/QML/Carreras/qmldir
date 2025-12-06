@@ -3,4 +3,4 @@ EditorDeCarreras EditorDeCarreras.qml
 internal Botonera Botonera.qml
 internal ComboBoxCarrera ComboBoxCarrera.qml
 internal EditorDeUnaCarrera EditorDeUnaCarrera.qml
-internal SelectorDeCarrera SelectorDeCarrera.qml
+internal SelectorYEditorDeCarrera SelectorYEditorDeCarrera.qml

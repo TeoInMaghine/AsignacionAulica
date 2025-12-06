@@ -126,7 +126,7 @@ class ListCarreras(QAbstractListModel):
             # o -1 si no hay carreras.
             return n_carreras - 1
     
-    def _set_edificio_preferido(self, i_carrera: int, i_edificio: int) -> bool:
+    def _set_edificio_preferido(self, i_carrera: int, i_edificio: int|Any) -> bool:
         '''
         Setear el edificio preferido de una carrera.
 
@@ -136,7 +136,10 @@ class ListCarreras(QAbstractListModel):
 
         :return: Bandera de éxito.
         '''
-        if not 0 <= i_carrera < self.rowCount():
+        if not isinstance(i_edificio, int):
+            logger.error('Set edificio preferido con valor de tipo %s (debería ser int).', type(i_edificio))
+            return False
+        elif not 0 <= i_carrera < self.rowCount():
             logger.error('Set edificio preferido con carrera fuera de rango.')
             return False
         elif i_edificio >= self.gestor.cantidad_de_edificios():

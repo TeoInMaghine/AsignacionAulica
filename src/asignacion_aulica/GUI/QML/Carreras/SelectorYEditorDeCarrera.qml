@@ -14,73 +14,96 @@ import ModelosAsignaciónÁulica
  * 
  * No se encargar de editar las materias y clases de la carrera.
  */
-RowLayout {
+ColumnLayout{
     spacing: 10
 
-    ListCarreras { id: modelo_de_carreras }
+    ListCarreras { id: listCarreras }
 
-    Label{
-        text: "Carrera: "
-        font.pointSize: FontSize.big
-    }
+    RowLayout {
+        spacing: 10
 
-    ComboBoxCarrera{
-        id: comboBox
-        modelo_de_carreras: modelo_de_carreras
-        visible: !inputEditarNombre.focus
-    }
-
-    TextField {
-        id: inputEditarNombre
-        visible: inputEditarNombre.focus
-        Layout.preferredHeight: comboBox.height
-        Layout.preferredWidth: comboBox.Layout.preferredWidth
-
-        text: comboBox.currentText
-        onAccepted: {
-            var nuevoÍndice = modelo_de_carreras.cambiarNombre(comboBox.currentIndex, inputEditarNombre.text)
-            comboBox.currentIndex = nuevoÍndice
-            inputEditarNombre.focus = false
+        Label{
+            text: "Carrera: "
+            font.pointSize: FontSize.big
         }
 
-        Keys.onEscapePressed: {
-            inputEditarNombre.focus = false
+        ComboBoxCarrera{
+            id: comboBox
+            listCarreras: listCarreras
+            visible: !inputEditarNombre.focus
+        }
+
+        TextField {
+            id: inputEditarNombre
+            visible: inputEditarNombre.focus
+            Layout.preferredHeight: comboBox.height
+            Layout.preferredWidth: comboBox.Layout.preferredWidth
+
+            text: comboBox.currentText
+            onAccepted: {
+                var nuevoÍndice = listCarreras.cambiarNombre(comboBox.currentIndex, inputEditarNombre.text)
+                comboBox.currentIndex = nuevoÍndice
+                inputEditarNombre.focus = false
+            }
+
+            Keys.onEscapePressed: {
+                inputEditarNombre.focus = false
+            }
+        }
+
+        BotónRedondeadoConTexto {
+            text: "Editar Nombre"
+            enabled: comboBox.hayCarreraSeleccionada
+            icon.source: assets_path + "/iconos/editar.png"
+            onClicked: {
+                inputEditarNombre.focus = true
+            }
+        }
+
+        BotónRedondeadoConTexto {
+            text: "Borrar Carrera"
+            enabled: comboBox.hayCarreraSeleccionada
+            icon.source: assets_path + "/iconos/Borrar.svg"
+            onClicked: confirmaciónBorrar.open()
+        }
+
+        // Solamente visible al clickear el botón de borrar:
+        Dialog {
+            id: confirmaciónBorrar
+            title: "¿Borrar la carrera?"
+            standardButtons: Dialog.Ok | Dialog.Cancel
+
+            onAccepted: {
+                var nuevoÍndice = listCarreras.borrarCarrera(comboBox.currentIndex)
+                comboBox.currentIndex = nuevoÍndice
+            }
+
+            width: 450 // Si no se define esto, da error: QML Dialog: Binding loop detected for property "implicitWidth"
+
+            Text {
+                text: "Se perderá toda la información de la carrera " + comboBox.currentText + "."
+                wrapMode: Text.Wrap
+                width: parent.width
+            }
         }
     }
 
-    BotónRedondeadoConTexto {
-        text: "Editar Nombre"
-        enabled: comboBox.hayCarreraSeleccionada
-        icon.source: assets_path + "/iconos/editar.png"
-        onClicked: {
-            inputEditarNombre.focus = true
-        }
-    }
+    RowLayout {
+        spacing: 10
 
-    BotónRedondeadoConTexto {
-        text: "Borrar Carrera"
-        enabled: comboBox.hayCarreraSeleccionada
-        icon.source: assets_path + "/iconos/Borrar.svg"
-        onClicked: confirmaciónBorrar.open()
-    }
-
-    // Solamente visible al clickear el botón de borrar:
-    Dialog {
-        id: confirmaciónBorrar
-        title: "¿Borrar la carrera?"
-        standardButtons: Dialog.Ok | Dialog.Cancel
-
-        onAccepted: {
-            var nuevoÍndice = modelo_de_carreras.borrarCarrera(comboBox.currentIndex)
-            comboBox.currentIndex = nuevoÍndice
+        Label{
+            text: "Edificio preferido: "
+            font.pointSize: FontSize.base
         }
 
-        width: 450 // Si no se define un esto, da error: QML Dialog: Binding loop detected for property "implicitWidth"
+        SelectorEdificio{
+            enabled: comboBox.hayCarreraSeleccionada
+            Layout.preferredWidth: 270
 
-        Text {
-            text: "Se perderá toda la información de la carrera " + comboBox.currentText + "."
-            wrapMode: Text.Wrap
-            width: parent.width
+            onActivated: indexEdificio => {
+                console.log(indexEdificio)
+                listCarreras.setEdificioPreferido(comboBox.currentIndex, indexEdificio-1)
+            }
         }
     }
 }

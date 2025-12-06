@@ -46,23 +46,6 @@ class ListCarreras(QAbstractListModel):
                 return la_carrera.edificio_preferido.nombre
             case _:
                 return None
-    
-    @override
-    def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
-        if not index.isValid(): return False
-        if role not in ROLES_A_NOMBRES_QT: return False
-
-        rol = Rol(role)
-        logger.debug(f'Editando {rol.name}')
-
-        match role:
-            case Rol.nombre:
-                logger.error("El nombre se debe cambiar con cambiarNombre, no con setData.")
-                return False
-            case Rol.edificio_preferido:
-                return self._set_edificio_preferido(index.row(), value)
-            case _:
-                return False
 
     @pyqtSlot(str, result=int)
     def agregarCarrera(self, nombre: str) -> int:
@@ -104,7 +87,6 @@ class ListCarreras(QAbstractListModel):
             # o -1 si no hay carreras.
             return n_carreras - 1
             
-    
     @pyqtSlot(int, result=int)
     def borrarCarrera(self, índice: int) -> int:
         '''
@@ -126,25 +108,19 @@ class ListCarreras(QAbstractListModel):
             # o -1 si no hay carreras.
             return n_carreras - 1
     
-    def _set_edificio_preferido(self, i_carrera: int, i_edificio: int|Any) -> bool:
+    @pyqtSlot(int, int)
+    def setEdificioPreferido(self, i_carrera: int, i_edificio: int):
         '''
         Setear el edificio preferido de una carrera.
 
         :param i_carrera: El índice de la carrera.
         :param i_edificio: El índice del nuevo edificio preferido, o -1 para
         borrar el edificio preferido.
-
-        :return: Bandera de éxito.
         '''
-        if not isinstance(i_edificio, int):
-            logger.error('Set edificio preferido con valor de tipo %s (debería ser int).', type(i_edificio))
-            return False
-        elif not 0 <= i_carrera < self.rowCount():
+        if not 0 <= i_carrera < self.rowCount():
             logger.error('Set edificio preferido con carrera fuera de rango.')
-            return False
         elif i_edificio >= self.gestor.cantidad_de_edificios():
             logger.error('Set edificio preferido con edificio fuera de rango.')
-            return False
         else:
             edificio = (
                 self.gestor.get_edificio(i_edificio)
@@ -152,7 +128,6 @@ class ListCarreras(QAbstractListModel):
                 else None
             )
             self.gestor.get_carrera(i_carrera).edificio_preferido = edificio
-            return True
 
     def _actualizarLista(self):
         self.beginResetModel()

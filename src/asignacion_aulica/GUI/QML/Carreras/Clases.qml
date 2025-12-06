@@ -33,6 +33,7 @@ ListView {
         property alias widthVirtual: headerClases.widthVirtual
         property alias widthCantidadDeAlumnos: headerClases.widthCantidadDeAlumnos
         property alias widthEquipamientoNecesario: headerClases.widthEquipamientoNecesario
+        property alias widthAulaAsignada: headerClases.widthAulaAsignada
         property alias widthNoCambiarAsignación: headerClases.widthNoCambiarAsignación
         // property alias widthXxxxxx: headerClases.widthXxxxxx
         // property alias widthXxxxxx: headerClases.widthXxxxxx
@@ -70,7 +71,6 @@ ListView {
 
             // Usar el ancho que no incluye los side buttons
             Layout.preferredWidth: Constantes.width_editores_horarios
-            Layout.alignment: Qt.AlignCenter
         }
 
         CheckBox {
@@ -107,8 +107,14 @@ ListView {
             }
         }
 
-        // TODO: Mostrar el aula asignada (en el futuro también te dejaría
-        // seleccionar el aula manualmente)
+        // TODO: Editar el aula asignada (posiblemente de la misma forma que el
+        // edificio preferido de una carrera?)
+        Label {
+            Layout.preferredWidth: headerItem.widthAulaAsignada
+
+            horizontalAlignment: Text.AlignHCenter
+            text: clase.aula_asignada
+        }
 
         CheckBox {
             Layout.preferredWidth: headerItem.widthNoCambiarAsignación

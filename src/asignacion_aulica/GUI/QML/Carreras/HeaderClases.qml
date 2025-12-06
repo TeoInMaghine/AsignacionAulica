@@ -11,6 +11,7 @@ RowLayout {
     property alias widthCantidadDeAlumnos: headerCantidadDeAlumnos.width
     property alias widthEquipamientoNecesario: headerEquipamientoNecesario.width
     property alias widthNoCambiarAsignación: headerNoCambiarAsignación.width
+    property alias widthAulaAsignada: headerAulaAsignada.width
 
     // TODO: Header selector de día
 
@@ -39,7 +40,11 @@ RowLayout {
         text: "Equipamiento necesario"
     }
 
-    // TODO: Header aula asignada
+    Label {
+        id: headerAulaAsignada
+        horizontalAlignment: Text.AlignHCenter
+        text: "Aula asignada"
+    }
 
     Label {
         id: headerNoCambiarAsignación

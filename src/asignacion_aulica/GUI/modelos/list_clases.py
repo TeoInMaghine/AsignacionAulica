@@ -88,6 +88,13 @@ class ListClases(QAbstractListModel):
         if rol == Rol.no_cambiar_asignación:
             return clase.no_cambiar_asignación
 
+        elif rol == Rol.aula_asignada:
+            return (
+                clase.aula_asignada.nombre
+                if clase.aula_asignada else
+                'Ninguna'
+            )
+
         elif rol == Rol.horario_inicio:
             return time_to_string_horario(clase.horario.inicio)
 
@@ -147,6 +154,12 @@ class ListClases(QAbstractListModel):
 
             clase.no_cambiar_asignación = value
             return True
+
+        if rol == Rol.aula_asignada:
+            logger.error(
+                'Todavía no se implementó la edición del aula asignada.'
+            )
+            return False
 
         logger.error(
             'Esto nunca debería ocurrir, todos los roles deberían manejarse.'

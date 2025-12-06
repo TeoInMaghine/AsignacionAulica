@@ -2,3 +2,7 @@ module QML.Edificios
 Edificios Edificios.qml
 internal Aulas Aulas.qml
 internal HeaderAulas HeaderAulas.qml
+internal EditorHorariosSemanalesEdificio EditorHorariosSemanalesEdificio.qml
+internal EditorHorariosSemanalesAula EditorHorariosSemanalesAula.qml
+internal EditorRangoHorarioEdificio EditorRangoHorarioEdificio.qml
+internal EditorRangoHorarioAula EditorRangoHorarioAula.qml

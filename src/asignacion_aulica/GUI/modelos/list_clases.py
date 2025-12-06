@@ -1,26 +1,27 @@
 import logging
 from enum import IntEnum, auto
-from datetime import time, datetime
+from datetime import time
 from copy import copy
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Clase
-from asignacion_aulica.gestor_de_datos.días_y_horarios import Día, RangoHorario
+from asignacion_aulica.gestor_de_datos.días_y_horarios import (
+    Día, RangoHorario, parse_string_horario_to_time, time_to_string_horario
+)
 
 logger = logging.getLogger(__name__)
 
 class Rol(IntEnum):
     # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt.
-    # día                   = Qt.ItemDataRole.UserRole + 1
-    # horario_inicio        = auto()
-    # horario_fin           = auto()
-    # virtual               = auto()
-    # cantidad_de_alumnos   = auto()
-    # aula_asignada         = auto()
-    # no_cambiar_asignación = auto()
-    cantidad_de_alumnos = Qt.ItemDataRole.UserRole + 1
+    día                   = Qt.ItemDataRole.UserRole + 1
+    horario_inicio        = auto()
+    horario_fin           = auto()
+    virtual               = auto()
+    cantidad_de_alumnos   = auto()
+    aula_asignada         = auto()
+    no_cambiar_asignación = auto()
 
 ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
     rol.value: QByteArray(rol.name.encode())
@@ -79,6 +80,13 @@ class ListClases(QAbstractListModel):
 
         if rol == Rol.cantidad_de_alumnos:
             return clase.cantidad_de_alumnos
+
+        elif rol == Rol.horario_inicio:
+            return time_to_string_horario(clase.horario.inicio)
+
+        elif rol == Rol.horario_fin:
+            return time_to_string_horario(clase.horario.fin)
+
         else:
             logger.warn('F**k off mate')
             return None

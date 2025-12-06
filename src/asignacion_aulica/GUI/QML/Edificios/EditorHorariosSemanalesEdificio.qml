@@ -23,7 +23,7 @@ Repeater {
         rolHorarioInicio: "horario_inicio_" + modelData
         rolHorarioFin: "horario_fin_" + modelData
         rolHorarioCerrado: "horario_cerrado_" + modelData
-        entidad: repeater.entidad
+        edificio: repeater.entidad
 
         Layout.preferredWidth: Constantes.width_columna_horario
         Layout.alignment: Qt.AlignCenter

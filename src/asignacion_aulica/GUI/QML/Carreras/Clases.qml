@@ -7,7 +7,7 @@ import QML.ComponentesUI
 ListView {
     id: view
 
-    // required property var carrera (?, quizás materia.carrear se puede?)
+    // required property var carrera (?, quizás materia.indexCarrera se puede? tal vez depende de la implementación de ListMaterias)
     // required property var materia
     readonly property int padding: 20
 
@@ -63,7 +63,13 @@ ListView {
 
         // TODO: SelectorDeDía { }
 
-        // TODO: EditorRangoHorarioClase { }
+        EditorRangoHorarioClase {
+            clase: editorDeClase.clase
+
+            // Usar el ancho que no incluye los side buttons
+            Layout.preferredWidth: Constantes.width_editores_horarios
+            Layout.alignment: Qt.AlignCenter
+        }
 
         // TODO: Checkbox de "es virtual". Tendría q no tener texto (q ya lo
         // hice en algún momento, espero q esté commiteado)

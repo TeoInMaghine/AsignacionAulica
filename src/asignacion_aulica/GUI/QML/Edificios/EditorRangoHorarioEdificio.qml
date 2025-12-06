@@ -4,7 +4,7 @@ import QtQuick.Layouts
 import QML.ComponentesUI
 
 RowLayout {
-    required property var entidad
+    required property var edificio
     required property string rolHorarioInicio
     required property string rolHorarioFin
     required property string rolHorarioCerrado
@@ -15,40 +15,40 @@ RowLayout {
     readonly property int textFieldPadding : 2
     EditorHorario {
         id: horarioInicio
-        visible: !entidad[rolHorarioCerrado]
+        visible: !edificio[rolHorarioCerrado]
 
         Layout.preferredWidth: Constantes.width_editor_horario
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: entidad[rolHorarioInicio]
+        text: edificio[rolHorarioInicio]
         onEditingFinished: {
-            entidad[rolHorarioInicio] = text
+            edificio[rolHorarioInicio] = text
         }
         onChangeText: function(newText) {
-            entidad[rolHorarioInicio] = newText
+            edificio[rolHorarioInicio] = newText
         }
     }
     EditorHorario {
         id: horarioFin
-        visible: !entidad[rolHorarioCerrado]
+        visible: !edificio[rolHorarioCerrado]
 
         Layout.preferredWidth: Constantes.width_editor_horario
         leftPadding: textFieldPadding
         rightPadding: textFieldPadding
 
-        text: entidad[rolHorarioFin]
+        text: edificio[rolHorarioFin]
         onEditingFinished: {
-            entidad[rolHorarioFin] = text
+            edificio[rolHorarioFin] = text
         }
         onChangeText: function(newText) {
-            entidad[rolHorarioFin] = newText
+            edificio[rolHorarioFin] = newText
         }
     }
 
     // Elemento que se muestra cuando el rango horario está cerrado
     Label {
-        visible: entidad[rolHorarioCerrado]
+        visible: edificio[rolHorarioCerrado]
 
         // Ocupa el mismo espacio que los editores de horarios
         Layout.preferredWidth: Constantes.width_editores_horarios
@@ -69,7 +69,7 @@ RowLayout {
         Layout.preferredWidth: Constantes.width_horario_sideButtons
         Layout.preferredHeight: Constantes.width_horario_sideButtons
 
-        checked: entidad[rolHorarioCerrado]
-        onClicked: entidad[rolHorarioCerrado] = checked
+        checked: edificio[rolHorarioCerrado]
+        onClicked: edificio[rolHorarioCerrado] = checked
     }
 }

@@ -12,7 +12,11 @@ RowLayout {
 
     // TODO: Header selector de día
 
-    // TODO: Header rango horario clase
+    Label {
+        Layout.preferredWidth: Constantes.width_editores_horarios
+        horizontalAlignment: Text.AlignHCenter
+        text: "Horario"
+    }
 
     // TODO: Header "es virtual"
 

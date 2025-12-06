@@ -10,4 +10,7 @@ ColumnLayout {
     Botonera { }
     SelectorDeCarrera { id: selector }
     Label { text: "Carrera seleccionada: " + selector.índiceDeLaCarreraActual }
+
+    // TODO: Placeholder, borrar eventualmente
+    Clases { }
 }

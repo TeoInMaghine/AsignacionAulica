@@ -156,7 +156,7 @@ class ListAulas(QAbstractListModel):
 
         if rol == Rol.nombre:
             if not isinstance(value, str):
-                logger.debug(
+                logger.error(
                     f'No se puede asignar el valor "{value}" de tipo'
                     f' {type(value)} al nombre, de tipo {str}.'
                 )
@@ -166,7 +166,7 @@ class ListAulas(QAbstractListModel):
 
         if rol == Rol.capacidad:
             if not isinstance(value, str):
-                logger.debug(
+                logger.error(
                     f'No se puede parsear como capacidad un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
                 )
@@ -179,7 +179,7 @@ class ListAulas(QAbstractListModel):
 
         if rol_horario == RolHorario.es_propio:
             if value != False:
-                logger.debug(
+                logger.error(
                     f'El valor "{value}" de tipo {type(value)} no es '
                     f'válido para "horario es propio", sólo admite {False}.'
                 )
@@ -198,7 +198,7 @@ class ListAulas(QAbstractListModel):
 
         if rol_horario == RolHorario.cerrado:
             if not isinstance(value, bool):
-                logger.debug(
+                logger.error(
                     f'No se puede asignar el valor "{value}" de tipo'
                     f' {type(value)} a "horario cerrado", de tipo {bool}.'
                 )
@@ -209,7 +209,7 @@ class ListAulas(QAbstractListModel):
 
         if rol_horario == RolHorario.inicio or rol_horario == RolHorario.fin:
             if not isinstance(value, str):
-                logger.debug(
+                logger.error(
                     f'No se puede parsear como horario un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
                 )

@@ -126,7 +126,7 @@ class ListClases(QAbstractListModel):
 
         if rol == Rol.cantidad_de_alumnos:
             if not isinstance(value, str):
-                logger.debug(
+                logger.error(
                     f'No se puede parsear como capacidad un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
                 )
@@ -136,7 +136,7 @@ class ListClases(QAbstractListModel):
 
         if rol == Rol.virtual:
             if not isinstance(value, bool):
-                logger.debug(
+                logger.error(
                     f'No se puede asignar el valor "{value}" de tipo'
                     f' {type(value)} a "virtual", de tipo {bool}.'
                 )
@@ -147,7 +147,7 @@ class ListClases(QAbstractListModel):
 
         if rol == Rol.no_cambiar_asignación:
             if not isinstance(value, bool):
-                logger.debug(
+                logger.error(
                     f'No se puede asignar el valor "{value}" de tipo'
                     f' {type(value)} a "no cambiar asignación", de tipo {bool}.'
                 )
@@ -164,13 +164,13 @@ class ListClases(QAbstractListModel):
 
         if rol == Rol.día:
             if not isinstance(value, int):
-                logger.debug(
+                logger.error(
                     f'No se puede parsear como día un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {int}.'
                 )
                 return False
             if value not in Día:
-                logger.debug(
+                logger.error(
                     f'No se puede parsear como día un valor "{value}",'
                     f' tiene que estar dentro del intervalo [0, 7).'
                 )
@@ -181,7 +181,7 @@ class ListClases(QAbstractListModel):
 
         if rol == Rol.horario_inicio or rol == Rol.horario_fin:
             if not isinstance(value, str):
-                logger.debug(
+                logger.error(
                     f'No se puede parsear como horario un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
                 )

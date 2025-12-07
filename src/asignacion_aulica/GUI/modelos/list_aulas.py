@@ -145,7 +145,7 @@ class ListAulas(QAbstractListModel):
         if role not in ROLES_A_NOMBRES_QT: return False
 
         rol = Rol(role)
-        logger.debug(f'Editando {rol.name}')
+        logger.debug(f'Editando {rol.name} con el valor {value}')
 
         was_set: bool = self.try_to_set(index, value, rol)
         if was_set: self.dataChanged.emit(index, index, [role])

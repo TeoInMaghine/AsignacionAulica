@@ -7,6 +7,7 @@ Colapsador Colapsador.qml
 Candado Candado.qml
 Reestablecer Reestablecer.qml
 SelectorEquipamiento SelectorEquipamiento.qml
+SelectorDeDía SelectorDeDía.qml
 EditorHorario EditorHorario.qml
 HeaderHorariosSemanales HeaderHorariosSemanales.qml
 singleton Constantes Constantes.qml

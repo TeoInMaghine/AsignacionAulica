@@ -95,6 +95,9 @@ class ListClases(QAbstractListModel):
                 'Ninguna'
             )
 
+        elif rol == Rol.día:
+            return clase.día.value
+
         elif rol == Rol.horario_inicio:
             return time_to_string_horario(clase.horario.inicio)
 
@@ -160,6 +163,23 @@ class ListClases(QAbstractListModel):
                 'Todavía no se implementó la edición del aula asignada.'
             )
             return False
+
+        if rol == Rol.día:
+            if not isinstance(value, int):
+                logger.debug(
+                    f'No se puede parsear como día un valor "{value}"'
+                    f' de tipo {type(value)}, se esperaba uno de tipo {int}.'
+                )
+                return False
+            if value not in Día:
+                logger.debug(
+                    f'No se puede parsear como día un valor "{value}",'
+                    f' tiene que estar dentro del intervalo [0, 7).'
+                )
+                return False
+
+            clase.día = Día(value)
+            return True
 
         logger.error(
             'Esto nunca debería ocurrir, todos los roles deberían manejarse.'

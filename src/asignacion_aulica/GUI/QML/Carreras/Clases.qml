@@ -30,14 +30,12 @@ ListView {
 
     header: Item {
         property alias spacing: headerClases.spacing
+        property alias widthDía: headerClases.widthDía
         property alias widthVirtual: headerClases.widthVirtual
         property alias widthCantidadDeAlumnos: headerClases.widthCantidadDeAlumnos
         property alias widthEquipamientoNecesario: headerClases.widthEquipamientoNecesario
         property alias widthAulaAsignada: headerClases.widthAulaAsignada
         property alias widthNoCambiarAsignación: headerClases.widthNoCambiarAsignación
-        // property alias widthXxxxxx: headerClases.widthXxxxxx
-        // property alias widthXxxxxx: headerClases.widthXxxxxx
-        // ...
         height: headerClases.height + view.spacing
         width: headerClases.width
 
@@ -64,7 +62,13 @@ ListView {
 
         property alias clase : editorDeClase.model
 
-        // TODO: SelectorDeDía { }
+        SelectorDeDía {
+            Layout.preferredWidth: headerItem.widthDía
+            currentIndex: clase.día
+            onActivated: (index) => {
+                clase.día = index
+            }
+        }
 
         EditorRangoHorarioClase {
             clase: editorDeClase.clase

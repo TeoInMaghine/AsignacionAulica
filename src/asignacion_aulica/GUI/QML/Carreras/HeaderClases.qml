@@ -7,13 +7,20 @@ import QML.ComponentesUI
 RowLayout {
     id: visualHeader
 
+    property alias widthDía: headerDía.width
     property alias widthVirtual: headerVirtual.width
     property alias widthCantidadDeAlumnos: headerCantidadDeAlumnos.width
     property alias widthEquipamientoNecesario: headerEquipamientoNecesario.width
     property alias widthNoCambiarAsignación: headerNoCambiarAsignación.width
     property alias widthAulaAsignada: headerAulaAsignada.width
 
-    // TODO: Header selector de día
+    Label {
+        id: headerDía
+        leftPadding: 50
+        rightPadding: 50
+        horizontalAlignment: Text.AlignHCenter
+        text: "Día"
+    }
 
     Label {
         Layout.preferredWidth: Constantes.width_editores_horarios

@@ -459,7 +459,7 @@ class GestorDeDatos:
         '''
         la_carrera = self._carreras[carrera]
         nombres_existentes = [materia.nombre for materia in la_carrera.materias]
-        nombre_nuevo = _generar_nombre_no_existente('Materia sin nombre', nombres_existentes)
+        nombre_nuevo = _generar_nombre_no_existente('Sin nombre', nombres_existentes)
         
         la_carrera.materias.append(Materia(
             nombre = nombre_nuevo,

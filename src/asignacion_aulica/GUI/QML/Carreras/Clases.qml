@@ -8,7 +8,7 @@ ListView {
     id: view
 
     // required property var carrera (?, quizás materia.indexCarrera se puede? tal vez depende de la implementación de ListMaterias)
-    // required property var materia
+    required property var materia
     readonly property int padding: 20
 
     spacing: headerItem.spacing
@@ -24,8 +24,7 @@ ListView {
         id: clases
         indexCarrera: 0
         // indexCarrera: carrera.index
-        indexMateria: 0
-        // indexMateria: materia.index
+        indexMateria: materia.index
     }
 
     header: Item {

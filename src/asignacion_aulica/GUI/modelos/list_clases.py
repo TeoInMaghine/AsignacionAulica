@@ -181,6 +181,18 @@ class ListClases(QAbstractListModel):
             clase.día = Día(value)
             return True
 
+        if rol == Rol.horario_inicio or rol == Rol.horario_fin:
+            if value_no_es_string:
+                logger.debug(
+                    f'No se puede parsear como horario un valor "{value}"'
+                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                )
+                return False
+
+            return self.try_to_set_horario_inicio_o_fin(
+                rol, clase.horario, value
+            )
+
         logger.error(
             'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
         )
@@ -197,6 +209,32 @@ class ListClases(QAbstractListModel):
             return True
 
         return False
+
+    def try_to_set_horario_inicio_o_fin(
+            self,
+            rol: Rol,
+            rango_horario: RangoHorario,
+            value: str
+        ) -> bool:
+        '''
+        Asignar inicio o fin del rango horario si no resulta en un rango
+        inválido (i.e.: con inicio >= fin).
+        '''
+
+        horario: time = parse_string_horario_to_time(value)
+
+        if rol == Rol.horario_inicio:
+            if horario >= rango_horario.fin:
+                return False
+
+            rango_horario.inicio = horario
+        else:
+            if horario <= rango_horario.inicio:
+                return False
+
+            rango_horario.fin = horario
+
+        return True
 
     @override
     def removeRows(self, row: int, count: int, parent: QModelIndex|None = None) -> bool:

@@ -81,31 +81,32 @@ class ListClases(QAbstractListModel):
         if rol == Rol.cantidad_de_alumnos:
             return clase.cantidad_de_alumnos
 
-        elif rol == Rol.virtual:
+        if rol == Rol.virtual:
             return clase.virtual
 
         if rol == Rol.no_cambiar_asignación:
             return clase.no_cambiar_asignación
 
-        elif rol == Rol.aula_asignada:
+        if rol == Rol.aula_asignada:
             return (
                 clase.aula_asignada.nombre
                 if clase.aula_asignada else
                 'Ninguna'
             )
 
-        elif rol == Rol.día:
+        if rol == Rol.día:
             return clase.día.value
 
-        elif rol == Rol.horario_inicio:
+        if rol == Rol.horario_inicio:
             return time_to_string_horario(clase.horario.inicio)
 
-        elif rol == Rol.horario_fin:
+        if rol == Rol.horario_fin:
             return time_to_string_horario(clase.horario.fin)
 
-        else:
-            logger.warn('F**k off mate')
-            return None
+        logger.error(
+            'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
+        )
+        return None
 
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:

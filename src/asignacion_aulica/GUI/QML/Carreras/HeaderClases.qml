@@ -11,7 +11,6 @@ RowLayout {
     property alias widthVirtual: headerVirtual.width
     property alias widthCantidadDeAlumnos: headerCantidadDeAlumnos.width
     property alias widthEquipamientoNecesario: headerEquipamientoNecesario.width
-    property alias widthNoCambiarAsignación: headerNoCambiarAsignación.width
     property alias widthAulaAsignada: headerAulaAsignada.width
 
     Label {
@@ -51,12 +50,6 @@ RowLayout {
         id: headerAulaAsignada
         horizontalAlignment: Text.AlignHCenter
         text: "Aula asignada"
-    }
-
-    Label {
-        id: headerNoCambiarAsignación
-        horizontalAlignment: Text.AlignHCenter
-        text: "No cambiar asignación"
     }
 
     // Item { } // Espacio vacío de 2 * spacing de ancho

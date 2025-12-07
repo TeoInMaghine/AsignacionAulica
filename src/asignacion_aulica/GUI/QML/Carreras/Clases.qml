@@ -35,7 +35,6 @@ ListView {
         property alias widthCantidadDeAlumnos: headerClases.widthCantidadDeAlumnos
         property alias widthEquipamientoNecesario: headerClases.widthEquipamientoNecesario
         property alias widthAulaAsignada: headerClases.widthAulaAsignada
-        property alias widthNoCambiarAsignación: headerClases.widthNoCambiarAsignación
         height: headerClases.height + view.spacing
         width: headerClases.width
 
@@ -111,21 +110,25 @@ ListView {
             }
         }
 
-        // TODO: Editar el aula asignada (posiblemente de la misma forma que el
-        // edificio preferido de una carrera?)
-        Label {
+        RowLayout {
             Layout.preferredWidth: headerItem.widthAulaAsignada
+            spacing: Constantes.spacing_horario
 
-            horizontalAlignment: Text.AlignHCenter
-            text: clase.aula_asignada
-        }
+            // TODO: Editar el aula asignada (posiblemente de la misma forma
+            // que el edificio preferido de una carrera?)
+            Label {
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                // Enfatizar texto cuando se "lockea" la asignación de aula
+                font.bold: clase.no_cambiar_asignación
+                text: clase.aula_asignada
+            }
+            Candado {
+                Layout.preferredWidth: Constantes.width_horario_sideButtons
+                Layout.preferredHeight: Constantes.width_horario_sideButtons
 
-        CheckBox {
-            Layout.preferredWidth: headerItem.widthNoCambiarAsignación
-
-            checked: clase.no_cambiar_asignación
-            onToggled: {
-                clase.no_cambiar_asignación = checked
+                checked: clase.no_cambiar_asignación
+                onClicked: clase.no_cambiar_asignación = checked
             }
         }
 

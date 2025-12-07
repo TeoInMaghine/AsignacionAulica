@@ -89,9 +89,8 @@ class ListClases(QAbstractListModel):
 
         if rol == Rol.aula_asignada:
             return (
-                clase.aula_asignada.nombre
-                if clase.aula_asignada else
-                'Ninguna'
+                f'{clase.aula_asignada.edificio.nombre} | {clase.aula_asignada.nombre}'
+                if clase.aula_asignada else 'Ninguna'
             )
 
         if rol == Rol.día:

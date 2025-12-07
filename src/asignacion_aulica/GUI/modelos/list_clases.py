@@ -1,9 +1,8 @@
 import logging
 from enum import IntEnum, auto
 from datetime import time
-from copy import copy
 from typing import Any, override
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Clase
@@ -124,10 +123,9 @@ class ListClases(QAbstractListModel):
         clase: Clase = self.gestor.get_clase(
             self.i_carrera, self.i_materia, index.row()
         )
-        value_no_es_string: bool = not isinstance(value, str)
 
         if rol == Rol.cantidad_de_alumnos:
-            if value_no_es_string:
+            if not isinstance(value, str):
                 logger.debug(
                     f'No se puede parsear como capacidad un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
@@ -182,7 +180,7 @@ class ListClases(QAbstractListModel):
             return True
 
         if rol == Rol.horario_inicio or rol == Rol.horario_fin:
-            if value_no_es_string:
+            if not isinstance(value, str):
                 logger.debug(
                     f'No se puede parsear como horario un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'

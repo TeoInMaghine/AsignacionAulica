@@ -153,10 +153,9 @@ class ListAulas(QAbstractListModel):
 
     def try_to_set(self, index: QModelIndex, value: Any, rol: Rol) -> bool:
         aula: Aula = self.gestor.get_aula(self.i_edificio, index.row())
-        value_no_es_string: bool = not isinstance(value, str)
 
         if rol == Rol.nombre:
-            if value_no_es_string:
+            if not isinstance(value, str):
                 logger.debug(
                     f'No se puede asignar el valor "{value}" de tipo'
                     f' {type(value)} al nombre, de tipo {str}.'
@@ -166,7 +165,7 @@ class ListAulas(QAbstractListModel):
             return self.try_to_set_nombre(aula, value)
 
         if rol == Rol.capacidad:
-            if value_no_es_string:
+            if not isinstance(value, str):
                 logger.debug(
                     f'No se puede parsear como capacidad un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
@@ -209,7 +208,7 @@ class ListAulas(QAbstractListModel):
             return True
 
         if rol_horario == RolHorario.inicio or rol_horario == RolHorario.fin:
-            if value_no_es_string:
+            if not isinstance(value, str):
                 logger.debug(
                     f'No se puede parsear como horario un valor "{value}"'
                     f' de tipo {type(value)}, se esperaba uno de tipo {str}.'

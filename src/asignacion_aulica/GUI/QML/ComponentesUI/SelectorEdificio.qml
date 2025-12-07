@@ -6,6 +6,7 @@ import ModelosAsignaciónÁulica
 ComboBox {
     id: comboBox
 
+    // El índice 0 indica que no hay edificio seleccionado.
     property bool hayEdificioSeleccionado: currentIndex > 0
 
     model: ListSelectorDeEdificios {

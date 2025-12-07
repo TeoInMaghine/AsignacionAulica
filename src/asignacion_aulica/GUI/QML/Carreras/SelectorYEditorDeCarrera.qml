@@ -92,6 +92,7 @@ ColumnLayout{
         spacing: 10
 
         Label{
+            enabled: comboBox.hayCarreraSeleccionada
             text: "Edificio preferido: "
             font.pointSize: FontSize.base
         }
@@ -101,7 +102,6 @@ ColumnLayout{
             Layout.preferredWidth: 270
 
             onActivated: indexEdificio => {
-                console.log(indexEdificio)
                 listCarreras.setEdificioPreferido(comboBox.currentIndex, indexEdificio-1)
             }
         }

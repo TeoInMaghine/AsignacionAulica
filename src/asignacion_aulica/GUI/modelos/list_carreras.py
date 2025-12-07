@@ -61,8 +61,9 @@ class ListCarreras(QAbstractListModel):
         if self.gestor.existe_carrera(nombre):
             return -2
 
+        self.beginResetModel()
         índice = self.gestor.agregar_carrera(nombre)
-        self._actualizarLista()
+        self.endResetModel()
         return índice
     
     @pyqtSlot(int, str, result=int)
@@ -74,14 +75,16 @@ class ListCarreras(QAbstractListModel):
         '''
         n_carreras = self.rowCount()
         if 0 <= índice < n_carreras:
+            self.beginResetModel()
             try:
                 nuevo_índice = self.gestor.set_carrera_nombre(índice, nuevo_nombre)
             except ValueError:
                 # Ignorar el error si el nuevo nombre no era válido
                 return índice
             else:
-                self._actualizarLista()
                 return nuevo_índice
+            finally:
+                self.endResetModel()
         else:
             # Índices inválidos: dejar seleccionada la última carrera
             # o -1 si no hay carreras.
@@ -97,8 +100,9 @@ class ListCarreras(QAbstractListModel):
         '''
         n_carreras = self.rowCount()
         if 0 <= índice < n_carreras:
+            self.beginResetModel()
             self.gestor.borrar_carrera(índice)
-            self._actualizarLista()
+            self.endResetModel()
             # Mantener el mismo índice, excepto que quede fuera de rango y ahí
             # dejamos seleccionada la última carrera de la lista o -1 si no
             # quedó ninguna carrera.
@@ -128,7 +132,3 @@ class ListCarreras(QAbstractListModel):
                 else None
             )
             self.gestor.get_carrera(i_carrera).edificio_preferido = edificio
-
-    def _actualizarLista(self):
-        self.beginResetModel()
-        self.endResetModel()

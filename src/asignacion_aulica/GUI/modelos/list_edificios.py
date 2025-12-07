@@ -179,7 +179,7 @@ class ListEdificios(QAbstractListModel):
             return False
 
         # Aceptamos cambiar la capitalización del nombre
-        cambio_de_capitalización: bool = nuevo_nombre == edificio.nombre.lower()
+        cambio_de_capitalización: bool = nuevo_nombre.lower() == edificio.nombre.lower()
         if not cambio_de_capitalización and self.gestor.existe_edificio(nuevo_nombre):
             logger.debug(
                 f'No se puede asignar el nombre "{nuevo_nombre}", porque ya'

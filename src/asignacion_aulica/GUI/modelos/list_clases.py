@@ -35,11 +35,6 @@ class ListClases(QAbstractListModel):
         self.i_carrera: int = 0 # Seteado por QT
         self.i_materia: int = 0 # Seteado por QT
 
-        # TODO: Placeholder, borrar eventualmente
-        if not gestor.existe_carrera('Sin nombre'):
-            gestor.agregar_carrera('Sin nombre')
-            gestor.agregar_materia(self.i_carrera)
-
     @pyqtProperty(int)
     def indexCarrera(self) -> int:
         return self.i_carrera
@@ -248,7 +243,7 @@ class ListClases(QAbstractListModel):
     @override
     def insertRows(self, row: int, count: int, parent: QModelIndex|None = None) -> bool:
         '''
-        Insertar aula "sin rellenar".
+        Insertar clase "sin rellenar".
 
         Inserta un solo elemento aún cuando count > 1, y lo inserta siempre al
         final independientemente del valor de row.

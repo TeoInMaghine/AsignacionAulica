@@ -7,15 +7,22 @@ import QML.ComponentesUI
 ListView {
     id: view
 
-    // required property var carrera
+    required property int indexCarrera
+    readonly property int padding: 20
 
     spacing: 10
-    clip: true
+    leftMargin: padding
+    rightMargin: padding
+    topMargin: padding
+    bottomMargin: padding
 
-    width: contentItem.childrenRect.width
-    height: contentHeight
+    width: contentItem.childrenRect.width + 2 * padding
+    height: contentHeight + 2 * padding
 
-    model: ListMaterias { id: materias }
+    model: ListMaterias {
+        id: materias
+        indexCarrera: view.indexCarrera
+    }
 
     // Mostrar un mensaje cuando no hay ninguna materia
     header: Label {
@@ -41,10 +48,11 @@ ListView {
             Colapsador {
                 id: colapsador
                 Component.onCompleted: {
-                    editorDetallesDeMateria.visible = checked
+                    // TODO: Averiguar wtf is going on here
+                    // editorDetallesDeMateria.visible = checked
                 }
                 onClicked: {
-                    editorDetallesDeMateria.visible = checked
+                    // editorDetallesDeMateria.visible = checked
                 }
             }
             TextFieldConEnter {
@@ -85,6 +93,8 @@ ListView {
                 }
             }
 
+            // TODO: Considerar agregar edición de "cuatrimestral o anual"
+
             Item {
                 Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
                 Layout.preferredHeight: editorDeClases.height
@@ -100,6 +110,7 @@ ListView {
                 }
                 Clases {
                     id: editorDeClases
+                    indexCarrera: view.indexCarrera
                     materia: editorDeMateria.materia
                 }
             }

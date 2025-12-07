@@ -25,10 +25,6 @@ class ListMaterias(QAbstractListModel):
         self.gestor: GestorDeDatos = gestor
         self.i_carrera: int = 0 # Seteado por QT
 
-        # TODO: Placeholder, borrar eventualmente
-        if not gestor.existe_carrera('Sin nombre'):
-            gestor.agregar_carrera('Sin nombre')
-
     @pyqtSlot()
     def ordenar(self):
         self.layoutAboutToBeChanged.emit()

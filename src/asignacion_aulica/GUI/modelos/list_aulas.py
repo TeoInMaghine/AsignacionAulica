@@ -105,7 +105,7 @@ class ListAulas(QAbstractListModel):
     @override
     def data(self, index: QModelIndex, role: int = 0) -> Any:
         if not index.isValid(): return None
-        if role not in ROLES_A_NOMBRES_QT: return None
+        if role not in Rol: return None
 
         rol = Rol(role)
         aula: Aula = self.gestor.get_aula(self.i_edificio, index.row())
@@ -142,7 +142,7 @@ class ListAulas(QAbstractListModel):
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
         if not index.isValid(): return False
-        if role not in ROLES_A_NOMBRES_QT: return False
+        if role not in Rol: return False
 
         rol = Rol(role)
         logger.debug('Editando %s con el valor %s', rol.name, value)

@@ -57,16 +57,18 @@ class ListMaterias(QAbstractListModel):
         rol = Rol(role)
         materia: Materia = self.gestor.get_materia(self.i_carrera, index.row())
 
-        if rol == Rol.nombre:
-            return materia.nombre
+        match rol:
+            case Rol.nombre:
+                return materia.nombre
 
-        if rol == Rol.año:
-            return materia.año
+            case Rol.año:
+                return materia.año
 
-        logger.error(
-            'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
-        )
-        return None
+            case _:
+                logger.error(
+                    'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
+                )
+                return None
 
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
@@ -83,32 +85,28 @@ class ListMaterias(QAbstractListModel):
     def try_to_set(self, index: QModelIndex, value: Any, rol: Rol) -> bool:
         materia: Materia = self.gestor.get_materia(self.i_carrera, index.row())
 
-        if rol == Rol.nombre:
-            if not isinstance(value, str):
+        match rol:
+            case Rol.nombre:
+                return self.try_to_set_nombre(materia, value)
+
+            case Rol.año:
+                return self.try_to_set_año(materia, value)
+
+            case _:
                 logger.error(
-                    f'No se puede asignar el valor "{value}" de tipo'
-                    f' {type(value)} al nombre, de tipo {str}.'
+                    'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
                 )
                 return False
-
-            return self.try_to_set_nombre(materia, value)
-
-        if rol == Rol.año:
-            if not isinstance(value, str):
-                logger.error(
-                    f'No se puede parsear como año un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
-                )
-                return False
-
-            return self.try_to_set_año(materia, value)
-
-        logger.error(
-            'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
-        )
-        return False
 
     def try_to_set_año(self, materia: Materia, value: str) -> bool:
+
+        if not isinstance(value, str):
+            logger.error(
+                f'No se puede parsear como año un valor "{value}"'
+                f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+            )
+            return False
+
         if value.isdigit():
             materia.año = int(value)
             return True
@@ -121,6 +119,14 @@ class ListMaterias(QAbstractListModel):
         return False
 
     def try_to_set_nombre(self, materia: Materia, value: str) -> bool:
+
+        if not isinstance(value, str):
+            logger.error(
+                f'No se puede asignar el valor "{value}" de tipo'
+                f' {type(value)} al nombre, de tipo {str}.'
+            )
+            return False
+
         nuevo_nombre: str = value.strip()
 
         # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar

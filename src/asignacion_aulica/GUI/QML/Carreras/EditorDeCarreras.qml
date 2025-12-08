@@ -15,9 +15,9 @@ ColumnLayout {
     }
 
     Loader {
-        active: selector.índiceDeLaCarreraActual >= 0
+        active: selector.hayCarreraSeleccionada
         sourceComponent: Materias {
-            indexCarrera: selector.índiceDeLaCarreraActual
+            carrera: selector.carrera
         }
     }
 }

@@ -7,7 +7,7 @@ import QML.ComponentesUI
 ListView {
     id: view
 
-    required property int indexCarrera
+    required property var carrera
     readonly property int padding: 20
 
     spacing: 10
@@ -21,7 +21,7 @@ ListView {
 
     model: ListMaterias {
         id: materias
-        indexCarrera: view.indexCarrera
+        indexCarrera: view.carrera.index
     }
 
     // Mostrar un mensaje cuando no hay ninguna materia
@@ -110,7 +110,7 @@ ListView {
                 }
                 Clases {
                     id: editorDeClases
-                    indexCarrera: view.indexCarrera
+                    indexCarrera: view.carrera.index
                     materia: editorDeMateria.materia
                 }
             }

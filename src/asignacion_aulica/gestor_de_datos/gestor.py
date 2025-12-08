@@ -643,7 +643,21 @@ class GestorDeDatos:
 
         :return: Info sobre el resultado de la asignación.
         '''
-        return asignar(self._edificios, self._carreras)
+        logger.info('Asignando aulas...')
+        result = asignar(self._edificios, self._carreras)
+        if result.todo_ok():
+            logger.info('... Asignación ok')
+        else:
+            logger.info(
+                '''... Asignación no ok.
+                Días sin asignar: %s
+                Clases con aula chica: %d
+                Clases fuera de su edificio preferido: %d''',
+                result.días_sin_asignar,
+                len(result.clases_con_aula_chica),
+                len(result.clases_fuera_de_su_edificio_preferido)
+            )
+        return result
 
     def importar_clases_de_excel(self, path: str, confirmación_de_sobreescritura: Callable[[list[str]], bool]):
         '''

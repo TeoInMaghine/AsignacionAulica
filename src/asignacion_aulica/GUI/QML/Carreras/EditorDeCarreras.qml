@@ -16,8 +16,10 @@ ColumnLayout {
 
     Loader {
         active: selector.hayCarreraSeleccionada
+        Layout.preferredWidth: width
+        Layout.preferredHeight: height
         sourceComponent: Materias {
-            carrera: selector.carrera
+            indexCarrera: selector.indexCarrera
         }
     }
 }

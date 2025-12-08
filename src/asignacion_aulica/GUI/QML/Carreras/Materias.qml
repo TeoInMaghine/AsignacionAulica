@@ -7,7 +7,7 @@ import QML.ComponentesUI
 ListView {
     id: view
 
-    required property var carrera
+    required property int indexCarrera
     readonly property int padding: 20
 
     spacing: 10
@@ -21,7 +21,7 @@ ListView {
 
     model: ListMaterias {
         id: materias
-        indexCarrera: view.carrera.index
+        indexCarrera: view.indexCarrera
     }
 
     // Mostrar un mensaje cuando no hay ninguna materia
@@ -48,11 +48,10 @@ ListView {
             Colapsador {
                 id: colapsador
                 Component.onCompleted: {
-                    // TODO: Averiguar wtf is going on here
-                    // editorDetallesDeMateria.visible = checked
+                    editorDetallesDeMateria.visible = checked
                 }
                 onClicked: {
-                    // editorDetallesDeMateria.visible = checked
+                    editorDetallesDeMateria.visible = checked
                 }
             }
             TextFieldConEnter {
@@ -110,7 +109,7 @@ ListView {
                 }
                 Clases {
                     id: editorDeClases
-                    indexCarrera: view.carrera.index
+                    indexCarrera: view.indexCarrera
                     materia: editorDeMateria.materia
                 }
             }

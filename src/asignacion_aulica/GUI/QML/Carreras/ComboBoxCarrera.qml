@@ -10,13 +10,15 @@ import ModelosAsignaciónÁulica
 ComboBox {
     id: comboBox
 
-    required property var modelo_de_carreras
-    property bool hayCarreraSeleccionada: comboBox.currentIndex >= 0
+    required property var listCarreras
+    property alias carrera: comboBox.currentValue
+    property bool hayCarreraSeleccionada: carrera !== undefined
 
-    model: modelo_de_carreras
+    model: listCarreras
 
     Layout.preferredWidth: 350
 
+    textRole: "nombre"
     displayText: hayCarreraSeleccionada ? currentText : "Ninguna"
 
     popup: Popup {
@@ -57,7 +59,7 @@ ComboBox {
                     placeholderText: "Nueva"
 
                     onAccepted: {
-                        var índice = modelo_de_carreras.agregarCarrera(editorNuevaCarrera.text)
+                        var índice = listCarreras.agregarCarrera(editorNuevaCarrera.text)
                         if (índice >= 0) {
                             comboBox.currentIndex = índice
                             editorNuevaCarrera.clear()

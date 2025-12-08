@@ -314,7 +314,7 @@ class GestorDeDatos:
 
     def cantidad_de_carreras(self) -> int:
         return len(self._carreras)
-        
+
     def get_carreras(self) -> list[str]:
         '''
         :return: Los nombres de todas las carreras en la base de
@@ -394,28 +394,6 @@ class GestorDeDatos:
             self._carreras.sort(key=lambda carrera: carrera.nombre.lower())
             nuevo_índice = self._carreras.index(la_carrera)
             return nuevo_índice
-
-    def set_carrera_edificio_preferido(self, índice: int, edificio: str|None):
-        '''
-        Cambiar el edificio preferido de una carrera existente.
-
-        :param índice: El índice de la carrera.
-        :param edificio: El nombre del nuevo edificio preferido, o None para que
-        no tenga preferencia.
-
-        :raise IndexError: Si el índice está fuera de rango.
-        :raise ValueError: Si no existe un edificio con el nombre dado.
-        '''
-        if edificio is None:
-            el_edificio = None
-        else:
-            # Buscar el primer edificio con el nombre especificado, si existe.
-            # Copiado de https://stackoverflow.com/a/2364277.
-            el_edificio = next((ed for ed in self._edificios if ed.nombre==edificio), None)
-            if el_edificio is None:
-                raise ValueError(f'No existe ningún edificio llamado "{edificio}".')
-        
-        self._carreras[índice].edificio_preferido = el_edificio
 
     def borrar_carrera(self, índice: int):
         '''

@@ -12,4 +12,7 @@ ColumnLayout {
     SelectorYEditorDeCarrera {
         id: selector
     }
+
+    // TODO: Placeholder, borrar eventualmente
+    Clases { }
 }

@@ -1,9 +1,11 @@
-from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
 from asignacion_aulica.GUI.modelos.list_selector_edificio import ListSelectorDeEdificios
-from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
-from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAula
+from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
+from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
+from asignacion_aulica.GUI.modelos.list_clases import ListClases
+from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAulas
+from asignacion_aulica.GUI.modelos.list_equipamientos_necesarios_clase import ListEquipamientosNecesariosDeClases
+from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from PyQt6.QtQml import qmlRegisterType
 
 QML_MODULE = 'ModelosAsignaciónÁulica'.encode()
@@ -19,9 +21,11 @@ crashea si no.
 clases_a_registrar: tuple[type, ...] = (
     ListEdificios,
     ListAulas,
-    ListEquipamientosDeAula,
     ListCarreras,
-    ListSelectorDeEdificios
+    ListClases,
+    ListEquipamientosDeAulas,
+    ListEquipamientosNecesariosDeClases,
+    ListSelectorDeEdificios,
 )
 
 def agregar_defaults_al_constructor(clase: type, **defaults) -> type:

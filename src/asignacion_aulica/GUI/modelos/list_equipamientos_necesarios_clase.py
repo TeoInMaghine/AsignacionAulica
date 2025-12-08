@@ -13,9 +13,9 @@ ROLE_NAMES: dict[int, QByteArray] = {
     ROL_SELECCIONADO: QByteArray("seleccionado".encode())
 }
 
-class ListEquipamientosDeAulas(QAbstractListModel):
+class ListEquipamientosNecesariosDeClases(QAbstractListModel):
     '''
-    Esta clase conecta el selector de equipamientos de las aulas en la GUI con
+    Esta clase conecta el selector de equipamientos de las clases en la GUI con
     el gestor datos.
 
     En la GUI los equipamientos existentes se muestran en orden alfabético, pero
@@ -30,8 +30,9 @@ class ListEquipamientosDeAulas(QAbstractListModel):
         self.gestor: GestorDeDatos = gestor
 
         # Cosas seteadas desde QT:
-        self.i_edificio: int = 0
-        self.i_aula: int = 0
+        self.i_carrera: int = 0
+        self.i_materia: int = 0
+        self.i_clase: int = 0
 
         # Cache para no estar pidiéndole al gestor que ordene los datos todo el
         # tiempo. Acordarse de actualizarla cuando puede haber cambios.
@@ -49,27 +50,38 @@ class ListEquipamientosDeAulas(QAbstractListModel):
             return ", ".join(seleccionados_en_orden_alfabético)
 
     @pyqtProperty(int)
-    def indexEdificio(self) -> int:
-        return self.i_edificio
+    def indexCarrera(self) -> int:
+        return self.i_carrera
 
-    @indexEdificio.setter
-    def indexEdificio(self, indexEdificio: int):
-        if indexEdificio >= 0: # Ignorar cuando QT setea -1
-            logger.debug('Set indexEdificio=%d', indexEdificio)
-            self.i_edificio = indexEdificio
+    @indexCarrera.setter
+    def indexCarrera(self, indexCarrera: int):
+        if indexCarrera >= 0: # Ignorar cuando QT setea -1
+            logger.debug('Set indexCarrera=%d', indexCarrera)
+            self.i_carrera = indexCarrera
             self.seleccionadosTextChanged.emit()
-    
+
     @pyqtProperty(int)
-    def indexAula(self) -> int:
-        return self.i_aula
+    def indexMateria(self) -> int:
+        return self.i_materia
 
-    @indexAula.setter
-    def indexAula(self, indexAula: int):
-        if indexAula >= 0: # Ignorar cuando QT setea -1
-            logger.debug('Set indexAula=%d', indexAula)
-            self.i_aula = indexAula
+    @indexMateria.setter
+    def indexMateria(self, indexMateria: int):
+        if indexMateria >= 0: # Ignorar cuando QT setea -1
+            logger.debug('Set indexMateria=%d', indexMateria)
+            self.i_materia = indexMateria
             self.seleccionadosTextChanged.emit()
-        
+
+    @pyqtProperty(int)
+    def indexClase(self) -> int:
+        return self.i_clase
+
+    @indexClase.setter
+    def indexClase(self, indexClase: int):
+        if indexClase >= 0: # Ignorar cuando QT setea -1
+            logger.debug('Set indexClase=%d', indexClase)
+            self.i_clase = indexClase
+            self.seleccionadosTextChanged.emit()
+
     @override
     def roleNames(self) -> dict[int, QByteArray]:
         return ROLE_NAMES
@@ -99,9 +111,13 @@ class ListEquipamientosDeAulas(QAbstractListModel):
         elif role == ROL_SELECCIONADO:
             equipamiento = self.equipamientos_posibles[index.row()]
             if value:
-                self.gestor.agregar_equipamiento_a_aula(self.i_edificio, self.i_aula, equipamiento)
+                self.gestor.agregar_equipamiento_a_clase(
+                    self.i_carrera, self.i_materia, self.i_clase, equipamiento
+                )
             else:
-                self.gestor.borrar_equipamiento_de_aula(self.i_edificio, self.i_aula, equipamiento)
+                self.gestor.borrar_equipamiento_de_clase(
+                    self.i_carrera, self.i_materia, self.i_clase, equipamiento
+                )
 
             self.seleccionadosTextChanged.emit()
             return True
@@ -117,7 +133,9 @@ class ListEquipamientosDeAulas(QAbstractListModel):
         if not name:
             return False
 
-        self.gestor.agregar_equipamiento_a_aula(self.i_edificio, self.i_aula, name)
+        self.gestor.agregar_equipamiento_a_clase(
+            self.i_carrera, self.i_materia, self.i_clase, name
+        )
         self.actualizarLista()
         self.seleccionadosTextChanged.emit()
         return True
@@ -130,4 +148,6 @@ class ListEquipamientosDeAulas(QAbstractListModel):
         self.endResetModel()
     
     def _get_equipamientos_seleccionados(self) -> set[str]:
-        return self.gestor.get_aula(self.i_edificio, self.i_aula).equipamiento
+        return self.gestor.get_clase(
+            self.i_carrera, self.i_materia, self.i_clase
+        ).equipamiento_necesario

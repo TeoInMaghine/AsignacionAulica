@@ -5,12 +5,11 @@ BotónRedondeadoConTexto BotónRedondeadoConTexto.qml
 BotónRedondeadoConTextoColorUNRN BotónRedondeadoConTextoColorUNRN.qml
 Colapsador Colapsador.qml
 Candado Candado.qml
+Reestablecer Reestablecer.qml
 SelectorEquipamiento SelectorEquipamiento.qml
-EditorHorariosSemanalesEdificio EditorHorariosSemanalesEdificio.qml
-EditorHorariosSemanalesAula EditorHorariosSemanalesAula.qml
+SelectorDeDía SelectorDeDía.qml
+EditorHorario EditorHorario.qml
 HeaderHorariosSemanales HeaderHorariosSemanales.qml
-EditorRangoHorario EditorRangoHorario.qml
-EditorRangoHorarioAula EditorRangoHorarioAula.qml
 SelectorEdificio SelectorEdificio.qml
 singleton Constantes Constantes.qml
 singleton FontSize FontSize.qml

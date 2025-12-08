@@ -1,10 +1,10 @@
 import QtQuick
 import QtQuick.Layouts
+import QML.ComponentesUI
 
 Repeater {
     id: repeater
-    required property var edificio
-    required property var aula
+    required property var entidad
 
     // Días de la semana
     model: [
@@ -17,15 +17,13 @@ Repeater {
         "domingo"
     ]
 
-    EditorRangoHorarioAula {
+    EditorRangoHorarioEdificio {
         // Este modelData es del Repeater, no del model de ListView...
         required property string modelData
         rolHorarioInicio: "horario_inicio_" + modelData
         rolHorarioFin: "horario_fin_" + modelData
         rolHorarioCerrado: "horario_cerrado_" + modelData
-        rolAulaTieneHorarioPropio: "horario_es_propio_" + modelData
-        edificio: repeater.edificio
-        aula: repeater.aula
+        edificio: repeater.entidad
 
         Layout.preferredWidth: Constantes.width_columna_horario
         Layout.alignment: Qt.AlignCenter

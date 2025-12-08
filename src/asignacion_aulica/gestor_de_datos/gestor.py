@@ -339,7 +339,7 @@ class GestorDeDatos:
         :raise ValueError: Si `nombre` está vacío o si ya existe una carrera con
         el mismo nombre.
         '''
-        logger.info(f'Agregando carrera: {nombre}')
+        logger.info('Agregando carrera: %s', nombre)
         
         nombre = nombre.strip()
         if not nombre:

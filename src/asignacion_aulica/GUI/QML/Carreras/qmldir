@@ -1,7 +1,8 @@
 module QML.Materias
 EditorDeCarreras EditorDeCarreras.qml
 internal Botonera Botonera.qml
-internal SelectorDeCarrera SelectorDeCarrera.qml
+internal ComboBoxCarrera ComboBoxCarrera.qml
+internal SelectorYEditorDeCarrera SelectorYEditorDeCarrera.qml
 internal Clases Clases.qml
 internal HeaderClases HeaderClases.qml
 internal EditorRangoHorarioClase EditorRangoHorarioClase.qml

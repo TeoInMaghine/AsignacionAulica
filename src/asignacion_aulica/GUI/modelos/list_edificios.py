@@ -109,7 +109,7 @@ class ListEdificios(QAbstractListModel):
         if role not in ROLES_A_NOMBRES_QT: return False
 
         rol = Rol(role)
-        logger.debug(f'Editando {rol.name} con el valor {value}')
+        logger.debug('Editando %s con el valor %s', rol.name, value)
 
         was_set: bool = self.try_to_set(index, value, rol)
         if was_set: self.dataChanged.emit(index, index, [role])
@@ -121,8 +121,9 @@ class ListEdificios(QAbstractListModel):
         if rol == Rol.nombre:
             if not isinstance(value, str):
                 logger.error(
-                    f'No se puede asignar el valor "{value}" de tipo'
-                    f' {type(value)} al nombre, de tipo {str}.'
+                    'No se puede asignar el valor "%s" de tipo'
+                    ' %s al nombre, de tipo %s.',
+                    value, type(value), str
                 )
                 return False
 
@@ -131,8 +132,9 @@ class ListEdificios(QAbstractListModel):
         if rol == Rol.preferir_no_usar:
             if not isinstance(value, bool):
                 logger.error(
-                    f'No se puede asignar el valor "{value}" de tipo'
-                    f' {type(value)} a "preferir no usar", de tipo {bool}.'
+                    'No se puede asignar el valor "%s" de tipo'
+                    ' %s a "preferir no usar", de tipo %s.',
+                    value, type(value), bool
                 )
                 return False
 
@@ -145,8 +147,9 @@ class ListEdificios(QAbstractListModel):
         if rol_horario == RolHorario.cerrado:
             if not isinstance(value, bool):
                 logger.error(
-                    f'No se puede asignar el valor "{value}" de tipo'
-                    f' {type(value)} a "horario cerrado", de tipo {bool}.'
+                    'No se puede asignar el valor "%s" de tipo'
+                    ' %s a "horario cerrado", de tipo %s.',
+                    value, type(value), bool
                 )
                 return False
 
@@ -156,8 +159,9 @@ class ListEdificios(QAbstractListModel):
         if rol_horario == RolHorario.inicio or rol_horario == RolHorario.fin:
             if not isinstance(value, str):
                 logger.error(
-                    f'No se puede parsear como horario un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                    'No se puede parsear como horario un valor "%s"'
+                    ' de tipo %s, se esperaba uno de tipo %s.',
+                    value, type(value), str
                 )
                 return False
 
@@ -182,8 +186,9 @@ class ListEdificios(QAbstractListModel):
         cambio_de_capitalización: bool = nuevo_nombre.lower() == edificio.nombre.lower()
         if not cambio_de_capitalización and self.gestor.existe_edificio(nuevo_nombre):
             logger.debug(
-                f'No se puede asignar el nombre "{nuevo_nombre}", porque ya'
-                ' existe un edificio con el mismo nombre.'
+                'No se puede asignar el nombre "%s", porque ya'
+                ' existe un edificio con el mismo nombre.',
+                nuevo_nombre
             )
             return False
 

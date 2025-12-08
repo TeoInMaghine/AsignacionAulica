@@ -113,7 +113,7 @@ class ListClases(QAbstractListModel):
         if role not in ROLES_A_NOMBRES_QT: return False
 
         rol = Rol(role)
-        logger.debug(f'Editando {rol.name} con el valor {value}')
+        logger.debug('Editando %s con el valor %s', rol.name, value)
 
         was_set: bool = self.try_to_set(index, value, rol)
         if was_set: self.dataChanged.emit(index, index, [role])
@@ -127,8 +127,9 @@ class ListClases(QAbstractListModel):
         if rol == Rol.cantidad_de_alumnos:
             if not isinstance(value, str):
                 logger.error(
-                    f'No se puede parsear como capacidad un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                    'No se puede parsear como capacidad un valor "%s"'
+                    ' de tipo %s, se esperaba uno de tipo %s.',
+                    value, type(value), str
                 )
                 return False
 
@@ -137,8 +138,9 @@ class ListClases(QAbstractListModel):
         if rol == Rol.virtual:
             if not isinstance(value, bool):
                 logger.error(
-                    f'No se puede asignar el valor "{value}" de tipo'
-                    f' {type(value)} a "virtual", de tipo {bool}.'
+                    'No se puede asignar el valor "%s" de tipo'
+                    ' %s a "virtual", de tipo %s.',
+                    value, type(value), bool
                 )
                 return False
 
@@ -148,8 +150,9 @@ class ListClases(QAbstractListModel):
         if rol == Rol.no_cambiar_asignación:
             if not isinstance(value, bool):
                 logger.error(
-                    f'No se puede asignar el valor "{value}" de tipo'
-                    f' {type(value)} a "no cambiar asignación", de tipo {bool}.'
+                    'No se puede asignar el valor "%s" de tipo'
+                    ' %s a "no cambiar asignación", de tipo %s.',
+                    value, type(value), bool
                 )
                 return False
 
@@ -165,14 +168,16 @@ class ListClases(QAbstractListModel):
         if rol == Rol.día:
             if not isinstance(value, int):
                 logger.error(
-                    f'No se puede parsear como día un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {int}.'
+                    'No se puede parsear como día un valor "%s"'
+                    ' de tipo %s, se esperaba uno de tipo %s.',
+                    value, type(value), int
                 )
                 return False
             if value not in Día:
                 logger.error(
-                    f'No se puede parsear como día un valor "{value}",'
-                    f' tiene que estar dentro del intervalo [0, 7).'
+                    'No se puede parsear como día un valor "%s",'
+                    ' tiene que estar dentro del intervalo [0, 7).',
+                    value
                 )
                 return False
 
@@ -182,8 +187,9 @@ class ListClases(QAbstractListModel):
         if rol == Rol.horario_inicio or rol == Rol.horario_fin:
             if not isinstance(value, str):
                 logger.error(
-                    f'No se puede parsear como horario un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                    'No se puede parsear como horario un valor "%s"'
+                    ' de tipo %s, se esperaba uno de tipo %s.',
+                    value, type(value), str
                 )
                 return False
 

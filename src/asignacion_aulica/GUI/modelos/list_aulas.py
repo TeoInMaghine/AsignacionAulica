@@ -125,7 +125,7 @@ class ListAulas(QAbstractListModel):
                 logger.error(
                     'Esto nunca debería ocurrir, se debe verificar que el'
                     ' horario sea propio antes de acceder al mismo.'
-                    f' Rol obtenido: {rol.name}.'
+                    ' Rol obtenido: %s.', rol.name
                 )
                 return None
 
@@ -145,7 +145,7 @@ class ListAulas(QAbstractListModel):
         if role not in ROLES_A_NOMBRES_QT: return False
 
         rol = Rol(role)
-        logger.debug(f'Editando {rol.name} con el valor {value}')
+        logger.debug('Editando %s con el valor %s', rol.name, value)
 
         was_set: bool = self.try_to_set(index, value, rol)
         if was_set: self.dataChanged.emit(index, index, [role])
@@ -157,8 +157,9 @@ class ListAulas(QAbstractListModel):
         if rol == Rol.nombre:
             if not isinstance(value, str):
                 logger.error(
-                    f'No se puede asignar el valor "{value}" de tipo'
-                    f' {type(value)} al nombre, de tipo {str}.'
+                    'No se puede asignar el valor "%s" de tipo'
+                    ' %s al nombre, de tipo %s.',
+                    value, type(value), str
                 )
                 return False
 
@@ -167,8 +168,9 @@ class ListAulas(QAbstractListModel):
         if rol == Rol.capacidad:
             if not isinstance(value, str):
                 logger.error(
-                    f'No se puede parsear como capacidad un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                    'No se puede parsear como capacidad un valor "%s"'
+                    ' de tipo %s, se esperaba uno de tipo %s.',
+                    value, type(value), str
                 )
                 return False
 
@@ -180,8 +182,9 @@ class ListAulas(QAbstractListModel):
         if rol_horario == RolHorario.es_propio:
             if value != False:
                 logger.error(
-                    f'El valor "{value}" de tipo {type(value)} no es '
-                    f'válido para "horario es propio", sólo admite {False}.'
+                    'El valor "%s" de tipo %s no es válido para'
+                    ' "horario es propio", sólo admite %s.',
+                    value, type(value), False
                 )
                 return False
 
@@ -199,8 +202,9 @@ class ListAulas(QAbstractListModel):
         if rol_horario == RolHorario.cerrado:
             if not isinstance(value, bool):
                 logger.error(
-                    f'No se puede asignar el valor "{value}" de tipo'
-                    f' {type(value)} a "horario cerrado", de tipo {bool}.'
+                    'No se puede asignar el valor "%s" de tipo'
+                    ' %s a "horario cerrado", de tipo %s.',
+                    value, type(value), bool
                 )
                 return False
 
@@ -210,8 +214,9 @@ class ListAulas(QAbstractListModel):
         if rol_horario == RolHorario.inicio or rol_horario == RolHorario.fin:
             if not isinstance(value, str):
                 logger.error(
-                    f'No se puede parsear como horario un valor "{value}"'
-                    f' de tipo {type(value)}, se esperaba uno de tipo {str}.'
+                    'No se puede parsear como horario un valor "%s"'
+                    ' de tipo %s, se esperaba uno de tipo %s.',
+                    value, type(value), str
                 )
                 return False
 
@@ -236,8 +241,9 @@ class ListAulas(QAbstractListModel):
         cambio_de_capitalización: bool = nuevo_nombre.lower() == aula.nombre.lower()
         if not cambio_de_capitalización and self.gestor.existe_aula(self.i_edificio, nuevo_nombre):
             logger.debug(
-                f'No se puede asignar el nombre "{nuevo_nombre}", porque ya'
-                ' existe un aula en el mismo edificio con el mismo nombre.'
+                'No se puede asignar el nombre "%s", porque ya'
+                ' existe un aula en el mismo edificio con el mismo nombre.',
+                nuevo_nombre
             )
             return False
 

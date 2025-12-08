@@ -110,34 +110,35 @@ class ListAulas(QAbstractListModel):
         rol = Rol(role)
         aula: Aula = self.gestor.get_aula(self.i_edificio, index.row())
 
-        if rol == Rol.nombre:
-            return aula.nombre
-        elif rol == Rol.capacidad:
-            return aula.capacidad
-        else: # Es un rol horario
-            día, rol_horario = rol.desempacar_día_y_rol_horario()
-            rango_horario: RangoHorario|None = aula.horarios[día]
+        match rol:
+            case Rol.nombre:
+                return aula.nombre
+            case Rol.capacidad:
+                return aula.capacidad
+            case _: # Es un rol horario
+                día, rol_horario = rol.desempacar_día_y_rol_horario()
+                rango_horario: RangoHorario|None = aula.horarios[día]
 
-            if rol_horario == RolHorario.es_propio:
-                return rango_horario is not None
+                if rol_horario == RolHorario.es_propio:
+                    return rango_horario is not None
 
-            if not rango_horario:
-                logger.error(
-                    'Esto nunca debería ocurrir, se debe verificar que el'
-                    ' horario sea propio antes de acceder al mismo.'
-                    ' Rol obtenido: %s.', rol.name
+                if not rango_horario:
+                    logger.error(
+                        'Esto nunca debería ocurrir, se debe verificar que el'
+                        ' horario sea propio antes de acceder al mismo.'
+                        ' Rol obtenido: %s.', rol.name
+                    )
+                    return None
+
+                if rol_horario == RolHorario.cerrado:
+                    return rango_horario.cerrado
+
+                horario: time = (
+                    rango_horario.inicio if rol_horario == RolHorario.inicio else
+                    rango_horario.fin
                 )
-                return None
 
-            if rol_horario == RolHorario.cerrado:
-                return rango_horario.cerrado
-
-            horario: time = (
-                rango_horario.inicio if rol_horario == RolHorario.inicio else
-                rango_horario.fin
-            )
-
-            return time_to_string_horario(horario)
+                return time_to_string_horario(horario)
 
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
@@ -155,25 +156,9 @@ class ListAulas(QAbstractListModel):
         aula: Aula = self.gestor.get_aula(self.i_edificio, index.row())
 
         if rol == Rol.nombre:
-            if not isinstance(value, str):
-                logger.error(
-                    'No se puede asignar el valor "%s" de tipo'
-                    ' %s al nombre, de tipo %s.',
-                    value, type(value), str
-                )
-                return False
-
             return self.try_to_set_nombre(aula, value)
 
         if rol == Rol.capacidad:
-            if not isinstance(value, str):
-                logger.error(
-                    'No se puede parsear como capacidad un valor "%s"'
-                    ' de tipo %s, se esperaba uno de tipo %s.',
-                    value, type(value), str
-                )
-                return False
-
             return self.try_to_set_capacidad(aula, value)
 
         # Es un rol horario
@@ -212,14 +197,6 @@ class ListAulas(QAbstractListModel):
             return True
 
         if rol_horario == RolHorario.inicio or rol_horario == RolHorario.fin:
-            if not isinstance(value, str):
-                logger.error(
-                    'No se puede parsear como horario un valor "%s"'
-                    ' de tipo %s, se esperaba uno de tipo %s.',
-                    value, type(value), str
-                )
-                return False
-
             return self.try_to_set_horario_inicio_o_fin(
                 rol_horario, rango_horario, value
             )
@@ -230,6 +207,15 @@ class ListAulas(QAbstractListModel):
         return False
 
     def try_to_set_nombre(self, aula: Aula, value: str) -> bool:
+
+        if not isinstance(value, str):
+            logger.error(
+                'No se puede asignar el valor "%s" de tipo'
+                ' %s al nombre, de tipo %s.',
+                value, type(value), str
+            )
+            return False
+
         nuevo_nombre: str = value.strip()
 
         # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
@@ -251,6 +237,15 @@ class ListAulas(QAbstractListModel):
         return True
 
     def try_to_set_capacidad(self, aula: Aula, value: str) -> bool:
+
+        if not isinstance(value, str):
+            logger.error(
+                'No se puede parsear como capacidad un valor "%s"'
+                ' de tipo %s, se esperaba uno de tipo %s.',
+                value, type(value), str
+            )
+            return False
+
         if value.isdigit():
             aula.capacidad = int(value)
             return True
@@ -272,6 +267,14 @@ class ListAulas(QAbstractListModel):
         Asignar inicio o fin del rango horario si no resulta en un rango
         inválido (i.e.: con inicio >= fin).
         '''
+
+        if not isinstance(value, str):
+            logger.error(
+                'No se puede parsear como horario un valor "%s"'
+                ' de tipo %s, se esperaba uno de tipo %s.',
+                value, type(value), str
+            )
+            return False
 
         horario: time = parse_string_horario_to_time(value)
 

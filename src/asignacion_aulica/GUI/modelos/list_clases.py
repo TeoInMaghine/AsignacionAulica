@@ -78,34 +78,36 @@ class ListClases(QAbstractListModel):
             self.i_carrera, self.i_materia, index.row()
         )
 
-        if rol == Rol.cantidad_de_alumnos:
-            return clase.cantidad_de_alumnos
+        match rol:
+            case Rol.cantidad_de_alumnos:
+                return clase.cantidad_de_alumnos
 
-        if rol == Rol.virtual:
-            return clase.virtual
+            case Rol.virtual:
+                return clase.virtual
 
-        if rol == Rol.no_cambiar_asignación:
-            return clase.no_cambiar_asignación
+            case Rol.no_cambiar_asignación:
+                return clase.no_cambiar_asignación
 
-        if rol == Rol.aula_asignada:
-            return (
+            case Rol.aula_asignada: return (
                 f'{clase.aula_asignada.edificio.nombre} | {clase.aula_asignada.nombre}'
                 if clase.aula_asignada else 'Ninguna'
             )
 
-        if rol == Rol.día:
-            return clase.día.value
+            case Rol.día:
+                return clase.día.value
 
-        if rol == Rol.horario_inicio:
-            return time_to_string_horario(clase.horario.inicio)
+            case Rol.horario_inicio:
+                return time_to_string_horario(clase.horario.inicio)
 
-        if rol == Rol.horario_fin:
-            return time_to_string_horario(clase.horario.fin)
+            case Rol.horario_fin:
+                return time_to_string_horario(clase.horario.fin)
 
-        logger.error(
-            'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
-        )
-        return None
+            case _:
+                logger.error(
+                    'Esto nunca debería ocurrir, '
+                    'todos los roles deberían manejarse.'
+                )
+                return None
 
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
@@ -124,85 +126,81 @@ class ListClases(QAbstractListModel):
             self.i_carrera, self.i_materia, index.row()
         )
 
-        if rol == Rol.cantidad_de_alumnos:
-            if not isinstance(value, str):
+        match rol:
+            case Rol.cantidad_de_alumnos:
+                return self.try_to_set_cantidad_de_alumnos(clase, value)
+
+            case Rol.virtual:
+                if not isinstance(value, bool):
+                    logger.error(
+                        'No se puede asignar el valor "%s" de tipo'
+                        ' %s a "virtual", de tipo %s.',
+                        value, type(value), bool
+                    )
+                    return False
+
+                clase.virtual = value
+                return True
+
+            case Rol.no_cambiar_asignación:
+                if not isinstance(value, bool):
+                    logger.error(
+                        'No se puede asignar el valor "%s" de tipo'
+                        ' %s a "no cambiar asignación", de tipo %s.',
+                        value, type(value), bool
+                    )
+                    return False
+
+                clase.no_cambiar_asignación = value
+                return True
+
+            case Rol.aula_asignada:
                 logger.error(
-                    'No se puede parsear como capacidad un valor "%s"'
-                    ' de tipo %s, se esperaba uno de tipo %s.',
-                    value, type(value), str
+                    'Todavía no se implementó la edición del aula asignada.'
                 )
                 return False
 
-            return self.try_to_set_cantidad_de_alumnos(clase, value)
+            case Rol.día:
+                if not isinstance(value, int):
+                    logger.error(
+                        'No se puede parsear como día un valor "%s"'
+                        ' de tipo %s, se esperaba uno de tipo %s.',
+                        value, type(value), int
+                    )
+                    return False
+                if value not in Día:
+                    logger.error(
+                        'No se puede parsear como día un valor "%s",'
+                        ' tiene que estar dentro del intervalo [0, 7).',
+                        value
+                    )
+                    return False
 
-        if rol == Rol.virtual:
-            if not isinstance(value, bool):
+                clase.día = Día(value)
+                return True
+
+            case Rol.horario_inicio | Rol.horario_fin:
+                return self.try_to_set_horario_inicio_o_fin(
+                    rol, clase.horario, value
+                )
+
+            case _:
                 logger.error(
-                    'No se puede asignar el valor "%s" de tipo'
-                    ' %s a "virtual", de tipo %s.',
-                    value, type(value), bool
+                    'Esto nunca debería ocurrir, '
+                    'todos los roles deberían manejarse.'
                 )
                 return False
 
-            clase.virtual = value
-            return True
+    def try_to_set_cantidad_de_alumnos(self, clase: Clase, value: str) -> bool:
 
-        if rol == Rol.no_cambiar_asignación:
-            if not isinstance(value, bool):
-                logger.error(
-                    'No se puede asignar el valor "%s" de tipo'
-                    ' %s a "no cambiar asignación", de tipo %s.',
-                    value, type(value), bool
-                )
-                return False
-
-            clase.no_cambiar_asignación = value
-            return True
-
-        if rol == Rol.aula_asignada:
+        if not isinstance(value, str):
             logger.error(
-                'Todavía no se implementó la edición del aula asignada.'
+                'No se puede parsear como capacidad un valor "%s"'
+                ' de tipo %s, se esperaba uno de tipo %s.',
+                value, type(value), str
             )
             return False
 
-        if rol == Rol.día:
-            if not isinstance(value, int):
-                logger.error(
-                    'No se puede parsear como día un valor "%s"'
-                    ' de tipo %s, se esperaba uno de tipo %s.',
-                    value, type(value), int
-                )
-                return False
-            if value not in Día:
-                logger.error(
-                    'No se puede parsear como día un valor "%s",'
-                    ' tiene que estar dentro del intervalo [0, 7).',
-                    value
-                )
-                return False
-
-            clase.día = Día(value)
-            return True
-
-        if rol == Rol.horario_inicio or rol == Rol.horario_fin:
-            if not isinstance(value, str):
-                logger.error(
-                    'No se puede parsear como horario un valor "%s"'
-                    ' de tipo %s, se esperaba uno de tipo %s.',
-                    value, type(value), str
-                )
-                return False
-
-            return self.try_to_set_horario_inicio_o_fin(
-                rol, clase.horario, value
-            )
-
-        logger.error(
-            'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
-        )
-        return False
-
-    def try_to_set_cantidad_de_alumnos(self, clase: Clase, value: str) -> bool:
         if value.isdigit():
             clase.cantidad_de_alumnos = int(value)
             return True
@@ -224,6 +222,14 @@ class ListClases(QAbstractListModel):
         Asignar inicio o fin del rango horario si no resulta en un rango
         inválido (i.e.: con inicio >= fin).
         '''
+
+        if not isinstance(value, str):
+            logger.error(
+                'No se puede parsear como horario un valor "%s"'
+                ' de tipo %s, se esperaba uno de tipo %s.',
+                value, type(value), str
+            )
+            return False
 
         horario: time = parse_string_horario_to_time(value)
 

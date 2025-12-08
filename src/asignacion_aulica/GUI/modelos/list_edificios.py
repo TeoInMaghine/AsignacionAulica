@@ -85,23 +85,24 @@ class ListEdificios(QAbstractListModel):
         # debugeamos pero en release quizás querríamos impedir eso
         edificio: Edificio = self.gestor.get_edificio(index.row())
 
-        if rol == Rol.nombre:
-            return edificio.nombre
-        elif rol == Rol.preferir_no_usar:
-            return edificio.preferir_no_usar
-        else: # Es un rol horario
-            día, rol_horario = rol.desempacar_día_y_rol_horario()
-            rango_horario: RangoHorario = edificio.horarios[día]
+        match rol:
+            case Rol.nombre:
+                return edificio.nombre
+            case Rol.preferir_no_usar:
+                return edificio.preferir_no_usar
+            case _: # Es un rol horario
+                día, rol_horario = rol.desempacar_día_y_rol_horario()
+                rango_horario: RangoHorario = edificio.horarios[día]
 
-            if rol_horario == RolHorario.cerrado:
-                return rango_horario.cerrado
+                if rol_horario == RolHorario.cerrado:
+                    return rango_horario.cerrado
 
-            horario: time = (
-                rango_horario.inicio if rol_horario == RolHorario.inicio else
-                rango_horario.fin
-            )
+                horario: time = (
+                    rango_horario.inicio if rol_horario == RolHorario.inicio else
+                    rango_horario.fin
+                )
 
-            return time_to_string_horario(horario)
+                return time_to_string_horario(horario)
 
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
@@ -119,14 +120,6 @@ class ListEdificios(QAbstractListModel):
         edificio: Edificio = self.gestor.get_edificio(index.row())
 
         if rol == Rol.nombre:
-            if not isinstance(value, str):
-                logger.error(
-                    'No se puede asignar el valor "%s" de tipo'
-                    ' %s al nombre, de tipo %s.',
-                    value, type(value), str
-                )
-                return False
-
             return self.try_to_set_nombre(edificio, value)
 
         if rol == Rol.preferir_no_usar:
@@ -157,14 +150,6 @@ class ListEdificios(QAbstractListModel):
             return True
 
         if rol_horario == RolHorario.inicio or rol_horario == RolHorario.fin:
-            if not isinstance(value, str):
-                logger.error(
-                    'No se puede parsear como horario un valor "%s"'
-                    ' de tipo %s, se esperaba uno de tipo %s.',
-                    value, type(value), str
-                )
-                return False
-
             return self.try_to_set_horario_inicio_o_fin(
                 rol_horario, rango_horario, value
             )
@@ -175,6 +160,15 @@ class ListEdificios(QAbstractListModel):
         return False
 
     def try_to_set_nombre(self, edificio: Edificio, value: str) -> bool:
+
+        if not isinstance(value, str):
+            logger.error(
+                'No se puede asignar el valor "%s" de tipo'
+                ' %s al nombre, de tipo %s.',
+                value, type(value), str
+            )
+            return False
+
         nuevo_nombre: str = value.strip()
 
         # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
@@ -205,6 +199,14 @@ class ListEdificios(QAbstractListModel):
         Asignar inicio o fin del rango horario si no resulta en un rango
         inválido (i.e.: con inicio >= fin).
         '''
+
+        if not isinstance(value, str):
+            logger.error(
+                'No se puede parsear como horario un valor "%s"'
+                ' de tipo %s, se esperaba uno de tipo %s.',
+                value, type(value), str
+            )
+            return False
 
         horario: time = parse_string_horario_to_time(value)
 

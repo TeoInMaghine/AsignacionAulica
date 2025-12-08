@@ -11,7 +11,8 @@ ComboBox {
     id: comboBox
 
     required property var listCarreras
-    property bool hayCarreraSeleccionada: comboBox.currentIndex >= 0
+    property alias carrera: comboBox.currentValue
+    property bool hayCarreraSeleccionada: carrera !== undefined
 
     model: listCarreras
 

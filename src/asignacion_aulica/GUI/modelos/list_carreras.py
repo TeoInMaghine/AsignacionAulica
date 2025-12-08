@@ -42,9 +42,16 @@ class ListCarreras(QAbstractListModel):
         match role:
             case Rol.nombre:
                 return la_carrera.nombre
-            case Rol.edificio_preferido if la_carrera.edificio_preferido is not None:
-                return la_carrera.edificio_preferido.nombre
+            case Rol.edificio_preferido:
+                if la_carrera.edificio_preferido is None:
+                    return 0
+                else:
+                    edificios: list[str] = self.gestor.get_edificios()
+                    return edificios.index(la_carrera.edificio_preferido.nombre) + 1
             case _:
+                logger.error(
+                    'Esto nunca debería ocurrir, todos los roles deberían manejarse.'
+                )
                 return None
 
     @pyqtSlot(str, result=int)
@@ -126,6 +133,7 @@ class ListCarreras(QAbstractListModel):
         elif i_edificio >= self.gestor.cantidad_de_edificios():
             logger.error('Set edificio preferido con edificio fuera de rango.')
         else:
+            logger.debug('Set edificio preferido con carrera=%d y edificio=%d', i_carrera, i_edificio)
             edificio = (
                 self.gestor.get_edificio(i_edificio)
                 if i_edificio >= 0

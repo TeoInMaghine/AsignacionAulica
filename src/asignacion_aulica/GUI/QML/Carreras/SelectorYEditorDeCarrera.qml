@@ -17,6 +17,8 @@ import ModelosAsignaciónÁulica
 ColumnLayout{
     spacing: 10
 
+    property alias hayCarreraSeleccionada: comboBox.hayCarreraSeleccionada
+    property alias carrera: comboBox.carrera
     ListCarreras { id: listCarreras }
 
     RowLayout {
@@ -53,7 +55,7 @@ ColumnLayout{
 
         BotónRedondeadoConTexto {
             text: "Editar Nombre"
-            enabled: comboBox.hayCarreraSeleccionada
+            enabled: hayCarreraSeleccionada
             icon.source: assets_path + "/iconos/editar.png"
             onClicked: {
                 inputEditarNombre.focus = true
@@ -62,7 +64,7 @@ ColumnLayout{
 
         BotónRedondeadoConTexto {
             text: "Borrar Carrera"
-            enabled: comboBox.hayCarreraSeleccionada
+            enabled: hayCarreraSeleccionada
             icon.source: assets_path + "/iconos/Borrar.svg"
             onClicked: confirmaciónBorrar.open()
         }
@@ -92,15 +94,16 @@ ColumnLayout{
         spacing: 10
 
         Label{
-            enabled: comboBox.hayCarreraSeleccionada
+            enabled: hayCarreraSeleccionada
             text: "Edificio preferido: "
             font.pointSize: FontSize.base
         }
 
         SelectorEdificio{
-            enabled: comboBox.hayCarreraSeleccionada
+            enabled: hayCarreraSeleccionada
             Layout.preferredWidth: 270
 
+            currentIndex: hayCarreraSeleccionada ? carrera.edificio_preferido : 0
             onActivated: indexEdificio => {
                 listCarreras.setEdificioPreferido(comboBox.currentIndex, indexEdificio-1)
             }

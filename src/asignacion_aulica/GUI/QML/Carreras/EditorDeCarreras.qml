@@ -2,15 +2,17 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QML.ComponentesUI
+import ModelosAsignaciónÁulica
 
 ColumnLayout {
     anchors.fill: parent
     anchors.margins: 15
-    spacing: 10
+    spacing: 20
     
     Botonera { }
-    SelectorDeCarrera { id: selector }
-    Label { text: "Carrera seleccionada: " + selector.índiceDeLaCarreraActual }
+    SelectorYEditorDeCarrera {
+        id: selector
+    }
 
     Loader {
         active: selector.índiceDeLaCarreraActual >= 0

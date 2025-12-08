@@ -8,7 +8,6 @@ RowLayout {
 
     spacing: Constantes.spacing_horario
 
-    // Editores de horarios que se muestran cuando el rango horario está abierto
     readonly property int textFieldPadding : 2
     EditorHorario {
         id: horarioInicio

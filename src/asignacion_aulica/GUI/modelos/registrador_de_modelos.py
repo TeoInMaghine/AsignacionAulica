@@ -1,3 +1,4 @@
+from asignacion_aulica.GUI.modelos.list_selector_edificio import ListSelectorDeEdificios
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
 from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
 from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
@@ -8,15 +9,8 @@ from asignacion_aulica.GUI.modelos.list_equipamientos_necesarios_clase import Li
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from PyQt6.QtQml import qmlRegisterType
 
-modelos_raw: tuple[type] = (
-    ListEdificios,
-    ListAulas,
-    ListCarreras,
-    ListMaterias,
-    ListClases,
-    ListEquipamientosDeAulas,
-    ListEquipamientosNecesariosDeClases,
-)
+QML_MODULE = 'ModelosAsignaciónÁulica'.encode()
+
 modelos_registrados: list[type] = []
 '''
 Guardamos referencias a los modelos registrados para que el GC no piense que
@@ -24,6 +18,17 @@ puede limpiar las clases wrapper cuando sale de este scope. Literal python
 crashea si no.
 *Achievement unlocked: use after free error in python.*
 '''
+
+clases_a_registrar: tuple[type, ...] = (
+    ListEdificios,
+    ListAulas,
+    ListCarreras,
+    ListMaterias,
+    ListClases,
+    ListEquipamientosDeAulas,
+    ListEquipamientosNecesariosDeClases,
+    ListSelectorDeEdificios,
+)
 
 def agregar_defaults_al_constructor(clase: type, **defaults) -> type:
     '''
@@ -46,8 +51,7 @@ def registrar_modelos_qml(gestor_de_datos: GestorDeDatos):
 
     :param gestor_de_datos: El gestor de datos a pasarle a los modelos.
     '''
-    qml_module = 'ModelosAsignaciónÁulica'.encode()
-    for modelo in modelos_raw:
+    for modelo in clases_a_registrar:
         modelo_wrapeado = agregar_defaults_al_constructor(modelo, gestor=gestor_de_datos)
-        qmlRegisterType(modelo_wrapeado, qml_module, 1, 0, modelo.__name__)
+        qmlRegisterType(modelo_wrapeado, QML_MODULE, 1, 0, modelo.__name__)
         modelos_registrados.append(modelo_wrapeado)

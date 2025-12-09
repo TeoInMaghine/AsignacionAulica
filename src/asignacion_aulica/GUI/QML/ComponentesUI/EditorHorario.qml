@@ -19,11 +19,6 @@ TextFieldConEnter {
         if (activeFocus) cursorPosition = 0
     }
 
-    // Tiene que definirse un handler para esta señal (onChangeText) para que
-    // funcionen las teclas de borrado. No se puede editar text directamente 
-    // porque haciendo eso se desvincula con lo que tuviera definido, por
-    // ejemplo el rol de un modelo.
-    signal changeText(newText: string)
     // Sobre-escribir comportamientos al presionar teclas de borrado.
     // Sino no hacen nada o resultan en comportamiento inválido al
     // seleccionar texto.
@@ -38,7 +33,10 @@ TextFieldConEnter {
 
                 var index = cursorPosition - 1
                 if (text[index] == ":") index-- // Para no intentar borrar el ":"
-                changeText(text.substring(0, index) + "0" + text.substring(index + 1))
+                // NOTA: (posiblemente) por la configuración que tenemos insert
+                // funciona no-intuitivamente, por eso no es necesario usar
+                // remove.
+                insert(index, "0")
                 cursorPosition = index
 
                 break
@@ -54,17 +52,17 @@ TextFieldConEnter {
                 // Como son sólo 4 casos y tienen excepciones entre sí, los manejo individualmente
                 switch (index) {
                     case 0:
-                        changeText("0" + text[1] + text.substring(2))
+                        insert(0, "0")
                         break
                     case 1:
-                        changeText("0" + text[0] + text.substring(2))
+                        insert(1, text[0])
                         index++ // Para que el cursor se mueva después del ":"
                         break
                     case 3:
-                        changeText(text.substring(0, 3) + "0" + text[4])
+                        insert(3, "0")
                         break
                     case 4:
-                        changeText(text.substring(0, 3) + "0" + text[3])
+                        insert(4, text[3])
                         break
                     default:
                         // cursorPosition != 2 sí o sí por la configuración que

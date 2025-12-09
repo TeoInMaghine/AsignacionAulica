@@ -20,9 +20,6 @@ RowLayout {
         onEditingFinished: {
             clase.horario_inicio = text
         }
-        onChangeText: function(newText) {
-            clase.horario_inicio = newText
-        }
     }
     EditorHorario {
         id: horarioFin
@@ -34,9 +31,6 @@ RowLayout {
         text: clase.horario_fin
         onEditingFinished: {
             clase.horario_fin = text
-        }
-        onChangeText: function(newText) {
-            clase.horario_fin = newText
         }
     }
 }

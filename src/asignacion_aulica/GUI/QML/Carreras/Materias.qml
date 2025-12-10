@@ -73,7 +73,7 @@ ListView {
                     text: "Año:"
                 }
                 TextFieldConEnter {
-                    Layout.preferredWidth: 30
+                    Layout.preferredWidth: 50
 
                     text: materia.año
                     validator: RegularExpressionValidator {

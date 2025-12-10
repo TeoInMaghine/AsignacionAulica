@@ -27,5 +27,5 @@ RoundButton {
         source: assets_path + "/iconos/Borrar.svg"
     }
 
-    highlighted: hovered
+    highlighted: enabled ? hovered : false
 }

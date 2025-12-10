@@ -33,9 +33,6 @@ TextFieldConEnter {
 
                 var index = cursorPosition - 1
                 if (text[index] == ":") index-- // Para no intentar borrar el ":"
-                // NOTA: (posiblemente) por la configuración que tenemos insert
-                // funciona no-intuitivamente, por eso no es necesario usar
-                // remove.
                 insert(index, "0")
                 cursorPosition = index
 

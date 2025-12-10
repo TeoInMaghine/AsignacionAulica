@@ -8,16 +8,10 @@ ListView {
     id: view
 
     required property int indexCarrera
-    readonly property int padding: 20
 
     spacing: 10
-    leftMargin: padding
-    rightMargin: padding
-    topMargin: padding
-    bottomMargin: padding
-
-    width: contentItem.childrenRect.width + 2 * padding
-    height: contentHeight + 2 * padding
+    width: contentItem.childrenRect.width
+    height: contentHeight
 
     model: ListMaterias {
         id: materias

@@ -37,6 +37,11 @@ class ListMaterias(QAbstractListModel):
 
     @indexCarrera.setter
     def indexCarrera(self, indexCarrera: int):
+        # No fallar cuando no hay carreras
+        if self.gestor.cantidad_de_carreras() == 0:
+            logger.debug('No hay carreras')
+            return
+
         if indexCarrera >= 0: # Ignorar cuando QT setea -1
             logger.debug('Set indexCarrera: %s', indexCarrera)
             self.i_carrera = indexCarrera
@@ -47,6 +52,10 @@ class ListMaterias(QAbstractListModel):
 
     @override
     def rowCount(self, parent: QModelIndex|None = None) -> int:
+        # No fallar cuando no hay carreras
+        if self.gestor.cantidad_de_carreras() == 0:
+            return 0
+
         return self.gestor.cantidad_de_materias(self.i_carrera)
 
     @override

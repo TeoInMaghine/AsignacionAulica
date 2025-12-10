@@ -10,8 +10,8 @@ ListView {
     required property int indexCarrera
 
     spacing: 10
-    width: contentItem.childrenRect.width
-    height: contentHeight
+    Layout.preferredWidth: contentItem.childrenRect.width
+    Layout.preferredHeight: contentHeight
 
     model: ListMaterias {
         id: materias

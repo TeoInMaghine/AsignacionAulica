@@ -14,12 +14,8 @@ ColumnLayout {
         id: selector
     }
 
-    Loader {
-        active: selector.hayCarreraSeleccionada
-        Layout.preferredWidth: width
-        Layout.preferredHeight: height
-        sourceComponent: Materias {
-            indexCarrera: selector.indexCarrera
-        }
+    Materias {
+        enabled: selector.hayCarreraSeleccionada
+        indexCarrera: selector.indexCarrera
     }
 }

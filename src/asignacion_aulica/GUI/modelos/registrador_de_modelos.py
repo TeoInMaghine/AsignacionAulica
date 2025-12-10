@@ -39,11 +39,10 @@ def agregar_defaults_al_constructor(clase: type, **defaults) -> type:
     :param defaults: Un diccionario que mapea nombres de argumentos a valores
     por defecto.
     '''
-    class Wrapped(clase):
-        def __init__(self, *args, **kwargs) -> None:
-            super().__init__(*args, **(defaults|kwargs))
+    def init(self, *args, **kwargs) -> None:
+        super(self.__class__, self).__init__(*args, **(defaults|kwargs))
 
-    return Wrapped
+    return type(f'Wrapped{clase.__name__}', (clase,), {'__init__': init})
 
 def registrar_modelos_qml(gestor_de_datos: GestorDeDatos):
     '''

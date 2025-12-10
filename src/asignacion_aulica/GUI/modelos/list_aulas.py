@@ -91,7 +91,7 @@ class ListAulas(QAbstractListModel):
     @indexEdificio.setter
     def indexEdificio(self, indexEdificio: int):
         if indexEdificio >= 0: # Ignorar cuando QT setea -1
-            logger.info('Set indexEdificio: %s', indexEdificio)
+            logger.debug('Set indexEdificio: %s', indexEdificio)
             self.i_edificio = indexEdificio
 
     @override

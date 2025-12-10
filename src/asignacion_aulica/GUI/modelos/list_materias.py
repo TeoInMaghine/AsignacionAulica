@@ -38,7 +38,7 @@ class ListMaterias(QAbstractListModel):
     @indexCarrera.setter
     def indexCarrera(self, indexCarrera: int):
         if indexCarrera >= 0: # Ignorar cuando QT setea -1
-            logger.info('Set indexCarrera: %s', indexCarrera)
+            logger.debug('Set indexCarrera: %s', indexCarrera)
             self.i_carrera = indexCarrera
 
     @override

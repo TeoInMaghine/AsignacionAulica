@@ -22,7 +22,7 @@ ListView {
     header: Label {
         text: "Todavía no hay materias registradas"
         visible: view.count === 0
-        font.pointSize: FontSize.big
+        font.pointSize: FontSize.base
     }
 
     delegate: ColumnLayout {

@@ -1,3 +1,4 @@
+from PyQt6.QtCore import QObject
 from asignacion_aulica.GUI.modelos.list_selector_edificio import ListSelectorDeEdificios
 from asignacion_aulica.GUI.modelos.proxy_gestor import ProxyGestorDeDatos
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
@@ -7,11 +8,11 @@ from asignacion_aulica.GUI.modelos.list_clases import ListClases
 from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAulas
 from asignacion_aulica.GUI.modelos.list_equipamientos_necesarios_clase import ListEquipamientosNecesariosDeClases
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
-from PyQt6.QtQml import qmlRegisterType
+from PyQt6.QtQml import qmlRegisterType, qmlRegisterSingletonInstance
 
 QML_MODULE = 'ModelosAsignaciónÁulica'.encode()
 
-modelos_registrados: list[type] = []
+modelos_registrados: list[type|QObject] = []
 '''
 Guardamos referencias a los modelos registrados para que el GC no piense que
 puede limpiar las clases wrapper cuando sale de este scope. Literal python
@@ -26,8 +27,7 @@ clases_a_registrar: tuple[type, ...] = (
     ListClases,
     ListEquipamientosDeAulas,
     ListEquipamientosNecesariosDeClases,
-    ListSelectorDeEdificios,
-    ProxyGestorDeDatos
+    ListSelectorDeEdificios
 )
 
 def agregar_defaults_al_constructor(clase: type, **defaults) -> type:
@@ -54,3 +54,7 @@ def registrar_modelos_qml(gestor_de_datos: GestorDeDatos):
         modelo_wrapeado = agregar_defaults_al_constructor(modelo, gestor=gestor_de_datos)
         qmlRegisterType(modelo_wrapeado, QML_MODULE, 1, 0, modelo.__name__)
         modelos_registrados.append(modelo_wrapeado)
+
+    proxy_gestor = ProxyGestorDeDatos(gestor_de_datos)
+    modelos_registrados.append(proxy_gestor)
+    qmlRegisterSingletonInstance(QML_MODULE, 1, 0, ProxyGestorDeDatos.__name__, proxy_gestor)

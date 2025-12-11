@@ -12,6 +12,7 @@ class ProxyGestorDeDatos(QObject):
     Bindings para poder llamar a métodos del gestor de datos desde QML.
     '''
 
+    # Se emite con un string que dice los días sin asignar.
     finAsignarAulas: pyqtSignal = pyqtSignal(str)
 
     def __init__(self, gestor: GestorDeDatos):
@@ -43,4 +44,5 @@ class _Asignador(QRunnable):
     def run(self):
         time.sleep(1.5)
         result: InfoPostAsignación = self.gestor.asignar_aulas()
-        self.señal_fin.emit(str(result.todo_ok()))
+        str_días_sin_asignar = ', '.join(map(lambda d: d.name, result.días_sin_asignar))
+        self.señal_fin.emit(str_días_sin_asignar)

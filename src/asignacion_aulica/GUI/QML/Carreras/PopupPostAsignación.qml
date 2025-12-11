@@ -8,7 +8,7 @@ import ModelosAsignaciónÁulica
 Popup {
     id: popup
 
-    required property var info
+    required property string díasSinAsignar
 
     modal: true
 
@@ -21,7 +21,9 @@ Popup {
         spacing: 20
 
         Label {
-            text: popup.info
+            text: popup.díasSinAsignar.length > 0
+                ? "No se pudieron asignar aulas a las clases de los días " + popup.díasSinAsignar
+                : "Se asignaron aulas a todas las clases."
             font.pointSize: FontSize.base
         }
 

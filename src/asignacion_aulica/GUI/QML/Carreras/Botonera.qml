@@ -13,7 +13,7 @@ RowLayout {
         target: ProxyGestorDeDatos
         function onFinAsignarAulas(result) {
             popupAsignación.close()
-            popupPostAsignación.info = result
+            popupPostAsignación.díasSinAsignar = result
             popupPostAsignación.open()
         }
     }
@@ -36,7 +36,7 @@ RowLayout {
     }
     PopupPostAsignación {
         id: popupPostAsignación
-        info: ""
+        díasSinAsignar: ""
     }
     
 }

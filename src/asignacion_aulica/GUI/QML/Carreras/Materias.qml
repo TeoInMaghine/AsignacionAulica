@@ -62,8 +62,6 @@ ListView {
             TextFieldConEnter {
                 text: materia.nombre
                 onEditingFinished: {
-                    print(editorSiempreVisibleDeMateria.height)
-                    print(editorDeMateria.height)
                     materia.nombre = text
                 }
             }

@@ -1,3 +1,5 @@
+import QtQml
+import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QML.ComponentesUI
@@ -7,13 +9,34 @@ import ModelosAsignaciónÁulica
 RowLayout {
     spacing: 15
 
-    property var gestor: ProxyGestorDeDatos{}
+    Connections {
+        target: ProxyGestorDeDatos
+        function onFinAsignarAulas(result) {
+            popupAsignación.close()
+            popupPostAsignación.info = result
+            popupPostAsignación.open()
+        }
+    }
 
-    // Por ahora no hacen nada
     BotónRedondeadoConTextoColorUNRN {
         text: "Asignar Aulas"
-        onClicked: gestor.asignarAulas()
+        onClicked: {
+            popupAsignación.open()
+            ProxyGestorDeDatos.asignarAulas()
+        }
     }
+    
+    // Por ahora no hacen nada
     BotónRedondeadoConTextoColorUNRN {text: "Exportar Excel"}
     BotónRedondeadoConTextoColorUNRN {text: "Importar Excel"}
+
+    // Popups mostrados al clickear "asignar aulas"
+    PopupDuranteAsignación {
+        id: popupAsignación
+    }
+    PopupPostAsignación {
+        id: popupPostAsignación
+        info: ""
+    }
+    
 }

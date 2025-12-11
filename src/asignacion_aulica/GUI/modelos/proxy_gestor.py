@@ -41,7 +41,6 @@ class _Asignador(QRunnable):
 
     @pyqtSlot()
     def run(self):
-        time.sleep(3.5)
+        time.sleep(1.5)
         result: InfoPostAsignación = self.gestor.asignar_aulas()
-        logger.debug('Terminó la asignación. Todo ok: %s', result.todo_ok())
-        self.señal_fin.emit('1')
+        self.señal_fin.emit(str(result.todo_ok()))

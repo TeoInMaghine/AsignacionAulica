@@ -18,11 +18,22 @@ ListView {
         indexCarrera: view.indexCarrera
     }
 
-    // Mostrar un mensaje cuando no hay ninguna materia
-    header: Label {
-        text: "Todavía no hay materias registradas"
-        visible: view.count === 0
-        font.pointSize: FontSize.base
+    header: Item {
+        height: headerMaterias.height + view.spacing
+        width: headerMaterias.width
+
+        Label {
+            id: headerMaterias
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.bottomMargin: view.spacing
+            anchors.leftMargin: 10
+
+            text: view.count === 0 ?
+                  "Todavía no hay materias registradas" :
+                  "Materias"
+            font.pointSize: FontSize.base
+        }
     }
 
     delegate: ColumnLayout {
@@ -51,6 +62,8 @@ ListView {
             TextFieldConEnter {
                 text: materia.nombre
                 onEditingFinished: {
+                    print(editorSiempreVisibleDeMateria.height)
+                    print(editorDeMateria.height)
                     materia.nombre = text
                 }
             }
@@ -115,7 +128,7 @@ ListView {
     }
 
     footer: Item {
-        height: footerMaterias.height + view.spacing
+        height: footerMaterias.height + footerMaterias.anchors.topMargin
         width: footerMaterias.width
 
         BotónRedondeadoConTexto {
@@ -123,7 +136,8 @@ ListView {
             text: "+ Materia"
             anchors.top: parent.top
             anchors.left: parent.left
-            anchors.topMargin: view.spacing
+            // No agregar "spacing" cuando están el header y footer juntos
+            anchors.topMargin: view.count === 0 ? 0 : view.spacing
             anchors.leftMargin: 10
 
             onClicked: {

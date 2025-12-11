@@ -25,9 +25,6 @@ RowLayout {
         onEditingFinished: {
             edificio[rolHorarioInicio] = text
         }
-        onChangeText: function(newText) {
-            edificio[rolHorarioInicio] = newText
-        }
     }
     EditorHorario {
         id: horarioFin
@@ -40,9 +37,6 @@ RowLayout {
         text: edificio[rolHorarioFin]
         onEditingFinished: {
             edificio[rolHorarioFin] = text
-        }
-        onChangeText: function(newText) {
-            edificio[rolHorarioFin] = newText
         }
     }
 

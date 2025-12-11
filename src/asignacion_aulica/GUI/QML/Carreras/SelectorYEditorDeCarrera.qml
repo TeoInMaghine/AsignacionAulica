@@ -19,6 +19,7 @@ ColumnLayout{
 
     property alias hayCarreraSeleccionada: comboBox.hayCarreraSeleccionada
     property alias carrera: comboBox.carrera
+    property alias indexCarrera: comboBox.indexCarrera
     ListCarreras { id: listCarreras }
 
     RowLayout {

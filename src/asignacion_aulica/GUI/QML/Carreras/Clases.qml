@@ -7,8 +7,8 @@ import QML.ComponentesUI
 ListView {
     id: view
 
-    // required property var carrera (?, quizás materia.indexCarrera se puede? tal vez depende de la implementación de ListMaterias)
-    // required property var materia
+    required property int indexCarrera
+    required property var materia
     readonly property int padding: 20
 
     spacing: headerItem.spacing
@@ -22,10 +22,8 @@ ListView {
 
     model: ListClases {
         id: clases
-        indexCarrera: 0
-        // indexCarrera: carrera.index
-        indexMateria: 0
-        // indexMateria: materia.index
+        indexCarrera: view.indexCarrera
+        indexMateria: materia.index
     }
 
     header: Item {
@@ -102,10 +100,8 @@ ListView {
             Layout.preferredWidth: headerItem.widthEquipamientoNecesario
             model: ListEquipamientosNecesariosDeClases {
                 id: equipamientoNecesario
-                // indexCarrera: carrera.index [(?) Tal vez materia.indexCarrera?]
-                // indexMateria: materia.index
-                indexCarrera: 0
-                indexMateria: 0
+                indexCarrera: view.indexCarrera
+                indexMateria: materia.index
                 indexClase: clase.index
             }
         }

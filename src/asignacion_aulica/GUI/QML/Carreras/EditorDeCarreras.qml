@@ -1,3 +1,4 @@
+import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
 import QML.ComponentesUI
@@ -13,6 +14,8 @@ ColumnLayout {
         id: selector
     }
 
-    // TODO: Placeholder, borrar eventualmente
-    Clases { }
+    Materias {
+        enabled: selector.hayCarreraSeleccionada
+        indexCarrera: selector.indexCarrera
+    }
 }

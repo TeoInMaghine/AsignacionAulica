@@ -2,6 +2,7 @@ from asignacion_aulica.GUI.modelos.list_selector_edificio import ListSelectorDeE
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
 from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
 from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
+from asignacion_aulica.GUI.modelos.list_materias import ListMaterias
 from asignacion_aulica.GUI.modelos.list_clases import ListClases
 from asignacion_aulica.GUI.modelos.list_equipamientos_aula import ListEquipamientosDeAulas
 from asignacion_aulica.GUI.modelos.list_equipamientos_necesarios_clase import ListEquipamientosNecesariosDeClases
@@ -22,6 +23,7 @@ clases_a_registrar: tuple[type, ...] = (
     ListEdificios,
     ListAulas,
     ListCarreras,
+    ListMaterias,
     ListClases,
     ListEquipamientosDeAulas,
     ListEquipamientosNecesariosDeClases,

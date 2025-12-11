@@ -26,5 +26,5 @@ RoundButton {
         source: assets_path + "/iconos/+.svg"
     }
 
-    highlighted: hovered
+    highlighted: enabled ? hovered : false
 }

@@ -11,5 +11,5 @@ RoundButton {
     font.pointSize: FontSize.base
     font.bold: true
 
-    highlighted: hovered
+    highlighted: enabled ? hovered : false
 }

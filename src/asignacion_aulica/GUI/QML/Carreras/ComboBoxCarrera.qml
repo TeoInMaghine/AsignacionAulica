@@ -12,6 +12,7 @@ ComboBox {
 
     required property var listCarreras
     property alias carrera: comboBox.currentValue
+    property alias indexCarrera: comboBox.currentIndex
     property bool hayCarreraSeleccionada: carrera !== undefined
 
     model: listCarreras

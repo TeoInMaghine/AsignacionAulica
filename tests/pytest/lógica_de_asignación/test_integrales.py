@@ -7,6 +7,15 @@ from asignacion_aulica.lógica_de_asignación.asignación import asignar
 
 from mocks import MockAula, MockClase, MockEdificio
 
+@pytest.mark.aulas()
+@pytest.mark.clases(
+    MockClase(día=Día.Miércoles, cantidad_de_alumnos=55),
+)
+def test_no_hay_edificios(edificios: Edificios, carreras: Carreras):
+    resultado = asignar(edificios, carreras)
+    assert not resultado.todo_ok()
+    assert resultado.días_sin_asignar == [Día.Miércoles]
+
 @pytest.mark.aulas(
     MockAula(capacidad=60),
     MockAula(capacidad=40, equipamiento={"proyector"}),

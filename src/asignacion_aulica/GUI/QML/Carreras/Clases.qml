@@ -25,6 +25,12 @@ ListView {
         indexCarrera: view.indexCarrera
         indexMateria: materia.index
     }
+    Connections {
+        target: ProxyGestorDeDatos
+        function onFinAsignarAulas(_) {
+            model.resetModel()
+        }
+    }
 
     header: Item {
         property alias spacing: headerClases.spacing

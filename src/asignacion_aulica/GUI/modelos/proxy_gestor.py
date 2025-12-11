@@ -1,5 +1,4 @@
-import logging
-import time
+import logging, time
 from PyQt6.QtCore import QObject, QThreadPool, pyqtBoundSignal, pyqtSignal, pyqtSlot, QRunnable
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
@@ -42,7 +41,7 @@ class _Asignador(QRunnable):
 
     @pyqtSlot()
     def run(self):
-        time.sleep(1.5)
+        time.sleep(0.8) # Para que parezca como que tarda un poquito
         result: InfoPostAsignación = self.gestor.asignar_aulas()
         str_días_sin_asignar = ', '.join(map(lambda d: d.name, result.días_sin_asignar))
         self.señal_fin.emit(str_días_sin_asignar)

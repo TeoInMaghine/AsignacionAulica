@@ -9,15 +9,6 @@ import ModelosAsignaciónÁulica
 RowLayout {
     spacing: 15
 
-    Connections {
-        target: ProxyGestorDeDatos
-        function onFinAsignarAulas(result) {
-            popupAsignación.close()
-            popupPostAsignación.díasSinAsignar = result
-            popupPostAsignación.open()
-        }
-    }
-
     BotónRedondeadoConTextoColorUNRN {
         text: "Asignar Aulas"
         onClicked: {
@@ -37,6 +28,15 @@ RowLayout {
     PopupPostAsignación {
         id: popupPostAsignación
         díasSinAsignar: ""
+    }
+
+    Connections {
+        target: ProxyGestorDeDatos
+        function onFinAsignarAulas(result) {
+            popupAsignación.close()
+            popupPostAsignación.díasSinAsignar = result
+            popupPostAsignación.open()
+        }
     }
     
 }

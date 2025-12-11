@@ -19,7 +19,7 @@ Popup {
         spacing: 20
 
         Label {
-            text: "Asignando Aulas"
+            text: "Asignando Aulas..."
             font.pointSize: FontSize.big
         }
 

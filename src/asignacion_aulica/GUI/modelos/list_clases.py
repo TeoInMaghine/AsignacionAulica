@@ -2,7 +2,7 @@ import logging
 from enum import IntEnum, auto
 from datetime import time
 from typing import Any, override
-from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty
+from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Clase
@@ -273,3 +273,8 @@ class ListClases(QAbstractListModel):
         self.gestor.agregar_clase(self.i_carrera, self.i_materia)
         self.endInsertRows()
         return True
+    
+    @pyqtSlot()
+    def resetModel(self):
+        self.beginResetModel()
+        self.endResetModel()

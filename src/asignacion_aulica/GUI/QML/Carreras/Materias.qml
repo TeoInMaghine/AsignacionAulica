@@ -31,7 +31,7 @@ ListView {
 
             text: view.count === 0 ?
                   "Todavía no hay materias registradas" :
-                  "Materias"
+                  "Materias:"
             font.pointSize: FontSize.base
         }
     }

@@ -96,6 +96,8 @@ def resolver_problema_de_asignación(
     '''
     if len(clases.clases) == 0:
         return []
+    elif len(aulas.aulas) == 0:
+        raise AsignaciónImposibleException('No hay ningún aula.')
 
     # Crear modelo, variables, restricciones, y penalizaciones
     modelo = cp_model.CpModel()

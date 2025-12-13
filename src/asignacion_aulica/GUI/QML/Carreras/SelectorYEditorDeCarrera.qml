@@ -104,7 +104,7 @@ ColumnLayout{
             enabled: hayCarreraSeleccionada
             Layout.preferredWidth: 270
 
-            currentIndex: hayCarreraSeleccionada ? carrera.edificio_preferido : 0
+            currentIndex: carrera ? carrera.edificio_preferido : 0
             onActivated: indexEdificio => {
                 listCarreras.setEdificioPreferido(comboBox.currentIndex, indexEdificio-1)
             }

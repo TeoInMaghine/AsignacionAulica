@@ -180,3 +180,8 @@ class ListMaterias(QAbstractListModel):
         self.gestor.agregar_materia(self.i_carrera)
         self.endInsertRows()
         return True
+
+    @pyqtSlot()
+    def resetModel(self):
+        self.beginResetModel()
+        self.endResetModel()

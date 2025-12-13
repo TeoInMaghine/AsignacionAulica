@@ -83,3 +83,49 @@ def test_agregar_y_quitar_equipamientos_en_varios_lugares(gestor: GestorDeDatos)
     gestor.borrar_equipamiento_de_aula(1, 0, 'A')
     assert gestor.get_aula(1, 0).equipamiento == set()
     assert gestor.get_equipamientos_existentes() == ['B', 'C'] # Ahora si se borra de la lista global
+
+def test_borrar_entidades_borra_equipamientos(gestor: GestorDeDatos):
+    '''
+    Agregar entidades con equipamientos y verificar que al borrar las
+    entidades, se borran los equipamientos de la lista global.
+    '''
+
+    # Agregar 2 edificios, cada uno con 1 aula
+    for i in range(2):
+        gestor.agregar_edificio()
+        gestor.agregar_aula(i)
+        gestor.agregar_equipamiento_a_aula(i, 0, 'Aula ' + str(i))
+
+    # Agregar 3 carreras, cada una con 1 materia y 1 clase
+    for i in range(3):
+        gestor.agregar_carrera(str(i))
+        gestor.agregar_materia(i)
+        gestor.agregar_clase(i, 0)
+        gestor.agregar_equipamiento_a_clase(i, 0, 0, 'Clase ' + str(i))
+
+    assert gestor.get_equipamientos_existentes() == [
+        'Aula 0', 'Aula 1', 'Clase 0', 'Clase 1', 'Clase 2'
+    ]
+
+    gestor.borrar_aula(0, 0)
+    assert gestor.get_equipamientos_existentes() == [
+        'Aula 1', 'Clase 0', 'Clase 1', 'Clase 2'
+    ]
+
+    gestor.borrar_edificio(1)
+    assert gestor.get_equipamientos_existentes() == [
+        'Clase 0', 'Clase 1', 'Clase 2'
+    ]
+
+    gestor.borrar_clase(0, 0, 0)
+    assert gestor.get_equipamientos_existentes() == [
+        'Clase 1', 'Clase 2'
+    ]
+
+    gestor.borrar_materia(1, 0)
+    assert gestor.get_equipamientos_existentes() == [
+        'Clase 2'
+    ]
+
+    gestor.borrar_carrera(2)
+    assert gestor.get_equipamientos_existentes() == []

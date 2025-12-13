@@ -121,6 +121,13 @@ class GestorDeDatos:
             if carrera.edificio_preferido is el_edificio:
                 carrera.edificio_preferido = None
         
+        # Borrar equipamientos de este edificio
+        for aula in el_edificio.aulas:
+            if aula.equipamiento:
+                self._equipamientos.subtract(aula.equipamiento)
+                # Esto borra los equipamientos con contadores en 0
+                self._equipamientos = +self._equipamientos
+
         # Borrar asignaciones a este edificio
         for clase in todas_las_clases(self._carreras):
             if clase.aula_asignada and clase.aula_asignada.edificio is el_edificio:
@@ -222,6 +229,12 @@ class GestorDeDatos:
             lambda ad: ad.aula_grande is el_aula or ad.aula_chica_1 is el_aula or ad.aula_chica_2 is el_aula,
             el_edificio.aulas_dobles
         )
+
+        # Borrar equipamientos de este aula
+        if el_aula.equipamiento:
+            self._equipamientos.subtract(el_aula.equipamiento)
+            # Esto borra los equipamientos con contadores en 0
+            self._equipamientos = +self._equipamientos
 
         # Borrar asignaciones a este aula
         for clase in todas_las_clases(self._carreras):
@@ -402,6 +415,14 @@ class GestorDeDatos:
         :raise IndexError: Si el índice está fuera de rango.
         '''
         logger.info('Borrando carrera %s', self._carreras[índice].nombre)
+
+        # Borrar equipamientos necesarios de esta carrera
+        for clase in todas_las_clases((self._carreras[índice],)):
+            if clase.equipamiento_necesario:
+                self._equipamientos.subtract(clase.equipamiento_necesario)
+                # Esto borra los equipamientos con contadores en 0
+                self._equipamientos = +self._equipamientos
+
         del self._carreras[índice]
 
     def cantidad_de_materias(self, carrera: int) -> int:
@@ -470,6 +491,14 @@ class GestorDeDatos:
         :param materia: El índice de la materia.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
+
+        # Borrar equipamientos necesarios de esta materia
+        for clase in self._carreras[carrera].materias[materia].clases:
+            if clase.equipamiento_necesario:
+                self._equipamientos.subtract(clase.equipamiento_necesario)
+                # Esto borra los equipamientos con contadores en 0
+                self._equipamientos = +self._equipamientos
+
         del self._carreras[carrera].materias[materia]
 
     def ordenar_materias(self, carrera: int):
@@ -533,6 +562,14 @@ class GestorDeDatos:
         :param clase: El índice de la clase.
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
+        la_clase = self._carreras[carrera].materias[materia].clases[clase]
+
+        # Borrar equipamientos necesarios de esta clase
+        if la_clase.equipamiento_necesario:
+            self._equipamientos.subtract(la_clase.equipamiento_necesario)
+            # Esto borra los equipamientos con contadores en 0
+            self._equipamientos = +self._equipamientos
+
         del self._carreras[carrera].materias[materia].clases[clase]
 
     def get_equipamientos_existentes(self) -> list[str]:

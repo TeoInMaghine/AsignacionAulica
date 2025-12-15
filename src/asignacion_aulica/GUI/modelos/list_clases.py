@@ -19,6 +19,7 @@ class Rol(IntEnum):
     horario_fin           = auto()
     virtual               = auto()
     cantidad_de_alumnos   = auto()
+    edificio_asignado     = auto()
     aula_asignada         = auto()
     no_cambiar_asignación = auto()
 
@@ -83,8 +84,13 @@ class ListClases(QAbstractListModel):
             case Rol.no_cambiar_asignación:
                 return clase.no_cambiar_asignación
 
+            case Rol.edificio_asignado: return (
+                clase.aula_asignada.edificio.nombre
+                if clase.aula_asignada else 'Ninguno'
+            )
+
             case Rol.aula_asignada: return (
-                f'{clase.aula_asignada.edificio.nombre} | {clase.aula_asignada.nombre}'
+                clase.aula_asignada.nombre
                 if clase.aula_asignada else 'Ninguna'
             )
 
@@ -148,6 +154,12 @@ class ListClases(QAbstractListModel):
 
                 clase.no_cambiar_asignación = value
                 return True
+
+            case Rol.edificio_asignado:
+                logger.error(
+                    'Todavía no se implementó la edición del aula asignada.'
+                )
+                return False
 
             case Rol.aula_asignada:
                 logger.error(

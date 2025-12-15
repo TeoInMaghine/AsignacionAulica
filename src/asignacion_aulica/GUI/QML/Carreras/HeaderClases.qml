@@ -11,7 +11,6 @@ RowLayout {
     property alias widthVirtual: headerVirtual.width
     property alias widthCantidadDeAlumnos: headerCantidadDeAlumnos.width
     property alias widthEquipamientoNecesario: headerEquipamientoNecesario.width
-    property alias widthAulaAsignada: headerAulaAsignada.width
 
     Label {
         id: headerDía
@@ -46,10 +45,16 @@ RowLayout {
         text: "Equipamiento necesario"
     }
 
-    Label {
-        id: headerAulaAsignada
-        horizontalAlignment: Text.AlignHCenter
-        text: "Aula asignada"
+    RowLayout {
+        Layout.preferredWidth: Constantes.width_columna_aula_asignada
+
+        Label {
+            Layout.preferredWidth: Constantes.width_editores_aula_asignada
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+
+            horizontalAlignment: Text.AlignHCenter
+            text: "Aula asignada"
+        }
     }
 
     // Item { } // Espacio vacío de 2 * spacing de ancho

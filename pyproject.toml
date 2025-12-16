@@ -10,7 +10,7 @@ authors = [
   {name = "Joaquín Rodríguez"}
 ]
 
-requires-python = "~= 3.11"
+requires-python = "~= 3.12"
 dependencies = [
   "pandas == 2.2.*",
   "numpy == 2.2.*",

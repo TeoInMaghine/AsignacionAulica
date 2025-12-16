@@ -96,6 +96,8 @@ def resolver_problema_de_asignación(
     '''
     if len(clases.clases) == 0:
         return []
+    elif len(aulas.aulas) == 0:
+        raise AsignaciónImposibleException('No hay ningún aula.')
 
     # Crear modelo, variables, restricciones, y penalizaciones
     modelo = cp_model.CpModel()
@@ -107,9 +109,9 @@ def resolver_problema_de_asignación(
     penalización = obtener_penalización(clases, aulas, modelo, asignaciones)
     modelo.minimize(penalización)
 
-    # Resolver (loggueando el proceso)
+    # Resolver (setear log_search_progress para loggear el proceso)
     solver = cp_model.CpSolver()
-    solver.parameters.log_search_progress = True
+    solver.parameters.log_search_progress = False #True
     solver.parameters.log_to_stdout = False
     solver.log_callback = logger.debug
 

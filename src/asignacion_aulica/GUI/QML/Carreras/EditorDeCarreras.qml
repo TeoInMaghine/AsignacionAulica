@@ -11,10 +11,14 @@ ColumnLayout {
     
     Botonera { }
     SelectorYEditorDeCarrera {
+        onCarreraChanged: {
+            materias.model.resetModel()
+        }
         id: selector
     }
 
     Materias {
+        id: materias
         enabled: selector.hayCarreraSeleccionada
         indexCarrera: selector.indexCarrera
     }

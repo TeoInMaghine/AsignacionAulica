@@ -14,6 +14,16 @@ QtObject {
         2*width_editor_horario + spacing_horario
     readonly property int width_columna_horario:
         width_editores_horarios + spacing_horario + width_horario_sideButtons
+
+    readonly property int width_editor_aula: 110
+    readonly property int width_editor_edificio: 110
+    readonly property int width_aula_asignada_sideButtons: 24
+    readonly property int spacing_aula_asignada: 2
+    readonly property int width_editores_aula_asignada:
+        width_editor_aula + spacing_aula_asignada + width_editor_edificio
+    readonly property int width_columna_aula_asignada:
+        width_editores_aula_asignada + spacing_horario + width_aula_asignada_sideButtons
+
     readonly property string ícono_colapsador_path:
         assets_path + "/iconos/Colapsador.svg"
     readonly property string ícono_candado_cerrado_path:

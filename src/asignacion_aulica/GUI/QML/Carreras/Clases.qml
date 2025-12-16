@@ -38,7 +38,6 @@ ListView {
         property alias widthVirtual: headerClases.widthVirtual
         property alias widthCantidadDeAlumnos: headerClases.widthCantidadDeAlumnos
         property alias widthEquipamientoNecesario: headerClases.widthEquipamientoNecesario
-        property alias widthAulaAsignada: headerClases.widthAulaAsignada
         height: headerClases.height + view.spacing
         width: headerClases.width
 
@@ -113,21 +112,29 @@ ListView {
         }
 
         RowLayout {
-            Layout.preferredWidth: headerItem.widthAulaAsignada
-            spacing: Constantes.spacing_horario
+            spacing: Constantes.spacing_aula_asignada
 
-            // TODO: Editar el aula asignada (posiblemente de la misma forma
-            // que el edificio preferido de una carrera?)
-            Label {
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
+            // TODO: Editar el aula asignada, con un SelectorEdificio y
+            // un SelectorAula.
+            TextField {
+                Layout.preferredWidth: Constantes.width_editor_aula
+                readOnly: true
+
                 // Enfatizar texto cuando se "lockea" la asignación de aula
                 font.bold: clase.no_cambiar_asignación
                 text: clase.aula_asignada
             }
+            TextField {
+                Layout.preferredWidth: Constantes.width_editor_edificio
+                readOnly: true
+
+                // Enfatizar texto cuando se "lockea" la asignación de aula
+                font.bold: clase.no_cambiar_asignación
+                text: clase.edificio_asignado
+            }
             Candado {
-                Layout.preferredWidth: Constantes.width_horario_sideButtons
-                Layout.preferredHeight: Constantes.width_horario_sideButtons
+                Layout.preferredWidth: Constantes.width_aula_asignada_sideButtons
+                Layout.preferredHeight: Constantes.width_aula_asignada_sideButtons
 
                 checked: clase.no_cambiar_asignación
                 onClicked: clase.no_cambiar_asignación = checked

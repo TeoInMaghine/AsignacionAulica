@@ -11,9 +11,11 @@ RowLayout {
     
     SelectorDeEdificioConAulas{
         id: selectorEdificio
+        Layout.preferredWidth: Constantes.width_editor_edificio
     }
 
     SelectorDeAula{
         indexEdificio: selectorEdificio.indexEdificioSeleccionado
+        Layout.preferredWidth: Constantes.width_editor_aula
     }
 }

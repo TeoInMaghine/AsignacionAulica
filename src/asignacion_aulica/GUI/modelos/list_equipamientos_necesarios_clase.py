@@ -148,6 +148,15 @@ class ListEquipamientosNecesariosDeClases(QAbstractListModel):
         self.endResetModel()
     
     def _get_equipamientos_seleccionados(self) -> set[str]:
-        return self.gestor.get_clase(
-            self.i_carrera, self.i_materia, self.i_clase
-        ).equipamiento_necesario
+        los_índices_son_válidos = (
+            self.gestor.cantidad_de_carreras() > self.i_carrera
+            and self.gestor.cantidad_de_materias(self.i_carrera) > self.i_materia
+            and self.gestor.cantidad_de_clases(self.i_carrera, self.i_materia) > self.i_clase
+        )
+        
+        if los_índices_son_válidos:
+            return self.gestor.get_clase(
+                self.i_carrera, self.i_materia, self.i_clase
+            ).equipamiento_necesario
+        else:
+            return set()

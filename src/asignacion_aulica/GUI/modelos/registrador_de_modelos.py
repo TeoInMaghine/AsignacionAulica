@@ -1,5 +1,6 @@
 from PyQt6.QtCore import QObject
 from asignacion_aulica.GUI.modelos.list_selector_edificio import ListSelectorDeEdificios
+from asignacion_aulica.GUI.modelos.list_selector_edificios_con_aulas import ListSelectorDeEdificiosConAulas
 from asignacion_aulica.GUI.modelos.list_selector_aula import ListSelectorDeAula
 from asignacion_aulica.GUI.modelos.proxy_gestor import ProxyGestorDeDatos
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
@@ -31,6 +32,7 @@ clases_a_registrar: tuple[type, ...] = (
     ListEquipamientosDeAulas,
     ListEquipamientosNecesariosDeClases,
     ListSelectorDeEdificios,
+    ListSelectorDeEdificiosConAulas,
     ListSelectorDeAula
 )
 

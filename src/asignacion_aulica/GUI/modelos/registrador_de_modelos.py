@@ -1,5 +1,6 @@
 from PyQt6.QtCore import QObject
 from asignacion_aulica.GUI.modelos.list_selector_edificio import ListSelectorDeEdificios
+from asignacion_aulica.GUI.modelos.list_selector_aula import ListSelectorDeAula
 from asignacion_aulica.GUI.modelos.proxy_gestor import ProxyGestorDeDatos
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
 from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
@@ -29,7 +30,8 @@ clases_a_registrar: tuple[type, ...] = (
     ListClases,
     ListEquipamientosDeAulas,
     ListEquipamientosNecesariosDeClases,
-    ListSelectorDeEdificios
+    ListSelectorDeEdificios,
+    ListSelectorDeAula
 )
 
 def agregar_defaults_al_constructor(clase: type, **defaults) -> type:

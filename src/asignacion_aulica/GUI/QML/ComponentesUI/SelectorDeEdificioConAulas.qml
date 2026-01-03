@@ -9,14 +9,21 @@ ComboBox {
     // El índice 0 indica que no hay edificio seleccionado.
     property bool hayEdificioSeleccionado: currentIndex > 0
 
+    property var indexEdificioSeleccionado: null
+
     model: ListSelectorDeEdificiosConAulas {
         id: edificios
         textoCuandoNoSeleccionado: "Ninguno"
     }
     textRole: "nombre"
+
+    onActivated: index => {
+        indexEdificioSeleccionado = edificios.get(index).índice
+    }
+
     onPressedChanged: if (pressed && !popup.visible) edificios.actualizar()
 
-    // Override space key handling to toggle items when the popup is visible
+    // Toggle items with the space key
     Keys.onSpacePressed: (event) => {
         if (comboBox.popup.visible) {
             var currentItem = comboBox.popup.contentItem.currentItem

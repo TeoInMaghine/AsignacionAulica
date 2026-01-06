@@ -75,10 +75,10 @@ class ListSelectorDeAula(QAbstractListModel):
     @override
     def data(self, index: QModelIndex, role: int = 0) -> Any:
         if not index.isValid(): return None
-        if self.i_edificio is None: return None
         
         i_aula: int|None = (
-            None if index.row() == 0
+            None
+            if self.i_edificio is None or index.row() == 0
             else index.row() - 1
         )
         

@@ -51,7 +51,6 @@ class ListSelectorDeEdificiosConAulas(QAbstractListModel):
             for i_edificio in range(self.gestor.cantidad_de_edificios())
             if self.gestor.cantidad_de_aulas(i_edificio) > 0
         ]
-        logger.info('%s', self.índices_de_edificios_con_aulas)
 
         self.layoutChanged.emit()
 
@@ -66,7 +65,6 @@ class ListSelectorDeEdificiosConAulas(QAbstractListModel):
     @override
     def data(self, index: QModelIndex, role: int = 0) -> Any:
         if not index.isValid(): return None
-        if role not in ROLES_A_NOMBRES_QT: return None
 
         i_edificio: int|None = (
             None if index.row() == 0

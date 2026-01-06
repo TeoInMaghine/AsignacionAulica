@@ -6,7 +6,7 @@ import ModelosAsignaciónÁulica
 ComboBox {
     id: comboBox
 
-    required property int indexEdificio
+    required property var indexEdificio // int or undefined
 
     // El índice 0 indica que no hay aula seleccionada.
     property bool hayAulaSeleccionada: currentIndex > 0
@@ -16,6 +16,9 @@ ComboBox {
         indexEdificio: comboBox.indexEdificio
         textoCuandoNoSeleccionado: "Ninguna"
     }
+    textRole: "nombre"
+    valueRole: "índice"
+
     onPressedChanged: if (pressed && !popup.visible) aulas.ordenar()
 
     // Toggle items with the space key

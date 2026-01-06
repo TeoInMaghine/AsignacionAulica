@@ -9,6 +9,8 @@ ComboBox {
     // El índice 0 indica que no hay edificio seleccionado.
     property bool hayEdificioSeleccionado: currentIndex > 0
 
+    property alias textoCuandoNoSeleccionado: edificios.textoCuandoNoSeleccionado
+
     model: ListSelectorDeEdificiosConAulas {
         id: edificios
         textoCuandoNoSeleccionado: "Ninguno"

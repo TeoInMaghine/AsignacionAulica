@@ -15,7 +15,9 @@ RowLayout {
     }
 
     SelectorDeAula{
-        indexEdificio: selectorEdificio.indexEdificioSeleccionado
+        id: selectorAula
+        enabled: selectorEdificio.hayEdificioSeleccionado
+        indexEdificio: selectorEdificio.currentValue
         Layout.preferredWidth: Constantes.width_editor_aula
     }
 }

@@ -9,17 +9,12 @@ ComboBox {
     // El índice 0 indica que no hay edificio seleccionado.
     property bool hayEdificioSeleccionado: currentIndex > 0
 
-    property var indexEdificioSeleccionado: null
-
     model: ListSelectorDeEdificiosConAulas {
         id: edificios
         textoCuandoNoSeleccionado: "Ninguno"
     }
     textRole: "nombre"
-
-    onActivated: index => {
-        indexEdificioSeleccionado = edificios.get(index).índice
-    }
+    valueRole: "índice"
 
     onPressedChanged: if (pressed && !popup.visible) edificios.actualizar()
 

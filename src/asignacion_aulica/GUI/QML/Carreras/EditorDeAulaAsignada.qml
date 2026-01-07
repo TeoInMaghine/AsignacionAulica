@@ -5,11 +5,9 @@ import QML.ComponentesUI
 import ModelosAsignaciónÁulica
 
 RowLayout {
-    required property int indexCarrera
-    required property int indexMateria
-    required property int indexClase
+    required property var clase
     
-    SelectorDeEdificioConAulas{
+    SelectorDeEdificioConAulas {
         id: selectorEdificio
         Layout.preferredWidth: Constantes.width_editor_edificio
 
@@ -31,11 +29,10 @@ RowLayout {
 
     SelectorDeAula{
         id: selectorAula
+        enabled: selectorEdificio.hayEdificioSeleccionado // No se puede elegir aula sin elegir edificio
         Layout.preferredWidth: Constantes.width_editor_aula
 
         textoCuandoNoSeleccionado: "Sin aula"
-
-        enabled: selectorEdificio.hayEdificioSeleccionado // No se puede elegir aula sin elegir edificio
         indexEdificio: selectorEdificio.currentValue
 
         onActivated: index => {
@@ -44,12 +41,12 @@ RowLayout {
                 selectorEdificio.currentIndex = 0
 
                 ProxyGestorDeDatos.borrarAulaDeUnaClase(
-                    indexCarrera, indexMateria, indexClase
+                    clase.indexCarrera, clase.indexMateria, clase.index
                 )
             }
             else {
                 ProxyGestorDeDatos.asignarAulaDeUnaClase(
-                    indexCarrera, indexMateria, indexClase,
+                    clase.indexCarrera, clase.indexMateria, clase.index,
                     selectorEdificio.currentValue, selectorAula.currentValue
                 )
             }

@@ -115,9 +115,7 @@ ListView {
             spacing: Constantes.spacing_aula_asignada
 
             EditorDeAulaAsignada {
-                indexCarrera: view.indexCarrera
-                indexMateria: materia.index
-                indexClase: clase.index
+                clase: editorDeClase.clase
             }
             Candado {
                 Layout.preferredWidth: Constantes.width_aula_asignada_sideButtons

@@ -173,6 +173,7 @@ class ListClases(QAbstractListModel):
                 else:
                     # Seleccionar la primer aula del edificio
                     clase.aula_asignada = self.gestor.get_aula(i_edificio, 0)
+                self.dataChanged.emit(index, index, [Rol.index_aula_asignada.value])
                 return True
 
             case Rol.index_aula_asignada:
@@ -185,6 +186,7 @@ class ListClases(QAbstractListModel):
                     return False
                 elif value == 0:
                     clase.aula_asignada = None
+                    self.dataChanged.emit(index, index, [Rol.index_edificio_asignado.value])
                     return True
                 elif clase.aula_asignada is None:
                     logger.error('No se puede seleccionar el aula sin seleccionar primero el edificio.')

@@ -51,8 +51,10 @@ class ListSelectorDeAula(QAbstractListModel):
         if not isinstance(indexEdificio, (int, NoneType)):
             logger.error('Invalid type for indexEdificio: %s %s', type(indexEdificio), indexEdificio)
         if indexEdificio is None or indexEdificio >= 0: # Ignorar cuando QT setea -1
+            self.layoutAboutToBeChanged.emit()
             logger.debug('Set indexEdificio: %s', indexEdificio)
             self.i_edificio = indexEdificio
+            self.layoutChanged.emit()
 
     @pyqtSlot()
     def ordenar(self):

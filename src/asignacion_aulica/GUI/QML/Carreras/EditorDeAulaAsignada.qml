@@ -17,7 +17,6 @@ RowLayout {
         currentIndex: clase.index_edificio_asignado
         onActivated: index => {
             clase.index_edificio_asignado = index
-            console.log("edificio " + clase.index_edificio_asignado + " aula " + clase.index_aula_asignada)
         }
     }
 
@@ -33,7 +32,6 @@ RowLayout {
         currentIndex: clase.index_aula_asignada
         onActivated: index => {
             clase.index_aula_asignada = index
-            console.log("edificio " + clase.index_edificio_asignado + " aula " + clase.index_aula_asignada)
         }
     }
 }

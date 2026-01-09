@@ -3,6 +3,7 @@ import logging
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtSlot, pyqtProperty
 
+from asignacion_aulica.gestor_de_datos.entidades import Edificio
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 
 logger = logging.getLogger(__name__)
@@ -60,16 +61,16 @@ class ListSelectorDeEdificiosConAulas(QAbstractListModel):
 
     @override
     def rowCount(self, parent: QModelIndex|None = None) -> int:
+        '''
+        Nota: hay que actualizar la lista antes de usar esto.
+        '''
         return len(self.índices_de_edificios_con_aulas) + 1
 
     @override
     def data(self, index: QModelIndex, role: int = 0) -> Any:
         if not index.isValid(): return None
 
-        i_edificio: int|None = (
-            None if index.row() == 0
-            else self.índices_de_edificios_con_aulas[index.row()-1]
-        )
+        i_edificio: int|None = self[index.row()]
         
         match role:
             case Rol.nombre:
@@ -83,3 +84,29 @@ class ListSelectorDeEdificiosConAulas(QAbstractListModel):
             case _:
                 logger.error('Rol desconocido: %s', role)
                 return None
+    
+    def index_of(self, edificio: Edificio) -> int|None:
+        '''
+        :return: El índice del edificio dado en esta lista, o 0 (que equivale a
+        no tener edificio seleccionado) si el edificio no está en la lista.
+        '''
+        logger.debug('index_of %s', edificio.nombre)
+        self.actualizar()
+        índice_en_el_gestor = self.gestor.índice_del_edificio(edificio)
+        logger.debug('índice_en_el_gestor: %s', índice_en_el_gestor)
+        try:
+            índice_en_esta_lista = self.índices_de_edificios_con_aulas.index(índice_en_el_gestor) + 1
+            logger.debug('índice_en_esta_lista: %s', índice_en_esta_lista)
+            return índice_en_esta_lista
+        except ValueError:
+            return 0
+    
+    def __getitem__(self, index: int) -> int|None:
+        '''
+        :return: El índice que tiene en el gestor de datos el elemento que en
+        esta lista tiene el índice `index`, o `None` si `index==0`.
+
+        Nota: hay que actualizar la lista antes de usar esto.
+        '''
+        if index == 0: return None
+        else: return self.índices_de_edificios_con_aulas[index-1]

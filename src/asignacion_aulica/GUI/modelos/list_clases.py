@@ -4,6 +4,7 @@ from datetime import time
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSlot
 
+from asignacion_aulica.GUI.modelos.list_selector_edificios_con_aulas import ListSelectorDeEdificiosConAulas
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.gestor_de_datos.entidades import Clase
 from asignacion_aulica.gestor_de_datos.días_y_horarios import (
@@ -14,25 +15,25 @@ logger = logging.getLogger(__name__)
 
 class Rol(IntEnum):
     # No se empieza desde 0 para no colisionar con los roles ya existentes de Qt.
-    día                   = Qt.ItemDataRole.UserRole + 1
-    horario_inicio        = auto()
-    horario_fin           = auto()
-    virtual               = auto()
-    cantidad_de_alumnos   = auto()
-    edificio_asignado     = auto()
-    aula_asignada         = auto()
-    no_cambiar_asignación = auto()
+    día                     = Qt.ItemDataRole.UserRole + 1
+    horario_inicio          = auto()
+    horario_fin             = auto()
+    virtual                 = auto()
+    cantidad_de_alumnos     = auto()
+    index_edificio_asignado = auto() # Este es el índice en la lista de edificios con aulas, no en la lista de todos los edificios
+    index_aula_asignada     = auto() # i==0 representa ningún aula, i>0 representa el aula i-1
+    no_cambiar_asignación   = auto()
 
 ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
     rol.value: QByteArray(rol.name.encode())
     for rol in Rol
 }
 
-
 class ListClases(QAbstractListModel):
     def __init__(self, parent, gestor: GestorDeDatos):
         super().__init__(parent)
         self.gestor: GestorDeDatos = gestor
+        self.edificios_disponibles: ListSelectorDeEdificiosConAulas = ListSelectorDeEdificiosConAulas(None, self.gestor)
         self.i_carrera: int = 0 # Seteado por QT
         self.i_materia: int = 0 # Seteado por QT
 
@@ -67,14 +68,12 @@ class ListClases(QAbstractListModel):
     @override
     def data(self, index: QModelIndex, role: int = 0) -> Any:
         if not index.isValid(): return None
-        if role not in Rol: return None
 
-        rol = Rol(role)
         clase: Clase = self.gestor.get_clase(
             self.i_carrera, self.i_materia, index.row()
         )
 
-        match rol:
+        match role:
             case Rol.cantidad_de_alumnos:
                 return clase.cantidad_de_alumnos
 
@@ -84,14 +83,14 @@ class ListClases(QAbstractListModel):
             case Rol.no_cambiar_asignación:
                 return clase.no_cambiar_asignación
 
-            case Rol.edificio_asignado: return (
-                clase.aula_asignada.edificio.nombre
-                if clase.aula_asignada else 'Ninguno'
-            )
+            case Rol.index_edificio_asignado: return(
+                    self.edificios_disponibles.index_of(clase.aula_asignada.edificio)
+                    if clase.aula_asignada else 0
+                )
 
-            case Rol.aula_asignada: return (
-                clase.aula_asignada.nombre
-                if clase.aula_asignada else 'Ninguna'
+            case Rol.index_aula_asignada: return (
+                clase.aula_asignada.edificio.aulas.index(clase.aula_asignada) + 1
+                if clase.aula_asignada else 0
             )
 
             case Rol.día:
@@ -104,16 +103,15 @@ class ListClases(QAbstractListModel):
                 return time_to_string_horario(clase.horario.fin)
 
             case _:
-                logger.error(
-                    'Esto nunca debería ocurrir, '
-                    'todos los roles deberían manejarse.'
-                )
+                logger.error('Rol desconocido: %s', role)
                 return None
 
     @override
     def setData(self, index: QModelIndex, value: Any, role: int = 0) -> bool:
         if not index.isValid(): return False
-        if role not in Rol: return False
+        if role not in Rol:
+            logger.error('Rol desconocido: %s', role)
+            return False
 
         rol = Rol(role)
         logger.debug('Editando %s con el valor %s', rol.name, value)
@@ -155,17 +153,50 @@ class ListClases(QAbstractListModel):
                 clase.no_cambiar_asignación = value
                 return True
 
-            case Rol.edificio_asignado:
-                logger.error(
-                    'Todavía no se implementó la edición del aula asignada.'
-                )
-                return False
+            case Rol.index_edificio_asignado:
+                if not isinstance(value, int):
+                    logger.error(
+                        'index_edificio_asignado recibió el valor "%s"'
+                        ' de tipo %s, pero se esperaba un int.',
+                        value, type(value)
+                    )
+                    return False
+                
+                self.edificios_disponibles.actualizar()
+                if value >= self.edificios_disponibles.rowCount():
+                    logger.error('index_edificio_asignado recibió un valor fuera de rango: %d', value)
+                    return False
+                
+                i_edificio: int | None = self.edificios_disponibles[value]
+                if i_edificio is None:
+                    clase.aula_asignada = None
+                else:
+                    # Seleccionar la primer aula del edificio
+                    clase.aula_asignada = self.gestor.get_aula(i_edificio, 0)
+                return True
 
-            case Rol.aula_asignada:
-                logger.error(
-                    'Todavía no se implementó la edición del aula asignada.'
-                )
-                return False
+            case Rol.index_aula_asignada:
+                if not isinstance(value, int):
+                    logger.error(
+                        'index_aula_asignada recibió el valor "%s" de tipo '
+                        '%s, pero se esperaba un int.',
+                        value, type(value)
+                    )
+                    return False
+                elif value == 0:
+                    clase.aula_asignada = None
+                    return True
+                elif clase.aula_asignada is None:
+                    logger.error('No se puede seleccionar el aula sin seleccionar primero el edificio.')
+                    return False
+                elif value > len(clase.aula_asignada.edificio.aulas):
+                    logger.error('index_aula_asignada recibió un valor fuera de rango para el edificio actual: %d', value)
+                    return False
+                else:
+                    # Seleccionar otro aula del mismo edificio
+                    edificio_actual = clase.aula_asignada.edificio
+                    clase.aula_asignada = edificio_actual.aulas[value-1]
+                    return True
 
             case Rol.día:
                 if not isinstance(value, int):
@@ -198,7 +229,7 @@ class ListClases(QAbstractListModel):
                 )
                 return False
 
-    def try_to_set_cantidad_de_alumnos(self, clase: Clase, value: str) -> bool:
+    def try_to_set_cantidad_de_alumnos(self, clase: Clase, value: str|Any) -> bool:
 
         if not isinstance(value, str):
             logger.error(
@@ -223,7 +254,7 @@ class ListClases(QAbstractListModel):
             self,
             rol: Rol,
             rango_horario: RangoHorario,
-            value: str
+            value: str|Any
         ) -> bool:
         '''
         Asignar inicio o fin del rango horario si no resulta en un rango

@@ -107,3 +107,9 @@ def test_ordenar_edificios(gestor: GestorDeDatos):
     assert gestor.get_edificio(0).nombre == 'a'
     assert gestor.get_edificio(1).nombre == 'b'
     assert gestor.get_edificio(2).nombre == 'd'
+
+def test_índice_del_edificio(gestor: GestorDeDatos):
+    gestor.agregar_edificio()
+    gestor.agregar_edificio()
+    assert gestor.índice_del_edificio(gestor.get_edificio(0)) == 0
+    assert gestor.índice_del_edificio(gestor.get_edificio(1)) == 1

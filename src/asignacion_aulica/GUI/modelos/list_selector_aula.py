@@ -60,6 +60,14 @@ class ListSelectorDeAula(QAbstractListModel):
             self.layoutAboutToBeChanged.emit()
             self.gestor.ordenar_aulas(self.i_edificio)
             self.layoutChanged.emit()
+    
+    @pyqtSlot()
+    def actualizar(self):
+        '''
+        Forzar que se vuelva a cargar la lista.
+        '''
+        self.layoutAboutToBeChanged.emit()
+        self.layoutChanged.emit()
 
     @override
     def roleNames(self) -> dict[int, QByteArray]:

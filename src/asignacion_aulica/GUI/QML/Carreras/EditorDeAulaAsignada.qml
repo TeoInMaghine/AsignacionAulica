@@ -11,45 +11,29 @@ RowLayout {
         id: selectorEdificio
         Layout.preferredWidth: Constantes.width_editor_edificio
 
-        textoCuandoNoSeleccionado: "Sin edificio"
+        Component.onCompleted: selectorEdificio.model.actualizar()
 
+        textoCuandoNoSeleccionado: "Sin edificio"
+        currentIndex: clase.index_edificio_asignado
         onActivated: index => {
-            if (index == 0) { // Se borró la selección
-                // Borrar también la selección de aula
-                selectorAula.currentIndex = 0
-                selectorAula.activated(0)
-            }
-            else { // Se seleccionó un edificio
-                // Seleccionar la primer aula del edificio
-                selectorAula.currentIndex = 1
-                selectorAula.activated(1)
-            }
+            clase.index_edificio_asignado = index
+            console.log("edificio " + clase.index_edificio_asignado + " aula " + clase.index_aula_asignada)
         }
     }
 
     SelectorDeAula{
         id: selectorAula
-        enabled: selectorEdificio.hayEdificioSeleccionado // No se puede elegir aula sin elegir edificio
         Layout.preferredWidth: Constantes.width_editor_aula
 
+        Component.onCompleted: selectorAula.model.actualizar()
+
         textoCuandoNoSeleccionado: "Sin aula"
+        enabled: selectorEdificio.hayEdificioSeleccionado // No se puede elegir aula sin elegir edificio
         indexEdificio: selectorEdificio.currentValue
-
+        currentIndex: clase.index_aula_asignada
         onActivated: index => {
-            if (index == 0){ // Se borró la selección
-                // Borrar selección de edificio
-                selectorEdificio.currentIndex = 0
-
-                ProxyGestorDeDatos.borrarAulaDeUnaClase(
-                    clase.indexCarrera, clase.indexMateria, clase.index
-                )
-            }
-            else {
-                ProxyGestorDeDatos.asignarAulaDeUnaClase(
-                    clase.indexCarrera, clase.indexMateria, clase.index,
-                    selectorEdificio.currentValue, selectorAula.currentValue
-                )
-            }
+            clase.index_aula_asignada = index
+            console.log("edificio " + clase.index_edificio_asignado + " aula " + clase.index_aula_asignada)
         }
     }
 }

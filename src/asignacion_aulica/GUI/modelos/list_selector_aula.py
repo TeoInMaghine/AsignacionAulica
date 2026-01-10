@@ -32,7 +32,7 @@ class ListSelectorDeAula(QAbstractListModel):
         
         # Seteado por QT
         self.texto_cuando_no_seleccionado: str = ''
-        self.i_edificio: int|None = 0
+        self.i_edificio: int|None = None
     
     @pyqtProperty(str)
     def textoCuandoNoSeleccionado(self) -> str:
@@ -50,7 +50,7 @@ class ListSelectorDeAula(QAbstractListModel):
     def indexEdificio(self, indexEdificio: int|None|Any):
         if not isinstance(indexEdificio, (int, NoneType)):
             logger.error('Invalid type for indexEdificio: %s %s', type(indexEdificio), indexEdificio)
-        if indexEdificio is None or indexEdificio >= 0: # Ignorar cuando QT setea -1
+        elif indexEdificio is None or indexEdificio >= 0: # Ignorar cuando QT setea -1
             self.layoutAboutToBeChanged.emit()
             logger.debug('Set indexEdificio: %s', indexEdificio)
             self.i_edificio = indexEdificio

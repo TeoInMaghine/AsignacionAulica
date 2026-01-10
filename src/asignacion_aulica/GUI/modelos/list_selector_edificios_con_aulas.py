@@ -85,18 +85,15 @@ class ListSelectorDeEdificiosConAulas(QAbstractListModel):
                 logger.error('Rol desconocido: %s', role)
                 return None
     
-    def index_of(self, edificio: Edificio) -> int|None:
+    def index_of(self, edificio: Edificio) -> int:
         '''
         :return: El índice del edificio dado en esta lista, o 0 (que equivale a
         no tener edificio seleccionado) si el edificio no está en la lista.
         '''
-        logger.debug('index_of %s', edificio.nombre)
         self.actualizar()
         índice_en_el_gestor = self.gestor.índice_del_edificio(edificio)
-        logger.debug('índice_en_el_gestor: %s', índice_en_el_gestor)
         try:
             índice_en_esta_lista = self.índices_de_edificios_con_aulas.index(índice_en_el_gestor) + 1
-            logger.debug('índice_en_esta_lista: %s', índice_en_esta_lista)
             return índice_en_esta_lista
         except ValueError:
             return 0

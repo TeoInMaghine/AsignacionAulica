@@ -24,6 +24,8 @@ class Rol(IntEnum):
     index_aula_asignada     = auto() # i==0 representa ningún aula, i>0 representa el aula i-1
     no_cambiar_asignación   = auto()
 
+ÍNDICE_CUANDO_NO_ASIGNADO: int = 0
+
 ROLES_A_NOMBRES_QT: dict[int, QByteArray] = {
     rol.value: QByteArray(rol.name.encode())
     for rol in Rol
@@ -85,12 +87,12 @@ class ListClases(QAbstractListModel):
 
             case Rol.index_edificio_asignado: return(
                     self.edificios_disponibles.index_of(clase.aula_asignada.edificio)
-                    if clase.aula_asignada else 0
+                    if clase.aula_asignada else ÍNDICE_CUANDO_NO_ASIGNADO
                 )
 
             case Rol.index_aula_asignada: return (
                 clase.aula_asignada.edificio.aulas.index(clase.aula_asignada) + 1
-                if clase.aula_asignada else 0
+                if clase.aula_asignada else ÍNDICE_CUANDO_NO_ASIGNADO
             )
 
             case Rol.día:
@@ -184,7 +186,7 @@ class ListClases(QAbstractListModel):
                         value, type(value)
                     )
                     return False
-                elif value == 0:
+                elif value == ÍNDICE_CUANDO_NO_ASIGNADO:
                     clase.aula_asignada = None
                     self.dataChanged.emit(index, index, [Rol.index_edificio_asignado.value])
                     return True

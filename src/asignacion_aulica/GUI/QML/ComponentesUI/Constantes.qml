@@ -15,8 +15,8 @@ QtObject {
     readonly property int width_columna_horario:
         width_editores_horarios + spacing_horario + width_horario_sideButtons
 
-    readonly property int width_editor_aula: 110
-    readonly property int width_editor_edificio: 110
+    readonly property int width_editor_edificio: 200
+    readonly property int width_editor_aula: 150
     readonly property int width_aula_asignada_sideButtons: 24
     readonly property int spacing_aula_asignada: 2
     readonly property int width_editores_aula_asignada:

@@ -8,3 +8,4 @@ internal HeaderClases HeaderClases.qml
 internal Materias Materias.qml
 internal HeaderMaterias HeaderMaterias.qml
 internal EditorRangoHorarioClase EditorRangoHorarioClase.qml
+internal EditorDeAulaAsignada EditorDeAulaAsignada.qml

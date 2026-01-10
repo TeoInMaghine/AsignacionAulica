@@ -114,23 +114,8 @@ ListView {
         RowLayout {
             spacing: Constantes.spacing_aula_asignada
 
-            // TODO: Editar el aula asignada, con un SelectorEdificio y
-            // un SelectorAula.
-            TextField {
-                Layout.preferredWidth: Constantes.width_editor_aula
-                readOnly: true
-
-                // Enfatizar texto cuando se "lockea" la asignación de aula
-                font.bold: clase.no_cambiar_asignación
-                text: clase.aula_asignada
-            }
-            TextField {
-                Layout.preferredWidth: Constantes.width_editor_edificio
-                readOnly: true
-
-                // Enfatizar texto cuando se "lockea" la asignación de aula
-                font.bold: clase.no_cambiar_asignación
-                text: clase.edificio_asignado
+            EditorDeAulaAsignada {
+                clase: editorDeClase.clase
             }
             Candado {
                 Layout.preferredWidth: Constantes.width_aula_asignada_sideButtons

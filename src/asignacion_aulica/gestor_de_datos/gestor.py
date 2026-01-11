@@ -139,6 +139,13 @@ class GestorDeDatos:
         '''
         logger.debug('ordenar_edificios')
         self._edificios.sort(key=lambda edificio: edificio.nombre.lower())
+    
+    def índice_del_edificio(self, edificio: Edificio) -> int:
+        '''
+        :return: El índice de `edificio`.
+        :raise ValueError: Si `edificio` no es un edificio de este gestor.
+        '''
+        return self._edificios.index(edificio)
 
     def get_aulas(self, edificio: int) -> list[str]:
         '''

@@ -29,6 +29,8 @@ asignacion-aulica = "asignacion_aulica.main:main"
 [tool.pytest.ini_options]
 testpaths = ["tests/pytest"]
 minversion = "8.3"
+tmp_path_retention_policy = "failed" # Guardar archivos temporales de las pruebas que fallan
+tmp_path_retention_count = 1 # Pero sólo guardar archivos de la última ejecución
 
 [tool.cxfreeze]
 executables = [

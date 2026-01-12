@@ -8,6 +8,7 @@ ListView {
     id: view
 
     required property var edificio
+    required property var aulasDobles
     readonly property int padding: 20
 
     spacing: headerItem.spacing
@@ -19,7 +20,11 @@ ListView {
     width: contentItem.childrenRect.width + 2 * padding
     height: contentHeight + 2 * padding
 
-    model: ListAulas { id: aulas; indexEdificio: edificio.index }
+    model: ListAulas {
+        id: aulas
+        aulasDobles: view.aulasDobles
+        indexEdificio: edificio.index
+    }
 
     header: Item {
         property alias spacing: headerAulas.spacing

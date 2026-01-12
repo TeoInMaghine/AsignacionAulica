@@ -264,9 +264,6 @@ class GestorDeDatos:
         '''
         return len(self._edificios[edificio].aulas_dobles)
 
-    # TODO: re-considerar la interfaz de aulas dobles cuando se implemente en
-    # la UI. Quizás es error prone el setear las aulas directamente, se podría
-    # accidentalmente asignar un aula de otro edificio por ejemplo.
     def get_aula_doble(self, edificio: int, aula_doble: int) -> AulaDoble:
         '''
         Obtener el aula doble (no una copia), la cual puede inspeccionarse y

@@ -20,11 +20,9 @@ RowLayout {
         }
     }
 
-    SelectorDeAula{
+    SelectorDeAula {
         id: selectorAula
         Layout.preferredWidth: Constantes.width_editor_aula
-
-        Component.onCompleted: selectorAula.model.actualizar()
 
         textoCuandoNoSeleccionado: "Sin aula"
         enabled: selectorEdificio.hayEdificioSeleccionado // No se puede elegir aula sin elegir edificio

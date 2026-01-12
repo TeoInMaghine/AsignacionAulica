@@ -27,9 +27,9 @@ class ListMaterias(QAbstractListModel):
 
     @pyqtSlot()
     def ordenar(self):
-        self.layoutAboutToBeChanged.emit()
+        self.layoutAboutToBeChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
         self.gestor.ordenar_materias(self.i_carrera)
-        self.layoutChanged.emit()
+        self.layoutChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
 
     @pyqtProperty(int)
     def indexCarrera(self) -> int:

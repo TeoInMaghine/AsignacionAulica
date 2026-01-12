@@ -91,7 +91,7 @@ Rectangle {
 
             Label {
                 id: label
-                font.pointSize: FontSize.base
+                font.pointSize: ComponentesUI.FontSize.base
             }
 
             ComponentesUI.BotónRedondeadoConTexto{

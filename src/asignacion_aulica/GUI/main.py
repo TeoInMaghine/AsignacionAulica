@@ -10,6 +10,8 @@ from asignacion_aulica import assets
 
 logger = logging.getLogger(__name__)
 
+PATH_GESTOR_DE_DATOS = Path(assets.get_path('gestor.pickle'))
+
 def configurar_fuente_por_defecto():
     fonts_path = assets.get_path('fonts')
     for font_file in os.listdir(fonts_path):
@@ -23,7 +25,7 @@ def main() -> int:
     icono = QIcon(assets.get_path('iconos', 'unrn.ico'))
     app.setWindowIcon(icono)
 
-    gestor_de_datos_de_la_aplicación = GestorDeDatos(assets.get_path('base_de_datos'))
+    gestor_de_datos_de_la_aplicación = GestorDeDatos(PATH_GESTOR_DE_DATOS)
     registrar_modelos_qml(gestor_de_datos_de_la_aplicación)
 
     configurar_fuente_por_defecto()

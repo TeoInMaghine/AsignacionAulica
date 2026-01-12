@@ -29,6 +29,21 @@ class ProxyGestorDeDatos(QObject):
         worker = _Asignador(self.gestor, self.finAsignarAulas)
         self.threadpool.start(worker)
 
+    @pyqtSlot(result=str)
+    def guardar(self) -> str:
+        '''
+        Llamar al método `guardar` del gestor de datos.
+
+        :return: Un mensaje de error, vacío en caso de éxito.
+        '''
+        try:
+            self.gestor.guardar()
+            return ''
+        except Exception as e:
+            logger.error('Error guardando datos: %s', e)
+            return 'No se pudieron guardar los datos.'
+
+
 class _Asignador(QRunnable):
     '''
     Objeto QT encargado de ejecutar la asignación de aulas en un hilo.

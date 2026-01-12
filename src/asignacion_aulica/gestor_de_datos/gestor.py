@@ -784,6 +784,7 @@ class GestorDeDatos:
         :raise ValueError: Si no se pasó un ``filename`` al constructor.
         '''
         if self._filename:
+            logger.info('Guardando datos.')
             datos_a_guardar = (self._edificios, self._carreras, self._equipamientos)
             with open(self._filename, 'wb') as stream:
                 pickle.dump(datos_a_guardar, stream)

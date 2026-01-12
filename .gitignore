@@ -140,5 +140,5 @@ pyrightconfig.json
 .~lock.*
 *.tmp
 
-# Ignorar archivo del gestor e datos generado durante pruebas
+# Ignorar archivo del gestor de datos generado durante pruebas
 assets/*.pickle

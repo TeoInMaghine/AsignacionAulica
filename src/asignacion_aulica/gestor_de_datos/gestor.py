@@ -777,11 +777,12 @@ class GestorDeDatos:
         Guardar el estado actual de los datos en el archivo configurado al
         construir el gestor.
 
+        Si no se pasó un nombre de archivo al constructor, este método no hace
+        nada.
+
         Los datos que existieran previamente en ese archivo son borrados.
 
         Si el archivo no existe, se lo crea.
-
-        :raise ValueError: Si no se pasó un ``filename`` al constructor.
         '''
         if self._filename:
             logger.info('Guardando datos.')

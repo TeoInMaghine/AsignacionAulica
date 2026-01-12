@@ -53,7 +53,7 @@ Rectangle {
             onClicked: {
                 var error_result = ProxyGestorDeDatos.guardar();
                 if (error_result !== "") {
-                    popupErrorGuardar.text = error_result;
+                    popupErrorGuardar.texto = error_result;
                     popupErrorGuardar.open();
                 }
             }
@@ -75,30 +75,11 @@ Rectangle {
     }
 
     // Popup de error al guardar
-    Popup {
+    ComponentesUI.PopupConTexto {
         id: popupErrorGuardar
-        property alias text: label.text
-
-        modal: true
-
-        topPadding: 40
-        bottomPadding: 40
-        leftPadding: 100
-        rightPadding: 100
-
-        ColumnLayout {
-            spacing: 20
-
-            Label {
-                id: label
-                font.pointSize: ComponentesUI.FontSize.base
-            }
-
-            ComponentesUI.BotónRedondeadoConTexto{
-                text: 'Cerrar'
-                onClicked: popupErrorGuardar.close()
-            }
-        }
+        texto: ""
+        textoBotón: "Cerrar"
+        onBotónClicked: popupErrorGuardar.close()
     }
 }
 

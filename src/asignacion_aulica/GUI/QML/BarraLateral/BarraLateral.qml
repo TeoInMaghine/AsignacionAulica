@@ -4,6 +4,7 @@ import QtQuick.Controls
 import QtQuick.Layouts
 import QtQuick.Controls.Basic
 import QML.ComponentesUI as ComponentesUI
+import ModelosAsignaciónÁulica
 
 Rectangle {
     Layout.preferredWidth: Constantes.ancho_de_la_barra
@@ -47,6 +48,16 @@ Rectangle {
             nombre: "Materias"
             onClicked: () => pestaña_actual = nombre
         }
+        BotónPestaña {
+            nombre: "Guardar"
+            onClicked: {
+                var error_result = ProxyGestorDeDatos.guardar();
+                if (error_result !== "") {
+                    popupErrorGuardar.text = error_result;
+                    popupErrorGuardar.open();
+                }
+            }
+        }
 
         // Spacer to push tabs to the top
         Item {
@@ -60,6 +71,33 @@ Rectangle {
             Layout.fillWidth: true
             fillMode: Image.PreserveAspectFit
             source: Constantes.logo_unrn_path
+        }
+    }
+
+    // Popup de error al guardar
+    Popup {
+        id: popupErrorGuardar
+        property alias text: label.text
+
+        modal: true
+
+        topPadding: 40
+        bottomPadding: 40
+        leftPadding: 100
+        rightPadding: 100
+
+        ColumnLayout {
+            spacing: 20
+
+            Label {
+                id: label
+                font.pointSize: FontSize.base
+            }
+
+            ComponentesUI.BotónRedondeadoConTexto{
+                text: 'Cerrar'
+                onClicked: popupErrorGuardar.close()
+            }
         }
     }
 }

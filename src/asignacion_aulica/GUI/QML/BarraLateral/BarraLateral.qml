@@ -79,7 +79,6 @@ Rectangle {
         id: popupErrorGuardar
         texto: ""
         textoBotón: "Cerrar"
-        onBotónClicked: popupErrorGuardar.close()
     }
 }
 

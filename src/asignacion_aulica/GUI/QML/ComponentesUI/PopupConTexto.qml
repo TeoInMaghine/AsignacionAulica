@@ -16,16 +16,16 @@ Popup {
 
     modal: true
 
-    topPadding: 30
-    bottomPadding: 30
-    leftPadding: 70
-    rightPadding: 70
+    topPadding: 20
+    bottomPadding: 20
+    leftPadding: 60
+    rightPadding: 60
     margins: 1
 
     anchors.centerIn: Overlay.overlay
 
     ColumnLayout {
-        spacing: 10
+        spacing: 20
 
         Label {
             text: texto
@@ -35,7 +35,10 @@ Popup {
         BotónRedondeadoConTexto{
             id: botón
             text: textoBotón
-            onClicked: popup.botónClicked()
+            onClicked: {
+                popup.botónClicked()
+                popup.close()
+            }
         }
     }
 }

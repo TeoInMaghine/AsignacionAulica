@@ -98,6 +98,7 @@ class ListSelectorDeEdificiosConAulas(QAbstractListModel):
         except ValueError:
             return 0
     
+    @pyqtSlot(int, result=int)
     def __getitem__(self, index: int) -> int|None:
         '''
         :return: El índice que tiene en el gestor de datos el elemento que en

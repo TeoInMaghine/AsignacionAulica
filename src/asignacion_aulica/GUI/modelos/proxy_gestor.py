@@ -20,6 +20,14 @@ class ProxyGestorDeDatos(QObject):
 
         self.threadpool = QThreadPool()
 
+    @pyqtSlot(int)
+    def ordenarAulas(self, i_edificio: int|None):
+        '''
+        Ordena las aulas del edificio en el índice dado (sólo si es válido).
+        '''
+        if i_edificio is not None and i_edificio >= 0 and i_edificio < self.gestor.cantidad_de_edificios():
+            self.gestor.ordenar_aulas(i_edificio)
+
     @pyqtSlot()
     def asignarAulas(self):
         '''

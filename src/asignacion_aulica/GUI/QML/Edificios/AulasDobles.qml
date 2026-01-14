@@ -35,7 +35,7 @@ ListView {
         }
         Label {
             Layout.margins: 10
-            text: "Todavía no hay aulas dobles registradas"
+            text: "No hay aulas dobles registradas"
             visible: view.count === 0
             font.pointSize: FontSize.medium
         }

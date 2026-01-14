@@ -75,7 +75,8 @@ class ListAulasDobles(QAbstractListModel):
 
         return (
             aula.edificio.aulas.index(aula) + 1
-            if aula != aula_no_seleccionada else ÍNDICE_CUANDO_NO_SELECCIONADO
+            if aula is not aula_no_seleccionada else
+            ÍNDICE_CUANDO_NO_SELECCIONADO
         )
 
     @override

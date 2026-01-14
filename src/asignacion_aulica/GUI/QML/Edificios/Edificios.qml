@@ -90,6 +90,11 @@ ListView {
                 id: contenedorDeSubListas
                 property alias aulasDobles: editorDeAulasDobles.model
 
+                Item { height: 10 }
+                Label {
+                    text: "Aulas:"
+                    font.pointSize: FontSize.medium
+                }
                 Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
                     Layout.preferredHeight: editorDeAulas.height
@@ -107,6 +112,11 @@ ListView {
                         edificio: editorDeEdificio.edificio
                         aulasDobles: contenedorDeSubListas.aulasDobles
                     }
+                }
+                Item { height: 10 }
+                Label {
+                    text: "Aulas Dobles:"
+                    font.pointSize: FontSize.medium
                 }
                 Item {
                     Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft

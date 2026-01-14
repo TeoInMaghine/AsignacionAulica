@@ -26,18 +26,14 @@ ListView {
 
     header: Item {
         property alias spacing: headerAulasDobles.spacing
-        height: headerAulasDobles.height + view.spacing
+        height: headerAulasDobles.visible ?
+                headerAulasDobles.height + view.spacing :
+                0
         width: headerAulasDobles.width
 
         HeaderAulasDobles {
             id: headerAulasDobles
             visible: view.count != 0
-        }
-        Label {
-            Layout.margins: 10
-            text: "No hay aulas dobles registradas"
-            visible: view.count === 0
-            font.pointSize: FontSize.medium
         }
     }
 

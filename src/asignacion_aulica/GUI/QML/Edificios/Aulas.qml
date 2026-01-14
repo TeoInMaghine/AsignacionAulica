@@ -31,18 +31,12 @@ ListView {
         property alias widthNombre: headerAulas.widthNombre
         property alias widthCapacidad: headerAulas.widthCapacidad
         property alias widthEquipamiento: headerAulas.widthEquipamiento
-        height: headerAulas.height + view.spacing
+        height: headerAulas.visible ? headerAulas.height + view.spacing : 0
         width: headerAulas.width
 
         HeaderAulas {
             id: headerAulas
             visible: view.count != 0
-        }
-        Label {
-            Layout.margins: 10
-            text: "Todavía no hay aulas registradas"
-            visible: view.count === 0
-            font.pointSize: FontSize.medium
         }
     }
 

@@ -666,15 +666,28 @@ class GestorDeDatos:
 
         Las validaciones que se hacen en esta función son:
         - Que la lista de aulas dobles no tenga aulas sin seleccionar.
+        - Que la lista de aulas dobles no tenga aulas repetidas.
         - (Puede ser que después se agreguen otras)
         
         :return: Un string con la descripción del primer problema, o `None` si
         no hay ningún problema.
         '''
         for edificio in self._edificios:
+            aulas_encontradas: set[str] = set()
             for aula_doble in edificio.aulas_dobles:
-                if aula_no_seleccionada in (aula_doble.aula_grande, aula_doble.aula_chica_1, aula_doble.aula_chica_2):
+                aulas = {
+                    aula_doble.aula_grande.nombre,
+                    aula_doble.aula_chica_1.nombre,
+                    aula_doble.aula_chica_2.nombre
+                }
+
+                if aula_no_seleccionada.nombre in aulas:
                     return f'En el edificio {edificio.nombre} falta seleccionar una componente de aula doble.'
+
+                if len(aulas) < 3 or not aulas_encontradas.isdisjoint(aulas):
+                    return f'Hay un aula repetida en las aulas dobles del edificio {edificio.nombre}.'
+
+                aulas_encontradas.update(aulas)
         
         return None
 

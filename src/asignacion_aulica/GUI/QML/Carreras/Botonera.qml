@@ -25,9 +25,14 @@ RowLayout {
     PopupDuranteAsignación {
         id: popupAsignación
     }
-    PopupPostAsignación {
+    PopupConTexto {
         id: popupPostAsignación
-        díasSinAsignar: ""
+        property string díasSinAsignar: ""
+
+        texto: díasSinAsignar.length > 0
+               ? "No se pudieron asignar aulas a las clases de los días " + díasSinAsignar
+               : "Se asignaron aulas a todas las clases."
+        textoBotón: "Cerrar"
     }
 
     Connections {

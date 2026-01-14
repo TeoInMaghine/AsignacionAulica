@@ -14,6 +14,8 @@ Popup {
     bottomPadding: 40
     leftPadding: 100
     rightPadding: 100
+    margins: 1
+    anchors.centerIn: Overlay.overlay
 
     ColumnLayout {
         spacing: 20

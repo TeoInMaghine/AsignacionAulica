@@ -1,6 +1,8 @@
 from collections.abc import Sequence
 from datetime import time
 from itertools import filterfalse
+from pathlib import Path
+import pickle
 from typing import Callable
 from collections import Counter
 import logging
@@ -30,28 +32,26 @@ class GestorDeDatos:
     Objeto encargado de administrar todos los datos de edificios, aulas, y
     clases.
 
-    Internamente usa una base de datos para almacenar los datos de manera
-    persistente.
-
-    Los campos de las entidades se identifican con números, los cuales se
-    corresponden con el orden de los campos en cada entidad y los mal llamados
-    roles de la UI.
-
     La lista de carreras se mantiene ordenada alfabéticamente, pero la de
     edificios sólo se ordena a pedido.
     '''
 
-    def __init__(self, path_base_de_datos: str|None = None):
+    def __init__(self, filename: Path|None = None):
         '''
-        :param path_base_de_datos: El path absoluto del archivo de la base de
-        datos. Si el archivo no existe, es creado. ``None`` para no guardar
-        datos.
+        :param filename: El path absoluto del archivo donde guardar los datos, o
+        ``None`` para no guardar datos.
+
+        Al construir el gestor, si el archivo existe, se cargan los datos que
+        contenga.
         '''
-        logger.info('Creando gestor de datos con path_base_de_datos=%s', path_base_de_datos)
+        logger.info('Creando gestor de datos con filename=%s', filename)
+        self._filename: Path|None = filename
 
         self._edificios: list[Edificio] = []
         self._carreras: list[Carrera] = []
         self._equipamientos: Counter[str] = Counter()
+
+        self._cargar()
 
     def get_edificios(self) -> list[str]:
         '''
@@ -771,6 +771,56 @@ class GestorDeDatos:
         # Nota: Este método debería llamar a archivos_excel.cronograma.exportar.
         # (El módulo archivos_excel todavía no existe, ver Issue #75)
         pass
+
+    def guardar(self):
+        '''
+        Guardar el estado actual de los datos en el archivo configurado al
+        construir el gestor.
+
+        Si no se pasó un nombre de archivo al constructor, este método no hace
+        nada.
+
+        Los datos que existieran previamente en ese archivo son borrados.
+
+        Si el archivo no existe, se lo crea.
+        '''
+        if self._filename:
+            logger.info('Guardando datos.')
+            datos_a_guardar = (self._edificios, self._carreras, self._equipamientos)
+            with open(self._filename, 'wb') as stream:
+                pickle.dump(datos_a_guardar, stream)
+    
+    def _cargar(self):
+        '''
+        Cargar los datos que haya en el archivo configurado al construir el
+        gestor.
+
+        Si no hay un archivo configurado o el archivo no existe, no pasa nada.
+
+        Si existen datos en el gestor antes de llamar a este método, se pierden.
+
+        :raise RuntimeError: Si el archivo contiene datos no válidos.
+        '''
+        if self._filename and self._filename.exists():
+            with open(self._filename, 'rb') as stream:
+                datos_leídos = pickle.load(stream)
+            
+            if not isinstance(datos_leídos, tuple):
+                raise RuntimeError(
+                    f'Se esperaba leer una tupla del archivo %s, pero se leyó un objeto de tipo %s',
+                    self._filename,
+                    type(datos_leídos)
+                )
+            elif len(datos_leídos) != 3:
+                raise RuntimeError(
+                    f'Se esperaba leer 3 objetos del archivo %s, pero se encontraron %d',
+                    self._filename,
+                    len(datos_leídos)
+                )
+            else:
+                self._edificios = datos_leídos[0]
+                self._carreras = datos_leídos[1]
+                self._equipamientos = datos_leídos[2]
 
 def _generar_nombre_no_existente(base: str, nombres_existentes: Sequence[str]) -> str:
     '''

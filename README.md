@@ -11,6 +11,8 @@ El ícono de ordenar es [Sort az icons created by Prosymbols Premium - Flaticon]
 
 El ícono de editar es [Write icons created by Arkinasi - Flaticon](https://www.flaticon.com/free-icons/write).
 
+El ícono de guardar está basado en [Save Item 1411 by bypeople - svgrepo](https://www.svgrepo.com/svg/512798/save-item-1411).
+
 La animación que se muestra durante la asignación es [cat Mark loading by Miroslav - LottieFiles](https://lottiefiles.com/free-animation/cat-mark-loading-VlrnxEpvgu).
 
 # Ambiente de Desarrollo

@@ -5,6 +5,7 @@ import QtQuick.Layouts
 import QML.Edificios
 import QML.Carreras
 import QML.BarraLateral
+import ModelosAsignaciónÁulica
 
 Window {
     id: mainWindow
@@ -13,6 +14,10 @@ Window {
     minimumHeight: 300
     minimumWidth: 800
     title: "Asignación Áulica"
+
+    onClosing: event => {
+        ProxyGestorDeDatos.guardar()
+    }
 
     // Layout raíz: barra lateral + contenido de las pestañas
     RowLayout {

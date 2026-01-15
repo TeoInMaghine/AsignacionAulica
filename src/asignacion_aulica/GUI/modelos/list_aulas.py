@@ -75,14 +75,24 @@ class ListAulas(QAbstractListModel):
         super().__init__(parent)
         self.gestor: GestorDeDatos = gestor
         self.i_edificio: int = 0 # Seteado por QT
+        self.modelo_aulas_dobles: QAbstractListModel # Seteado por QT
 
-    # TODO: Mover ordenamiento al nivel de elemento de lista de edificios
-    # (para que al ordenar también se actualizen los índices de las aulas dobles)
+    @pyqtProperty(QAbstractListModel)
+    def aulasDobles(self) -> QAbstractListModel:
+        return self.modelo_aulas_dobles
+
+    @aulasDobles.setter
+    def aulasDobles(self, aulasDobles: QAbstractListModel):
+        logger.debug('Set aulasDobles: %s', aulasDobles)
+        self.modelo_aulas_dobles = aulasDobles
+
     @pyqtSlot()
     def ordenar(self):
-        self.layoutAboutToBeChanged.emit()
+        self.modelo_aulas_dobles.layoutAboutToBeChanged.emit()
+        self.layoutAboutToBeChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
         self.gestor.ordenar_aulas(self.i_edificio)
-        self.layoutChanged.emit()
+        self.layoutChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
+        self.modelo_aulas_dobles.layoutChanged.emit()
 
     @pyqtProperty(int)
     def indexEdificio(self) -> int:
@@ -234,6 +244,11 @@ class ListAulas(QAbstractListModel):
             return False
 
         aula.nombre = nuevo_nombre
+
+        # También actualizar nombres de aulas dobles
+        self.modelo_aulas_dobles.layoutAboutToBeChanged.emit()
+        self.modelo_aulas_dobles.layoutChanged.emit()
+
         return True
 
     def try_to_set_capacidad(self, aula: Aula, value: str) -> bool:
@@ -296,9 +311,11 @@ class ListAulas(QAbstractListModel):
         '''Borra un solo elemento aún cuando count > 1.'''
         if parent is None: return False
 
+        self.modelo_aulas_dobles.layoutAboutToBeChanged.emit()
         self.beginRemoveRows(parent, row, row)
         self.gestor.borrar_aula(self.i_edificio, row)
         self.endRemoveRows()
+        self.modelo_aulas_dobles.layoutChanged.emit()
         return True
 
     @override
@@ -312,7 +329,9 @@ class ListAulas(QAbstractListModel):
         if parent is None: return False
 
         actual_row = self.gestor.cantidad_de_aulas(self.i_edificio)
+        self.modelo_aulas_dobles.layoutAboutToBeChanged.emit()
         self.beginInsertRows(parent, actual_row, actual_row)
         self.gestor.agregar_aula(self.i_edificio)
         self.endInsertRows()
+        self.modelo_aulas_dobles.layoutChanged.emit()
         return True

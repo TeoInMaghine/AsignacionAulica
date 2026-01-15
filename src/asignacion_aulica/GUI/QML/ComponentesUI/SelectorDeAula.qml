@@ -21,8 +21,6 @@ ComboBox {
     textRole: "nombre"
     valueRole: "índice"
 
-    onPressedChanged: if (pressed && !popup.visible) aulas.ordenar()
-
     // Toggle items with the space key
     Keys.onSpacePressed: (event) => {
         if (comboBox.popup.visible) {

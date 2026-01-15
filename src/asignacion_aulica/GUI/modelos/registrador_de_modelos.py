@@ -5,6 +5,7 @@ from asignacion_aulica.GUI.modelos.list_selector_aula import ListSelectorDeAula
 from asignacion_aulica.GUI.modelos.proxy_gestor import ProxyGestorDeDatos
 from asignacion_aulica.GUI.modelos.list_edificios import ListEdificios
 from asignacion_aulica.GUI.modelos.list_aulas import ListAulas
+from asignacion_aulica.GUI.modelos.list_aulas_dobles import ListAulasDobles
 from asignacion_aulica.GUI.modelos.list_carreras import ListCarreras
 from asignacion_aulica.GUI.modelos.list_materias import ListMaterias
 from asignacion_aulica.GUI.modelos.list_clases import ListClases
@@ -26,6 +27,7 @@ crashea si no.
 clases_a_registrar: tuple[type, ...] = (
     ListEdificios,
     ListAulas,
+    ListAulasDobles,
     ListCarreras,
     ListMaterias,
     ListClases,

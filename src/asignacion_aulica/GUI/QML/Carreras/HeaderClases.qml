@@ -56,6 +56,4 @@ RowLayout {
             text: "Aula asignada"
         }
     }
-
-    // Item { } // Espacio vacío de 2 * spacing de ancho
 }

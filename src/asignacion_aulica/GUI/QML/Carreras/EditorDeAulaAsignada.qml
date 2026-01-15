@@ -11,20 +11,28 @@ RowLayout {
         id: selectorEdificio
         Layout.preferredWidth: Constantes.width_editor_edificio
 
-        Component.onCompleted: selectorEdificio.model.actualizar()
+        // Necesario para que se vean los valores correctos del aula asignada
+        Component.onCompleted: {
+            selectorEdificio.model.actualizar()
+            ProxyGestorDeDatos.ordenarAulas(currentValue)
+        }
 
         textoCuandoNoSeleccionado: "Sin edificio"
         currentIndex: clase.index_edificio_asignado
         onActivated: index => {
+
+            // Obtener el índice real del edificio que se seleccionó, y ordenar
+            // las aulas de ese edificio *antes* de actualizar lo demás
+            let nextÍndice = selectorEdificio.model.__getitem__(index)
+            ProxyGestorDeDatos.ordenarAulas(nextÍndice)
+
             clase.index_edificio_asignado = index
         }
     }
 
-    SelectorDeAula{
+    SelectorDeAula {
         id: selectorAula
         Layout.preferredWidth: Constantes.width_editor_aula
-
-        Component.onCompleted: selectorAula.model.actualizar()
 
         textoCuandoNoSeleccionado: "Sin aula"
         enabled: selectorEdificio.hayEdificioSeleccionado // No se puede elegir aula sin elegir edificio

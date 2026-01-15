@@ -8,6 +8,7 @@ ListView {
     id: view
 
     required property var edificio
+    required property var aulasDobles
     readonly property int padding: 20
 
     spacing: headerItem.spacing
@@ -19,25 +20,23 @@ ListView {
     width: contentItem.childrenRect.width + 2 * padding
     height: contentHeight + 2 * padding
 
-    model: ListAulas { id: aulas; indexEdificio: edificio.index }
+    model: ListAulas {
+        id: aulas
+        aulasDobles: view.aulasDobles
+        indexEdificio: edificio.index
+    }
 
     header: Item {
         property alias spacing: headerAulas.spacing
         property alias widthNombre: headerAulas.widthNombre
         property alias widthCapacidad: headerAulas.widthCapacidad
         property alias widthEquipamiento: headerAulas.widthEquipamiento
-        height: headerAulas.height + view.spacing
+        height: headerAulas.visible ? headerAulas.height + view.spacing : 0
         width: headerAulas.width
 
         HeaderAulas {
             id: headerAulas
             visible: view.count != 0
-        }
-        Label {
-            Layout.margins: 10
-            text: "Todavía no hay aulas registradas"
-            visible: view.count === 0
-            font.pointSize: FontSize.medium
         }
     }
 

@@ -86,22 +86,54 @@ ListView {
             RowLayout { HeaderHorariosSemanales { } }
             RowLayout { EditorHorariosSemanalesEdificio { entidad: edificio } }
 
-            Item {
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-                Layout.preferredHeight: editorDeAulas.height
-                Layout.preferredWidth: editorDeAulas.width
+            ColumnLayout {
+                id: contenedorDeSubListas
+                property alias aulasDobles: editorDeAulasDobles.model
 
-                Rectangle {
-                    id: fondo
-                    anchors.fill: parent
-
-                    color: "#F0F0F0"
-                    border.width: 1
-                    border.color: "lightgray"
+                Item { height: 10 }
+                Label {
+                    text: "Aulas:"
+                    font.pointSize: FontSize.medium
                 }
-                Aulas {
-                    id: editorDeAulas
-                    edificio: editorDeEdificio.edificio
+                Item {
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                    Layout.preferredHeight: editorDeAulas.height
+                    Layout.preferredWidth: editorDeAulas.width
+
+                    Rectangle { // Fondo
+                        anchors.fill: parent
+
+                        color: "#F0F0F0"
+                        border.width: 1
+                        border.color: "lightgray"
+                    }
+                    Aulas {
+                        id: editorDeAulas
+                        edificio: editorDeEdificio.edificio
+                        aulasDobles: contenedorDeSubListas.aulasDobles
+                    }
+                }
+                Item { height: 10 }
+                Label {
+                    text: "Aulas Dobles:"
+                    font.pointSize: FontSize.medium
+                }
+                Item {
+                    Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                    Layout.preferredHeight: editorDeAulasDobles.height
+                    Layout.preferredWidth: editorDeAulasDobles.width
+
+                    Rectangle { // Fondo
+                        anchors.fill: parent
+
+                        color: "#F0F0F0"
+                        border.width: 1
+                        border.color: "lightgray"
+                    }
+                    AulasDobles {
+                        id: editorDeAulasDobles
+                        edificio: editorDeEdificio.edificio
+                    }
                 }
             }
 

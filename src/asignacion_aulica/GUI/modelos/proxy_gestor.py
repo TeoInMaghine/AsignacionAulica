@@ -64,8 +64,16 @@ class _Asignador(QRunnable):
 
     @pyqtSlot()
     def run(self):
-        # TODO: Borrar sleep, y agregar validación de datos
-        time.sleep(0.8) # Para que parezca como que tarda un poquito
-        result: InfoPostAsignación = self.gestor.asignar_aulas()
-        str_días_sin_asignar = ', '.join(map(lambda d: d.name, result.días_sin_asignar))
-        self.señal_fin.emit(str_días_sin_asignar)
+        mensaje_final = ''
+
+        posible_error = self.gestor.validar_datos()
+        if posible_error:
+            mensaje_final = posible_error
+        else:
+            time.sleep(0.8) # Para que parezca como que tarda un poquito
+            result: InfoPostAsignación = self.gestor.asignar_aulas()
+            if result.días_sin_asignar:
+                str_días_sin_asignar = ', '.join(map(lambda d: d.name, result.días_sin_asignar))
+                mensaje_final = 'No se puedieron asignar aulas para las clases de los días ' + str_días_sin_asignar
+        
+        self.señal_fin.emit(mensaje_final)

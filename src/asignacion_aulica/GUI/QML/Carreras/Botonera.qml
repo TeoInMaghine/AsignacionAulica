@@ -27,11 +27,9 @@ RowLayout {
     }
     PopupConTexto {
         id: popupPostAsignación
-        property string díasSinAsignar: ""
+        property string mensajeError: ""
 
-        texto: díasSinAsignar.length > 0
-               ? "No se pudieron asignar aulas a las clases de los días " + díasSinAsignar
-               : "Se asignaron aulas a todas las clases."
+        texto: mensajeError.length > 0 ? mensajeError : "Se asignaron aulas a todas las clases."
         textoBotón: "Cerrar"
     }
 
@@ -39,7 +37,7 @@ RowLayout {
         target: ProxyGestorDeDatos
         function onFinAsignarAulas(result) {
             popupAsignación.close()
-            popupPostAsignación.díasSinAsignar = result
+            popupPostAsignación.mensajeError = result
             popupPostAsignación.open()
         }
     }

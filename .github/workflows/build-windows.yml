@@ -1,0 +1,57 @@
+name: Build For Windows
+
+on: workflow_dispatch
+
+jobs:
+  build-windows:
+    runs-on: windows-2022
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Extract version numbers from pyproject.toml
+        shell: pwsh
+        run: |
+          $regex_search = Select-String -Path pyproject.toml -Pattern 'requires-python\s*=\s*"~=\s*(\d+\.\d+)"'
+          $PYTHON_VERSION = $regex_search.Matches.Groups[1].Value
+          echo "PYTHON_VERSION=$PYTHON_VERSION"
+          echo "PYTHON_VERSION=$PYTHON_VERSION" >> $env:GITHUB_ENV
+
+          $regex_search = Select-String -Path pyproject.toml -Pattern 'version\s*=\s*"(.*)"'
+          $PROJECT_VERSION = $regex_search.Matches.Groups[1].Value
+          echo "PROJECT_VERSION=$PROJECT_VERSION"
+          echo "PROJECT_VERSION=$PROJECT_VERSION" >> $env:GITHUB_ENV
+
+          # Copy the version number into the installer configuration
+          (Get-Content .\instalador.iss) | ForEach-Object { $_ -replace "AppVersion=esto se completa en el CI", "AppVersion=$PROJECT_VERSION" } | Set-Content .\instalador.iss
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          
+      - name: Build Windows App
+        shell: pwsh
+        run: |
+          pip install .[build]
+          cxfreeze build --verbose
+      
+      - name: Make an installer
+        uses: Minionguyjpro/Inno-Setup-Action@v1.2.2
+        with:
+          path: instalador.iss
+          options: /Qp
+
+      - name: Log created files
+        run: |
+          ls build
+          ls .\
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4.3.4
+        with:
+          name: Instalador-AsignaciónÁulica-${{ env.PROJECT_VERSION }}
+          path: .\Instalador-AsignaciónÁulica.exe
+          if-no-files-found: warn
+          overwrite: false

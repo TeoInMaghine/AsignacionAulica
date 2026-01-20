@@ -1,0 +1,70 @@
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Window
+import QtQuick.Layouts
+import QML.Edificios
+import QML.Carreras
+import QML.BarraLateral
+import ModelosAsignaciónÁulica
+
+Window {
+    id: mainWindow
+    visible: true
+    visibility: Window.Maximized
+    minimumHeight: 300
+    minimumWidth: 800
+    title: "Asignación Áulica"
+
+    onClosing: event => {
+        ProxyGestorDeDatos.guardar()
+    }
+
+    // Layout raíz: barra lateral + contenido de las pestañas
+    RowLayout {
+        spacing: 0
+        anchors.fill: parent
+
+        BarraLateral {
+            id: sidebar
+        }
+
+        // Mecanismo para cambiar de pestaña
+        // TODO: Quizás cambiarlo a TabBar
+        // (https://doc.qt.io/qt-6/qml-qtquick-controls-tabbar.html)
+        Loader {
+            id: tabLoader
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            sourceComponent: {
+                switch(sidebar.pestaña_actual) {
+                    case "Aulas": return pestañaAulas
+                    case "Materias": return pestañaMaterias
+                    default: return pestañaAulas
+                }
+            }
+        }
+    }
+
+    Component {
+        id: pestañaAulas
+        
+        ScrollView{
+            width: parent.width
+            height: parent.height
+            
+            Edificios { }
+        }
+    }
+
+    Component {
+        id: pestañaMaterias
+        
+        ScrollView{
+            width: parent.width
+            height: parent.height
+            
+            EditorDeCarreras { }
+        }
+    }
+}

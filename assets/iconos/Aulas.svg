@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="Layer_1"
+   data-name="Layer 1"
+   viewBox="0 0 1.125 1.125"
+   width="24"
+   height="24"
+   version="1.1"
+   sodipodi:docname="Edificios.svg"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="34.666667"
+     inkscape:cx="12"
+     inkscape:cy="12"
+     inkscape:window-width="1920"
+     inkscape:window-height="1043"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="Layer_1" />
+  <defs
+     id="defs1" />
+  <path
+     d="M 0.65625,0.609375 H 0.75 v 0.09375 H 0.65625 Z m 0.1875,0.09375 H 0.9375 V 0.609375 H 0.84375 Z m -0.1875,0.1875 H 0.75 V 0.796875 H 0.65625 Z m 0.1875,0 H 0.9375 V 0.796875 H 0.84375 Z m -0.1875,-0.5625 H 0.75 V 0.234375 H 0.65625 Z m 0.1875,0 H 0.9375 V 0.234375 H 0.84375 Z m -0.1875,0.1875 H 0.75 V 0.421875 H 0.65625 Z m 0.1875,0 H 0.9375 V 0.421875 H 0.84375 Z M 1.125,0.140625 V 1.125 H 0 V 0.41385938 C 0,0.3763125 0.014625,0.34096875 0.04120312,0.31439063 L 0.16809375,0.1875 c 0.0604219,-0.0604687 0.16589063,-0.0604687 0.2263125,0 L 0.46875,0.26184375 V 0.140625 C 0.46875,0.06309375 0.53184375,0 0.609375,0 h 0.375 C 1.0619062,0 1.125,0.06309375 1.125,0.140625 Z M 0.46875,0.41385938 c 0,-0.0125156 -0.004875,-0.0243281 -0.0137344,-0.0331875 L 0.328125,0.25378125 c -0.0246562,-0.0246563 -0.0690938,-0.0246563 -0.09375,0 L 0.10748438,0.38067188 C 0.098625,0.38953125 0.09375,0.40129688 0.09375,0.41385938 V 1.03125 h 0.375 z M 1.03125,0.140625 C 1.03125,0.1147969 1.010203,0.09375 0.984375,0.09375 h -0.375 C 0.58354688,0.09375 0.5625,0.11479687 0.5625,0.140625 V 1.03125 h 0.46875 z m -0.796875,0.5625 h 0.09375 v -0.09375 h -0.09375 z m 0,-0.1875 h 0.09375 v -0.09375 h -0.09375 z m 0,0.375 h 0.09375 v -0.09375 h -0.09375 z"
+     id="path1"
+     style="stroke-width:0.046875;fill:#ffffff;fill-opacity:1" />
+</svg>

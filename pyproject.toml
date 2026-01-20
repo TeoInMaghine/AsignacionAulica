@@ -1,7 +1,7 @@
 [project]
 name = "asignacion-aulica"
 description = "Software de asignación de aulas para la UNRN Sede Andina"
-version = "0.0.2"
+version = "1.0.0"
 
 authors = [
   {name = "Cristian Gustavo Mogensen"},
@@ -10,29 +10,34 @@ authors = [
   {name = "Joaquín Rodríguez"}
 ]
 
-requires-python = "~= 3.11"
+requires-python = "~= 3.12"
 dependencies = [
   "pandas == 2.2.*",
   "numpy == 2.2.*",
   "ortools == 9.12.*",
-  "openpyxl == 3.1.*",
-  "pillow == 11.3.*",
-  "flet == 0.28.3"
+  "pyqt6 == 6.9.*"
 ]
 
 [project.optional-dependencies]
-test = [
-  "pytest ~= 8.3"
-]
+test = ["pytest == 8.3.*"]
+build = ["cx_freeze == 8.4.*"]
+excel = ["openpyxl == 3.1.*", "pillow == 11.3.*"]
+
+[project.scripts]
+asignacion-aulica = "asignacion_aulica.main:main"
 
 [tool.pytest.ini_options]
 testpaths = ["tests/pytest"]
 minversion = "8.3"
+tmp_path_retention_policy = "failed" # Guardar archivos temporales de las pruebas que fallan
+tmp_path_retention_count = 1 # Pero sólo guardar archivos de la última ejecución
 
-[tool.flet]
-company = "UNRN"
-org = "ar.edu.unrn"
-product = "Asignacion Aulica"
+[tool.cxfreeze]
+executables = [
+    {script = "src/asignacion_aulica/main.py", base = "gui"}
+]
 
-[tool.flet.app]
-path = "src"
+[tool.cxfreeze.build_exe]
+build_exe = "build/AsignaciónÁulica"
+include_files = "assets,src/asignacion_aulica/GUI/QML"
+silent_level = 1

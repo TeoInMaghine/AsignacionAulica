@@ -1,0 +1,4 @@
+module QML.BarraLateral
+BarraLateral BarraLateral.qml
+internal BotónPestaña BotónPestaña.qml
+singleton Constantes Constantes.qml

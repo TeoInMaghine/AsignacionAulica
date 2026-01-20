@@ -20,11 +20,12 @@ RowLayout {
         textoCuandoNoSeleccionado: "Sin edificio"
         currentIndex: clase.index_edificio_asignado
         onActivated: index => {
-
-            // Obtener el índice real del edificio que se seleccionó, y ordenar
-            // las aulas de ese edificio *antes* de actualizar lo demás
-            let nextÍndice = selectorEdificio.model.__getitem__(index)
-            ProxyGestorDeDatos.ordenarAulas(nextÍndice)
+            if (index > 0) {
+                // Obtener el índice real del edificio que se seleccionó, y ordenar
+                // las aulas de ese edificio *antes* de actualizar lo demás
+                let actualIndex = selectorEdificio.model.__getitem__(index)
+                ProxyGestorDeDatos.ordenarAulas(actualIndex)
+            }
 
             clase.index_edificio_asignado = index
         }

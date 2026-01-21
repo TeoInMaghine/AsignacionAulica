@@ -9,7 +9,7 @@ este_directorio = path.split(__file__)[0]
 
 logo_path = path.join(este_directorio, 'unrn_logo.png')
 
-rojo_unrn = 'EB2242'
+rojo_unrn = 'EB1C38'
 fill_rojo_unrn = PatternFill(patternType='solid', fgColor=rojo_unrn)
 
 font_default = Font(name = 'arial', size = 12)

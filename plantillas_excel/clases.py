@@ -87,6 +87,7 @@ def insertar_preámbulo(hoja: Worksheet):
     hoja.add_image(logo, 'A1')
     hoja.merge_cells(start_row=1, end_row=2, start_column=1, end_column=2)
     no_cambiar_este_valor.add('A1:B2')
+    hoja.cell(1, 1).fill = fill_rojo_unrn
     hoja.cell(1, 1).border = Border(left=borde_negro, top=borde_negro)
     hoja.cell(1, 2).border = Border(right=borde_negro, top=borde_negro)
     hoja.cell(2, 1).border = Border(left=borde_negro, bottom=borde_negro)

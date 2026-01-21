@@ -1,4 +1,4 @@
-from openpyxl.styles import PatternFill, Border, Side, Alignment, Font, Fill
+from openpyxl.styles import PatternFill, Border, Side, Alignment, Font
 from openpyxl.utils.units import points_to_pixels
 from openpyxl.drawing.image import Image
 from copy import copy

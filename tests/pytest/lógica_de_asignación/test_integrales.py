@@ -57,8 +57,8 @@ def test_restricciones_y_preferencias(edificios: Edificios, carreras: Carreras):
 ))
 @pytest.mark.clases(
     MockClase(cantidad_de_alumnos=60),
-    MockClase(cantidad_de_alumnos=35),
-    MockClase(cantidad_de_alumnos=30),
+    MockClase(cantidad_de_alumnos=34),
+    MockClase(cantidad_de_alumnos=29),
 )
 def test_aulas_dobles(edificios: Edificios, carreras: Carreras):
     '''
@@ -71,11 +71,13 @@ def test_aulas_dobles(edificios: Edificios, carreras: Carreras):
     resultado = asignar(edificios, carreras)
     assert not resultado.todo_ok()
 
-    assert carreras[0].materias[0].clases[0].aula_asignada == edificios[0].aulas[3] # aula individual
-    assert carreras[0].materias[0].clases[1].aula_asignada == edificios[0].aulas[2] # hija 2
-    assert carreras[0].materias[0].clases[2].aula_asignada == edificios[0].aulas[1] # hija 1
+    clases = carreras[0].materias[0].clases
+
+    assert clases[0].aula_asignada.nombre == 'hija 2'
+    assert clases[1].aula_asignada.nombre == 'hija 1'
+    assert clases[2].aula_asignada.nombre == 'individual'
     
-    assert resultado.clases_con_aula_chica == [carreras[0].materias[0].clases[0]]
+    assert resultado.clases_con_aula_chica == clases
     assert len(resultado.clases_fuera_de_su_edificio_preferido) == 0
     assert len(resultado.días_sin_asignar) == 0
 

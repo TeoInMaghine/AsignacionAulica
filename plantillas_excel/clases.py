@@ -26,16 +26,17 @@ import sys
 
 from estilos import (
     get_logo,
+    estilo_header,
+    estilo_horarios,
+    estilo_tabla,
     fill_rojo_unrn,
     font_default,
-    font_bold,
     font_preámbulo,
-    centrado,
+    font_bold,
     a_la_derecha,
     a_la_izquierda,
     borde_blanco,
-    borde_negro,
-    todos_los_bordes_negros
+    borde_negro
 )
 
 from validadores import (
@@ -66,6 +67,9 @@ COLUMNAS = (
 
 n_columnas = len(COLUMNAS)
 última_columna = get_column_letter(n_columnas)
+
+# Cantidad de filas a las que aplicar formato
+n_filas = 200
 
 def insertar_preámbulo(hoja: Worksheet):
     # Configurar tamaño de las filas
@@ -154,10 +158,7 @@ def insertar_tabla(hoja: Worksheet):
 
     # Configurar estilo de los nombres
     for i in range(1, n_columnas+1):
-        cell = hoja.cell(fila_header, i)
-        cell.font = font_bold
-        cell.alignment = centrado
-        cell.border = todos_los_bordes_negros
+        cell = hoja.cell(fila_header, i).style = estilo_header
     
     # Ajustar tamaños de las columnas (los números fueron calibrados por prueba y error)
     font_size_ratio = font_bold.size / 11
@@ -181,7 +182,16 @@ def insertar_tabla(hoja: Worksheet):
     día_de_la_semana.add(f'F{fila_header+1}:F1048576') # Día
     horario.add(f'G{fila_header+1}:G1048576') # Horario de inicio
     horario.add(f'H{fila_header+1}:H1048576') # Horario de fin
-    número_natural.add(f'I{fila_header+1}:I1048576') # Cupo 
+    número_natural.add(f'I{fila_header+1}:I1048576') # Cupo
+
+    # Configurar estilo de la tabla hasta la fila n_filas
+    columnas_horario = (7, 8)
+    for row in range(fila_header + 1, fila_header + n_filas):
+        for col in range(1, n_columnas):
+            if col in columnas_horario:
+                hoja.cell(row, col).style = estilo_horarios
+            else:
+                hoja.cell(row, col).style = estilo_tabla
 
 def crear_plantilla() -> Workbook:
     plantilla = Workbook()

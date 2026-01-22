@@ -18,7 +18,8 @@ día_de_la_semana = DataValidation(
     error = 'Por favor ingresar un día de la semana.',
     errorStyle = 'warning',
     showErrorMessage = True,
-    showDropDown = True # True significa False
+    showDropDown = True, # True significa False
+    allow_blank = True
 )
 '''
 Un validador que acepta los días de la semana (escritos de cualquier forma
@@ -45,7 +46,8 @@ año_del_calendario = DataValidation(
     formula1=2000,
     error = 'El valor de esta celda debe ser un año.',
     errorStyle = 'stop',
-    showErrorMessage = True
+    showErrorMessage = True,
+    allow_blank = True
 )
 '''
 Un validador para números de año.
@@ -61,7 +63,8 @@ año_del_plan_de_estudios = DataValidation(
     errorTitle = 'El dato ingresado no es válido.',
     error = 'El valor debe ser un año del plan de estudios.\n1, 2, 3, etc.',
     errorStyle = 'warning',
-    showErrorMessage = True
+    showErrorMessage = True,
+    allow_blank = True
 )
 '''
 Un validador para la columna de "Año".
@@ -76,7 +79,8 @@ número_natural = DataValidation(
     errorTitle = 'El dato ingresado no es válido.',
     error = 'El valor debe ser un número entero no negativo.',
     errorStyle = 'warning',
-    showErrorMessage = True
+    showErrorMessage = True,
+    allow_blank = True
 )
 '''
 Un validador que solamente acepta números naturales (incluyendo el 0).
@@ -89,7 +93,8 @@ horario = DataValidation(
     formula2 = 1,
     error = 'Excel no reconoce el valor ingresado como un horario.',
     errorStyle = 'warning',
-    showErrorMessage = True
+    showErrorMessage = True,
+    allow_blank = True
 )
 '''
 Un validador para horarios.

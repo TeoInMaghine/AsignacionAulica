@@ -1,22 +1,21 @@
 '''
-Este script crea la plantilla para el archivo excel de clases/horarios/aulas.
-
-El path en donde guardar el archivo se recibe como argumento.
+Este modulo define la plantilla para el archivo excel de clases/horarios/aulas.
 
 La plantilla está basada en el archivo excel que les directores de carreras le
 pasan al encargado de la asignación. Se modificaron algunas cosas para que sea
-más usable.
+más usable y automatizable.
 
-La plantilla tiene un preámbulo que consiste de:
+La plantilla tiene un encabezado que consiste de:
 - El logo de la universidad
 - El nombre de la carrera
 - El año y número de cuatrimestre
 
-Abajo del preámbulo hay una tabla con varias columnas de datos. La tabla tiene
+Abajo del encabezado hay una tabla con varias columnas de datos. La tabla tiene
 una fila por cada clase, posiblemente con celdas unidas verticalmente (por
 ejemplo, la columna "Materia" puede estar unida en las filas de las clases de
 cada materia).
 '''
+from collections.abc import Sequence
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles.borders import Border
@@ -24,14 +23,14 @@ from openpyxl import Workbook
 
 import sys
 
-from estilos import (
+from asignacion_aulica.excel.estilos import (
     get_logo,
     estilo_header,
     estilo_horarios,
     estilo_tabla,
     fill_rojo_unrn,
     font_default,
-    font_preámbulo,
+    font_encabezado,
     font_bold,
     a_la_derecha,
     a_la_izquierda,
@@ -39,7 +38,7 @@ from estilos import (
     borde_negro
 )
 
-from validadores import (
+from asignacion_aulica.excel.validadores import (
     no_cambiar_este_valor,
     año_del_calendario,
     año_del_plan_de_estudios,
@@ -48,7 +47,7 @@ from validadores import (
     horario
 )
 
-COLUMNAS = (
+COLUMNAS: Sequence[str] = (
     'Año',
     'Materia',
     'Cuatrimestral / Anual',
@@ -66,14 +65,14 @@ COLUMNAS = (
 )
 
 n_columnas = len(COLUMNAS)
-última_columna = get_column_letter(n_columnas)
+última_columna: str = get_column_letter(n_columnas)
 
 # Cantidad de filas a las que aplicar formato
 n_filas = 200
 
-def insertar_preámbulo(hoja: Worksheet):
+def generar_encabezado(hoja: Worksheet):
     # Configurar tamaño de las filas
-    altura_filas = font_preámbulo.size + 7
+    altura_filas = font_encabezado.size + 7
     hoja.row_dimensions[1].height = altura_filas
     hoja.row_dimensions[2].height = altura_filas
 
@@ -97,14 +96,14 @@ def insertar_preámbulo(hoja: Worksheet):
     cell = hoja.cell(1, 3, value='Carrera: ')
     no_cambiar_este_valor.add(cell)
     cell.fill = fill_rojo_unrn
-    cell.font = font_preámbulo
+    cell.font = font_encabezado
     cell.alignment = a_la_derecha
     cell.border = Border(top=borde_negro, bottom=borde_blanco, left=borde_negro)
 
     hoja.merge_cells(start_row=1, end_row=1, start_column=4, end_column=11)
     cell = hoja.cell(1, 4, value='') # Celda para completar el nombre de la carrera
     cell.fill = fill_rojo_unrn
-    cell.font = font_preámbulo
+    cell.font = font_encabezado
     cell.alignment = a_la_izquierda
     
     hoja.merge_cells(start_row=1, end_row=1, start_column=12, end_column=n_columnas)
@@ -120,27 +119,27 @@ def insertar_preámbulo(hoja: Worksheet):
     cell = hoja.cell(2, 3, value='Año: ')
     no_cambiar_este_valor.add(cell)
     cell.fill = fill_rojo_unrn
-    cell.font = font_preámbulo
+    cell.font = font_encabezado
     cell.alignment = a_la_derecha
     cell.border = Border(left=borde_negro)
 
     cell = hoja.cell(2, 4, value='') # Celda para completar el año
     año_del_calendario.add(cell)
     cell.fill = fill_rojo_unrn
-    cell.font = font_preámbulo
+    cell.font = font_encabezado
     cell.alignment = a_la_izquierda
 
     hoja.merge_cells(start_row=2, end_row=2, start_column=5, end_column=6)
     no_cambiar_este_valor.add(f'{get_column_letter(5)}2:{get_column_letter(6)}2')
     cell = hoja.cell(2, 5, value='Cuatrimestre: ')
     cell.fill = fill_rojo_unrn
-    cell.font = font_preámbulo
+    cell.font = font_encabezado
     cell.alignment = a_la_derecha
 
     hoja.merge_cells(start_row=2, end_row=2, start_column=7, end_column=11)
     cell = hoja.cell(2, 7, value='') # Celda para completar el cuatrimestre
     cell.fill = fill_rojo_unrn
-    cell.font = font_preámbulo
+    cell.font = font_encabezado
     cell.alignment = a_la_izquierda
 
     hoja.merge_cells(start_row=2, end_row=2, start_column=12, end_column=n_columnas)
@@ -154,15 +153,15 @@ def insertar_tabla(hoja: Worksheet):
     fila_header = hoja.max_row
     no_cambiar_este_valor.add(f'A{fila_header}:{última_columna}{fila_header}')
 
-    # Bloquear movimiento de los nombres para que se mantangan visibles al escrolear
+    # Bloquear movimiento de los nombres para que se mantangan visibles al escrollear
     hoja.freeze_panes = hoja.cell(fila_header+1, 1)
 
     # Configurar estilo de los nombres
     for i in range(1, n_columnas+1):
-        cell = hoja.cell(fila_header, i).style = estilo_header
+        hoja.cell(fila_header, i).style = estilo_header
     
     # Ajustar tamaños de las columnas (los números fueron calibrados por prueba y error)
-    font_size_ratio = font_bold.size / 11
+    font_size_ratio = estilo_header.font.size / 11
     hoja.column_dimensions['A'].width =  5 * font_size_ratio # Año
     hoja.column_dimensions['B'].width = 25 * font_size_ratio # Materia
     hoja.column_dimensions['C'].width = 12 * font_size_ratio # Cuatrimestral o anual
@@ -207,14 +206,7 @@ def crear_plantilla() -> Workbook:
     hoja.add_data_validation(día_de_la_semana)
     hoja.add_data_validation(horario)
     
-    insertar_preámbulo(hoja)
+    generar_encabezado(hoja)
     insertar_tabla(hoja)
 
     return plantilla
-
-def main():
-    plantilla = crear_plantilla()
-    plantilla.save(sys.argv[1])
-
-if __name__ == '__main__':
-    main()

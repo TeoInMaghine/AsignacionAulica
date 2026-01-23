@@ -81,73 +81,66 @@ def generar_encabezado(hoja: Worksheet):
     hoja.column_dimensions[última_columna].border = Border(right=borde_negro)
 
     # Insertar el logo
-    altura_logo = 2 * altura_filas - 2
-    logo = get_logo(altura_logo)
+    logo = get_logo(2*altura_filas)
     hoja.add_image(logo, 'A1')
-    hoja.merge_cells(start_row=1, end_row=2, start_column=1, end_column=2)
-    no_cambiar_este_valor.add('A1:B2')
+    hoja.merge_cells(start_row=1, end_row=2, start_column=1, end_column=4)
+    no_cambiar_este_valor.add('A1:D2')
     hoja.cell(1, 1).fill = fill_rojo_unrn
-    hoja.cell(1, 1).border = Border(left=borde_negro, top=borde_negro)
-    hoja.cell(1, 2).border = Border(right=borde_negro, top=borde_negro)
-    hoja.cell(2, 1).border = Border(left=borde_negro, bottom=borde_negro)
-    hoja.cell(2, 2).border = Border(right=borde_negro, bottom=borde_negro)
+    hoja.cell(1, 1).border = Border(top=borde_negro, left=borde_negro)
+    hoja.cell(1, 2).border = Border(top=borde_negro)
+    hoja.cell(1, 3).border = Border(top=borde_negro)
+    hoja.cell(1, 4).border = Border(top=borde_negro)
+
+    hoja.cell(2, 1).border = Border(bottom=borde_negro, left=borde_negro)
+    hoja.cell(2, 2).border = Border(bottom=borde_negro)
+    hoja.cell(2, 3).border = Border(bottom=borde_negro)
+    hoja.cell(2, 4).border = Border(bottom=borde_negro)
 
     # Fila con el nombre de la carrera
-    cell = hoja.cell(1, 3, value='Carrera: ')
+    cell = hoja.cell(1, 5, value='Carrera: ')
     no_cambiar_este_valor.add(cell)
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_derecha
-    cell.border = Border(top=borde_negro, bottom=borde_blanco, left=borde_negro)
+    cell.border = Border(top=borde_negro, bottom=borde_blanco)
 
-    hoja.merge_cells(start_row=1, end_row=1, start_column=4, end_column=11)
-    cell = hoja.cell(1, 4, value='') # Celda para completar el nombre de la carrera
+    hoja.merge_cells(start_row=1, end_row=1, start_column=6, end_column=n_columnas)
+    cell = hoja.cell(1, 6, value='') # Celda para completar el nombre de la carrera
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_izquierda
-    
-    hoja.merge_cells(start_row=1, end_row=1, start_column=12, end_column=n_columnas)
-    no_cambiar_este_valor.add(f'{get_column_letter(12)}1:{última_columna}1')
-    cell = hoja.cell(1, 12)
-    cell.fill = fill_rojo_unrn
 
-    for i in range(4, n_columnas):
+    for i in range(6, n_columnas):
         hoja.cell(1, i).border = Border(top=borde_negro, bottom=borde_blanco)
     hoja.cell(1, n_columnas).border = Border(top=borde_negro, bottom=borde_blanco, right=borde_negro)
 
     # Fila con el año y cuatrimestre
-    cell = hoja.cell(2, 3, value='Año: ')
+    cell = hoja.cell(2, 5, value='Año: ')
     no_cambiar_este_valor.add(cell)
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_derecha
-    cell.border = Border(left=borde_negro)
 
-    cell = hoja.cell(2, 4, value='') # Celda para completar el año
+    cell = hoja.cell(2, 6, value='') # Celda para completar el año
     año_del_calendario.add(cell)
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_izquierda
 
-    hoja.merge_cells(start_row=2, end_row=2, start_column=5, end_column=6)
-    no_cambiar_este_valor.add(f'{get_column_letter(5)}2:{get_column_letter(6)}2')
-    cell = hoja.cell(2, 5, value='Cuatrimestre: ')
+    hoja.merge_cells(start_row=2, end_row=2, start_column=7, end_column=9)
+    no_cambiar_este_valor.add(f'{get_column_letter(7)}2:{get_column_letter(9)}2')
+    cell = hoja.cell(2, 7, value='Cuatrimestre: ')
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_derecha
 
-    hoja.merge_cells(start_row=2, end_row=2, start_column=7, end_column=11)
-    cell = hoja.cell(2, 7, value='') # Celda para completar el cuatrimestre
+    hoja.merge_cells(start_row=2, end_row=2, start_column=10, end_column=n_columnas)
+    cell = hoja.cell(2, 10, value='') # Celda para completar el cuatrimestre
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_izquierda
 
-    hoja.merge_cells(start_row=2, end_row=2, start_column=12, end_column=n_columnas)
-    no_cambiar_este_valor.add(f'{get_column_letter(12)}2:{última_columna}2')
-    hoja.cell(2, 12).fill = fill_rojo_unrn
-    hoja.cell(2, n_columnas).border = Border(right=borde_negro)
-
-def insertar_tabla(hoja: Worksheet):
+def generar_tabla(hoja: Worksheet):
     # Insertar fila con los nombres de las columnas
     hoja.append(COLUMNAS)
     fila_header = hoja.max_row
@@ -166,7 +159,7 @@ def insertar_tabla(hoja: Worksheet):
     hoja.column_dimensions['B'].width = 25 * font_size_ratio # Materia
     hoja.column_dimensions['C'].width = 12 * font_size_ratio # Cuatrimestral o anual
     hoja.column_dimensions['D'].width = 10 * font_size_ratio # Comisión
-    hoja.column_dimensions['E'].width = 10 * font_size_ratio # Teórica o práctica
+    hoja.column_dimensions['E'].width = 11 * font_size_ratio # Teórica o práctica
     hoja.column_dimensions['F'].width = 11 * font_size_ratio # Día
     hoja.column_dimensions['G'].width =  7 * font_size_ratio # Horario de inicio
     hoja.column_dimensions['H'].width =  7 * font_size_ratio # Horario de fin
@@ -207,6 +200,6 @@ def crear_plantilla() -> Workbook:
     hoja.add_data_validation(horario)
     
     generar_encabezado(hoja)
-    insertar_tabla(hoja)
+    generar_tabla(hoja)
 
     return plantilla

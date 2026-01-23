@@ -5,7 +5,7 @@ from copy import copy
 
 from asignacion_aulica import assets
 
-logo_path = assets.get_path('logo_unrn_para_excel.png')
+logo_path = assets.get_path('logo_unrn_excel.png')
 
 rojo_unrn = 'EB1C38'
 fill_rojo_unrn = PatternFill(patternType='solid', fgColor=rojo_unrn)

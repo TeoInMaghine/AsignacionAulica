@@ -21,8 +21,6 @@ from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles.borders import Border
 from openpyxl import Workbook
 
-import sys
-
 from asignacion_aulica.excel.estilos import (
     get_logo,
     estilo_header,
@@ -31,7 +29,6 @@ from asignacion_aulica.excel.estilos import (
     fill_rojo_unrn,
     font_default,
     font_encabezado,
-    font_bold,
     a_la_derecha,
     a_la_izquierda,
     borde_blanco,
@@ -60,7 +57,7 @@ COLUMNAS: Sequence[str] = (
     'Docente',
     'Auxiliar',
     'Promocionable\nSi (Nota) / No',
-    'Lugar',
+    'Edificio',
     'Aula'
 )
 
@@ -167,7 +164,7 @@ def generar_tabla(hoja: Worksheet):
     hoja.column_dimensions['J'].width = 12 * font_size_ratio # Docente
     hoja.column_dimensions['K'].width = 12 * font_size_ratio # Auxiliar
     hoja.column_dimensions['L'].width = 14 * font_size_ratio # Promocionable
-    hoja.column_dimensions['M'].width = 12 * font_size_ratio # Lugar
+    hoja.column_dimensions['M'].width = 12 * font_size_ratio # Edificio
     hoja.column_dimensions['N'].width =  8 * font_size_ratio # Aula
 
     # Agregar validadores
@@ -186,12 +183,11 @@ def generar_tabla(hoja: Worksheet):
             else:
                 hoja.cell(row, col).style = estilo_tabla
 
-def crear_plantilla() -> Workbook:
-    plantilla = Workbook()
-    plantilla._fonts[0] = font_default
-
-    hoja = plantilla.active
-    hoja.title = 'Plantilla'
+def generar_plantilla(hoja: Worksheet):
+    '''
+    Genera en la hija dada la plantilla para datos de clases.
+    '''
+    hoja.parent._fonts[0] = font_default
     hoja.add_data_validation(no_cambiar_este_valor)
     hoja.add_data_validation(año_del_plan_de_estudios)
     hoja.add_data_validation(año_del_calendario)
@@ -201,5 +197,3 @@ def crear_plantilla() -> Workbook:
     
     generar_encabezado(hoja)
     generar_tabla(hoja)
-
-    return plantilla

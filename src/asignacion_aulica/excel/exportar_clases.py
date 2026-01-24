@@ -7,7 +7,7 @@ from pathlib import Path
 from openpyxl.worksheet.worksheet import Worksheet
 
 from asignacion_aulica.excel import plantilla_clases
-from asignacion_aulica.gestor_de_datos.entidades import Carrera, Materia
+from asignacion_aulica.gestor_de_datos.entidades import Carrera, Clase, Materia
 
 # Coordenadas de las celdas relevantes
 celda_nombre_carrera = 'F1'
@@ -77,6 +77,14 @@ def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
 def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actual: RowCounter):
     _merge_cells_and_set_value(hoja, materia.año, fila_actual.current(), Columna.año, n_rows=len(materia.clases))
     _merge_cells_and_set_value(hoja, materia.nombre, fila_actual.current(), Columna.materia, n_rows=len(materia.clases))
+    _merge_cells_and_set_value(hoja, materia.cuatrimestral_o_anual, fila_actual.current(), Columna.cuatrimestral_o_anual, n_rows=len(materia.clases))
+
+    for clase in materia.clases:
+        _escribir_datos_de_una_clase(hoja, clase, fila_actual.current())
+
+def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int):
+    #hoja.cell(fila_actual, Columna.cuatrimestral_o_anual, value=clase.cu)
+    pass
 
 def _merge_cells_and_set_value(
     sheet: Worksheet,

@@ -87,6 +87,7 @@ class MockMateria:
     nombre: str|None = None
     año: int = 1
     clases: Sequence[MockClase] = field(default_factory=list)
+    cuatrimestral_o_anual: str = ''
 
 @dataclass
 class MockCarrera:
@@ -168,6 +169,7 @@ def make_carreras(edificios: Edificios, carreras: Sequence[MockCarrera]) -> Carr
                 nombre=materia.nombre or f'materia {i_materia}',
                 carrera=carrera_de_verdad,
                 año=materia.año,
+                cuatrimestral_o_anual=materia.cuatrimestral_o_anual
             )
             for clase in materia.clases:
                 if clase.aula_asignada:

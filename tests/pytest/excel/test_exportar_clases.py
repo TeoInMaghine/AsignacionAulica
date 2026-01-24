@@ -67,6 +67,7 @@ def test_encabezado(carreras: Carreras, excel_exportado: Workbook):
             MockMateria(
                 nombre='Ma 1',
                 año = 8,
+                cuatrimestral_o_anual = 'no sé',
                 clases=(
                     MockClase(aula_asignada=(0, 1)),
                     MockClase(aula_asignada=(1, 0)),
@@ -87,4 +88,7 @@ def test_datos_de_las_clases(carreras: Carreras, excel_exportado: Workbook):
     for i in range(len(clases)):
         assert get_cell_value(hoja, i+4, Columna.año) == materia.año
         assert get_cell_value(hoja, i+4, Columna.materia) == materia.nombre
+        assert get_cell_value(hoja, i+4, Columna.cuatrimestral_o_anual) == materia.cuatrimestral_o_anual
+    
+    assert False, "Falló exitosamente"
     

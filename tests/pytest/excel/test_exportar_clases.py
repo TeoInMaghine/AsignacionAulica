@@ -86,6 +86,5 @@ def test_datos_de_las_clases(carreras: Carreras, excel_exportado: Workbook):
     
     for i in range(len(clases)):
         assert get_cell_value(hoja, i+4, Columna.año) == materia.año
-    
-    assert False
+        assert get_cell_value(hoja, i+4, Columna.materia) == materia.nombre
     

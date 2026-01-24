@@ -81,10 +81,10 @@ def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actua
 
     for clase in materia.clases:
         _escribir_datos_de_una_clase(hoja, clase, fila_actual.current())
+        fila_actual.next()
 
 def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int):
-    #hoja.cell(fila_actual, Columna.cuatrimestral_o_anual, value=clase.cu)
-    pass
+    hoja.cell(fila_actual, Columna.comisión, value=clase.comisión)
 
 def _merge_cells_and_set_value(
     sheet: Worksheet,

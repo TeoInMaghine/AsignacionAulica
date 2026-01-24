@@ -28,7 +28,9 @@ def excel_exportado(carreras: Carreras, tmp_xlsx_filename: Path) -> Workbook:
 
 def get_cell_value(sheet: Worksheet, row: int, col: int) -> Any:
     '''
-    :return: The value of a cell that may be merged or not
+    :return: The value of a cell that may be merged or not.
+
+    For empy cells, return an empty string instead of `None`.
     
     https://stackoverflow.com/a/76617485
     '''
@@ -39,7 +41,7 @@ def get_cell_value(sheet: Worksheet, row: int, col: int) -> Any:
                 # return the left top cell
                 cell = sheet.cell(row=merged_range.min_row, column=merged_range.min_col)
                 break
-    return cell.value
+    return '' if cell.value is None else cell.value
 
 @pytest.mark.carreras(
     MockCarrera(nombre='A'),
@@ -69,10 +71,10 @@ def test_encabezado(carreras: Carreras, excel_exportado: Workbook):
                 año = 8,
                 cuatrimestral_o_anual = 'no sé',
                 clases=(
-                    MockClase(aula_asignada=(0, 1)),
+                    MockClase(comisión='una', aula_asignada=(0, 1)),
                     MockClase(aula_asignada=(1, 0)),
                     MockClase(aula_asignada=None),
-                    MockClase(virtual=True),
+                    MockClase(comisión='otra', virtual=True),
                 )
             ),
         )
@@ -89,6 +91,7 @@ def test_datos_de_las_clases(carreras: Carreras, excel_exportado: Workbook):
         assert get_cell_value(hoja, i+4, Columna.año) == materia.año
         assert get_cell_value(hoja, i+4, Columna.materia) == materia.nombre
         assert get_cell_value(hoja, i+4, Columna.cuatrimestral_o_anual) == materia.cuatrimestral_o_anual
+        assert get_cell_value(hoja, i+4, Columna.comisión) == clases[i].comisión
     
     assert False, "Falló exitosamente"
     

@@ -85,6 +85,21 @@ def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actua
 
 def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int):
     hoja.cell(fila_actual, Columna.comisión, value=clase.comisión)
+    hoja.cell(fila_actual, Columna.teórica_o_práctica, value=clase.teórica_o_práctica)
+    hoja.cell(fila_actual, Columna.día, value=clase.día.name)
+    hoja.cell(fila_actual, Columna.horario_inicio, value=clase.horario.inicio)
+    hoja.cell(fila_actual, Columna.horario_fin, value=clase.horario.fin)
+    hoja.cell(fila_actual, Columna.cupo, value=clase.cantidad_de_alumnos)
+    hoja.cell(fila_actual, Columna.docente, value=clase.docente)
+    hoja.cell(fila_actual, Columna.auxiliar, value=clase.auxiliar)
+    hoja.cell(fila_actual, Columna.promocionable, value=clase.promocionable)
+
+    if clase.virtual:
+        _merge_cells_and_set_value(hoja, 'virtual', fila_actual, Columna.edificio, n_cols=2)
+    elif clase.aula_asignada is not None:
+        hoja.cell(fila_actual, Columna.edificio, value=clase.aula_asignada.edificio.nombre)
+        hoja.cell(fila_actual, Columna.aula, value=clase.aula_asignada.nombre)
+
 
 def _merge_cells_and_set_value(
     sheet: Worksheet,

@@ -1,3 +1,4 @@
+from datetime import time
 from pathlib import Path
 from typing import Any
 
@@ -6,6 +7,7 @@ from openpyxl.cell import MergedCell
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 from asignacion_aulica.excel.exportar_clases import Columna, exportar_datos_de_clases_a_excel
+from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import Carreras
 from mocks import MockCarrera, MockMateria, MockClase, MockEdificio, MockAula
 import pytest
@@ -71,10 +73,28 @@ def test_encabezado(carreras: Carreras, excel_exportado: Workbook):
                 año = 8,
                 cuatrimestral_o_anual = 'no sé',
                 clases=(
-                    MockClase(comisión='una', aula_asignada=(0, 1)),
-                    MockClase(aula_asignada=(1, 0)),
-                    MockClase(aula_asignada=None),
-                    MockClase(comisión='otra', virtual=True),
+                    MockClase(
+                        comisión='una',
+                        horario=RangoHorario(time(7,15), time(8,45)),
+                        promocionable='Si (10)',
+                        aula_asignada=(0, 1)
+                    ),
+                    MockClase(
+                        día=Día.Jueves,
+                        cantidad_de_alumnos=69,
+                        aula_asignada=(1, 0)
+                    ),
+                    MockClase(
+                        teórica_o_práctica='si',
+                        aula_asignada=None,
+                        docente='Uno re copado'
+                    ),
+                    MockClase(
+                        comisión='otra',
+                        cantidad_de_alumnos=2,
+                        auxiliar='meh',
+                        virtual=True
+                    ),
                 )
             ),
         )
@@ -92,6 +112,26 @@ def test_datos_de_las_clases(carreras: Carreras, excel_exportado: Workbook):
         assert get_cell_value(hoja, i+4, Columna.materia) == materia.nombre
         assert get_cell_value(hoja, i+4, Columna.cuatrimestral_o_anual) == materia.cuatrimestral_o_anual
         assert get_cell_value(hoja, i+4, Columna.comisión) == clases[i].comisión
+        assert get_cell_value(hoja, i+4, Columna.teórica_o_práctica) == clases[i].teórica_o_práctica
+        assert get_cell_value(hoja, i+4, Columna.día) == clases[i].día.name
+        assert get_cell_value(hoja, i+4, Columna.horario_inicio) == clases[i].horario.inicio
+        assert get_cell_value(hoja, i+4, Columna.horario_fin) == clases[i].horario.fin
+        assert get_cell_value(hoja, i+4, Columna.cupo) == clases[i].cantidad_de_alumnos
+        assert get_cell_value(hoja, i+4, Columna.docente) == clases[i].docente
+        assert get_cell_value(hoja, i+4, Columna.auxiliar) == clases[i].auxiliar
+        assert get_cell_value(hoja, i+4, Columna.promocionable) == clases[i].promocionable
+    
+    assert get_cell_value(hoja, 4+0, Columna.edificio) == clases[0].aula_asignada.edificio.nombre
+    assert get_cell_value(hoja, 4+0, Columna.aula) == clases[0].aula_asignada.nombre
+
+    assert get_cell_value(hoja, 4+1, Columna.edificio) == clases[1].aula_asignada.edificio.nombre
+    assert get_cell_value(hoja, 4+1, Columna.aula) == clases[1].aula_asignada.nombre
+
+    assert get_cell_value(hoja, 4+2, Columna.edificio) == ''
+    assert get_cell_value(hoja, 4+2, Columna.aula) == ''
+
+    assert get_cell_value(hoja, 4+3, Columna.edificio) == 'virtual'
+    assert get_cell_value(hoja, 4+3, Columna.aula) == 'virtual'
     
     assert False, "Falló exitosamente"
     

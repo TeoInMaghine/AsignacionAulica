@@ -82,6 +82,10 @@ class MockClase:
     equipamiento_necesario: set[str] = field(default_factory=set)
     aula_asignada: tuple[int, int]|None = None # índices del edificio y del aula 
     comisión: str = ''
+    teórica_o_práctica: str = ''
+    docente: str = ''
+    auxiliar: str = ''
+    promocionable: str = ''
 
 @dataclass
 class MockMateria:
@@ -188,7 +192,11 @@ def make_carreras(edificios: Edificios, carreras: Sequence[MockCarrera]) -> Carr
                     equipamiento_necesario=clase.equipamiento_necesario,
                     aula_asignada=aula_asignada,
                     no_cambiar_asignación=clase.no_cambiar_asignación,
-                    comisión=clase.comisión
+                    comisión=clase.comisión,
+                    teórica_o_práctica=clase.teórica_o_práctica,
+                    docente=clase.docente,
+                    auxiliar=clase.auxiliar,
+                    promocionable=clase.promocionable
                 ))
 
             carrera_de_verdad.materias.append(materia_de_verdad)

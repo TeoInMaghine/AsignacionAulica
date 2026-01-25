@@ -17,6 +17,10 @@ DefaultDirName={autopf}\AsignaciónÁulica
 [Languages]
 Name: "es"; MessagesFile: "compiler:Languages\Spanish.isl"
 
+[Dirs]
+; Generar carpeta vacía en "AppData\Local" del usuario:
+Name: "{localappdata}\AsignaciónÁulica"
+
 [Files]
 ; Copiar la carpeta "build\AsignaciónÁulica" generada por cxfreeze
 Source: "build\AsignaciónÁulica\*"; DestDir: "{app}"; Flags: recursesubdirs

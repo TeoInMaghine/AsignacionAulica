@@ -817,13 +817,13 @@ class GestorDeDatos:
             
             if not isinstance(datos_leídos, tuple):
                 raise RuntimeError(
-                    f'Se esperaba leer una tupla del archivo %s, pero se leyó un objeto de tipo %s',
+                    'Se esperaba leer una tupla del archivo %s, pero se leyó un objeto de tipo %s',
                     self._filename,
                     type(datos_leídos)
                 )
             elif len(datos_leídos) != 3:
                 raise RuntimeError(
-                    f'Se esperaba leer 3 objetos del archivo %s, pero se encontraron %d',
+                    'Se esperaba leer 3 objetos del archivo %s, pero se encontraron %d',
                     self._filename,
                     len(datos_leídos)
                 )

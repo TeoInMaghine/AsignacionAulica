@@ -10,7 +10,7 @@ from asignacion_aulica import assets
 
 logger = logging.getLogger(__name__)
 
-PATH_GESTOR_DE_DATOS = Path(assets.get_path('gestor.pickle'))
+PATH_GESTOR_DE_DATOS = Path(assets.get_path('gestor.pickle', read_only=False))
 
 def configurar_fuente_por_defecto():
     fonts_path = assets.get_path('fonts')

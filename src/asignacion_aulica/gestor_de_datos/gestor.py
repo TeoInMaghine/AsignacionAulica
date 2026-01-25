@@ -51,7 +51,10 @@ class GestorDeDatos:
         self._carreras: list[Carrera] = []
         self._equipamientos: Counter[str] = Counter()
 
-        self._cargar()
+        try:
+            self._cargar()
+        except:
+            logger.exception('Error al cargar el archivo.')
 
     def get_edificios(self) -> list[str]:
         '''

@@ -83,7 +83,12 @@ def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actua
     _merge_cells_and_set_value(hoja, materia.nombre, fila_actual.current(), Columna.materia, n_rows=len(materia.clases))
     _merge_cells_and_set_value(hoja, materia.cuatrimestral_o_anual, fila_actual.current(), Columna.cuatrimestral_o_anual, n_rows=len(materia.clases))
 
-    for clase in materia.clases:
+    # Copiamos la lista de clases para poder ordenarla sin afectar al gestor.
+    # Ordenamos las clases primero por comisión, después por día, y después por horario de inicio
+    clases = list(materia.clases)
+    clases.sort(key=lambda clase: (clase.comisión, clase.día, clase.horario.inicio))
+
+    for clase in clases:
         _escribir_datos_de_una_clase(hoja, clase, fila_actual.current())
         fila_actual.next()
 

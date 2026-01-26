@@ -128,8 +128,8 @@ def test_datos_de_las_clases(carreras: Carreras, excel_exportado: Workbook):
     assert get_cell_value(hoja, fila_primer_clase+1, Columna.edificio) == clases[1].aula_asignada.edificio.nombre
     assert get_cell_value(hoja, fila_primer_clase+1, Columna.aula) == clases[1].aula_asignada.nombre
 
-    assert get_cell_value(hoja, fila_primer_clase+2, Columna.edificio) == 'virtual'
-    assert get_cell_value(hoja, fila_primer_clase+2, Columna.aula) == 'virtual'
+    assert get_cell_value(hoja, fila_primer_clase+2, Columna.edificio) == 'Virtual'
+    assert get_cell_value(hoja, fila_primer_clase+2, Columna.aula) == 'Virtual'
     
     assert get_cell_value(hoja, fila_primer_clase+3, Columna.edificio) == clases[3].aula_asignada.edificio.nombre
     assert get_cell_value(hoja, fila_primer_clase+3, Columna.aula) == clases[3].aula_asignada.nombre

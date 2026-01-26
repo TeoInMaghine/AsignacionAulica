@@ -92,7 +92,7 @@ def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int
     hoja.cell(fila_actual, Columna.promocionable, value=clase.promocionable)
 
     if clase.virtual:
-        _merge_cells_and_set_value(hoja, 'virtual', fila_actual, Columna.edificio, n_cols=2)
+        _merge_cells_and_set_value(hoja, 'Virtual', fila_actual, Columna.edificio, n_cols=2)
     elif clase.aula_asignada is not None:
         hoja.cell(fila_actual, Columna.edificio, value=clase.aula_asignada.edificio.nombre)
         hoja.cell(fila_actual, Columna.aula, value=clase.aula_asignada.nombre)

@@ -10,7 +10,7 @@ from asignacion_aulica import assets
 
 logger = logging.getLogger(__name__)
 
-PATH_GESTOR_DE_DATOS = Path(assets.get_path('gestor.pickle', read_only=False))
+PATH_GESTOR_DE_DATOS = Path(os.path.join(assets.APP_DATA_PATH, 'gestor.pickle'))
 
 def configurar_fuente_por_defecto():
     fonts_path = assets.get_path('fonts')
@@ -31,8 +31,8 @@ def main() -> int:
     configurar_fuente_por_defecto()
 
     engine = QQmlApplicationEngine()
-    engine.rootContext().setContextProperty('assets_path', Path(assets.assets_path).as_uri())
-    engine.addImportPath(assets.QML_import_path)
+    engine.rootContext().setContextProperty('assets_path', Path(assets.ASSETS_PATH).as_uri())
+    engine.addImportPath(assets.QML_IMPORT_PATH)
     engine.loadFromModule('QML', "Main")
     
     if not engine.rootObjects():

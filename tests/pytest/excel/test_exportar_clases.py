@@ -131,8 +131,29 @@ def test_datos_de_las_clases(carreras: Carreras, excel_exportado: Workbook):
     assert get_cell_value(hoja, fila_primer_clase+2, Columna.edificio) == ''
     assert get_cell_value(hoja, fila_primer_clase+2, Columna.aula) == ''
 
-    assert get_cell_value(hoja, 4+3, Columna.edificio) == 'virtual'
-    assert get_cell_value(hoja, 4+3, Columna.aula) == 'virtual'
-    
-    assert False, "Falló exitosamente"
-    
+    assert get_cell_value(hoja, fila_primer_clase+3, Columna.edificio) == 'virtual'
+    assert get_cell_value(hoja, fila_primer_clase+3, Columna.aula) == 'virtual'
+
+@pytest.mark.carreras(
+    MockCarrera(
+        materias=(
+            MockMateria(año = 5, nombre = '5', clases=(MockClase(),)),
+            MockMateria(año = 1, nombre = '1', clases=(MockClase(),)),
+            MockMateria(año = 2, nombre = '2', clases=(MockClase(),)),
+            MockMateria(año = 4, nombre = '4b', clases=(MockClase(),)),
+            MockMateria(año = 4, nombre = '4a', clases=(MockClase(),))
+        )
+    )
+)
+def test_materias_ordenadas_por_año_y_nombre(carreras: Carreras, excel_exportado: Workbook):
+    hoja = excel_exportado.worksheets[0]
+    assert get_cell_value(hoja, fila_primer_clase+0, Columna.año) == 1
+    assert get_cell_value(hoja, fila_primer_clase+0, Columna.materia) == '1'
+    assert get_cell_value(hoja, fila_primer_clase+1, Columna.año) == 2
+    assert get_cell_value(hoja, fila_primer_clase+1, Columna.materia) == '2'
+    assert get_cell_value(hoja, fila_primer_clase+2, Columna.año) == 4
+    assert get_cell_value(hoja, fila_primer_clase+2, Columna.materia) == '4a'
+    assert get_cell_value(hoja, fila_primer_clase+3, Columna.año) == 4
+    assert get_cell_value(hoja, fila_primer_clase+3, Columna.materia) == '4b'
+    assert get_cell_value(hoja, fila_primer_clase+4, Columna.año) == 5
+    assert get_cell_value(hoja, fila_primer_clase+4, Columna.materia) == '5'

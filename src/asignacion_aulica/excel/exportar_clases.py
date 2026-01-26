@@ -68,9 +68,13 @@ def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
     hoja[celda_nombre_carrera].value = carrera.nombre
     #TODO: ano y cuatrimestre
 
-    # 4 es la primera fila después del header de la tabla
-    fila_actual = RowCounter(initial_value=4)
-    for materia in carrera.materias:
+    # Copiamos la lista de materias para poder ordenarla sin afectar al gestor.
+    # Ordenamos las materias primero por año y después alfabéticamente.
+    materias = list(carrera.materias)
+    materias.sort(key=lambda materia: (materia.año, materia.nombre))
+
+    fila_actual = RowCounter(initial_value=plantilla_clases.fila_primer_clase)
+    for materia in materias:
         if len(materia.clases) > 0:
             _escribir_datos_de_una_materia(hoja, materia, fila_actual)
 

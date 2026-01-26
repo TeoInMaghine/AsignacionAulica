@@ -3,18 +3,23 @@ Este módulo se encarga de calcular los paths absolutos de archivos, detectando
 si se está ejecutando el programa en el entorno de desarrollo o en el entorno
 empaquetado.
 '''
-from os import path
+from os import path, getenv
 import sys
 
 estamos_en_ambiente_empaquetado = getattr(sys, 'frozen', False)
+ASSETS_PATH: str
+APP_DATA_PATH: str
+QML_IMPORT_PATH: str
 
 if estamos_en_ambiente_empaquetado:
-    assets_path = path.join(sys.prefix, 'assets')
-    QML_import_path = sys.prefix
+    ASSETS_PATH = path.join(sys.prefix, 'assets')
+    APP_DATA_PATH = path.join(getenv('LOCALAPPDATA'), 'AsignaciónÁulica')
+    QML_IMPORT_PATH = sys.prefix
 else:
     este_directorio = path.dirname(__file__)
-    assets_path = path.abspath(path.join(este_directorio, path.pardir, path.pardir, 'assets'))
-    QML_import_path = path.join(este_directorio, 'GUI')
+    ASSETS_PATH = path.abspath(path.join(este_directorio, path.pardir, path.pardir, 'assets'))
+    APP_DATA_PATH = path.abspath(path.join(este_directorio, path.pardir, path.pardir, 'data'))
+    QML_IMPORT_PATH = path.join(este_directorio, 'GUI')
 
 def get_path(*nombres: str) -> str:
     '''
@@ -29,4 +34,4 @@ def get_path(*nombres: str) -> str:
     :return: El path absoluto obtenido al unir el path de la carpeta assets con
     la lista de nombres.
     '''
-    return path.join(assets_path, *nombres)
+    return path.join(ASSETS_PATH, *nombres)

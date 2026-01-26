@@ -47,8 +47,8 @@ class ProxyGestorDeDatos(QObject):
         try:
             self.gestor.guardar()
             return ''
-        except Exception as e:
-            logger.error('Error guardando datos: %s', e)
+        except:
+            logger.exception('Error guardando datos.')
             return 'No se pudieron guardar los datos.'
 
 

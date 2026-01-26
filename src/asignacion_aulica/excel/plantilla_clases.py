@@ -67,6 +67,10 @@ n_columnas = len(COLUMNAS)
 # Cantidad de filas a las que aplicar formato
 n_filas = 200
 
+n_filas_encabezado = 2
+fila_header = n_filas_encabezado + 1
+fila_primer_clase = fila_header + 1
+
 def generar_encabezado(hoja: Worksheet):
     # Configurar tamaño de las filas
     altura_filas = font_encabezado.size + 7
@@ -140,7 +144,6 @@ def generar_encabezado(hoja: Worksheet):
 def generar_tabla(hoja: Worksheet):
     # Insertar fila con los nombres de las columnas
     hoja.append(COLUMNAS)
-    fila_header = hoja.max_row
     no_cambiar_este_valor.add(f'A{fila_header}:{última_columna}{fila_header}')
 
     # Bloquear movimiento de los nombres para que se mantangan visibles al escrollear

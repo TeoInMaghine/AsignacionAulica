@@ -1,3 +1,4 @@
+from collections import Counter
 from enum import IntEnum, auto
 from typing import Any
 from openpyxl.workbook.workbook import Workbook
@@ -88,9 +89,16 @@ def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actua
     clases = list(materia.clases)
     clases.sort(key=lambda clase: (clase.comisión, clase.día, clase.horario.inicio))
 
+    fila_primera_clase = fila_actual.current()
     for clase in clases:
         _escribir_datos_de_una_clase(hoja, clase, fila_actual.current())
         fila_actual.next()
+    
+    # Unir las celdas de las comisiones
+    cuantas_clases_en_cada_comisión = Counter(clase.comisión for clase in clases)
+    for comisión, n_clases in cuantas_clases_en_cada_comisión.items():
+        _merge_cells_and_set_value(hoja, comisión, fila_primera_clase, Columna.comisión, n_clases)
+        fila_primera_clase += n_clases
 
 def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int):
     hoja.cell(fila_actual, Columna.comisión, value=clase.comisión)

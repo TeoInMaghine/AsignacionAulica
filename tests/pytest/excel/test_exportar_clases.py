@@ -6,8 +6,8 @@ import openpyxl
 from openpyxl.cell import MergedCell
 from openpyxl.workbook import Workbook
 from openpyxl.worksheet.worksheet import Worksheet
-from asignacion_aulica.excel.exportar_clases import Columna, exportar_datos_de_clases_a_excel
-from asignacion_aulica.excel.plantilla_clases import fila_primer_clase
+from asignacion_aulica.excel.exportar_clases import exportar_datos_de_clases_a_excel
+from asignacion_aulica.excel.plantilla_clases import fila_primer_clase, Columna
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import Carreras
 from mocks import MockCarrera, MockMateria, MockClase, MockEdificio, MockAula

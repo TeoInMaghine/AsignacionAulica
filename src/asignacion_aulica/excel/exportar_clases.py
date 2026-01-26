@@ -1,5 +1,4 @@
 from collections import Counter
-from enum import IntEnum, auto
 from typing import Any
 from openpyxl.workbook.workbook import Workbook
 from collections.abc import Sequence
@@ -7,32 +6,13 @@ from pathlib import Path
 
 from openpyxl.worksheet.worksheet import Worksheet
 
-from asignacion_aulica.excel import plantilla_clases
+from asignacion_aulica.excel.plantilla_clases import generar_plantilla, fila_primer_clase, Columna
 from asignacion_aulica.gestor_de_datos.entidades import Carrera, Clase, Materia
 
 # Coordenadas de las celdas relevantes
 celda_nombre_carrera = 'F1'
 celda_año = 'F2'
 celda_cuatrimestre = 'J2'
-
-class Columna(IntEnum):
-    '''
-    Los índices de las columnas de la tabla.
-    '''
-    año = 1
-    materia = auto()
-    cuatrimestral_o_anual = auto()
-    comisión = auto()
-    teórica_o_práctica = auto()
-    día = auto()
-    horario_inicio = auto()
-    horario_fin = auto()
-    cupo = auto()
-    docente = auto()
-    auxiliar = auto()
-    promocionable = auto()
-    edificio = auto()
-    aula = auto()
 
 class RowCounter:
     def __init__(self, initial_value: int = 0):
@@ -60,7 +40,7 @@ def exportar_datos_de_clases_a_excel(carreras: Sequence[Carrera], path: Path):
 
     for carrera in carreras:
         hoja = excel.create_sheet(title=carrera.nombre)
-        plantilla_clases.generar_plantilla(hoja)
+        generar_plantilla(hoja)
         _escribir_datos_de_una_carrera(hoja, carrera)
 
     excel.save(path)
@@ -74,7 +54,7 @@ def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
     materias = list(carrera.materias)
     materias.sort(key=lambda materia: (materia.año, materia.nombre))
 
-    fila_actual = RowCounter(initial_value=plantilla_clases.fila_primer_clase)
+    fila_actual = RowCounter(initial_value=fila_primer_clase)
     for materia in materias:
         if len(materia.clases) > 0:
             _escribir_datos_de_una_materia(hoja, materia, fila_actual)

@@ -16,6 +16,7 @@ ejemplo, la columna "Materia" puede estar unida en las filas de las clases de
 cada materia).
 '''
 from collections.abc import Sequence
+from enum import IntEnum, auto
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles.borders import Border
@@ -44,7 +45,26 @@ from asignacion_aulica.excel.validadores import (
     horario
 )
 
-COLUMNAS: Sequence[str] = (
+class Columna(IntEnum):
+    '''
+    Los índices de las columnas de la tabla.
+    '''
+    año = 1
+    materia = auto()
+    cuatrimestral_o_anual = auto()
+    comisión = auto()
+    teórica_o_práctica = auto()
+    día = auto()
+    horario_inicio = auto()
+    horario_fin = auto()
+    cupo = auto()
+    docente = auto()
+    auxiliar = auto()
+    promocionable = auto()
+    edificio = auto()
+    aula = auto()
+
+TÍTULOS_DE_COLUMNAS: Sequence[str] = (
     'Año',
     'Materia',
     'Cuatrimestral / Anual',
@@ -61,7 +81,7 @@ COLUMNAS: Sequence[str] = (
     'Aula'
 )
 
-n_columnas = len(COLUMNAS)
+n_columnas = len(Columna)
 última_columna: str = get_column_letter(n_columnas)
 
 # Cantidad de filas a las que aplicar formato
@@ -143,7 +163,7 @@ def generar_encabezado(hoja: Worksheet):
 
 def generar_tabla(hoja: Worksheet):
     # Insertar fila con los nombres de las columnas
-    hoja.append(COLUMNAS)
+    hoja.append(TÍTULOS_DE_COLUMNAS)
     no_cambiar_este_valor.add(f'A{fila_header}:{última_columna}{fila_header}')
 
     # Bloquear movimiento de los nombres para que se mantangan visibles al escrollear

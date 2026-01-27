@@ -7,6 +7,7 @@ from typing import Callable
 from collections import Counter
 import logging
 
+from asignacion_aulica.excel.exportar_clases import exportar_datos_de_clases_a_excel
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
@@ -741,25 +742,24 @@ class GestorDeDatos:
         # (El módulo archivos_excel todavía no existe, ver Issue #52)
         pass
 
-    def exportar_clases_a_excel(self, path: str, carrera: str|None = None):
+    def exportar_clases_a_excel(self, path: str, carrera: int|None = None):
         '''
         Escribir los datos de las clases (incluyendo la asignación de aulas) en
         un archivo excel.
 
-        Si se especifica el nombre de una carrera, se exportan solamente las
-        clases de esa carrera. Si no se especifica el nombre de una carrera, se
-        exportan los datos de todas las carreras, una en cada hoja del archivo.
+        Si se especifica el índice de una carrera, se exportan solamente las
+        clases de esa carrera. Si no se especifica una carrera, se exportan los
+        datos de todas las carreras, una en cada hoja del archivo.
 
         :param path: El path absoluto del archivo.
-        :param carrera: El nombre de una carrera, o `None`.
+        :param carrera: El índice de una carrera, o `None`.
 
-        :raise ValueError: Si `carrera` no es `None` y no es el nombre de una
+        :raise IndexError: Si `carrera` no es `None` y no es el índice de una
         carrera que existe.
         :raise TBD: Si no se puede escribir el archivo en el path dado.
         '''
-        # Nota: Este método debería llamar a archivos_excel.clases.exportar.
-        # (El módulo archivos_excel todavía no existe, ver Issue #74)
-        pass
+        carreras = (self._carreras[carrera],) if carrera is not None else self._carreras
+        exportar_datos_de_clases_a_excel(carreras, Path(path))
 
     def exportar_cronograma_de_edificios_a_excel(self, path: str, edificio: str|None = None):
         '''

@@ -200,7 +200,7 @@ def generar_tabla(hoja: Worksheet):
     # Configurar estilo de la tabla hasta la fila n_filas
     columnas_horario = (7, 8)
     for row in range(fila_header + 1, fila_header + n_filas):
-        for col in range(1, n_columnas):
+        for col in range(1, n_columnas+1):
             if col in columnas_horario:
                 hoja.cell(row, col).style = estilo_horarios
             else:

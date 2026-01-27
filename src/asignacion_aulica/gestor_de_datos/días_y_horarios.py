@@ -60,7 +60,7 @@ def time_to_string_horario(horario: time) -> str:
 
 def crear_horarios_semanales() -> HorariosSemanales:
     return HorariosSemanales(
-        RangoHorario(time(7), time(22), d == Día.Domingo or d == Día.Sábado)
+        RangoHorario(time(7), time(23), d == Día.Domingo)
         for d in Día
     )
 

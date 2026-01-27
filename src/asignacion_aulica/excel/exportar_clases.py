@@ -6,13 +6,13 @@ from pathlib import Path
 
 from openpyxl.worksheet.worksheet import Worksheet
 
-from asignacion_aulica.excel.plantilla_clases import generar_plantilla, fila_primer_clase, Columna
+from asignacion_aulica.excel.plantilla_clases import (
+    celda_nombre_carrera,
+    generar_plantilla,
+    fila_primer_clase,
+    Columna
+)
 from asignacion_aulica.gestor_de_datos.entidades import Carrera, Clase, Materia
-
-# Coordenadas de las celdas relevantes
-celda_nombre_carrera = 'F1'
-celda_año = 'F2'
-celda_cuatrimestre = 'J2'
 
 class RowCounter:
     def __init__(self, initial_value: int = 0):

@@ -84,14 +84,34 @@ TÍTULOS_DE_COLUMNAS: Sequence[str] = (
 n_columnas = len(Columna)
 última_columna: str = get_column_letter(n_columnas)
 
-# Cantidad de filas a las que aplicar formato
-n_filas = 200
+# Coordenadas de las celdas relevantes
+celda_nombre_carrera = 'F1'
+celda_año = 'F2'
+celda_cuatrimestre = 'J2'
 
 n_filas_encabezado = 2
 fila_header = n_filas_encabezado + 1
 fila_primer_clase = fila_header + 1
 
-def generar_encabezado(hoja: Worksheet):
+# Cantidad de filas a las que aplicar formato
+_n_filas = 200
+
+def generar_plantilla(hoja: Worksheet):
+    '''
+    Genera en la hija dada la plantilla para datos de clases.
+    '''
+    hoja.parent._fonts[0] = font_default
+    hoja.add_data_validation(no_cambiar_este_valor)
+    hoja.add_data_validation(año_del_plan_de_estudios)
+    hoja.add_data_validation(año_del_calendario)
+    hoja.add_data_validation(número_natural)
+    hoja.add_data_validation(día_de_la_semana)
+    hoja.add_data_validation(horario)
+    
+    _generar_encabezado(hoja)
+    _generar_tabla(hoja)
+
+def _generar_encabezado(hoja: Worksheet):
     # Configurar tamaño de las filas
     altura_filas = font_encabezado.size + 7
     hoja.row_dimensions[1].height = altura_filas
@@ -161,7 +181,7 @@ def generar_encabezado(hoja: Worksheet):
     cell.font = font_encabezado
     cell.alignment = a_la_izquierda
 
-def generar_tabla(hoja: Worksheet):
+def _generar_tabla(hoja: Worksheet):
     # Insertar fila con los nombres de las columnas
     hoja.append(TÍTULOS_DE_COLUMNAS)
     no_cambiar_este_valor.add(f'A{fila_header}:{última_columna}{fila_header}')
@@ -199,24 +219,9 @@ def generar_tabla(hoja: Worksheet):
 
     # Configurar estilo de la tabla hasta la fila n_filas
     columnas_horario = (7, 8)
-    for row in range(fila_header + 1, fila_header + n_filas):
+    for row in range(fila_header + 1, fila_header + _n_filas):
         for col in range(1, n_columnas+1):
             if col in columnas_horario:
                 hoja.cell(row, col).style = estilo_horarios
             else:
                 hoja.cell(row, col).style = estilo_tabla
-
-def generar_plantilla(hoja: Worksheet):
-    '''
-    Genera en la hija dada la plantilla para datos de clases.
-    '''
-    hoja.parent._fonts[0] = font_default
-    hoja.add_data_validation(no_cambiar_este_valor)
-    hoja.add_data_validation(año_del_plan_de_estudios)
-    hoja.add_data_validation(año_del_calendario)
-    hoja.add_data_validation(número_natural)
-    hoja.add_data_validation(día_de_la_semana)
-    hoja.add_data_validation(horario)
-    
-    generar_encabezado(hoja)
-    generar_tabla(hoja)

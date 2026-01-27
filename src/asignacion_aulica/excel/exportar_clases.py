@@ -69,16 +69,24 @@ def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actua
     clases = list(materia.clases)
     clases.sort(key=lambda clase: (clase.comisión, clase.día, clase.horario.inicio))
 
-    fila_primera_clase = fila_actual.current()
+    primera_fila_de_la_materia = fila_actual.current()
     for clase in clases:
         _escribir_datos_de_una_clase(hoja, clase, fila_actual.current())
         fila_actual.next()
     
-    # Unir las celdas de las comisiones
+    # Unir las celdas con valores repetidos dentro de cada comisión
+    columnas_a_unir = (
+        col for col in Columna
+        if col not in (Columna.año, Columna.materia, Columna.cuatrimestral_o_anual)
+    )
     cuantas_clases_en_cada_comisión = Counter(clase.comisión for clase in clases)
-    for comisión, n_clases in cuantas_clases_en_cada_comisión.items():
-        _merge_cells_and_set_value(hoja, comisión, fila_primera_clase, Columna.comisión, n_clases)
-        fila_primera_clase += n_clases
+    primera_fila_de_la_comisión = primera_fila_de_la_materia
+    for n_clases in cuantas_clases_en_cada_comisión.values():
+        for col in columnas_a_unir:
+            _merge_vertically_neighboring_cells_with_equal_value(
+                hoja, col, primera_fila_de_la_comisión, n_clases
+            )
+        primera_fila_de_la_comisión += n_clases
 
 def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int):
     hoja.cell(fila_actual, Columna.comisión, value=clase.comisión)
@@ -113,3 +121,30 @@ def _merge_cells_and_set_value(
         end_column=start_col + n_cols - 1
     )
     sheet.cell(start_row, start_col, value=value)
+
+def _merge_vertically_neighboring_cells_with_equal_value(
+    sheet: Worksheet,
+    column: int,
+    start_row: int,
+    n_rows: int,
+):
+    end_row = start_row + n_rows - 1
+    start_of_range = start_row
+    while start_of_range < end_row:
+        end_of_range = _find_rows_with_equal_values(sheet, column, start_of_range, end_row)
+        if end_of_range > start_of_range:
+            sheet.merge_cells(start_row=start_of_range, end_row=end_of_range, start_column=column, end_column=column)
+        start_of_range = end_of_range + 1
+
+def _find_rows_with_equal_values(
+    sheet: Worksheet,
+    column: int,
+    start_row: int,
+    max_row: int
+):
+    value = sheet.cell(row=start_row, column=column).value
+    current_row = start_row
+    while current_row < max_row and sheet.cell(row=current_row+1, column=column).value == value:
+        current_row += 1
+    
+    return current_row

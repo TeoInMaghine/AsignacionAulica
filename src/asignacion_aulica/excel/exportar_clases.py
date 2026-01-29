@@ -1,4 +1,5 @@
-from collections import Counter
+from itertools import groupby
+from collections.abc import Iterable
 from typing import Any
 from openpyxl.workbook.workbook import Workbook
 from collections.abc import Sequence
@@ -17,7 +18,7 @@ from asignacion_aulica.gestor_de_datos.entidades import Carrera, Clase, Materia
 class RowCounter:
     def __init__(self, initial_value: int = 0):
         self._current: int = initial_value
-    def current(self) -> int:
+    def get(self) -> int:
         return self._current
     def next(self) -> int:
         self._current += 1
@@ -60,33 +61,35 @@ def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
             _escribir_datos_de_una_materia(hoja, materia, fila_actual)
 
 def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actual: RowCounter):
-    _merge_cells_and_set_value(hoja, materia.año, fila_actual.current(), Columna.año, n_rows=len(materia.clases))
-    _merge_cells_and_set_value(hoja, materia.nombre, fila_actual.current(), Columna.materia, n_rows=len(materia.clases))
-    _merge_cells_and_set_value(hoja, materia.cuatrimestral_o_anual, fila_actual.current(), Columna.cuatrimestral_o_anual, n_rows=len(materia.clases))
+    _merge_cells_and_set_value(hoja, materia.año, fila_actual.get(), Columna.año, n_rows=len(materia.clases))
+    _merge_cells_and_set_value(hoja, materia.nombre, fila_actual.get(), Columna.materia, n_rows=len(materia.clases))
+    _merge_cells_and_set_value(hoja, materia.cuatrimestral_o_anual, fila_actual.get(), Columna.cuatrimestral_o_anual, n_rows=len(materia.clases))
 
     # Copiamos la lista de clases para poder ordenarla sin afectar al gestor.
     # Ordenamos las clases primero por comisión, después por día, y después por horario de inicio
     clases = list(materia.clases)
     clases.sort(key=lambda clase: (clase.comisión, clase.día, clase.horario.inicio))
+    
+    clases_por_comisión = groupby(clases, key=lambda clase: clase.comisión)
+    for _, clases_de_la_comisión in clases_por_comisión:
+        _escribir_datos_de_una_comisión(hoja, clases_de_la_comisión, fila_actual)
 
-    primera_fila_de_la_materia = fila_actual.current()
+def _escribir_datos_de_una_comisión(hoja: Worksheet, clases: Iterable[Clase], fila_actual: RowCounter):
+    primera_fila_de_la_comisión = fila_actual.get()
+
     for clase in clases:
-        _escribir_datos_de_una_clase(hoja, clase, fila_actual.current())
+        _escribir_datos_de_una_clase(hoja, clase, fila_actual.get())
         fila_actual.next()
     
-    # Unir las celdas con valores repetidos dentro de cada comisión
+    # Unir las celdas que tienen los mismos valores
     columnas_a_unir = tuple(
         col for col in Columna
         if col not in (Columna.año, Columna.materia, Columna.cuatrimestral_o_anual)
     )
-    cuantas_clases_en_cada_comisión = Counter(clase.comisión for clase in clases)
-    primera_fila_de_la_comisión = primera_fila_de_la_materia
-    for n_clases in cuantas_clases_en_cada_comisión.values():
-        for col in columnas_a_unir:
-            _merge_vertically_neighboring_cells_with_equal_value(
-                hoja, col, primera_fila_de_la_comisión, n_clases
-            )
-        primera_fila_de_la_comisión += n_clases
+    for col in columnas_a_unir:
+        _merge_vertically_neighboring_cells_with_equal_value(
+            hoja, col, primera_fila_de_la_comisión, fila_actual.get()-primera_fila_de_la_comisión
+        )
 
 def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int):
     hoja.cell(fila_actual, Columna.comisión, value=clase.comisión)

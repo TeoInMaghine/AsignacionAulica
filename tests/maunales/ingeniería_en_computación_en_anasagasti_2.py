@@ -216,7 +216,7 @@ for i_materia, datos_de_materia in enumerate(materias):
         clase.virtual = datos_de_clase.get('virtual', False)
         clase.cantidad_de_alumnos = datos_de_clase['alumnos']
         clase.comisión = datos_de_clase.get('comisión', '')
-        clase.teórica_o_práctica = datos_de_clase.get('teórica o práctica', 'Teórico/Práctica')
+        clase.teórica_o_práctica = datos_de_clase.get('teórica o práctica', '')
         clase.promocionable = datos_de_clase.get('promocionable', '')
         clase.docente = datos_de_clase.get('docente', '')
         clase.auxiliar = datos_de_clase.get('auxiliar', '')

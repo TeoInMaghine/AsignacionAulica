@@ -61,8 +61,7 @@ class Columna(IntEnum):
     docente = auto()
     auxiliar = auto()
     promocionable = auto()
-    edificio = auto()
-    aula = auto()
+    lugar = auto()
 
 TÍTULOS_DE_COLUMNAS: Sequence[str] = (
     'Año',
@@ -77,8 +76,7 @@ TÍTULOS_DE_COLUMNAS: Sequence[str] = (
     'Docente',
     'Auxiliar',
     'Promocionable\nSi (Nota) / No',
-    'Edificio',
-    'Aula'
+    'Lugar'
 )
 
 n_columnas = len(Columna)
@@ -207,8 +205,7 @@ def _generar_tabla(hoja: Worksheet):
     hoja.column_dimensions['J'].width = 12 * font_size_ratio # Docente
     hoja.column_dimensions['K'].width = 12 * font_size_ratio # Auxiliar
     hoja.column_dimensions['L'].width = 14 * font_size_ratio # Promocionable
-    hoja.column_dimensions['M'].width = 12 * font_size_ratio # Edificio
-    hoja.column_dimensions['N'].width =  8 * font_size_ratio # Aula
+    hoja.column_dimensions['M'].width = 20 * font_size_ratio # Lugar
 
     # Agregar validadores
     año_del_plan_de_estudios.add(f'A{fila_header+1}:A1048576') # 1048576 significa hasta el final de la columna.

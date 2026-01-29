@@ -75,7 +75,7 @@ def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actua
         fila_actual.next()
     
     # Unir las celdas con valores repetidos dentro de cada comisión
-    columnas_a_unir = (
+    columnas_a_unir = tuple(
         col for col in Columna
         if col not in (Columna.año, Columna.materia, Columna.cuatrimestral_o_anual)
     )
@@ -100,11 +100,13 @@ def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int
     hoja.cell(fila_actual, Columna.promocionable, value=clase.promocionable)
 
     if clase.virtual:
-        _merge_cells_and_set_value(hoja, 'Virtual', fila_actual, Columna.edificio, n_cols=2)
+        lugar = 'Virtual'
     elif clase.aula_asignada is not None:
-        hoja.cell(fila_actual, Columna.edificio, value=clase.aula_asignada.edificio.nombre)
-        hoja.cell(fila_actual, Columna.aula, value=clase.aula_asignada.nombre)
-
+        lugar = clase.aula_asignada.edificio.nombre + ' - ' + clase.aula_asignada.nombre
+    else:
+        lugar = ''
+    
+    hoja.cell(fila_actual, Columna.lugar, value=lugar)
 
 def _merge_cells_and_set_value(
     sheet: Worksheet,

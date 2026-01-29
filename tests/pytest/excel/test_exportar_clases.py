@@ -122,17 +122,15 @@ def test_datos_de_las_clases(carreras: Carreras, excel_exportado: Workbook):
         assert get_cell_value(hoja, fila_primer_clase+i, Columna.auxiliar) == clases[i].auxiliar
         assert get_cell_value(hoja, fila_primer_clase+i, Columna.promocionable) == clases[i].promocionable
 
-    assert get_cell_value(hoja, fila_primer_clase, Columna.edificio) == ''
-    assert get_cell_value(hoja, fila_primer_clase, Columna.aula) == ''
+    assert get_cell_value(hoja, fila_primer_clase, Columna.lugar) == ''
 
-    assert get_cell_value(hoja, fila_primer_clase+1, Columna.edificio) == clases[1].aula_asignada.edificio.nombre
-    assert get_cell_value(hoja, fila_primer_clase+1, Columna.aula) == clases[1].aula_asignada.nombre
+    assert clases[1].aula_asignada.edificio.nombre in get_cell_value(hoja, fila_primer_clase+1, Columna.lugar)
+    assert clases[1].aula_asignada.nombre in get_cell_value(hoja, fila_primer_clase+1, Columna.lugar)
 
-    assert get_cell_value(hoja, fila_primer_clase+2, Columna.edificio) == 'Virtual'
-    assert get_cell_value(hoja, fila_primer_clase+2, Columna.aula) == 'Virtual'
+    assert get_cell_value(hoja, fila_primer_clase+2, Columna.lugar) == 'Virtual'
     
-    assert get_cell_value(hoja, fila_primer_clase+3, Columna.edificio) == clases[3].aula_asignada.edificio.nombre
-    assert get_cell_value(hoja, fila_primer_clase+3, Columna.aula) == clases[3].aula_asignada.nombre
+    assert clases[3].aula_asignada.edificio.nombre in get_cell_value(hoja, fila_primer_clase+3, Columna.lugar)
+    assert clases[3].aula_asignada.nombre in get_cell_value(hoja, fila_primer_clase+3, Columna.lugar)
 
 @pytest.mark.carreras(
     MockCarrera(

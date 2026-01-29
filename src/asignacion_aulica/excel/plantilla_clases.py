@@ -53,38 +53,38 @@ class Columna(IntEnum):
     materia = auto()
     cuatrimestral_o_anual = auto()
     comisión = auto()
-    teórica_o_práctica = auto()
+    cupo = auto()
     día = auto()
     horario_inicio = auto()
     horario_fin = auto()
-    cupo = auto()
+    lugar = auto()
+    teórica_o_práctica = auto()
     docente = auto()
     auxiliar = auto()
     promocionable = auto()
-    lugar = auto()
 
 TÍTULOS_DE_COLUMNAS: Sequence[str] = (
     'Año',
     'Materia',
     'Cuatrimestral / Anual',
     'Comisión',
-    'Teórica / Práctica',
+    'Cupo',
     'Día',
     'Horario desde',
     'Horario hasta',
-    'Cupo',
+    'Lugar',
+    'Teórica / Práctica',
     'Docente',
     'Auxiliar',
-    'Promocionable\nSi (Nota) / No',
-    'Lugar'
+    'Promocionable\nSi (Nota) / No'
 )
 
 n_columnas = len(Columna)
 última_columna: str = get_column_letter(n_columnas)
 
 # Coordenadas de las celdas relevantes
-celda_nombre_carrera = 'F1'
-celda_año = 'F2'
+celda_nombre_carrera = 'G1'
+celda_año = 'G2'
 celda_cuatrimestre = 'J2'
 
 n_filas_encabezado = 2
@@ -109,15 +109,15 @@ def generar_plantilla(hoja: Worksheet):
     _generar_encabezado(hoja)
     _generar_tabla(hoja)
 
+    # Marcar bordes externos
+    hoja.column_dimensions['A'].border = Border(left=borde_negro)
+    hoja.column_dimensions[última_columna].border = Border(right=borde_negro)
+
 def _generar_encabezado(hoja: Worksheet):
     # Configurar tamaño de las filas
     altura_filas = font_encabezado.size + 7
     hoja.row_dimensions[1].height = altura_filas
     hoja.row_dimensions[2].height = altura_filas
-
-    # Marcar bordes externos
-    hoja.column_dimensions['A'].border = Border(left=borde_negro)
-    hoja.column_dimensions[última_columna].border = Border(right=borde_negro)
 
     # Insertar el logo
     logo = get_logo(2*altura_filas)
@@ -136,6 +136,7 @@ def _generar_encabezado(hoja: Worksheet):
     hoja.cell(2, 4).border = Border(bottom=borde_negro)
 
     # Fila con el nombre de la carrera
+    hoja.merge_cells(start_row=1, end_row=1, start_column=5, end_column=6)
     cell = hoja.cell(1, 5, value='Carrera: ')
     no_cambiar_este_valor.add(cell)
     cell.fill = fill_rojo_unrn
@@ -143,8 +144,8 @@ def _generar_encabezado(hoja: Worksheet):
     cell.alignment = a_la_derecha
     cell.border = Border(top=borde_negro, bottom=borde_blanco)
 
-    hoja.merge_cells(start_row=1, end_row=1, start_column=6, end_column=n_columnas)
-    cell = hoja.cell(1, 6, value='') # Celda para completar el nombre de la carrera
+    hoja.merge_cells(start_row=1, end_row=1, start_column=7, end_column=n_columnas)
+    cell = hoja.cell(1, 7, value='') # Celda para completar el nombre de la carrera
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_izquierda
@@ -154,21 +155,22 @@ def _generar_encabezado(hoja: Worksheet):
     hoja.cell(1, n_columnas).border = Border(top=borde_negro, bottom=borde_blanco, right=borde_negro)
 
     # Fila con el año y cuatrimestre
+    hoja.merge_cells(start_row=2, end_row=2, start_column=5, end_column=6)
     cell = hoja.cell(2, 5, value='Año: ')
     no_cambiar_este_valor.add(cell)
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_derecha
 
-    cell = hoja.cell(2, 6, value='') # Celda para completar el año
+    hoja.merge_cells(start_row=2, end_row=2, start_column=7, end_column=8)
+    cell = hoja.cell(2, 7, value='') # Celda para completar el año
     año_del_calendario.add(cell)
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_izquierda
 
-    hoja.merge_cells(start_row=2, end_row=2, start_column=7, end_column=9)
-    no_cambiar_este_valor.add(f'{get_column_letter(7)}2:{get_column_letter(9)}2')
-    cell = hoja.cell(2, 7, value='Cuatrimestre: ')
+    cell = hoja.cell(2, 9, value='Cuatrimestre: ')
+    no_cambiar_este_valor.add(cell)
     cell.fill = fill_rojo_unrn
     cell.font = font_encabezado
     cell.alignment = a_la_derecha
@@ -197,15 +199,15 @@ def _generar_tabla(hoja: Worksheet):
     hoja.column_dimensions['B'].width = 25 * font_size_ratio # Materia
     hoja.column_dimensions['C'].width = 12 * font_size_ratio # Cuatrimestral o anual
     hoja.column_dimensions['D'].width = 10 * font_size_ratio # Comisión
-    hoja.column_dimensions['E'].width = 11 * font_size_ratio # Teórica o práctica
+    hoja.column_dimensions['E'].width =  5 * font_size_ratio # Cupo
     hoja.column_dimensions['F'].width = 11 * font_size_ratio # Día
     hoja.column_dimensions['G'].width =  7 * font_size_ratio # Horario de inicio
     hoja.column_dimensions['H'].width =  7 * font_size_ratio # Horario de fin
-    hoja.column_dimensions['I'].width =  5 * font_size_ratio # Cupo
-    hoja.column_dimensions['J'].width = 12 * font_size_ratio # Docente
-    hoja.column_dimensions['K'].width = 12 * font_size_ratio # Auxiliar
-    hoja.column_dimensions['L'].width = 14 * font_size_ratio # Promocionable
-    hoja.column_dimensions['M'].width = 20 * font_size_ratio # Lugar
+    hoja.column_dimensions['I'].width = 20 * font_size_ratio # Lugar
+    hoja.column_dimensions['J'].width = 11 * font_size_ratio # Teórica o práctica
+    hoja.column_dimensions['K'].width = 12 * font_size_ratio # Docente
+    hoja.column_dimensions['L'].width = 12 * font_size_ratio # Auxiliar
+    hoja.column_dimensions['M'].width = 14 * font_size_ratio # Promocionable
 
     # Agregar validadores
     año_del_plan_de_estudios.add(f'A{fila_header+1}:A1048576') # 1048576 significa hasta el final de la columna.

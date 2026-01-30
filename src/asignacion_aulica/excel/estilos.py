@@ -9,6 +9,8 @@ logo_path = assets.get_path('logo_unrn_excel.png')
 
 rojo_unrn = 'EB1C38'
 fill_rojo_unrn = PatternFill(patternType='solid', fgColor=rojo_unrn)
+fill_rojo_super_clarito = PatternFill(patternType='solid', fgColor='FFE6E6')
+fill_blanco = PatternFill(patternType='solid', fgColor='FFFFFF')
 
 font_default = Font(name = 'arial', size = 12)
 
@@ -26,6 +28,7 @@ a_la_izquierda = Alignment(horizontal = 'left', vertical='center')
 borde_negro = Side(border_style='thin', color='000000')
 borde_negro_grueso = Side(border_style='medium', color='000000')
 borde_blanco = Side(border_style='thin', color='FFFFFF')
+borde_gris = Side(border_style='thin', color='7F7F7F')
 todos_los_bordes_negros = Border(top=borde_negro, bottom=borde_negro, left=borde_negro, right=borde_negro)
 
 estilo_header = NamedStyle(name='header', font=font_bold, border=todos_los_bordes_negros, alignment=centrado)

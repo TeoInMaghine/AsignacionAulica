@@ -214,7 +214,7 @@ def _generar_tabla(hoja: Worksheet):
     día_de_la_semana.add(f'F{fila_header+1}:F1048576') # Día
     horario.add(f'G{fila_header+1}:G1048576') # Horario de inicio
     horario.add(f'H{fila_header+1}:H1048576') # Horario de fin
-    número_natural.add(f'I{fila_header+1}:I1048576') # Cupo
+    número_natural.add(f'E{fila_header+1}:E1048576') # Cupo
 
     # Configurar estilo de la tabla hasta la fila n_filas
     columnas_horario = (7, 8)

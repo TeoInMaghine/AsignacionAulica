@@ -1,12 +1,14 @@
 from itertools import groupby
 from collections.abc import Iterable
 from typing import Any
+from openpyxl.styles import Border, PatternFill
 from openpyxl.workbook.workbook import Workbook
 from collections.abc import Sequence
 from pathlib import Path
 
 from openpyxl.worksheet.worksheet import Worksheet
 
+from asignacion_aulica.excel.estilos import borde_gris, fill_blanco, fill_rojo_super_clarito
 from asignacion_aulica.excel.plantilla_clases import (
     celda_nombre_carrera,
     generar_plantilla,
@@ -56,14 +58,34 @@ def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
     materias.sort(key=lambda materia: (materia.año, materia.nombre))
 
     fila_actual = RowCounter(initial_value=fila_primer_clase)
+    par = True
     for materia in materias:
         if len(materia.clases) > 0:
-            _escribir_datos_de_una_materia(hoja, materia, fila_actual)
+            _escribir_datos_de_una_materia(
+                hoja,
+                materia,
+                fila_actual,
+                # Colores de fondo intercalados para mejor legibilidad
+                fill=fill_blanco if par else fill_rojo_super_clarito
+            )
+            par = not par
 
-def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actual: RowCounter):
-    _merge_cells_and_set_value(hoja, materia.año, fila_actual.get(), Columna.año, n_rows=len(materia.clases))
-    _merge_cells_and_set_value(hoja, materia.nombre, fila_actual.get(), Columna.materia, n_rows=len(materia.clases))
-    _merge_cells_and_set_value(hoja, materia.cuatrimestral_o_anual, fila_actual.get(), Columna.cuatrimestral_o_anual, n_rows=len(materia.clases))
+def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actual: RowCounter, fill: PatternFill):
+    columnas_a_unir: tuple[tuple[Columna, str|int], ...] = (
+        (Columna.año, materia.año),
+        (Columna.materia, materia.nombre),
+        (Columna.cuatrimestral_o_anual, materia.cuatrimestral_o_anual)
+    )
+    for columna, valor in columnas_a_unir:
+        _merge_cells_and_set_value(
+            hoja,
+            valor,
+            start_row=fila_actual.get(),
+            start_col=columna,
+            n_rows=len(materia.clases),
+            border=Border(bottom=borde_gris, top=borde_gris),
+            fill=fill
+        )
 
     # Copiamos la lista de clases para poder ordenarla sin afectar al gestor.
     # Ordenamos las clases primero por comisión, después por día, y después por horario de inicio
@@ -72,13 +94,13 @@ def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actua
     
     clases_por_comisión = groupby(clases, key=lambda clase: clase.comisión)
     for _, clases_de_la_comisión in clases_por_comisión:
-        _escribir_datos_de_una_comisión(hoja, clases_de_la_comisión, fila_actual)
+        _escribir_datos_de_una_comisión(hoja, clases_de_la_comisión, fila_actual, fill)
 
-def _escribir_datos_de_una_comisión(hoja: Worksheet, clases: Iterable[Clase], fila_actual: RowCounter):
+def _escribir_datos_de_una_comisión(hoja: Worksheet, clases: Iterable[Clase], fila_actual: RowCounter, fill: PatternFill):
     primera_fila_de_la_comisión = fila_actual.get()
 
     for clase in clases:
-        _escribir_datos_de_una_clase(hoja, clase, fila_actual.get())
+        _escribir_datos_de_una_clase(hoja, clase, fila_actual.get(), fill)
         fila_actual.next()
     
     # Unir las celdas que tienen los mismos valores
@@ -90,26 +112,32 @@ def _escribir_datos_de_una_comisión(hoja: Worksheet, clases: Iterable[Clase], f
         _merge_vertically_neighboring_cells_with_equal_value(
             hoja, col, primera_fila_de_la_comisión, fila_actual.get()-primera_fila_de_la_comisión
         )
+        hoja.cell(primera_fila_de_la_comisión, col).border=Border(top=borde_gris)
+        hoja.cell(fila_actual.get()-1, col).border=Border(bottom=borde_gris)
 
-def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila_actual: int):
-    hoja.cell(fila_actual, Columna.comisión, value=clase.comisión)
-    hoja.cell(fila_actual, Columna.teórica_o_práctica, value=clase.teórica_o_práctica)
-    hoja.cell(fila_actual, Columna.día, value=clase.día.name)
-    hoja.cell(fila_actual, Columna.horario_inicio, value=clase.horario.inicio)
-    hoja.cell(fila_actual, Columna.horario_fin, value=clase.horario.fin)
-    hoja.cell(fila_actual, Columna.cupo, value=clase.cantidad_de_alumnos)
-    hoja.cell(fila_actual, Columna.docente, value=clase.docente)
-    hoja.cell(fila_actual, Columna.auxiliar, value=clase.auxiliar)
-    hoja.cell(fila_actual, Columna.promocionable, value=clase.promocionable)
-
-    if clase.virtual:
-        lugar = 'Virtual'
-    elif clase.aula_asignada is not None:
-        lugar = clase.aula_asignada.edificio.nombre + ' - ' + clase.aula_asignada.nombre
-    else:
-        lugar = ''
-    
-    hoja.cell(fila_actual, Columna.lugar, value=lugar)
+def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila: int, fill: PatternFill):
+    columnas_y_valores: tuple[tuple[int, Any], ...] = (
+        (Columna.comisión, clase.comisión),
+        (Columna.teórica_o_práctica, clase.teórica_o_práctica),
+        (Columna.día, clase.día.name),
+        (Columna.horario_inicio, clase.horario.inicio),
+        (Columna.horario_fin, clase.horario.fin),
+        (Columna.cupo, clase.cantidad_de_alumnos),
+        (Columna.docente, clase.docente),
+        (Columna.auxiliar, clase.auxiliar),
+        (Columna.promocionable, clase.promocionable),
+        (Columna.lugar,
+            'Virtual'
+            if clase.virtual
+            else clase.aula_asignada.edificio.nombre + ' - ' + clase.aula_asignada.nombre
+            if clase.aula_asignada is not None
+            else ''
+        )
+    )
+    for columna, valor in columnas_y_valores:
+        cell = hoja.cell(fila, columna)
+        cell.value = valor
+        cell.fill = fill
 
 def _merge_cells_and_set_value(
     sheet: Worksheet,
@@ -117,7 +145,9 @@ def _merge_cells_and_set_value(
     start_row: int,
     start_col: int,
     n_rows: int = 1,
-    n_cols: int = 1
+    n_cols: int = 1,
+    border: Border|None = None,
+    fill: PatternFill|None = None
 ):
     sheet.merge_cells(
         start_row=start_row,
@@ -125,7 +155,12 @@ def _merge_cells_and_set_value(
         start_column=start_col,
         end_column=start_col + n_cols - 1
     )
-    sheet.cell(start_row, start_col, value=value)
+    merged_cell = sheet.cell(start_row, start_col)
+    merged_cell.value = value
+    if fill:
+        merged_cell.fill = fill
+    if border:
+        merged_cell.border = border
 
 def _merge_vertically_neighboring_cells_with_equal_value(
     sheet: Worksheet,

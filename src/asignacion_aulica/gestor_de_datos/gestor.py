@@ -11,6 +11,7 @@ from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostA
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import (
+    VERSIÓN_ACTUAL,
     Aula,
     AulaDoble,
     Carrera,
@@ -50,11 +51,6 @@ class GestorDeDatos:
         self._edificios: list[Edificio] = []
         self._carreras: list[Carrera] = []
         self._equipamientos: Counter[str] = Counter()
-
-        try:
-            self._cargar()
-        except:
-            logger.exception('Error al cargar el archivo.')
 
     def get_edificios(self) -> list[str]:
         '''
@@ -799,41 +795,82 @@ class GestorDeDatos:
         '''
         if self._filename:
             logger.info('Guardando datos.')
-            datos_a_guardar = (self._edificios, self._carreras, self._equipamientos)
+            datos_a_guardar = (
+                VERSIÓN_ACTUAL,
+                self._edificios,
+                self._carreras,
+                self._equipamientos
+            )
             with open(self._filename, 'wb') as stream:
                 pickle.dump(datos_a_guardar, stream)
     
-    def _cargar(self):
+    def cargar(self):
         '''
-        Cargar los datos que haya en el archivo configurado al construir el
-        gestor.
+        Cargar los datos que haya en el archivo con la ruta configurado al
+        construir el gestor.
 
-        Si no hay un archivo configurado o el archivo no existe, no pasa nada.
+        Si no hay una ruta configurada o no existe un archivo en esa ruta, no
+        pasa nada.
 
         Si existen datos en el gestor antes de llamar a este método, se pierden.
 
-        :raise RuntimeError: Si el archivo contiene datos no válidos.
+        :raise OSError: Si falla la apertura del archivo.
+        :raise RuntimeError: Si el archivo contiene datos inválidos.
         '''
         if self._filename and self._filename.exists():
-            with open(self._filename, 'rb') as stream:
-                datos_leídos = pickle.load(stream)
-            
+            try:
+                with open(self._filename, 'rb') as stream:
+                    datos_leídos = pickle.load(stream)
+            except EOFError:
+                raise RuntimeError(
+                    'Se esperaba leer datos del archivo %s, pero no tenía nada',
+                    self._filename
+                )
+
             if not isinstance(datos_leídos, tuple):
                 raise RuntimeError(
                     'Se esperaba leer una tupla del archivo %s, pero se leyó un objeto de tipo %s',
                     self._filename,
                     type(datos_leídos)
                 )
-            elif len(datos_leídos) != 3:
+            elif len(datos_leídos) < 1:
                 raise RuntimeError(
-                    'Se esperaba leer 3 objetos del archivo %s, pero se encontraron %d',
+                    'Se esperaba leer al menos un objeto del archivo %s, pero se encontraron %s',
                     self._filename,
                     len(datos_leídos)
                 )
             else:
-                self._edificios = datos_leídos[0]
-                self._carreras = datos_leídos[1]
-                self._equipamientos = datos_leídos[2]
+                versión = datos_leídos[0]
+
+                if not isinstance(versión, int):
+                    raise RuntimeError(
+                        'Se esperaba leer un número de versión como primer '
+                        'objeto del archivo %s, pero se encontró un objeto de tipo %s',
+                        self._filename,
+                        type(versión)
+                    )
+                elif versión != VERSIÓN_ACTUAL:
+                    # TODO: Manejar versiones anteriores (cuando las haya)
+                    raise RuntimeError(
+                        'Se leyó el archivo %s con la versión %s, que no es igual a la versión actual (%s)',
+                        self._filename,
+                        versión,
+                        VERSIÓN_ACTUAL
+                    )
+
+                elif len(datos_leídos) != 4:
+                    raise RuntimeError(
+                        'Se esperaba leer 4 objetos del archivo %s, pero se encontraron %d',
+                        self._filename,
+                        len(datos_leídos)
+                    )
+                else:
+                    # NOTA: Se podrían hacer más chequeos sobre la validez de
+                    # los datos, pero a partir de este punto podemos asumir con
+                    # bastante certidumbre de que son correctos.
+                    self._edificios     = datos_leídos[1]
+                    self._carreras      = datos_leídos[2]
+                    self._equipamientos = datos_leídos[3]
 
 def _generar_nombre_no_existente(base: str, nombres_existentes: Sequence[str]) -> str:
     '''

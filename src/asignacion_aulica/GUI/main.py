@@ -26,6 +26,13 @@ def main() -> int:
     app.setWindowIcon(icono)
 
     gestor_de_datos_de_la_aplicación = GestorDeDatos(PATH_GESTOR_DE_DATOS)
+    try:
+        gestor_de_datos_de_la_aplicación.cargar()
+    except OSError:
+        raise # TODO
+    except RuntimeError:
+        raise # TODO
+
     registrar_modelos_qml(gestor_de_datos_de_la_aplicación)
 
     configurar_fuente_por_defecto()

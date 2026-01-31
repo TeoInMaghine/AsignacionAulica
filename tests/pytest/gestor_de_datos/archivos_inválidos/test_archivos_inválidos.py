@@ -31,10 +31,28 @@ def test_archivos_inválidos(invalid_file: Path, expected_substring: str):
 
     logging.info(str(exc_info))
 
-def test_archivo_inválido_con_versión_actual():
+@pytest.mark.parametrize(
+    argnames='filename',
+    argvalues=[
+        ('invalid_current_version.pickle'),
+    ]
+)
+def test_archivo_inválido_con_versión_actual(invalid_file: Path):
     '''
     Verificar que el gestor puede identificar archivos inválidos marcados con
     la versión actual.
     '''
-    # TODO
-    assert False
+    gestor = GestorDeDatos(invalid_file)
+    
+    with pytest.raises(RuntimeError) as exc_info:
+        gestor.cargar()
+
+    substrings_not_included = (
+        'nada',
+        'tupla',
+        'al menos un',
+        'versión como primer objeto',
+        'no es igual a la versión actual'
+    )
+    assert all(substring not in str(exc_info) for substring in substrings_not_included)
+    logging.info(str(exc_info))

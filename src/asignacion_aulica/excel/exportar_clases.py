@@ -8,7 +8,7 @@ from pathlib import Path
 
 from openpyxl.worksheet.worksheet import Worksheet
 
-from asignacion_aulica.excel.estilos import borde_gris, fill_blanco, fill_rojo_super_clarito
+from asignacion_aulica.excel.estilos import borde_gris, fill_blanco, fill_rojo_clarito
 from asignacion_aulica.excel.plantilla_clases import (
     celda_nombre_carrera,
     generar_plantilla,
@@ -22,9 +22,8 @@ class RowCounter:
         self._current: int = initial_value
     def get(self) -> int:
         return self._current
-    def next(self) -> int:
+    def next(self):
         self._current += 1
-        return self._current
 
 def exportar_datos_de_clases_a_excel(carreras: Sequence[Carrera], path: Path):
     '''
@@ -58,7 +57,7 @@ def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
     materias.sort(key=lambda materia: (materia.año, materia.nombre))
 
     fila_actual = RowCounter(initial_value=fila_primer_clase)
-    par = True
+    es_par: bool = True
     for materia in materias:
         if len(materia.clases) > 0:
             _escribir_datos_de_una_materia(
@@ -66,9 +65,9 @@ def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
                 materia,
                 fila_actual,
                 # Colores de fondo intercalados para mejor legibilidad
-                fill=fill_blanco if par else fill_rojo_super_clarito
+                fill=fill_blanco if es_par else fill_rojo_clarito
             )
-            par = not par
+            es_par = not es_par
 
 def _escribir_datos_de_una_materia(hoja: Worksheet, materia: Materia, fila_actual: RowCounter, fill: PatternFill):
     columnas_a_unir: tuple[tuple[Columna, str|int], ...] = (
@@ -110,7 +109,7 @@ def _escribir_datos_de_una_comisión(hoja: Worksheet, clases: Iterable[Clase], f
     )
     for col in columnas_a_unir:
         _merge_vertically_neighboring_cells_with_equal_value(
-            hoja, col, primera_fila_de_la_comisión, fila_actual.get()-primera_fila_de_la_comisión
+            hoja, col, primera_fila_de_la_comisión, fila_actual.get()-1
         )
         hoja.cell(primera_fila_de_la_comisión, col).border=Border(top=borde_gris)
         hoja.cell(fila_actual.get()-1, col).border=Border(bottom=borde_gris)
@@ -127,11 +126,9 @@ def _escribir_datos_de_una_clase(hoja: Worksheet, clase: Clase, fila: int, fill:
         (Columna.auxiliar, clase.auxiliar),
         (Columna.promocionable, clase.promocionable),
         (Columna.lugar,
-            'Virtual'
-            if clase.virtual
+            'Virtual' if clase.virtual
+            else '' if clase.aula_asignada is None
             else clase.aula_asignada.edificio.nombre + ' - ' + clase.aula_asignada.nombre
-            if clase.aula_asignada is not None
-            else ''
         )
     )
     for columna, valor in columnas_y_valores:
@@ -166,9 +163,8 @@ def _merge_vertically_neighboring_cells_with_equal_value(
     sheet: Worksheet,
     column: int,
     start_row: int,
-    n_rows: int,
+    end_row: int,
 ):
-    end_row = start_row + n_rows - 1
     start_of_range = start_row
     while start_of_range < end_row:
         end_of_range = _find_rows_with_equal_values(sheet, column, start_of_range, end_row)

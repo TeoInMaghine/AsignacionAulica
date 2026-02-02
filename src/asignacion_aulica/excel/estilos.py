@@ -9,7 +9,7 @@ logo_path = assets.get_path('logo_unrn_excel.png')
 
 rojo_unrn = 'EB1C38'
 fill_rojo_unrn = PatternFill(patternType='solid', fgColor=rojo_unrn)
-fill_rojo_super_clarito = PatternFill(patternType='solid', fgColor='FFE6E6')
+fill_rojo_clarito = PatternFill(patternType='solid', fgColor='FFE6E6')
 fill_blanco = PatternFill(patternType='solid', fgColor='FFFFFF')
 
 font_default = Font(name = 'arial', size = 12)

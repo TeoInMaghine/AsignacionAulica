@@ -230,5 +230,5 @@ if result.días_sin_asignar:
 
 print(f'Clases con aula chica: {len(result.clases_con_aula_chica)}')
 
-filename = argv[1] if len(argv) > 1 else './IngenieríaEnComputación.xlsx'
+filename = argv[1] if len(argv) > 1 else 'IngenieríaEnComputación.xlsx'
 gestor.exportar_clases_a_excel(filename)

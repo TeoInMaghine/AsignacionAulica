@@ -13,11 +13,6 @@ from asignacion_aulica.gestor_de_datos.días_y_horarios import (
     crear_horarios_semanales_opcionales
 )
 
-# Versión de la disposición de los datos de entidades.
-# Permite, por ejemplo, manejar los casos donde se carga un archivo serializado
-# con una versión anterior.
-VERSIÓN_ACTUAL: int = 1
-
 @dataclass
 class Edificio:
     nombre: str

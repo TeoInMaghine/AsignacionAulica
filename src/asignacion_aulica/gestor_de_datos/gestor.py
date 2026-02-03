@@ -11,7 +11,6 @@ from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostA
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import (
-    VERSIÓN_ACTUAL,
     Aula,
     AulaDoble,
     Carrera,
@@ -22,6 +21,13 @@ from asignacion_aulica.gestor_de_datos.entidades import (
 )
 
 logger = logging.getLogger(__name__)
+
+VERSIÓN_ACTUAL: int = 1
+'''
+Versión de la disposición de los datos de entidades.
+Permite, por ejemplo, manejar los casos donde se carga un archivo serializado
+con una versión anterior.
+'''
 
 aula_no_seleccionada: Aula = Aula(nombre='Sin Seleccionar', edificio=None, capacidad=0)
 '''

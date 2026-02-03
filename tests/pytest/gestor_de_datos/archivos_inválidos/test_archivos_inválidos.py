@@ -26,7 +26,7 @@ def test_archivos_inválidos(invalid_file: Path, expected_substring: str):
     '''
     gestor = GestorDeDatos(invalid_file)
     
-    with pytest.raises(RuntimeError, match=expected_substring) as exc_info:
+    with pytest.raises(ValueError, match=expected_substring) as exc_info:
         gestor.cargar()
 
     logging.info(str(exc_info))
@@ -44,7 +44,7 @@ def test_archivo_inválido_con_versión_actual(invalid_file: Path):
     '''
     gestor = GestorDeDatos(invalid_file)
     
-    with pytest.raises(RuntimeError) as exc_info:
+    with pytest.raises(ValueError) as exc_info:
         gestor.cargar()
 
     substrings_not_included = (

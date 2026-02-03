@@ -821,26 +821,26 @@ class GestorDeDatos:
         Si existen datos en el gestor antes de llamar a este método, se pierden.
 
         :raise OSError: Si falla la apertura del archivo.
-        :raise RuntimeError: Si el archivo contiene datos inválidos.
+        :raise ValueError: Si el archivo contiene datos inválidos.
         '''
         if self._filename and self._filename.exists():
             try:
                 with open(self._filename, 'rb') as stream:
                     datos_leídos = pickle.load(stream)
             except EOFError:
-                raise RuntimeError(
+                raise ValueError(
                     'Se esperaba leer datos del archivo %s, pero no tenía nada',
                     self._filename
                 )
 
             if not isinstance(datos_leídos, tuple):
-                raise RuntimeError(
+                raise ValueError(
                     'Se esperaba leer una tupla del archivo %s, pero se leyó un objeto de tipo %s',
                     self._filename,
                     type(datos_leídos)
                 )
             elif len(datos_leídos) < 1:
-                raise RuntimeError(
+                raise ValueError(
                     'Se esperaba leer al menos un objeto del archivo %s, pero se encontraron %s',
                     self._filename,
                     len(datos_leídos)
@@ -849,7 +849,7 @@ class GestorDeDatos:
                 versión = datos_leídos[0]
 
                 if not isinstance(versión, int):
-                    raise RuntimeError(
+                    raise ValueError(
                         'Se esperaba leer un número de versión como primer '
                         'objeto del archivo %s, pero se encontró un objeto de tipo %s',
                         self._filename,
@@ -857,7 +857,7 @@ class GestorDeDatos:
                     )
                 elif versión != VERSIÓN_ACTUAL:
                     # TODO: Manejar versiones anteriores (cuando las haya)
-                    raise RuntimeError(
+                    raise ValueError(
                         'Se leyó el archivo %s con la versión %s, que no es igual a la versión actual (%s)',
                         self._filename,
                         versión,
@@ -865,7 +865,7 @@ class GestorDeDatos:
                     )
 
                 elif len(datos_leídos) != 4:
-                    raise RuntimeError(
+                    raise ValueError(
                         'Se esperaba leer 4 objetos del archivo %s, pero se encontraron %d',
                         self._filename,
                         len(datos_leídos)

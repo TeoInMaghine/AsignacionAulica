@@ -30,7 +30,7 @@ def main() -> int:
         gestor_de_datos_de_la_aplicación.cargar()
     except OSError:
         raise # TODO
-    except RuntimeError:
+    except ValueError:
         raise # TODO
 
     registrar_modelos_qml(gestor_de_datos_de_la_aplicación)

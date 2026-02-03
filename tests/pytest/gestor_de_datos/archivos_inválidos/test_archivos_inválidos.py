@@ -1,3 +1,14 @@
+'''
+Los archivos que se usan en estos tests fueron generados con pickle.dump, y
+tienen los siguientes contenidos:
+
+- empty.pickle                  : Nada, es un archivo vacío
+- not_tuple.pickle              : [1, [], [], []]
+- empty_tuple.pickle            : ()
+- no_version.pickle             : ([], [], [])
+- not_current_version.pickle    : (-1, [], [], [])
+- invalid_current_version.pickle: (1, [], [])
+'''
 from os import path
 from pathlib import Path
 import pytest, logging

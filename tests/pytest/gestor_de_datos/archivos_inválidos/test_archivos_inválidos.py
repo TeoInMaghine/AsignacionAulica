@@ -8,7 +8,7 @@ def invalid_file(filename: str) -> Path:
     '''
     :return: A file inside this directory with the given name.
     '''
-    return Path(path.dirname(__file__) + '\\' + filename)
+    return Path(__file__).parent / filename
 
 @pytest.mark.parametrize(
     argnames='filename,expected_substring',

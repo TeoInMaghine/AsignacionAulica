@@ -820,18 +820,15 @@ class GestorDeDatos:
 
         Si existen datos en el gestor antes de llamar a este método, se pierden.
 
+        NOTA: Se utiliza pickle.load para parsear el archivo, el cual puede
+        tirar potencialmente cualquier excepción. Manejar acordemente.
+
         :raise OSError: Si falla la apertura del archivo.
         :raise ValueError: Si el archivo contiene datos inválidos.
         '''
         if self._filename and self._filename.exists():
-            try:
-                with open(self._filename, 'rb') as stream:
-                    datos_leídos = pickle.load(stream)
-            except EOFError:
-                raise ValueError(
-                    'Se esperaba leer datos del archivo %s, pero no tenía nada',
-                    self._filename
-                )
+            with open(self._filename, 'rb') as stream:
+                datos_leídos = pickle.load(stream)
 
             if not isinstance(datos_leídos, tuple):
                 raise ValueError(

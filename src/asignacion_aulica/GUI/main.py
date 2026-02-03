@@ -28,10 +28,12 @@ def main() -> int:
     gestor_de_datos_de_la_aplicación = GestorDeDatos(PATH_GESTOR_DE_DATOS)
     try:
         gestor_de_datos_de_la_aplicación.cargar()
-    except OSError:
-        raise # TODO
     except ValueError:
         raise # TODO
+    except OSError:
+        raise # TODO
+    except Exception:
+        raise # TODO: ocurrió un error inesperado
 
     registrar_modelos_qml(gestor_de_datos_de_la_aplicación)
 

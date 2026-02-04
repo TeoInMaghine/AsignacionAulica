@@ -31,16 +31,19 @@ def main() -> int:
         gestor_de_datos_de_la_aplicación.cargar()
     except ValueError as e:
         mensaje_de_error_al_cargar = str(e)
+        logger.exception('')
     except OSError as e:
         mensaje_de_error_al_cargar = (
             'Ocurrió un error al leer el archivo'
             f' {PATH_GESTOR_DE_DATOS}: {str(e)}'
         )
+        logger.exception(f'Ocurrió un error al leer el archivo {PATH_GESTOR_DE_DATOS}: ')
     except Exception as e:
         mensaje_de_error_al_cargar = (
             'Ocurrió un error inesperado al cargar el '
             f'archivo {PATH_GESTOR_DE_DATOS}: {str(e)}'
         )
+        logger.exception(f'Ocurrió un error inesperado al cargar el archivo {PATH_GESTOR_DE_DATOS}: ')
 
     registrar_modelos_qml(gestor_de_datos_de_la_aplicación)
 

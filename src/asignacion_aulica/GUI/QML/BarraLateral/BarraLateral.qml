@@ -74,6 +74,16 @@ Rectangle {
         }
     }
 
+    // Popup de error al cargar
+    ComponentesUI.PopupConTexto {
+        id: popupErrorCargar
+        // Esta propiedad se setea desde pyqt
+        texto: mensaje_de_error_al_cargar
+        textoBotón: "Cerrar"
+        Component.onCompleted: {
+            if (mensaje_de_error_al_cargar !== "") popupErrorCargar.open()
+        }
+    }
     // Popup de error al guardar
     ComponentesUI.PopupConTexto {
         id: popupErrorGuardar

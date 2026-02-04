@@ -832,15 +832,13 @@ class GestorDeDatos:
 
             if not isinstance(datos_leídos, tuple):
                 raise ValueError(
-                    'Se esperaba leer una tupla del archivo %s, pero se leyó un objeto de tipo %s',
-                    self._filename,
-                    type(datos_leídos)
+                    f'Se esperaba leer una tupla del archivo {self._filename},'
+                    f' pero se leyó un objeto de tipo {type(datos_leídos)}'
                 )
             elif len(datos_leídos) < 1:
                 raise ValueError(
-                    'Se esperaba leer al menos un objeto del archivo %s, pero se encontraron %s',
-                    self._filename,
-                    len(datos_leídos)
+                    'Se esperaba leer al menos un objeto del archivo '
+                    f'{self._filename}, pero se encontraron {len(datos_leídos)}' 
                 )
             else:
                 versión = datos_leídos[0]
@@ -848,24 +846,20 @@ class GestorDeDatos:
                 if not isinstance(versión, int):
                     raise ValueError(
                         'Se esperaba leer un número de versión como primer '
-                        'objeto del archivo %s, pero se encontró un objeto de tipo %s',
-                        self._filename,
-                        type(versión)
+                        f'objeto del archivo {self._filename}, pero se '
+                        f'encontró un objeto de tipo {type(versión)}'
                     )
                 elif versión != VERSIÓN_ACTUAL:
                     # TODO: Manejar versiones anteriores (cuando las haya)
                     raise ValueError(
-                        'Se leyó el archivo %s con la versión %s, que no es igual a la versión actual (%s)',
-                        self._filename,
-                        versión,
-                        VERSIÓN_ACTUAL
+                        f'Se leyó el archivo {self._filename} con la versión '
+                        f'{versión}, que no es igual a la versión actual ({VERSIÓN_ACTUAL})'
                     )
 
                 elif len(datos_leídos) != 4:
                     raise ValueError(
-                        'Se esperaba leer 4 objetos del archivo %s, pero se encontraron %d',
-                        self._filename,
-                        len(datos_leídos)
+                        'Se esperaba leer 4 objetos del archivo '
+                        f'{self._filename}, pero se encontraron {len(datos_leídos)}'
                     )
                 else:
                     # NOTA: Se podrían hacer más chequeos sobre la validez de

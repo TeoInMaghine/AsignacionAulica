@@ -25,22 +25,31 @@ def main() -> int:
     icono = QIcon(assets.get_path('iconos', 'unrn.ico'))
     app.setWindowIcon(icono)
 
+    mensaje_de_error_al_cargar = ''
     gestor_de_datos_de_la_aplicación = GestorDeDatos(PATH_GESTOR_DE_DATOS)
     try:
         gestor_de_datos_de_la_aplicación.cargar()
-    except ValueError:
-        raise # TODO
-    except OSError:
-        raise # TODO
-    except Exception:
-        raise # TODO: ocurrió un error inesperado
+    except ValueError as e:
+        mensaje_de_error_al_cargar = str(e)
+    except OSError as e:
+        mensaje_de_error_al_cargar = (
+            'Ocurrió un error al leer el archivo'
+            f' {PATH_GESTOR_DE_DATOS}: {str(e)}'
+        )
+    except Exception as e:
+        mensaje_de_error_al_cargar = (
+            'Ocurrió un error inesperado al cargar el '
+            f'archivo {PATH_GESTOR_DE_DATOS}: {str(e)}'
+        )
 
     registrar_modelos_qml(gestor_de_datos_de_la_aplicación)
 
     configurar_fuente_por_defecto()
 
     engine = QQmlApplicationEngine()
-    engine.rootContext().setContextProperty('assets_path', Path(assets.ASSETS_PATH).as_uri())
+    context = engine.rootContext()
+    context.setContextProperty('assets_path', Path(assets.ASSETS_PATH).as_uri())
+    context.setContextProperty('mensaje_de_error_al_cargar', mensaje_de_error_al_cargar)
     engine.addImportPath(assets.QML_IMPORT_PATH)
     engine.loadFromModule('QML', "Main")
     

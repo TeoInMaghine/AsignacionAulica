@@ -23,7 +23,7 @@ def invalid_file(filename: str) -> Path:
 @pytest.mark.parametrize(
     argnames='filename,expected_exception,expected_substring',
     argvalues=[
-        ('empty.pickle',                   EOFError,     'Ran out of input'),
+        ('empty.pickle',                   EOFError,   'Ran out of input'),
         ('not_tuple.pickle',               ValueError, 'tupla'),
         ('empty_tuple.pickle',             ValueError, 'al menos un'),
         ('no_version.pickle',              ValueError, 'versión como primer objeto'),

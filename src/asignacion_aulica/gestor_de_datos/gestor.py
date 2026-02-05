@@ -22,9 +22,19 @@ from asignacion_aulica.gestor_de_datos.entidades import (
 
 logger = logging.getLogger(__name__)
 
+VERSIÓN_ACTUAL: int = 1
+'''
+Versión de la disposición de los datos de entidades.
+Permite, por ejemplo, manejar los casos donde se carga un archivo serializado
+con una versión anterior.
+'''
+
 aula_no_seleccionada: Aula = Aula(nombre='Sin Seleccionar', edificio=None, capacidad=0)
 '''
 Aula dummy usada para inicializar las aulas dobles.
+Nota: Hacer pruebas por igualdad de valor en vez de identidad, ya que al
+des-serializar los datos se "desvincula" la relación con este objeto (i.e.:
+usar "==" en vez de "is").
 '''
 
 class GestorDeDatos:
@@ -50,8 +60,6 @@ class GestorDeDatos:
         self._edificios: list[Edificio] = []
         self._carreras: list[Carrera] = []
         self._equipamientos: Counter[str] = Counter()
-
-        self._cargar()
 
     def get_edificios(self) -> list[str]:
         '''
@@ -675,14 +683,20 @@ class GestorDeDatos:
         for edificio in self._edificios:
             aulas_encontradas: set[str] = set()
             for aula_doble in edificio.aulas_dobles:
+                algún_aula_no_seleccionada: bool = (
+                    aula_doble.aula_grande == aula_no_seleccionada or
+                    aula_doble.aula_chica_1 == aula_no_seleccionada or
+                    aula_doble.aula_chica_2 == aula_no_seleccionada
+                )
+
+                if algún_aula_no_seleccionada:
+                    return f'En el edificio {edificio.nombre} falta seleccionar una componente de aula doble.'
+
                 aulas = {
                     aula_doble.aula_grande.nombre,
                     aula_doble.aula_chica_1.nombre,
                     aula_doble.aula_chica_2.nombre
                 }
-
-                if aula_no_seleccionada.nombre in aulas:
-                    return f'En el edificio {edificio.nombre} falta seleccionar una componente de aula doble.'
 
                 if len(aulas) < 3 or not aulas_encontradas.isdisjoint(aulas):
                     return f'Hay un aula repetida en las aulas dobles del edificio {edificio.nombre}.'
@@ -796,41 +810,73 @@ class GestorDeDatos:
         '''
         if self._filename:
             logger.info('Guardando datos.')
-            datos_a_guardar = (self._edificios, self._carreras, self._equipamientos)
+            datos_a_guardar = (
+                VERSIÓN_ACTUAL,
+                self._edificios,
+                self._carreras,
+                self._equipamientos
+            )
             with open(self._filename, 'wb') as stream:
                 pickle.dump(datos_a_guardar, stream)
     
-    def _cargar(self):
+    def cargar(self):
         '''
-        Cargar los datos que haya en el archivo configurado al construir el
-        gestor.
+        Cargar los datos que haya en el archivo con la ruta configurado al
+        construir el gestor.
 
-        Si no hay un archivo configurado o el archivo no existe, no pasa nada.
+        Si no hay una ruta configurada o no existe un archivo en esa ruta, no
+        pasa nada.
 
         Si existen datos en el gestor antes de llamar a este método, se pierden.
 
-        :raise RuntimeError: Si el archivo contiene datos no válidos.
+        NOTA: Se utiliza pickle.load para parsear el archivo, el cual puede
+        tirar potencialmente cualquier excepción. Manejar acordemente.
+
+        :raise OSError: Si falla la apertura del archivo.
+        :raise ValueError: Si el archivo contiene datos inválidos.
         '''
         if self._filename and self._filename.exists():
             with open(self._filename, 'rb') as stream:
                 datos_leídos = pickle.load(stream)
-            
+
             if not isinstance(datos_leídos, tuple):
-                raise RuntimeError(
-                    f'Se esperaba leer una tupla del archivo %s, pero se leyó un objeto de tipo %s',
-                    self._filename,
-                    type(datos_leídos)
+                raise ValueError(
+                    f'Se esperaba leer una tupla del archivo {self._filename},'
+                    f' pero se leyó un objeto de tipo {type(datos_leídos)}'
                 )
-            elif len(datos_leídos) != 3:
-                raise RuntimeError(
-                    f'Se esperaba leer 3 objetos del archivo %s, pero se encontraron %d',
-                    self._filename,
-                    len(datos_leídos)
+            elif len(datos_leídos) < 1:
+                raise ValueError(
+                    'Se esperaba leer al menos un objeto del archivo '
+                    f'{self._filename}, pero se encontraron {len(datos_leídos)}' 
                 )
             else:
-                self._edificios = datos_leídos[0]
-                self._carreras = datos_leídos[1]
-                self._equipamientos = datos_leídos[2]
+                versión = datos_leídos[0]
+
+                if not isinstance(versión, int):
+                    raise ValueError(
+                        'Se esperaba leer un número de versión como primer '
+                        f'objeto del archivo {self._filename}, pero se '
+                        f'encontró un objeto de tipo {type(versión)}'
+                    )
+                elif versión != VERSIÓN_ACTUAL:
+                    # TODO: Manejar versiones anteriores (cuando las haya)
+                    raise ValueError(
+                        f'Se leyó el archivo {self._filename} con la versión '
+                        f'{versión}, que no es igual a la versión actual ({VERSIÓN_ACTUAL})'
+                    )
+
+                elif len(datos_leídos) != 4:
+                    raise ValueError(
+                        'Se esperaba leer 4 objetos del archivo '
+                        f'{self._filename}, pero se encontraron {len(datos_leídos)}'
+                    )
+                else:
+                    # NOTA: Se podrían hacer más chequeos sobre la validez de
+                    # los datos, pero a partir de este punto podemos asumir con
+                    # bastante certidumbre de que son correctos.
+                    self._edificios     = datos_leídos[1]
+                    self._carreras      = datos_leídos[2]
+                    self._equipamientos = datos_leídos[3]
 
 def _generar_nombre_no_existente(base: str, nombres_existentes: Sequence[str]) -> str:
     '''

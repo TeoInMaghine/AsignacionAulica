@@ -17,10 +17,35 @@ ListView {
     model: ListEdificios { id: edificios }
 
     // Mostrar un mensaje cuando no hay ningún edificio
-    header: Label {
-        text: "Todavía no hay edificios registrados"
-        visible: view.count === 0
-        font.pointSize: FontSize.big
+    header: Item {
+        height: (mensajeSinEdificios.visible ? mensajeSinEdificios.height : headerEdificios.height)
+                + view.spacing
+        width: mensajeSinEdificios.visible ? mensajeSinEdificios.width : headerEdificios.width
+
+        Label {
+            id: mensajeSinEdificios
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.bottomMargin: view.spacing
+            anchors.leftMargin: 10
+
+            text: "Todavía no hay edificios registrados"
+            visible: view.count === 0
+            font.pointSize: FontSize.big
+        }
+        BotónOrdenar {
+            id: headerEdificios
+            labelText: "Edificios"
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.bottomMargin: view.spacing
+            anchors.leftMargin: 10
+
+            visible: view.count !== 0
+            onClicked: {
+                edificios.ordenar()
+            }
+        }
     }
 
     delegate: ColumnLayout {

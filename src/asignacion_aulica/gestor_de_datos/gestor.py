@@ -32,6 +32,9 @@ con una versión anterior.
 aula_no_seleccionada: Aula = Aula(nombre='Sin Seleccionar', edificio=None, capacidad=0)
 '''
 Aula dummy usada para inicializar las aulas dobles.
+Nota: Hacer pruebas por igualdad de valor en vez de identidad, ya que al
+des-serializar los datos se "desvincula" la relación con este objeto (i.e.:
+usar "==" en vez de "is").
 '''
 
 class GestorDeDatos:
@@ -680,14 +683,20 @@ class GestorDeDatos:
         for edificio in self._edificios:
             aulas_encontradas: set[str] = set()
             for aula_doble in edificio.aulas_dobles:
+                algún_aula_no_seleccionada: bool = (
+                    aula_doble.aula_grande == aula_no_seleccionada or
+                    aula_doble.aula_chica_1 == aula_no_seleccionada or
+                    aula_doble.aula_chica_2 == aula_no_seleccionada
+                )
+
+                if algún_aula_no_seleccionada:
+                    return f'En el edificio {edificio.nombre} falta seleccionar una componente de aula doble.'
+
                 aulas = {
                     aula_doble.aula_grande.nombre,
                     aula_doble.aula_chica_1.nombre,
                     aula_doble.aula_chica_2.nombre
                 }
-
-                if aula_no_seleccionada.nombre in aulas:
-                    return f'En el edificio {edificio.nombre} falta seleccionar una componente de aula doble.'
 
                 if len(aulas) < 3 or not aulas_encontradas.isdisjoint(aulas):
                     return f'Hay un aula repetida en las aulas dobles del edificio {edificio.nombre}.'

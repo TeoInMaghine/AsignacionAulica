@@ -197,7 +197,7 @@ def _generar_tabla(hoja: Worksheet):
     font_size_ratio = estilo_header.font.size / 11
     hoja.column_dimensions['A'].width =  5 * font_size_ratio # Año
     hoja.column_dimensions['B'].width = 25 * font_size_ratio # Materia
-    hoja.column_dimensions['C'].width = 12 * font_size_ratio # Cuatrimestral o anual
+    hoja.column_dimensions['C'].width = 15 * font_size_ratio # Cuatrimestral o anual
     hoja.column_dimensions['D'].width = 10 * font_size_ratio # Comisión
     hoja.column_dimensions['E'].width =  5 * font_size_ratio # Cupo
     hoja.column_dimensions['F'].width = 11 * font_size_ratio # Día

@@ -32,9 +32,9 @@ de python.
     .\venv\Scripts\activate  # En Windows
     ```
 
-3. Instalar las dependencias del proyecto con `pip install --editable .[test,build,excel]`
+3. Instalar las dependencias del proyecto con `pip install --editable .[test,build]`
 
-    Nota: la opción `[test,build,excel]` instala los paquetes extra necesarios
+    Nota: la opción `[test,build]` instala los paquetes extra necesarios
     para ejecutar las pruebas unitarias, para empaquetar el programa, y para
     generar las plantillas excel. Se puede omitir cualquiera de los tres extras
     si no se va a usar.

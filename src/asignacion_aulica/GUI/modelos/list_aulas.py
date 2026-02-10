@@ -89,9 +89,9 @@ class ListAulas(QAbstractListModel):
     @pyqtSlot()
     def ordenar(self):
         self.modelo_aulas_dobles.layoutAboutToBeChanged.emit()
-        self.layoutAboutToBeChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
+        self.layoutAboutToBeChanged.emit()
         self.gestor.ordenar_aulas(self.i_edificio)
-        self.layoutChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
+        self.layoutChanged.emit()
         self.modelo_aulas_dobles.layoutChanged.emit()
 
     @pyqtProperty(int)

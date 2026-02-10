@@ -19,20 +19,33 @@ ListView {
     }
 
     header: Item {
-        height: headerMaterias.height + view.spacing
-        width: headerMaterias.width
+        height: (mensajeSinMaterias.visible ? mensajeSinMaterias.height : headerMaterias.height)
+                + view.spacing
+        width: mensajeSinMaterias.visible ? mensajeSinMaterias.width : headerMaterias.width
 
         Label {
-            id: headerMaterias
+            id: mensajeSinMaterias
             anchors.top: parent.top
             anchors.left: parent.left
             anchors.bottomMargin: view.spacing
             anchors.leftMargin: 10
 
-            text: view.count === 0 ?
-                  "Todavía no hay materias registradas" :
-                  "Materias:"
+            visible: view.count === 0
+            text: "Todavía no hay materias registradas"
             font.pointSize: FontSize.base
+        }
+        BotónOrdenar {
+            id: headerMaterias
+            labelText: "Materias"
+            anchors.top: parent.top
+            anchors.left: parent.left
+            anchors.bottomMargin: view.spacing
+            anchors.leftMargin: 10
+
+            visible: view.count !== 0
+            onClicked: {
+                materias.ordenar()
+            }
         }
     }
 

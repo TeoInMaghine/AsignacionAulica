@@ -4,14 +4,14 @@ import QtQuick.Layouts
 import QtQuick.Effects
 
 Button {
-    id: headerAulaGrande
+    id: botónOrdenar
 
     property alias labelText: label.text
 
     contentItem: MultiEffect {
         source: label_con_ícono
         anchors.fill: label_con_ícono
-        brightness: headerAulaGrande.highlighted ? 1.0 : 0.1
+        brightness: botónOrdenar.highlighted ? 1.0 : 0.1
     }
 
     RowLayout {

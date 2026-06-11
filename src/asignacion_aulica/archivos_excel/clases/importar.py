@@ -6,7 +6,7 @@ import openpyxl
 
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException
 from asignacion_aulica.validación_de_datos.validaciones import *
-from asignacion_aulica.archivos_excel.clases.clase import Clase
+from asignacion_aulica.gestor_de_datos.entidades import Clase
 
 COLUMNAS = (
     'Año',

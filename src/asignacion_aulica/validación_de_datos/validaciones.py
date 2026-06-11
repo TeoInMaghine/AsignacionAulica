@@ -1,7 +1,8 @@
 from datetime import time
 from typing import Any
 
-from asignacion_aulica.lógica_de_asignación.día import Día
+from asignacion_aulica.gestor_de_datos.días_y_horarios import Día
+
 from .excepciones import DatoInválidoException
 
 def _es_número_entero(valor: int|str|Any) -> bool:

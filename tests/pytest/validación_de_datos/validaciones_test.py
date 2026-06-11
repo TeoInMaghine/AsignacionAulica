@@ -3,7 +3,6 @@ from datetime import time
 
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException
 from asignacion_aulica.validación_de_datos.validaciones import *
-from asignacion_aulica.lógica_de_asignación.día import Día
 
 def test_str_posiblemente_vacío():
     assert str_posiblemente_vacío(' hola ') == 'hola'
@@ -94,11 +93,11 @@ def test_validar_año_del_plan_de_estudios():
     assert 'no debe estar vacío' in mensaje
 
 def test_validar_día():
-    assert validar_día('lunes', 'msg') == Día.LUNES
-    assert validar_día('MarTeS', 'msg') == Día.MARTES
-    assert validar_día('MIERCOLES', 'msg') == Día.MIÉRCOLES
-    assert validar_día('miércoles', 'msg') == Día.MIÉRCOLES
-    assert validar_día('sabado', 'msg') == Día.SÁBADO
+    assert validar_día('lunes', 'msg') == Día.Lunes
+    assert validar_día('MarTeS', 'msg') == Día.Martes
+    assert validar_día('MIERCOLES', 'msg') == Día.Miércoles
+    assert validar_día('miércoles', 'msg') == Día.Miércoles
+    assert validar_día('sabado', 'msg') == Día.Sábado
 
     with pytest.raises(DatoInválidoException) as exc_info:
         validar_día(None, 'msg')

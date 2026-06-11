@@ -1,10 +1,10 @@
 from datetime import time, date, datetime
 import pytest
 
+from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
+from asignacion_aulica.gestor_de_datos.entidades import Clase
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException
 from asignacion_aulica.archivos_excel.clases.importar import leer_preámbulo, leer_tabla, importar
-from asignacion_aulica.archivos_excel.clases.clase import Clase
-from asignacion_aulica.lógica_de_asignación.día import Día
 
 @pytest.mark.archivo('clases_nominal.xlsx')
 def test_preámbulo_nominal(primera_hoja_del_archivo):
@@ -35,14 +35,11 @@ def test_tabla_nominal(primera_hoja_del_archivo):
     
     assert len(clases) == 3
     assert clases[0] == Clase(
-        año = 1,
         materia = 'Introducción a cosas',
-        cuatrimestral_o_anual = 'Cuatrimestral',
         comisión = 'COM1B',
         teórica_o_práctica = 'Las dos cosas',
-        día = Día.LUNES,
-        horario_inicio = time(15, 30),
-        horario_fin = time(18),
+        día = Día.Lunes,
+        horario = RangoHorario(time(15, 30), time(18)),
         cantidad_de_alumnos = 100,
         docente = 'Charly García',
         auxiliar = 'Nadie',
@@ -57,7 +54,7 @@ def test_tabla_nominal(primera_hoja_del_archivo):
         cuatrimestral_o_anual = 'Anual',
         comisión = '',
         teórica_o_práctica = '',
-        día = Día.SÁBADO,
+        día = Día.Sábado,
         horario_inicio = time(22),
         horario_fin = time(23, 30),
         cantidad_de_alumnos = 3,
@@ -74,7 +71,7 @@ def test_tabla_nominal(primera_hoja_del_archivo):
         cuatrimestral_o_anual = 'Anual',
         comisión = '',
         teórica_o_práctica = '',
-        día = Día.MIÉRCOLES,
+        día = Día.Miércoles,
         horario_inicio = time(7),
         horario_fin = time(10),
         cantidad_de_alumnos = None, # El cupo puede estar vacío para las clases virtuales
@@ -196,7 +193,7 @@ def test_importar_nominal_con_dos_hojas(archivo):
         cuatrimestral_o_anual = 'Cuatrimestral',
         comisión = 'COM1B',
         teórica_o_práctica = 'Las dos cosas',
-        día = Día.LUNES,
+        día = Día.Lunes,
         horario_inicio = time(15, 30),
         horario_fin = time(18),
         cantidad_de_alumnos = 100,
@@ -213,7 +210,7 @@ def test_importar_nominal_con_dos_hojas(archivo):
         cuatrimestral_o_anual = 'Anual',
         comisión = '',
         teórica_o_práctica = '',
-        día = Día.SÁBADO,
+        día = Día.Sábado,
         horario_inicio = time(22),
         horario_fin = time(23, 30),
         cantidad_de_alumnos = 3,

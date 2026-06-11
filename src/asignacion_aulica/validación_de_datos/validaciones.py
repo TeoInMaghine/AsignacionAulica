@@ -111,18 +111,18 @@ def validar_día(valor: str|Any, mensaje: str) -> Día:
     elif not isinstance(valor, str):
         raise DatoInválidoException(mensaje + 'no se reconoce como un día de la semana.')
     
-    valor_mayúculas = valor.upper()
+    valor_title_case = valor.title()
 
     # Permitir que les falte la tilde
-    if valor_mayúculas == 'MIERCOLES':
-        valor_mayúculas = 'MIÉRCOLES'
-    elif valor_mayúculas == 'SABADO':
-        valor_mayúculas = 'SÁBADO'
+    if valor_title_case == 'Miercoles':
+        valor_title_case = 'Miércoles'
+    elif valor_title_case == 'Sabado':
+        valor_title_case = 'Sábado'
     
-    if valor_mayúculas not in Día:
+    if valor_title_case not in (día.name for día in Día):
         raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un día de la semana.')
     
-    return Día[valor_mayúculas]
+    return Día[valor_title_case]
 
 def validar_int_positivo_opcional(valor: int|str|None|Any, mensaje: str) -> int|None:
     '''

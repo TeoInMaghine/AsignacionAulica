@@ -11,35 +11,10 @@ RowLayout {
     property alias widthCapacidad: headerCapacidad.width
     property alias widthEquipamiento: headerEquipamiento.width
 
-    Button {
+    BotónOrdenar {
         id: headerNombre
+        labelText: "Aula"
         Layout.preferredWidth: 120 // Para que entre el texto "Sin nombre 1"
-
-        contentItem: MultiEffect {
-            source: label_con_ícono
-            anchors.fill: label_con_ícono
-            brightness: headerNombre.highlighted ? 1.0 : 0.1
-        }
-
-        RowLayout {
-            id: label_con_ícono
-            visible: false // Para renderizar solo el MultiEffect
-            anchors.centerIn: parent
-            spacing: 6
-
-            Label {
-                leftPadding: 5
-                text: "Aula"
-            }
-            Image {
-                width: 17
-                fillMode: Image.PreserveAspectFit
-                sourceSize.width: width
-                source: assets_path + "/iconos/ordenar.png"
-            }
-        }
-
-        highlighted: hovered
         onClicked: {
             aulas.ordenar()
         }

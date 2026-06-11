@@ -30,9 +30,9 @@ class ListAulasDobles(QAbstractListModel):
 
     @pyqtSlot()
     def ordenar(self):
-        self.layoutAboutToBeChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
+        self.layoutAboutToBeChanged.emit()
         self.gestor.ordenar_aulas_dobles(self.i_edificio)
-        self.layoutChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
+        self.layoutChanged.emit()
 
     @pyqtProperty(int)
     def indexEdificio(self) -> int:
@@ -75,7 +75,7 @@ class ListAulasDobles(QAbstractListModel):
 
         return (
             aula.edificio.aulas.index(aula) + 1
-            if aula is not aula_no_seleccionada else
+            if aula != aula_no_seleccionada else
             ÍNDICE_CUANDO_NO_SELECCIONADO
         )
 

@@ -1,6 +1,7 @@
 module QML.ComponentesUI
 BotónAgregar BotónAgregar.qml
 BotónBorrar BotónBorrar.qml
+BotónOrdenar BotónOrdenar.qml
 BotónRedondeadoConTexto BotónRedondeadoConTexto.qml
 BotónRedondeadoConTextoColorUNRN BotónRedondeadoConTextoColorUNRN.qml
 Candado Candado.qml

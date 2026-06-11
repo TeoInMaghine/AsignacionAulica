@@ -17,9 +17,9 @@ def test_agregar_aula_doble_genera_valores_default(gestor: GestorDeDatos):
     gestor.agregar_aula_doble(0)
 
     assert gestor.cantidad_de_aulas_dobles(0) == 1
-    assert gestor.get_aula_doble(0, 0).aula_grande is aula_no_seleccionada
-    assert gestor.get_aula_doble(0, 0).aula_chica_1 is aula_no_seleccionada
-    assert gestor.get_aula_doble(0, 0).aula_chica_2 is aula_no_seleccionada
+    assert gestor.get_aula_doble(0, 0).aula_grande == aula_no_seleccionada
+    assert gestor.get_aula_doble(0, 0).aula_chica_1 == aula_no_seleccionada
+    assert gestor.get_aula_doble(0, 0).aula_chica_2 == aula_no_seleccionada
 
 def test_add_varias_aulas_dobles(gestor: GestorDeDatos):
     gestor.agregar_edificio()

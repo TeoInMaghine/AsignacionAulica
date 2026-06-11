@@ -10,7 +10,7 @@ from asignacion_aulica import assets
 
 logger = logging.getLogger(__name__)
 
-PATH_GESTOR_DE_DATOS = Path(assets.get_path('gestor.pickle'))
+PATH_GESTOR_DE_DATOS = Path(os.path.join(assets.APP_DATA_PATH, 'gestor.pickle'))
 
 def configurar_fuente_por_defecto():
     fonts_path = assets.get_path('fonts')
@@ -25,14 +25,35 @@ def main() -> int:
     icono = QIcon(assets.get_path('iconos', 'unrn.ico'))
     app.setWindowIcon(icono)
 
+    mensaje_de_error_al_cargar = ''
     gestor_de_datos_de_la_aplicación = GestorDeDatos(PATH_GESTOR_DE_DATOS)
+    try:
+        gestor_de_datos_de_la_aplicación.cargar()
+    except ValueError as e:
+        mensaje_de_error_al_cargar = str(e)
+        logger.exception('')
+    except OSError as e:
+        mensaje_de_error_al_cargar = (
+            'Ocurrió un error al leer el archivo'
+            f' {PATH_GESTOR_DE_DATOS}: {str(e)}'
+        )
+        logger.exception(f'Ocurrió un error al leer el archivo {PATH_GESTOR_DE_DATOS}: ')
+    except Exception as e:
+        mensaje_de_error_al_cargar = (
+            'Ocurrió un error inesperado al cargar el '
+            f'archivo {PATH_GESTOR_DE_DATOS}: {str(e)}'
+        )
+        logger.exception(f'Ocurrió un error inesperado al cargar el archivo {PATH_GESTOR_DE_DATOS}: ')
+
     registrar_modelos_qml(gestor_de_datos_de_la_aplicación)
 
     configurar_fuente_por_defecto()
 
     engine = QQmlApplicationEngine()
-    engine.rootContext().setContextProperty('assets_path', Path(assets.assets_path).as_uri())
-    engine.addImportPath(assets.QML_import_path)
+    context = engine.rootContext()
+    context.setContextProperty('assets_path', Path(assets.ASSETS_PATH).as_uri())
+    context.setContextProperty('mensaje_de_error_al_cargar', mensaje_de_error_al_cargar)
+    engine.addImportPath(assets.QML_IMPORT_PATH)
     engine.loadFromModule('QML', "Main")
     
     if not engine.rootObjects():

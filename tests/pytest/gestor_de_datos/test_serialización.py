@@ -18,12 +18,14 @@ def test_roundtrip_vacío(tmp_filename: Path):
     gestor.guardar()
 
     gestor2 = GestorDeDatos(tmp_filename)
+    gestor2.cargar()
     assert gestor2.cantidad_de_edificios() == 0
     assert gestor2.cantidad_de_carreras() == 0
     assert gestor2.get_equipamientos_existentes() == []
 
 def test_roundtrip_con_aulas(tmp_filename: Path):
     gestor = GestorDeDatos(tmp_filename)
+    gestor.cargar()
 
     gestor.agregar_edificio()
     edificio = gestor.get_edificio(0)
@@ -41,6 +43,7 @@ def test_roundtrip_con_aulas(tmp_filename: Path):
     gestor.guardar()
 
     gestor2 = GestorDeDatos(tmp_filename)
+    gestor2.cargar()
     assert gestor2.cantidad_de_edificios() == 2
     edificio2 = gestor2.get_edificio(0)
     assert edificio2.preferir_no_usar is True
@@ -54,6 +57,7 @@ def test_roundtrip_con_aulas(tmp_filename: Path):
 
 def test_roundtrip_con_clases(tmp_filename: Path):
     gestor = GestorDeDatos(tmp_filename)
+    gestor.cargar()
 
     gestor.agregar_carrera('C0')
     gestor.agregar_carrera('C1')
@@ -73,6 +77,7 @@ def test_roundtrip_con_clases(tmp_filename: Path):
     gestor.guardar()
 
     gestor2 = GestorDeDatos(tmp_filename)
+    gestor2.cargar()
     assert gestor2.cantidad_de_carreras() == 2
     assert gestor2.get_carrera(0).nombre == 'C0'
     assert gestor2.get_carrera(1).nombre == 'C1'
@@ -100,6 +105,7 @@ def test_stress_guardar_validar_leer(tmp_filename: Path):
     '''
     # Popular un gestor con una cantidad realista de datos
     gestor = GestorDeDatos(tmp_filename)
+    gestor.cargar()
     _popular_gestor_con_datos_más_o_menos_realistas(gestor)
 
     # Medir el tiempo que tarda en validar
@@ -119,6 +125,7 @@ def test_stress_guardar_validar_leer(tmp_filename: Path):
     # Medir el tiempo que tarda en leer
     t_start = time.monotonic()
     _gestor2 = GestorDeDatos(tmp_filename)
+    _gestor2.cargar()
     t_end = time.monotonic()
     t_delta = datetime.timedelta(seconds=t_end-t_start)
     logging.info('Leer los datos demoró %s', t_delta)

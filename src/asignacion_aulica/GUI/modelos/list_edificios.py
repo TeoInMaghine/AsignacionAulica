@@ -63,9 +63,9 @@ class ListEdificios(QAbstractListModel):
 
     @pyqtSlot()
     def ordenar(self):
-        self.layoutAboutToBeChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
+        self.layoutAboutToBeChanged.emit()
         self.gestor.ordenar_edificios()
-        self.layoutChanged.emit([], self.LayoutChangeHint.VerticalSortHint)
+        self.layoutChanged.emit()
 
     @override
     def roleNames(self) -> dict[int, QByteArray]:

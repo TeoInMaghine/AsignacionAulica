@@ -126,37 +126,41 @@ def leer_materias(hoja: Worksheet) -> list[MateriaLeída]:
         if fila_vacía: continue
 
         nombre_materia: str = validar_str_no_vacío(
-            fila[Columna.materia].value,
-            f'En la celda {_cell_coordinates(fila[Columna.materia])}: el nombre de la materia no debe estar vacío.'
+            fila[Columna.materia-1].value,
+            f'En la celda {_cell_coordinates(fila[Columna.materia-1])}: el nombre de la materia no debe estar vacío.'
         )
         if nombre_materia not in materias:
-            año = validar_año_del_plan_de_estudios(fila[Columna.año].value, f'En la celda {_cell_coordinates(fila[Columna.año])}: ')
-            cuatrimestral_o_anual = str_posiblemente_vacío(fila[Columna.cuatrimestral_o_anual].value)
+            año = validar_año_del_plan_de_estudios(fila[Columna.año-1].value, f'En la celda {_cell_coordinates(fila[Columna.año-1])}: ')
+            cuatrimestral_o_anual = str_posiblemente_vacío(fila[Columna.cuatrimestral_o_anual-1].value)
             materias[nombre_materia] = MateriaLeída(año, nombre_materia, cuatrimestral_o_anual, clases=[])
         
-        comisión = str_posiblemente_vacío(fila[Columna.comisión].value)
-        cantidad_de_alumnos = validar_int_positivo_opcional(fila[Columna.cupo].value, f'En la celda {_cell_coordinates(fila[Columna.cupo])}: el cupo ')
-        día = validar_día(fila[Columna.día].value, f'En la celda {_cell_coordinates(fila[Columna.día])}: ')
-        horario_inicio = debería_ser_time(fila[Columna.horario_inicio].value, f'En la celda {_cell_coordinates(fila[Columna.horario_inicio])}: ')
-        horario_fin = debería_ser_time(fila[Columna.horario_fin].value, f'En la celda {_cell_coordinates(fila[Columna.horario_fin])}: ')
-        lugar = str_posiblemente_vacío(fila[Columna.lugar].value)
-        teórica_o_práctica = str_posiblemente_vacío(fila[Columna.teórica_o_práctica].value)
-        docente = str_posiblemente_vacío(fila[Columna.docente].value)
-        auxiliar = str_posiblemente_vacío(fila[Columna.auxiliar].value)
-        promocionable = str_posiblemente_vacío(fila[Columna.promocionable].value)
+        comisión = str_posiblemente_vacío(fila[Columna.comisión-1].value)
+        cantidad_de_alumnos = validar_int_positivo_opcional(fila[Columna.cupo-1].value, f'En la celda {_cell_coordinates(fila[Columna.cupo-1])}: el cupo ')
+        día = validar_día(fila[Columna.día-1].value, f'En la celda {_cell_coordinates(fila[Columna.día-1])}: ')
+        horario_inicio = debería_ser_time(fila[Columna.horario_inicio-1].value, f'En la celda {_cell_coordinates(fila[Columna.horario_inicio-1])}: ')
+        horario_fin = debería_ser_time(fila[Columna.horario_fin-1].value, f'En la celda {_cell_coordinates(fila[Columna.horario_fin-1])}: ')
+        lugar = str_posiblemente_vacío(fila[Columna.lugar-1].value)
+        teórica_o_práctica = str_posiblemente_vacío(fila[Columna.teórica_o_práctica-1].value)
+        docente = str_posiblemente_vacío(fila[Columna.docente-1].value)
+        auxiliar = str_posiblemente_vacío(fila[Columna.auxiliar-1].value)
+        promocionable = str_posiblemente_vacío(fila[Columna.promocionable-1].value)
 
-        if lugar.lower() == 'virtual':
+        if len(lugar) == 0:
+            virtual = False
+            edificio = None
+            aula = None
+        elif lugar.lower() == 'virtual':
             virtual = True
             edificio = None
             aula = None
         elif lugar.count(' - ') != 1:
-            raise DatoInválidoException(f'En la celda {_cell_coordinates(fila[Columna.lugar])}: "{lugar}" no se reconoce como un nombre de edificio y aula.')
+            raise DatoInválidoException(f'En la celda {_cell_coordinates(fila[Columna.lugar-1])}: "{lugar}" no se reconoce como un nombre de edificio y aula.')
         else:
             virtual = False
             edificio, aula = lugar.split(' - ')
         
         if not virtual and cantidad_de_alumnos is None:
-            raise DatoInválidoException(f'En la celda {_cell_coordinates(fila[Columna.cupo])}: el cupo de las clases presenciales no debe estar vacío.')
+            raise DatoInválidoException(f'En la celda {_cell_coordinates(fila[Columna.cupo-1])}: el cupo de las clases presenciales no debe estar vacío.')
     
         materias[nombre_materia].clases.append(ClaseLeída(
             día, RangoHorario(horario_inicio, horario_fin), virtual, cantidad_de_alumnos, edificio,

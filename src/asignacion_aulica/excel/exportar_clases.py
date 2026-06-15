@@ -10,10 +10,10 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 from asignacion_aulica.excel.estilos import borde_gris, fill_blanco, fill_rojo_clarito
 from asignacion_aulica.excel.plantilla_clases import (
-    celda_nombre_carrera,
     generar_plantilla,
     fila_primer_clase,
-    Columna
+    Columna,
+    CeldaEncabezado
 )
 from asignacion_aulica.gestor_de_datos.entidades import Carrera, Clase, Materia
 
@@ -48,7 +48,7 @@ def exportar_datos_de_clases_a_excel(carreras: Sequence[Carrera], path: Path):
     excel.save(path)
 
 def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
-    hoja[celda_nombre_carrera].value = carrera.nombre
+    hoja[CeldaEncabezado.carrera].value = carrera.nombre
     #TODO: ano y cuatrimestre
 
     # Copiamos la lista de materias para poder ordenarla sin afectar al gestor.

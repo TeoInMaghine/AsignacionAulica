@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 
 from mocks import (
-    pytest_configure,
+    pytest_configure as configure_mocks,
     edificios,
     carreras
 )
@@ -14,6 +14,8 @@ archivos_de_prueba = Path(__file__).parent.resolve() / 'archivos_de_prueba'
 def pytest_configure(config):
     # Registrar los markers usados por las fixtures
     config.addinivalue_line("markers", "archivo: marca para pasar parametros al fixture archivo")
+
+    configure_mocks(config)
 
 @pytest.fixture
 def archivo(request) -> Path:

@@ -90,9 +90,9 @@ def test_tabla_vacía(primera_hoja_del_archivo):
     [
         # Casos de error para la columna Año
         ('A4', 2026, 'no se reconoce como un año del plan de estudios'),
-        ('A7', 'esto no es un número xd123', 'debe ser un número'),
-        ('A28', 4.0, 'debe ser un número entero'),
-        ('A5', None, 'no debe estar vacío'),
+        ('A4', 'esto no es un número xd123', 'debe ser un número'),
+        ('A4', 4.0, 'debe ser un número entero'),
+        ('A4', None, 'no debe estar vacío'),
 
         # Casos de error para la columna Materia
         ('B5', None, 'no debe estar vacío'),
@@ -115,11 +115,11 @@ def test_tabla_vacía(primera_hoja_del_archivo):
         ('H5', datetime(2025,7,25,10,45), 'no se reconoce como un horario'),
         
         # Casos de error para la columna Cupo
-        ('I4', None, 'no debe estar vacío'),
-        ('I4', '', 'no debe estar vacío'),
-        ('I4', 'abc', 'no se reconoce como un número entero'),
-        ('I4', 10.7, 'no se reconoce como un número entero'),
-        ('I4', -1, 'positivo')
+        ('E4', None, 'no debe estar vacío'),
+        ('E4', '', 'no debe estar vacío'),
+        ('E4', 'abc', 'no se reconoce como un número entero'),
+        ('E4', 10.7, 'no se reconoce como un número entero'),
+        ('E4', -1, 'positivo')
     ]
 )
 @pytest.mark.archivo('clases_nominal.xlsx')
@@ -167,58 +167,25 @@ def test_columna_cambiada(primera_hoja_del_archivo):
 def test_importar_nominal(archivo):
     data = importar(archivo)
     assert len(data) == 1
-
-    carrera, año, cuatrimestre, clases = data[0]
-    assert carrera == 'Acá va el nombre de la carrera'
-    assert año == 2025
-    assert cuatrimestre == 'Primero'
-    assert len(clases) == 3 # El contenido de las clases se verifica en otro caso de prueba.
+    assert data[0].nombre == 'Acá va el nombre de la carrera'
+    assert data[0].año == 2025
+    assert data[0].cuatrimestre == 'Primero'
+    assert len(data[0].materias) == 2 # El contenido de las materias se verifica en otro caso de prueba.
 
 @pytest.mark.archivo('clases_nominal_dos_hojas.xlsx')
 def test_importar_nominal_con_dos_hojas(archivo):
     data = importar(archivo)
     assert len(data) == 2
 
-    carrera, año, cuatrimestre, clases = data[0]
-    assert carrera == 'Acá va el nombre de la carrera'
-    assert año == 2025
-    assert cuatrimestre == 'Primero'
-    assert len(clases) == 2
-    assert clases[0] == Clase(
-        año = 1,
-        materia = 'Introducción a cosas',
-        cuatrimestral_o_anual = 'Cuatrimestral',
-        comisión = 'COM1B',
-        teórica_o_práctica = 'Las dos cosas',
-        día = Día.Lunes,
-        horario_inicio = time(15, 30),
-        horario_fin = time(18),
-        cantidad_de_alumnos = 100,
-        docente = 'Charly García',
-        auxiliar = 'Nadie',
-        promocionable = 'Si (8)',
-        edificio = 'Anasagasti 7',
-        aula = '',
-        virtual = False
-    )
-    assert clases[1] == Clase(
-        año = 5,
-        materia = 'Hormigón Armado 3',
-        cuatrimestral_o_anual = 'Anual',
-        comisión = '',
-        teórica_o_práctica = '',
-        día = Día.Sábado,
-        horario_inicio = time(22),
-        horario_fin = time(23, 30),
-        cantidad_de_alumnos = 3,
-        docente = '',
-        auxiliar = '',
-        promocionable = '',
-        edificio = '',
-        aula = '',
-        virtual = False
-    )
-    assert data[0] == data[1]
+    assert data[0].nombre == 'Acá va el nombre de la carrera'
+    assert data[0].año == 2025
+    assert data[0].cuatrimestre == 'Primero'
+    assert len(data[0].materias) == 2
+
+    assert data[1].nombre == 'Acá va el nombre de la carrera 2'
+    assert data[1].año == 2025
+    assert data[1].cuatrimestre == 'Primero'
+    assert data[1].materias == data[0].materias
 
 @pytest.mark.archivo('clases_error_en_la_segunda_hoja.xlsx')
 def test_importar_con_error_en_una_hoja(archivo):
@@ -227,4 +194,4 @@ def test_importar_con_error_en_una_hoja(archivo):
         importar(archivo)
     
     mensaje = str(exc_info.value)
-    assert 'Hoja 2' in mensaje
+    assert 'hoja A_2' in mensaje

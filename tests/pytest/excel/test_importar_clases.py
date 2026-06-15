@@ -31,57 +31,54 @@ def test_carrera_vacía(primera_hoja_del_archivo):
 
 @pytest.mark.archivo('clases_nominal.xlsx')
 def test_tabla_nominal(primera_hoja_del_archivo):
-    clases = leer_materias(primera_hoja_del_archivo)
+    materias = leer_materias(primera_hoja_del_archivo)
     
-    assert len(clases) == 3
-    assert clases[0] == Clase(
-        materia = 'Introducción a cosas',
-        comisión = 'COM1B',
-        teórica_o_práctica = 'Las dos cosas',
-        día = Día.Lunes,
-        horario = RangoHorario(time(15, 30), time(18)),
-        cantidad_de_alumnos = 100,
-        docente = 'Charly García',
-        auxiliar = 'Nadie',
-        promocionable = 'Si (8)',
-        edificio = 'Anasagasti 7',
-        aula = '',
-        virtual = False
-    )
-    assert clases[1] == Clase(
-        año = 5,
-        materia = 'Hormigón Armado 3',
-        cuatrimestral_o_anual = 'Anual',
-        comisión = '',
-        teórica_o_práctica = '',
-        día = Día.Sábado,
-        horario_inicio = time(22),
-        horario_fin = time(23, 30),
-        cantidad_de_alumnos = 3,
-        docente = '',
-        auxiliar = '',
-        promocionable = '',
-        edificio = '',
-        aula = '',
-        virtual = False
-    )
-    assert clases[2] == Clase( # Esta clase tiene celdas mergeadas
-        año = 5,
-        materia = 'Hormigón Armado 3',
-        cuatrimestral_o_anual = 'Anual',
-        comisión = '',
-        teórica_o_práctica = '',
-        día = Día.Miércoles,
-        horario_inicio = time(7),
-        horario_fin = time(10),
-        cantidad_de_alumnos = None, # El cupo puede estar vacío para las clases virtuales
-        docente = '',
-        auxiliar = '',
-        promocionable = '',
-        edificio = '',
-        aula = '',
-        virtual = True
-    )
+    assert len(materias) == 2
+    assert materias[0].nombre == 'Introducción a cosas'
+    assert materias[0].año == 1
+    assert materias[0].cuatrimestral_o_anual == 'Cuatrimestral'
+
+    assert len(materias[0].clases) == 1
+    assert materias[0].clases[0].día == Día.Lunes
+    assert materias[0].clases[0].horario == RangoHorario(time(15, 30), time(18))
+    assert materias[0].clases[0].virtual == False
+    assert materias[0].clases[0].cantidad_de_alumnos == 100
+    assert materias[0].clases[0].edificio == 'Anasagasti 7'
+    assert materias[0].clases[0].aula == 'B202'
+    assert materias[0].clases[0].comisión == 'COM1B'
+    assert materias[0].clases[0].teórica_o_práctica == 'Las dos cosas'
+    assert materias[0].clases[0].promocionable == 'Si (8)'
+    assert materias[0].clases[0].docente == 'Charly García'
+    assert materias[0].clases[0].auxiliar == 'Nadie'
+
+    assert materias[1].nombre == 'Hormigón Armado 3'
+    assert materias[1].año == 5
+    assert materias[1].cuatrimestral_o_anual == 'Anual'
+
+    assert len(materias[1].clases) == 2
+    assert materias[1].clases[0].día == Día.Sábado
+    assert materias[1].clases[0].horario == RangoHorario(time(22), time(23, 30))
+    assert materias[1].clases[0].virtual == False
+    assert materias[1].clases[0].cantidad_de_alumnos == 3
+    assert materias[1].clases[0].edificio is None
+    assert materias[1].clases[0].aula is None
+    assert materias[1].clases[0].comisión == ''
+    assert materias[1].clases[0].teórica_o_práctica == ''
+    assert materias[1].clases[0].promocionable == ''
+    assert materias[1].clases[0].docente == ''
+    assert materias[1].clases[0].auxiliar == ''
+
+    assert materias[1].clases[1].día == Día.Miércoles
+    assert materias[1].clases[1].horario == RangoHorario(time(7), time(10))
+    assert materias[1].clases[1].virtual == True
+    assert materias[1].clases[1].cantidad_de_alumnos is None
+    assert materias[1].clases[1].edificio is None
+    assert materias[1].clases[1].aula is None
+    assert materias[1].clases[1].comisión == ''
+    assert materias[1].clases[1].teórica_o_práctica == ''
+    assert materias[1].clases[1].promocionable == ''
+    assert materias[1].clases[1].docente == ''
+    assert materias[1].clases[1].auxiliar == ''
 
 @pytest.mark.archivo('clases_carrera_vacía.xlsx')
 def test_tabla_vacía(primera_hoja_del_archivo):

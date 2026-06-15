@@ -4,7 +4,7 @@ import pytest
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import Clase
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException
-from asignacion_aulica.archivos_excel.clases.importar import leer_preámbulo, leer_tabla, importar
+from asignacion_aulica.excel.importar_clases import leer_preámbulo, leer_tabla, importar
 
 @pytest.mark.archivo('clases_nominal.xlsx')
 def test_preámbulo_nominal(primera_hoja_del_archivo):

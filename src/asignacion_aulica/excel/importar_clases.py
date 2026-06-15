@@ -1,9 +1,10 @@
-from openpyxl.worksheet.worksheet import Worksheet
-from openpyxl.utils import get_column_letter
 from openpyxl.cell.cell import Cell
+from openpyxl.utils import get_column_letter
+from openpyxl.worksheet.worksheet import Worksheet
 from pathlib import Path
 import openpyxl
 
+from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException
 from asignacion_aulica.validación_de_datos.validaciones import *
 from asignacion_aulica.gestor_de_datos.entidades import Clase
@@ -115,9 +116,11 @@ def leer_tabla(hoja: Worksheet) -> list[Clase]:
                 raise DatoInválidoException(f'En la celda {_cell_coordinates(fila[8])}: el cupo de las clases presenciales no debe estar vacío.')
         
             clases.append(Clase(
-                año, materia, cuatrimestral_o_anual, comisión, teórica_o_práctica,
-                día, horario_inicio, horario_fin, cantidad_de_alumnos, docente,
-                auxiliar, promocionable, virtual, edificio, aula
+                materia, día, RangoHorario(horario_inicio, horario_fin),
+                virtual, cantidad_de_alumnos
+                # año, materia, cuatrimestral_o_anual, comisión, teórica_o_práctica,
+                # día, horario_inicio, horario_fin, cantidad_de_alumnos, docente,
+                # auxiliar, promocionable, virtual, edificio, aula
             ))
     
     return clases

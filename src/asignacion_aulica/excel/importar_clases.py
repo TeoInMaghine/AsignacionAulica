@@ -1,37 +1,169 @@
+from dataclasses import dataclass
+
 from openpyxl.cell.cell import Cell
 from openpyxl.utils import get_column_letter
 from openpyxl.worksheet.worksheet import Worksheet
 from pathlib import Path
 import openpyxl
 
+from asignacion_aulica.excel.plantilla_clases import CeldaEncabezado, Columna, TÍTULOS_DE_COLUMNAS, fila_header, fila_primer_clase, n_columnas
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException
 from asignacion_aulica.validación_de_datos.validaciones import *
-from asignacion_aulica.gestor_de_datos.entidades import Clase
 
-COLUMNAS = (
-    'Año',
-    'Materia',
-    'Cuatrimestral / Anual',
-    'Comisión',
-    'Teórica / Práctica',
-    'Día',
-    'Horario inicio',
-    'Horario fin',
-    'Cupo',
-    'Docente',
-    'Auxiliar',
-    'Promocionable\nSi (Nota) / No',
-    'Lugar',
-    'Aula'
-)
+@dataclass
+class ClaseLeída:
+    día: Día
+    horario: RangoHorario
+    virtual: bool
+    cantidad_de_alumnos: int|None
+    edificio: str|None
+    aula: str|None
+    comisión: str
+    teórica_o_práctica: str
+    promocionable: str
+    docente: str
+    auxiliar: str
 
-def _cell_coordinates(cell: Cell) -> str:
+@dataclass
+class MateriaLeída:
+    año: int
+    nombre: str
+    cuatrimestral_o_anual: str
+    clases: list[ClaseLeída]
+
+@dataclass
+class CarreraLeída:
+    nombre: str
+    año: int
+    cuatrimestre: str
+    materias: list[MateriaLeída]
+
+@dataclass
+class DatosLeídos:
+    carreras: list[CarreraLeída]
+
+def importar(filename: str|Path) -> list[CarreraLeída]:
     '''
-    Dada una celda, devuelve sus coordenadas en un formato legible para el usuario.
-    Por ejemplo: F5.
+    Leer datos de un archivo excel con el formato de la plantilla de clases.
+
+    :param filename: El path absoluto del archivo.
+
+    :return: Una lista con los datos leídos de cada página del archivo.
+
+    :raise FileNotFoundError: Si el archivo no existe.
+    :raise openpyxl.utils.exceptions.InvalidFileException: Si el archivo no es un archivo excel.
+    :raise ExcelInválidoException: Si el formato del archivo no es correcto.
+    :raise DatoInválidoException: Si el archivo contiene un dato inválido.
     '''
-    return cell.column_letter+str(cell.row)
+    archivo = openpyxl.load_workbook(filename)
+    nombres_de_las_hojas = archivo.sheetnames
+
+    data: list[CarreraLeída] = []
+
+    for nombre in nombres_de_las_hojas:
+        hoja = archivo[nombre]
+        try:
+            carrera, año, cuatrimestre = leer_encabezado(hoja)
+            materias = leer_materias(hoja)
+            data.append(CarreraLeída(carrera, año, cuatrimestre, materias))
+        except (ExcelInválidoException, DatoInválidoException) as e:
+            # Tirar la misma excepción, pero agregando el nombre de la hoja al mensaje
+            raise type(e)(f'En la hoja {nombre}: ' + str(e))
+
+    return data
+
+def leer_encabezado(hoja: Worksheet) -> tuple[str, int, str]:
+    '''
+    Verifica que el encabezado de una hoja del archivo sea válido y extrae sus
+    datos.
+
+    :return: Nombre de la carrera, año, cuatrimestre.
+    :raise ExcelInválidoException: Si el formato del preámbulo no es válido.
+    :raise DatoInválidoException: Si el contenido del preámbulo no es válido.
+    '''
+    if (
+        hoja[CeldaEncabezado.label_carrera].value != 'Carrera: '
+        or hoja[CeldaEncabezado.label_año].value != 'Año: '
+        or hoja[CeldaEncabezado.label_cuatrimestre].value != 'Cuatrimestre: '
+    ):
+        raise ExcelInválidoException('El encabezado del archivo fue modificado. Por favor no modificar la estructura de la plantilla.')
+    
+    carrera = validar_str_no_vacío(
+        hoja[CeldaEncabezado.carrera].value,
+        'El nombre de la carrera en la celda D1 no puede estar vacío.'
+    )
+    año = validar_año(
+        hoja[CeldaEncabezado.año].value,
+        'El valor de la celda D2 '
+    )
+    cuatrimestre = str_posiblemente_vacío(hoja[CeldaEncabezado.cuatrimestre].value)
+
+    return carrera, año, cuatrimestre
+
+def leer_materias(hoja: Worksheet) -> list[MateriaLeída]:
+    '''
+    Lee los datos de materias y clases de una hoja del excel.
+
+    :raise DatoInválidoException: Si hay un dato inválido.
+    :raise ExcelInválidoException: Si el formato de la tabla no es correcto.
+    '''
+    # Verificar que no se hayan modificado las columnas
+    if hoja.max_column < n_columnas:
+        raise ExcelInválidoException('Se quitaron columnas de la tabla. Por favor no modificar la estructura de la plantilla.')
+    
+    for columna, título in zip(Columna, TÍTULOS_DE_COLUMNAS):
+        if hoja.cell(fila_header, columna).value != título:
+            raise ExcelInválidoException(f'Se cambió una columna de la tabla en la celda {get_column_letter(columna)}{fila_header}. Por favor no modificar la estructura de la plantilla.')
+    
+    # Si hay celdas unidas dentro de la tabla, separarlas
+    _separar_celdas_unidas(hoja, fila_header)
+
+    # Cargar y verificar datos
+    materias: dict[str, MateriaLeída] = {}
+    for fila in hoja.iter_rows(fila_primer_clase, hoja.max_row, 1, n_columnas):
+        fila_vacía = all(map(lambda cell: not cell.value, fila))
+        if fila_vacía: continue
+
+        nombre_materia: str = validar_str_no_vacío(
+            fila[Columna.materia].value,
+            f'En la celda {_cell_coordinates(fila[Columna.materia])}: el nombre de la materia no debe estar vacío.'
+        )
+        if nombre_materia not in materias:
+            año = validar_año_del_plan_de_estudios(fila[Columna.año].value, f'En la celda {_cell_coordinates(fila[Columna.año])}: ')
+            cuatrimestral_o_anual = str_posiblemente_vacío(fila[Columna.cuatrimestral_o_anual].value)
+            materias[nombre_materia] = MateriaLeída(año, nombre_materia, cuatrimestral_o_anual, clases=[])
+        
+        comisión = str_posiblemente_vacío(fila[Columna.comisión].value)
+        cantidad_de_alumnos = validar_int_positivo_opcional(fila[Columna.cupo].value, f'En la celda {_cell_coordinates(fila[Columna.cupo])}: el cupo ')
+        día = validar_día(fila[Columna.día].value, f'En la celda {_cell_coordinates(fila[Columna.día])}: ')
+        horario_inicio = debería_ser_time(fila[Columna.horario_inicio].value, f'En la celda {_cell_coordinates(fila[Columna.horario_inicio])}: ')
+        horario_fin = debería_ser_time(fila[Columna.horario_fin].value, f'En la celda {_cell_coordinates(fila[Columna.horario_fin])}: ')
+        lugar = str_posiblemente_vacío(fila[Columna.lugar].value)
+        teórica_o_práctica = str_posiblemente_vacío(fila[Columna.teórica_o_práctica].value)
+        docente = str_posiblemente_vacío(fila[Columna.docente].value)
+        auxiliar = str_posiblemente_vacío(fila[Columna.auxiliar].value)
+        promocionable = str_posiblemente_vacío(fila[Columna.promocionable].value)
+
+        if lugar.lower() == 'virtual':
+            virtual = True
+            edificio = None
+            aula = None
+        elif lugar.count(' - ') != 1:
+            raise DatoInválidoException(f'En la celda {_cell_coordinates(fila[Columna.lugar])}: "{lugar}" no se reconoce como un nombre de edificio y aula.')
+        else:
+            virtual = False
+            edificio, aula = lugar.split(' - ')
+        
+        if not virtual and cantidad_de_alumnos is None:
+            raise DatoInválidoException(f'En la celda {_cell_coordinates(fila[Columna.cupo])}: el cupo de las clases presenciales no debe estar vacío.')
+    
+        materias[nombre_materia].clases.append(ClaseLeída(
+            día, RangoHorario(horario_inicio, horario_fin), virtual, cantidad_de_alumnos, edificio,
+            aula, comisión, teórica_o_práctica, promocionable, docente, auxiliar
+        ))
+    
+    return list(materias.values())
 
 def _separar_celdas_unidas(hoja: Worksheet, min_row: int):
     '''
@@ -42,6 +174,8 @@ def _separar_celdas_unidas(hoja: Worksheet, min_row: int):
     quedan separadas pero mantienen el valor que tenían.
     '''
     for rango in list(hoja.merged_cells.ranges):
+        if rango.min_row < min_row: continue
+
         valor = hoja.cell(rango.min_row, rango.min_col).value
         hoja.unmerge_cells(rango.coord)
 
@@ -49,109 +183,9 @@ def _separar_celdas_unidas(hoja: Worksheet, min_row: int):
             for celda in fila:
                 celda.value = valor
 
-def leer_preámbulo(hoja: Worksheet) -> tuple[str, int, str]:
+def _cell_coordinates(cell: Cell) -> str:
     '''
-    Verifica que el preámbulo de una hoja del archivo sea válido y extrae sus
-    datos.
-
-    :return: Nombre de la carrera, año, cuatrimestre.
-    :raise ExcelInválidoException: Si el formato del preámbulo no es válido.
-    :raise DatoInválidoException: Si el contenido del preámbulo no es válido.
+    Dada una celda, devuelve sus coordenadas en un formato legible para el usuario.
+    Por ejemplo: F5.
     '''
-    if hoja['C1'].value != 'Carrera: ' or hoja['C2'].value != 'Año: ' or hoja['E2'].value != 'Cuatrimestre: ':
-        raise ExcelInválidoException('El encabezado del archivo fue modificado. Por favor no modificar la estructura de la plantilla.')
-    
-    carrera = validar_str_no_vacío(hoja['D1'].value, 'El nombre de la carrera en la celda D1 no puede estar vacío.')
-    año = validar_año(hoja['D2'].value, 'El valor de la celda D2 ')
-    cuatrimestre = str_posiblemente_vacío(hoja['G2'].value)
-
-    return carrera, año, cuatrimestre
-
-def leer_tabla(hoja: Worksheet) -> list[Clase]:
-    '''
-    Lee los datos de clases de una hoja del excel.
-
-    :return: Un iterable de clases. TODO: Determinar en qué formato conviene
-        devolver los datos cuando esté la interfaz del módulo de gestión de datos.
-    :raise DatoInválidoException: Si hay un dato inválido.
-    :raise ExcelInválidoException: Si el formato de la tabla no es correcto.
-    '''
-    # Verificar que no se hayan modificado las columnas
-    if hoja.max_column < len(COLUMNAS):
-        raise ExcelInválidoException('Se quitaron columnas de la tabla. Por favor no modificar la estructura de la plantilla.')
-    
-    fila_títulos = 3
-    for índice, título in enumerate(COLUMNAS):
-        if hoja.cell(fila_títulos, índice+1).value != título:
-            raise ExcelInválidoException(f'Se cambió una columna de la tabla en la celda {get_column_letter(índice+1)}{fila_títulos}. Por favor no modificar la estructura de la plantilla.')
-    
-    # Si hay celdas unidas dentro de la tabla, separarlas
-    _separar_celdas_unidas(hoja, fila_títulos+1)
-
-    # Cargar y verificar datos
-    clases = []
-    for fila in hoja.iter_rows(fila_títulos+1, hoja.max_row, 1, len(COLUMNAS)):
-        fila_no_vacía = any(map(lambda cell: cell.value, fila))
-        if fila_no_vacía:
-            año =              validar_año_del_plan_de_estudios(fila[ 0].value, f'En la celda {_cell_coordinates(fila[0])}: ')
-            materia =                      validar_str_no_vacío(fila[ 1].value, f'En la celda {_cell_coordinates(fila[1])}: el nombre de la materia no debe estar vacío.')
-            cuatrimestral_o_anual =      str_posiblemente_vacío(fila[ 2].value)
-            comisión =                   str_posiblemente_vacío(fila[ 3].value)
-            teórica_o_práctica =         str_posiblemente_vacío(fila[ 4].value)
-            día =                                   validar_día(fila[ 5].value, f'En la celda {_cell_coordinates(fila[5])}: ')
-            horario_inicio =                   debería_ser_time(fila[ 6].value, f'En la celda {_cell_coordinates(fila[6])}: ')
-            horario_fin =                      debería_ser_time(fila[ 7].value, f'En la celda {_cell_coordinates(fila[7])}: ')
-            cantidad_de_alumnos = validar_int_positivo_opcional(fila[ 8].value, f'En la celda {_cell_coordinates(fila[8])}: el cupo ')
-            docente =                    str_posiblemente_vacío(fila[ 9].value)
-            auxiliar =                   str_posiblemente_vacío(fila[10].value)
-            promocionable =              str_posiblemente_vacío(fila[11].value)
-            edificio =                   str_posiblemente_vacío(fila[12].value)
-            aula =                       str_posiblemente_vacío(fila[13].value)
-            
-            virtual = edificio.lower() == 'virtual'
-            if virtual:
-                edificio = ''
-
-            if not virtual and cantidad_de_alumnos is None:
-                raise DatoInválidoException(f'En la celda {_cell_coordinates(fila[8])}: el cupo de las clases presenciales no debe estar vacío.')
-        
-            clases.append(Clase(
-                materia, día, RangoHorario(horario_inicio, horario_fin),
-                virtual, cantidad_de_alumnos
-                # año, materia, cuatrimestral_o_anual, comisión, teórica_o_práctica,
-                # día, horario_inicio, horario_fin, cantidad_de_alumnos, docente,
-                # auxiliar, promocionable, virtual, edificio, aula
-            ))
-    
-    return clases
-
-def importar(filename: str|Path) -> list[ tuple[str, int, str, list[Clase]] ]:
-    '''
-    Leer datos de un archivo excel con el formato de la plantilla de clases.
-
-    :param filename: El path absoluto del archivo.
-
-    :return: Una lista de tuplas (carrera, año, cuatrimestre, clases). Cada
-        elemento de la lista contiene los datos de una página del archivo.
-
-    :raise FileNotFoundError: Si el archivo no existe.
-    :raise openpyxl.utils.exceptions.InvalidFileException: Si el archivo no es un archivo excel.
-    :raise ExcelInválidoException: Si el formato del archivo no es correcto.
-    :raise DatoInválidoException: Si el archivo contiene un dato inválido.
-    '''
-    archivo = openpyxl.load_workbook(filename)
-    nombres_de_las_hojas = archivo.sheetnames
-
-    data = []
-
-    for nombre in nombres_de_las_hojas:
-        hoja = archivo[nombre]
-        try:
-            carrera, año, cuatrimestre = leer_preámbulo(hoja)
-            clases = leer_tabla(hoja)
-            data.append((carrera, año, cuatrimestre, clases))
-        except (ExcelInválidoException, DatoInválidoException) as e:
-            # Tirar la misma excepción, pero agregando el nombre de la hoja al mensaje
-            raise type(e)(f'En la hoja {nombre}: ' + str(e))
-
-    return data
+    return cell.column_letter+str(cell.row)

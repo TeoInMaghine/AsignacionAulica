@@ -60,7 +60,7 @@ def test_encabezado(carreras: Carreras, excel_exportado: Workbook):
     assert len(excel_exportado.worksheets) == len(carreras)
     for hoja, carrera in zip(excel_exportado.worksheets, carreras):
         assert hoja.title == carrera.nombre
-        assert hoja[plantilla_clases.celda_nombre_carrera].value == carrera.nombre
+        assert hoja[plantilla_clases.CeldaEncabezado.carrera].value == carrera.nombre
         #TODO: año y cuatrimestre
     
 @pytest.mark.edificios(

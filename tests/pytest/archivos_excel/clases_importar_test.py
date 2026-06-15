@@ -4,11 +4,11 @@ import pytest
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import Clase
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException
-from asignacion_aulica.excel.importar_clases import leer_preámbulo, leer_tabla, importar
+from asignacion_aulica.excel.importar_clases import leer_encabezado, leer_materias, importar
 
 @pytest.mark.archivo('clases_nominal.xlsx')
 def test_preámbulo_nominal(primera_hoja_del_archivo):
-    carrera, año, cuatrimestre = leer_preámbulo(primera_hoja_del_archivo)
+    carrera, año, cuatrimestre = leer_encabezado(primera_hoja_del_archivo)
     assert carrera == 'Acá va el nombre de la carrera'
     assert año == 2025
     assert cuatrimestre == 'Primero'
@@ -16,7 +16,7 @@ def test_preámbulo_nominal(primera_hoja_del_archivo):
 @pytest.mark.archivo('clases_preámbulo_roto.xlsx')
 def test_preámbulo_roto(primera_hoja_del_archivo):
     with pytest.raises(ExcelInválidoException) as exc_info:
-        leer_preámbulo(primera_hoja_del_archivo)
+        leer_encabezado(primera_hoja_del_archivo)
     
     mensaje = str(exc_info.value)
     assert 'El encabezado del archivo fue modificado' in mensaje
@@ -24,14 +24,14 @@ def test_preámbulo_roto(primera_hoja_del_archivo):
 @pytest.mark.archivo('clases_carrera_vacía.xlsx')
 def test_carrera_vacía(primera_hoja_del_archivo):
     with pytest.raises(DatoInválidoException) as exc_info:
-        leer_preámbulo(primera_hoja_del_archivo)
+        leer_encabezado(primera_hoja_del_archivo)
 
     mensaje = str(exc_info.value)
     assert 'El nombre de la carrera en la celda D1 no puede estar vacío' in mensaje
 
 @pytest.mark.archivo('clases_nominal.xlsx')
 def test_tabla_nominal(primera_hoja_del_archivo):
-    clases = leer_tabla(primera_hoja_del_archivo)
+    clases = leer_materias(primera_hoja_del_archivo)
     
     assert len(clases) == 3
     assert clases[0] == Clase(
@@ -85,7 +85,7 @@ def test_tabla_nominal(primera_hoja_del_archivo):
 
 @pytest.mark.archivo('clases_carrera_vacía.xlsx')
 def test_tabla_vacía(primera_hoja_del_archivo):
-    clases = leer_tabla(primera_hoja_del_archivo)
+    clases = leer_materias(primera_hoja_del_archivo)
     assert len(clases) == 0, 'TODO: Decidir si esto tiene que tirar excepción o no.'
 
 @pytest.mark.parametrize(
@@ -136,7 +136,7 @@ def test_valores_inválidos_en_la_tabla(primera_hoja_del_archivo, celda_con_erro
 
     # Intentar leer la tabla
     with pytest.raises(DatoInválidoException) as exc_info:
-        leer_tabla(primera_hoja_del_archivo)
+        leer_materias(primera_hoja_del_archivo)
 
     # Verificar el error
     mensaje = str(exc_info.value)
@@ -149,7 +149,7 @@ def test_columna_faltante(primera_hoja_del_archivo):
     primera_hoja_del_archivo.delete_cols(5)
 
     with pytest.raises(ExcelInválidoException) as exc_info:
-        leer_tabla(primera_hoja_del_archivo)
+        leer_materias(primera_hoja_del_archivo)
     
     mensaje = str(exc_info.value)
     assert 'Se quitaron columnas de la tabla' in mensaje
@@ -160,7 +160,7 @@ def test_columna_cambiada(primera_hoja_del_archivo):
     primera_hoja_del_archivo['E3'].value = 'hola amiga'
 
     with pytest.raises(ExcelInválidoException) as exc_info:
-        leer_tabla(primera_hoja_del_archivo)
+        leer_materias(primera_hoja_del_archivo)
     
     mensaje = str(exc_info.value)
     assert 'Se cambió una columna' in mensaje

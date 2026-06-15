@@ -88,11 +88,11 @@ def validar_año_del_plan_de_estudios(valor: int|str|Any, mensaje) -> int:
     _validar_no_vacío(valor, mensaje)
 
     if not _es_número_entero(valor):
-        raise DatoInválidoException(mensaje + f'"{valor} no se reconoce como un año del plan de estudios (debe ser un número entero).')
+        raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un año del plan de estudios (debe ser un número entero).')
     
     valor_int = int(valor)
     if not 0 < valor_int < 10:
-        raise DatoInválidoException(mensaje + f'"{valor} no se reconoce como un año del plan de estudios (debe estar entre 1 y 9).')
+        raise DatoInválidoException(mensaje + f'"{valor}" no se reconoce como un año del plan de estudios (debe estar entre 1 y 9).')
     
     return valor_int
 

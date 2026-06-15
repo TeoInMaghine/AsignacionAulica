@@ -39,10 +39,6 @@ class CarreraLeída:
     cuatrimestre: str
     materias: list[MateriaLeída]
 
-@dataclass
-class DatosLeídos:
-    carreras: list[CarreraLeída]
-
 def importar(filename: str|Path) -> list[CarreraLeída]:
     '''
     Leer datos de un archivo excel con el formato de la plantilla de clases.

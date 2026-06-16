@@ -1,12 +1,13 @@
 from collections.abc import Sequence
 from datetime import time
-from itertools import filterfalse
+import itertools
 from pathlib import Path
 import pickle
 from typing import Callable
 from collections import Counter
 import logging
 
+from asignacion_aulica.excel.importar_clases import importar_clases_de_excel
 from asignacion_aulica.excel.exportar_clases import exportar_datos_de_clases_a_excel
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
@@ -20,6 +21,7 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     Materia,
     todas_las_clases
 )
+from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException
 
 logger = logging.getLogger(__name__)
 
@@ -241,7 +243,7 @@ class GestorDeDatos:
         el_aula = el_edificio.aulas.pop(índice)
         
         # Borrar aulas dobles que usen este aula
-        el_edificio.aulas_dobles[:] = filterfalse(
+        el_edificio.aulas_dobles[:] = itertools.filterfalse(
             lambda ad: ad.aula_grande is el_aula or ad.aula_chica_1 is el_aula or ad.aula_chica_2 is el_aula,
             el_edificio.aulas_dobles
         )
@@ -728,33 +730,42 @@ class GestorDeDatos:
             )
         return result
 
-    def importar_clases_de_excel(self, path: str, confirmación_de_sobreescritura: Callable[[list[str]], bool]):
+    def importar_clases_de_excel(self, path: str|Path, confirmación_de_sobreescritura: Callable[[list[str]], bool]):
         '''
         Leer datos de carreras, materias y clases de un archivo excel e
         incorporarlos a la base de datos.
 
-        Las clases/materias/carreras que estén definidas en el archivo y que no
-        existan en la base de datos, se agregan. Las que ya existan, se
-        actualizan con los nuevos datos (los datos presentes en el excel se
-        sobreescriben, los datos no presentes en el excel -como el equipamiento
-        requerido- se dejan como estaban).
+        Las carreras que estén definidas en el archivo y que no existan en la
+        base de datos, se agregan junto con sus materias y clases. Las carreras
+        que ya existan, se borran y se vuelven a agregar (perdiendo la
+        información que no está contenida en el archivo, como el equipamiento
+        requerido).
 
         :param path: El path absoluto del archivo.
         :param confirmación_de_sobreescritura: Una función para preguntarle al
         usuario si quiere sobreescribir datos. La función recibe una lista de
-        nombres de carreras en las que se sobreescribirán datos, y devuelve un
-        `bool`. Si devuelve `True` se continúa con la operación; si devuelve
-        `False` se cancela la operación sin hacer ningún cambio en la base de
-        datos.
+        nombres de carreras que se sobreescribirán, y devuelve un `bool`. Si
+        devuelve `True` se continúa con la operación; si devuelve `False` se
+        cancela la operación sin hacer ningún cambio en la base de datos.
 
         :raise FileNotFoundError: Si el archivo no existe.
         :raise ExcelInválidoException: Si el formato del archivo no es correcto.
         :raise DatoInválidoException: Si el archivo contiene un dato inválido.
         '''
-        # Nota: Este método debería llamar a archivos_excel.clases.importar,
-        # y actualizar la base de datos con el resultado.
-        # (El módulo archivos_excel todavía no existe, ver Issue #52)
-        pass
+        carreras_leídas = importar_clases_de_excel(Path(path))
+
+        # Verificar que no haya referencias a aulas que no existen
+        todas_las_clases = itertools.chain(*(itertools.chain(*(materia.clases for materia in carrera.materias)) for carrera in carreras_leídas))
+        for clase in todas_las_clases:
+            if clase.edificio is None or clase.aula is None: continue
+            i_edificio: int|None = next(
+                (índice for índice, edificio in enumerate(self._edificios) if edificio.nombre==clase.edificio),
+                None
+            )
+            if i_edificio is None:
+                raise DatoInválidoException(f'No se conoce el edificio {clase.edificio}. Por favor, cargue los datos de este edificio o eliminelo del archivo excel.')
+            elif not self.existe_aula(i_edificio, clase.aula):
+                raise DatoInválidoException(f'No se conoce el aula {clase.aula} del edificio {clase.edificio}. Por favor, cargue los datos de este aula o eliminela del archivo excel.')
 
     def exportar_clases_a_excel(self, path: str, carrera: int|None = None):
         '''

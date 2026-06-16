@@ -4,7 +4,7 @@ import pytest
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.entidades import Clase
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException, ExcelInválidoException
-from asignacion_aulica.excel.importar_clases import leer_encabezado, leer_materias, importar
+from asignacion_aulica.excel.importar_clases import leer_encabezado, leer_materias, importar_clases_de_excel
 
 @pytest.mark.archivo('clases_nominal.xlsx')
 def test_preámbulo_nominal(primera_hoja_del_archivo):
@@ -165,7 +165,7 @@ def test_columna_cambiada(primera_hoja_del_archivo):
 
 @pytest.mark.archivo('clases_nominal.xlsx')
 def test_importar_nominal(archivo):
-    data = importar(archivo)
+    data = importar_clases_de_excel(archivo)
     assert len(data) == 1
     assert data[0].nombre == 'Acá va el nombre de la carrera'
     assert data[0].año == 2025
@@ -174,7 +174,7 @@ def test_importar_nominal(archivo):
 
 @pytest.mark.archivo('clases_nominal_dos_hojas.xlsx')
 def test_importar_nominal_con_dos_hojas(archivo):
-    data = importar(archivo)
+    data = importar_clases_de_excel(archivo)
     assert len(data) == 2
 
     assert data[0].nombre == 'Acá va el nombre de la carrera'
@@ -191,7 +191,7 @@ def test_importar_nominal_con_dos_hojas(archivo):
 def test_importar_con_error_en_una_hoja(archivo):
     '''Verificar que se incluye el nombre de la hoja en los mensajes de error.'''
     with pytest.raises(DatoInválidoException) as exc_info:
-        importar(archivo)
+        importar_clases_de_excel(archivo)
     
     mensaje = str(exc_info.value)
     assert 'hoja A_2' in mensaje

@@ -2,10 +2,14 @@
 Configuraciones comunes a todos los tests unitarios.
 '''
 import pytest, logging
+from pathlib import Path
+
+archivos_de_prueba = Path(__file__).parent.resolve() / 'archivos_de_prueba'
 
 def pytest_configure(config):
     # Registrar un marker para reconocer stress tests
     config.addinivalue_line("markers", "stress_test: indica que es un stress test, solo se ejecuta al usar el argumento --stress-tests")
+    config.addinivalue_line("markers", "archivo: marca para pasar parametros al fixture archivo")
 
 def pytest_addoption(parser):
     # Añadir opción de línea de comandos personalizada a pytest
@@ -22,3 +26,14 @@ def pytest_runtest_setup(item):
 @pytest.fixture(autouse=True)
 def log_start_of_tc(request):
     logging.info('----- Inicio del TC %s.%s -----', request.function.__module__, request.function.__name__)
+
+@pytest.fixture
+def archivo(request) -> Path:
+    '''
+    Recibe en el marker "archivo" un nombre de archivo del directorio
+    "archivos_de_prueba".
+
+    :return: El path absoluto del archivo.
+    '''
+    nombre = request.node.get_closest_marker('archivo').args[0]
+    return archivos_de_prueba / nombre

@@ -157,6 +157,19 @@ class GestorDeDatos:
         :raise ValueError: Si `edificio` no es un edificio de este gestor.
         '''
         return self._edificios.index(edificio)
+    
+    def índice_del_edificio_por_nombre(self, nombre: str) -> int|None:
+        '''
+        :return: el índice del edificio con el nombre dado, o None si no existe
+        un edificio con el nombre dado.
+        '''
+        return next(
+            (
+                índice for índice, edificio in enumerate(self._edificios)
+                if edificio.nombre==nombre
+            ),
+            None
+        )
 
     def get_aulas(self, edificio: int) -> list[str]:
         '''
@@ -226,6 +239,19 @@ class GestorDeDatos:
         nombre = nombre.lower().strip()
         el_edificio = self._edificios[edificio]
         return any(aula.nombre.lower() == nombre for aula in el_edificio.aulas)
+
+    def índice_del_aula_por_nombre(self, edificio: int, nombre: str) -> int|None:
+        '''
+        :return: el índice del aula con el nombre dado, o None si no existe
+        un aula con el nombre dado.
+        '''
+        return next(
+            (
+                índice for índice, aula in enumerate(self._edificios[edificio].aulas)
+                if aula.nombre==nombre
+            ),
+            None
+        )
 
     def borrar_aula(self, edificio: int, índice: int):
         '''
@@ -358,6 +384,19 @@ class GestorDeDatos:
         '''
         return self._carreras[índice]
 
+    def índice_de_carrera_por_nombre(self, nombre: str) -> int|None:
+        '''
+        :return: el índice de la carrera con el nombre dado, o None si no existe
+        una carrera con el nombre dado.
+        '''
+        return next(
+            (
+                índice for índice, carrera in enumerate(self._carreras)
+                if carrera.nombre==nombre
+            ),
+            None
+        )
+
     def agregar_carrera(self, nombre: str) -> int:
         '''
         Añadir una nueva carrera con el nombre dado, inicializada con valores
@@ -461,6 +500,19 @@ class GestorDeDatos:
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         return self._carreras[carrera].materias[materia]
+
+    def índice_de_materia_por_nombre(self, carrera: int, nombre: str) -> int|None:
+        '''
+        :return: el índice de la materia con el nombre dado, o None si no existe
+        una materia con el nombre dado.
+        '''
+        return next(
+            (
+                índice for índice, materia in enumerate(self.get_carrera(carrera).materias)
+                if materia.nombre==nombre
+            ),
+            None
+        )
 
     def existe_materia(self, carrera: int, nombre: str) -> bool:
         '''
@@ -758,14 +810,48 @@ class GestorDeDatos:
         todas_las_clases = itertools.chain(*(itertools.chain(*(materia.clases for materia in carrera.materias)) for carrera in carreras_leídas))
         for clase in todas_las_clases:
             if clase.edificio is None or clase.aula is None: continue
-            i_edificio: int|None = next(
-                (índice for índice, edificio in enumerate(self._edificios) if edificio.nombre==clase.edificio),
-                None
-            )
+            i_edificio: int|None = self.índice_del_edificio_por_nombre(clase.edificio)
             if i_edificio is None:
                 raise DatoInválidoException(f'No se conoce el edificio {clase.edificio}. Por favor, cargue los datos de este edificio o eliminelo del archivo excel.')
-            elif not self.existe_aula(i_edificio, clase.aula):
+            i_aula: int|None = self.índice_del_aula_por_nombre(i_edificio, clase.aula)
+            if i_aula is None:
                 raise DatoInválidoException(f'No se conoce el aula {clase.aula} del edificio {clase.edificio}. Por favor, cargue los datos de este aula o eliminela del archivo excel.')
+        
+        # Cargar los datos
+        for carrera_leída in carreras_leídas:
+            i_carrera = self.índice_de_carrera_por_nombre(carrera_leída.nombre)
+            if i_carrera is None:
+                i_carrera = self.agregar_carrera(carrera_leída.nombre)
+            else:
+                while self.cantidad_de_materias(i_carrera) != 0:
+                    self.borrar_materia(i_carrera, 0)
+            
+            for materia_leída in carrera_leída.materias:
+                self.agregar_materia(i_carrera)
+                i_materia = self.cantidad_de_materias(i_carrera) - 1
+                materia = self.get_materia(i_carrera, i_materia)
+                materia.nombre = materia_leída.nombre
+                materia.cuatrimestral_o_anual = materia_leída.cuatrimestral_o_anual
+                materia.año = materia_leída.año
+
+                for clase_leída in materia_leída.clases:
+                    self.agregar_clase(i_carrera, i_materia)
+                    i_clase = self.cantidad_de_clases(i_carrera, i_materia) - 1
+                    clase = self.get_clase(i_carrera, i_materia, i_clase)
+                    clase.comisión = clase_leída.comisión
+                    clase.cantidad_de_alumnos = clase_leída.cantidad_de_alumnos if clase_leída.cantidad_de_alumnos is not None else 1
+                    clase.horario = clase_leída.horario
+                    clase.teórica_o_práctica = clase_leída.teórica_o_práctica
+                    clase.docente = clase_leída.docente
+                    clase.auxiliar = clase_leída.auxiliar
+                    clase.promocionable = clase_leída.promocionable
+                    clase.día = clase_leída.día
+                    clase.virtual = clase_leída.virtual
+
+                    if clase_leída.edificio is not None and clase_leída.aula is not None:
+                        i_edificio: int = self.índice_del_edificio_por_nombre(clase_leída.edificio)
+                        i_aula: int = self.índice_del_aula_por_nombre(i_edificio, clase_leída.aula)
+                        clase.aula_asignada = self.get_aula(i_edificio, i_aula)
 
     def exportar_clases_a_excel(self, path: str, carrera: int|None = None):
         '''

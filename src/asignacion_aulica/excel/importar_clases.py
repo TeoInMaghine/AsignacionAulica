@@ -136,7 +136,7 @@ def leer_materias(hoja: Worksheet) -> list[MateriaLeída]:
     
     if len(materias) == 0:
         raise DatoInválidoException('La carrera debe tener al menos una clase.')
-    
+
     return list(materias.values())
 
 def _leer_clase(fila: tuple[Cell, ...]) -> ClaseLeída:

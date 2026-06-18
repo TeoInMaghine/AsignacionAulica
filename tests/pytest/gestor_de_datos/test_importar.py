@@ -5,7 +5,7 @@ import pytest
 from asignacion_aulica.gestor_de_datos.días_y_horarios import RangoHorario, Día
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException
-from mocks import MockAula, MockEdificio
+from mocks import MockAula, MockCarrera, MockEdificio
 
 def este_callback_no_debería_ser_llamado(_: list[str]) -> bool:
     raise AssertionError('Este callback no debería haber sido llamado.')
@@ -81,3 +81,37 @@ def test_importar_datos_de_una_carrera(gestor: GestorDeDatos, archivo: Path):
     assert clase1_1.docente == ''
     assert clase1_1.auxiliar == ''
     assert clase1_1.promocionable == ''
+
+@pytest.mark.archivo('clases_nominal.xlsx')
+@pytest.mark.edificios(MockEdificio(nombre='Anasagasti 7', aulas=(MockAula(nombre='B202'),)))
+@pytest.mark.carreras(MockCarrera(nombre='Acá va el nombre de la carrera'))
+def test_confirmación_de_sobreescritura_true(gestor: GestorDeDatos, archivo: Path):
+    argumentos_recibidos = []
+    def callback(x: list[str]) -> bool:
+        nonlocal argumentos_recibidos
+        argumentos_recibidos.append(x)
+        return True
+    
+    gestor.importar_clases_de_excel(archivo, callback)
+
+    assert len(argumentos_recibidos) == 1
+    assert argumentos_recibidos[0] == ['Acá va el nombre de la carrera']
+
+    assert gestor.cantidad_de_materias(0) == 2
+
+@pytest.mark.archivo('clases_nominal.xlsx')
+@pytest.mark.edificios(MockEdificio(nombre='Anasagasti 7', aulas=(MockAula(nombre='B202'),)))
+@pytest.mark.carreras(MockCarrera(nombre='Acá va el nombre de la carrera'))
+def test_confirmación_de_sobreescritura_false(gestor: GestorDeDatos, archivo: Path):
+    argumentos_recibidos = []
+    def callback(x: list[str]) -> bool:
+        nonlocal argumentos_recibidos
+        argumentos_recibidos.append(x)
+        return False
+    
+    gestor.importar_clases_de_excel(archivo, callback)
+
+    assert len(argumentos_recibidos) == 1
+    assert argumentos_recibidos[0] == ['Acá va el nombre de la carrera']
+
+    assert gestor.cantidad_de_materias(0) == 0

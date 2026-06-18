@@ -817,6 +817,11 @@ class GestorDeDatos:
             if i_aula is None:
                 raise DatoInválidoException(f'No se conoce el aula {clase.aula} del edificio {clase.edificio}. Por favor, cargue los datos de este aula o eliminela del archivo excel.')
         
+        # Confirmar sobreescritura
+        carreras_existentes = [carrera.nombre for carrera in carreras_leídas if self.existe_carrera(carrera.nombre)]
+        if len(carreras_existentes) != 0 and not confirmación_de_sobreescritura(carreras_existentes):
+            return
+
         # Cargar los datos
         for carrera_leída in carreras_leídas:
             i_carrera = self.índice_de_carrera_por_nombre(carrera_leída.nombre)
@@ -849,8 +854,8 @@ class GestorDeDatos:
                     clase.virtual = clase_leída.virtual
 
                     if clase_leída.edificio is not None and clase_leída.aula is not None:
-                        i_edificio: int = self.índice_del_edificio_por_nombre(clase_leída.edificio)
-                        i_aula: int = self.índice_del_aula_por_nombre(i_edificio, clase_leída.aula)
+                        i_edificio = self.índice_del_edificio_por_nombre(clase_leída.edificio)
+                        i_aula = self.índice_del_aula_por_nombre(i_edificio, clase_leída.aula)
                         clase.aula_asignada = self.get_aula(i_edificio, i_aula)
 
     def exportar_clases_a_excel(self, path: str, carrera: int|None = None):

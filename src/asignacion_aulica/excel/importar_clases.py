@@ -53,8 +53,10 @@ def importar_clases_de_excel(filename: str|Path) -> list[CarreraLeída]:
     :raise DatoInválidoException: Si el archivo contiene un dato inválido.
     '''
     archivo = openpyxl.load_workbook(filename)
-    nombres_de_las_hojas = archivo.sheetnames
+    if len(archivo.sheetnames) == 0:
+        raise ExcelInválidoException('El archivo debe tener al menos una hoja.')
 
+    nombres_de_las_hojas = archivo.sheetnames
     data: list[CarreraLeída] = []
 
     for nombre in nombres_de_las_hojas:
@@ -131,6 +133,9 @@ def leer_materias(hoja: Worksheet) -> list[MateriaLeída]:
             materias[nombre_materia] = MateriaLeída(año, nombre_materia, cuatrimestral_o_anual, clases=[])
         
         materias[nombre_materia].clases.append(_leer_clase(fila))
+    
+    if len(materias) == 0:
+        raise DatoInválidoException('La carrera debe tener al menos una clase.')
     
     return list(materias.values())
 

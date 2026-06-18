@@ -82,8 +82,8 @@ def test_tabla_nominal(primera_hoja_del_archivo):
 
 @pytest.mark.archivo('clases_carrera_vacía.xlsx')
 def test_tabla_vacía(primera_hoja_del_archivo):
-    clases = leer_materias(primera_hoja_del_archivo)
-    assert len(clases) == 0, 'TODO: Decidir si esto tiene que tirar excepción o no.'
+    with pytest.raises(DatoInválidoException):
+        leer_materias(primera_hoja_del_archivo)
 
 @pytest.mark.parametrize(
     ('celda_con_error', 'valor', 'mensaje_esperado'),

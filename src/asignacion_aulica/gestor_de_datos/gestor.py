@@ -788,10 +788,10 @@ class GestorDeDatos:
         incorporarlos a la base de datos.
 
         Las carreras que estén definidas en el archivo y que no existan en la
-        base de datos, se agregan junto con sus materias y clases. Las carreras
-        que ya existan, se borran y se vuelven a agregar (perdiendo la
-        información que no está contenida en el archivo, como el equipamiento
-        requerido).
+        base de datos, se agregan junto con sus materias y clases. En las
+        carreras que ya existan, se borran todas sus materias y clases antes de
+        agregar los datos nuevos (perdiendo la información que no está contenida
+        en el archivo, como el equipamiento requerido).
 
         :param path: El path absoluto del archivo.
         :param confirmación_de_sobreescritura: Una función para preguntarle al

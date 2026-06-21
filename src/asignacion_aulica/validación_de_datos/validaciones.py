@@ -64,6 +64,8 @@ def validar_año(valor: int|str|Any, mensaje: str) -> int:
     :raise DatoInválidoException: Si `valor` no es un número entero mayor a 1999.
     '''
     _validar_no_vacío(valor, mensaje)
+    if isinstance(valor, str):
+        valor = valor.strip()
 
     if not _es_número_entero(valor):
         raise DatoInválidoException(mensaje + 'no se reconoce como un número de año (debe ser un número entero).')

@@ -38,6 +38,7 @@ def test_validar_año():
     assert validar_año(2000, 'un mensaje') == 2000
     assert validar_año(2025, 'un mensaje') == 2025
     assert validar_año('2032', 'un mensaje') == 2032
+    assert validar_año('   3546   ', 'un mensaje') == 3546
 
     with pytest.raises(DatoInválidoException) as exc_info:
         validar_año(2025.0, 'msg') # No es int

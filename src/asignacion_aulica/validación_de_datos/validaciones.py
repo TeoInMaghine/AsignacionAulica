@@ -17,7 +17,7 @@ def _validar_no_vacío(valor: Any, mensaje: str) -> Any:
     :return: El mismo valor.
     :raise DatoInválidoException: Si `valor` es `None` o el string vacío.
     '''
-    if valor is None or valor == '':
+    if valor is None or (isinstance(valor, str) and valor.strip() == ''):
         raise DatoInválidoException(mensaje + 'no debe estar vacío.')
     else:
         return valor
@@ -106,12 +106,14 @@ def validar_día(valor: str|Any, mensaje: str) -> Día:
     :return: El día de la semana.
     :raise DatoInválidoException: Si `valor` no es el nombre de un día de la semana.
     '''
-    if valor is None or valor == '':
+    if valor is None:
         raise DatoInválidoException(mensaje + 'el día de la semana no debe estar vacío.')
     elif not isinstance(valor, str):
         raise DatoInválidoException(mensaje + 'no se reconoce como un día de la semana.')
     
-    valor_title_case = valor.title()
+    valor_title_case = valor.strip().title()
+    if valor_title_case == '':
+        raise DatoInválidoException(mensaje + 'el día de la semana no debe estar vacío.')
 
     # Permitir que les falte la tilde
     if valor_title_case == 'Miercoles':
@@ -137,6 +139,9 @@ def validar_int_positivo_opcional(valor: int|str|None|Any, mensaje: str) -> int|
         `valor` es el string vacío o `None`, `None`.
     :raise DatoInválidoException: Si `valor` no es `None` ni un entero positivo.
     '''
+    if isinstance(valor, str):
+        valor = valor.strip()
+
     if valor is None or valor == '':
         return None
     else:

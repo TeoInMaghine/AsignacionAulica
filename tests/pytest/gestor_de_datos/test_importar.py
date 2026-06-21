@@ -19,7 +19,7 @@ def test_importar_clases_pero_no_existe_el_edificio(gestor: GestorDeDatos, archi
     assert 'Anasagasti 7' in mensaje
 
 @pytest.mark.archivo('clases_nominal.xlsx')
-@pytest.mark.edificios(MockEdificio(nombre='Anasagasti 7'))
+@pytest.mark.edificios(MockEdificio(nombre='Anasagasti 7')) # Este edificio se usa en el archivo
 def test_importar_clases_pero_no_existe_el_aula(gestor: GestorDeDatos, archivo: Path):
     with pytest.raises(DatoInválidoException) as exc_info:
         gestor.importar_clases_de_excel(archivo, este_callback_no_debería_ser_llamado)
@@ -28,7 +28,10 @@ def test_importar_clases_pero_no_existe_el_aula(gestor: GestorDeDatos, archivo: 
     assert 'B202' in mensaje
 
 @pytest.mark.archivo('clases_nominal.xlsx')
-@pytest.mark.edificios(MockEdificio(nombre='Anasagasti 7', aulas=(MockAula(nombre='B202'),)))
+@pytest.mark.edificios(
+    # Este edificio y aula se usan en el archivo
+    MockEdificio(nombre='Anasagasti 7', aulas=(MockAula(nombre='B202'),))
+)
 def test_importar_datos_de_una_carrera(gestor: GestorDeDatos, archivo: Path):
     gestor.importar_clases_de_excel(archivo, lambda x: False)
 
@@ -83,8 +86,14 @@ def test_importar_datos_de_una_carrera(gestor: GestorDeDatos, archivo: Path):
     assert clase1_1.promocionable == ''
 
 @pytest.mark.archivo('clases_nominal.xlsx')
-@pytest.mark.edificios(MockEdificio(nombre='Anasagasti 7', aulas=(MockAula(nombre='B202'),)))
-@pytest.mark.carreras(MockCarrera(nombre='Acá va el nombre de la carrera'))
+@pytest.mark.edificios(
+    # Este edificio y aula se usan en el archivo
+    MockEdificio(nombre='Anasagasti 7', aulas=(MockAula(nombre='B202'),))
+)
+@pytest.mark.carreras(
+    # El archivo tiene clases de esta carrera
+    MockCarrera(nombre='Acá va el nombre de la carrera')
+)
 def test_confirmación_de_sobreescritura_true(gestor: GestorDeDatos, archivo: Path):
     argumentos_recibidos = []
     def callback(x: list[str]) -> bool:
@@ -100,8 +109,14 @@ def test_confirmación_de_sobreescritura_true(gestor: GestorDeDatos, archivo: Pa
     assert gestor.cantidad_de_materias(0) == 2
 
 @pytest.mark.archivo('clases_nominal.xlsx')
-@pytest.mark.edificios(MockEdificio(nombre='Anasagasti 7', aulas=(MockAula(nombre='B202'),)))
-@pytest.mark.carreras(MockCarrera(nombre='Acá va el nombre de la carrera'))
+@pytest.mark.edificios(
+    # Este edificio y aula se usan en el archivo
+    MockEdificio(nombre='Anasagasti 7', aulas=(MockAula(nombre='B202'),))
+)
+@pytest.mark.carreras(
+    # El archivo tiene clases de esta carrera
+    MockCarrera(nombre='Acá va el nombre de la carrera')
+)
 def test_confirmación_de_sobreescritura_false(gestor: GestorDeDatos, archivo: Path):
     argumentos_recibidos = []
     def callback(x: list[str]) -> bool:

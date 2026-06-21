@@ -1,12 +1,13 @@
 from collections.abc import Sequence
 from datetime import time
-from itertools import filterfalse
+import itertools
 from pathlib import Path
 import pickle
 from typing import Callable
 from collections import Counter
 import logging
 
+from asignacion_aulica.excel.importar_clases import importar_clases_de_excel
 from asignacion_aulica.excel.exportar_clases import exportar_datos_de_clases_a_excel
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
 from asignacion_aulica.lógica_de_asignación.asignación import asignar
@@ -20,6 +21,7 @@ from asignacion_aulica.gestor_de_datos.entidades import (
     Materia,
     todas_las_clases
 )
+from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +157,19 @@ class GestorDeDatos:
         :raise ValueError: Si `edificio` no es un edificio de este gestor.
         '''
         return self._edificios.index(edificio)
+    
+    def índice_del_edificio_por_nombre(self, nombre: str) -> int|None:
+        '''
+        :return: el índice del edificio con el nombre dado, o None si no existe
+        un edificio con el nombre dado.
+        '''
+        return next(
+            (
+                índice for índice, edificio in enumerate(self._edificios)
+                if edificio.nombre==nombre
+            ),
+            None
+        )
 
     def get_aulas(self, edificio: int) -> list[str]:
         '''
@@ -225,6 +240,19 @@ class GestorDeDatos:
         el_edificio = self._edificios[edificio]
         return any(aula.nombre.lower() == nombre for aula in el_edificio.aulas)
 
+    def índice_del_aula_por_nombre(self, edificio: int, nombre: str) -> int|None:
+        '''
+        :return: el índice del aula con el nombre dado, o None si no existe
+        un aula con el nombre dado.
+        '''
+        return next(
+            (
+                índice for índice, aula in enumerate(self._edificios[edificio].aulas)
+                if aula.nombre==nombre
+            ),
+            None
+        )
+
     def borrar_aula(self, edificio: int, índice: int):
         '''
         Borrar de la base de datos el aula especificada.
@@ -241,7 +269,7 @@ class GestorDeDatos:
         el_aula = el_edificio.aulas.pop(índice)
         
         # Borrar aulas dobles que usen este aula
-        el_edificio.aulas_dobles[:] = filterfalse(
+        el_edificio.aulas_dobles[:] = itertools.filterfalse(
             lambda ad: ad.aula_grande is el_aula or ad.aula_chica_1 is el_aula or ad.aula_chica_2 is el_aula,
             el_edificio.aulas_dobles
         )
@@ -356,6 +384,19 @@ class GestorDeDatos:
         '''
         return self._carreras[índice]
 
+    def índice_de_carrera_por_nombre(self, nombre: str) -> int|None:
+        '''
+        :return: el índice de la carrera con el nombre dado, o None si no existe
+        una carrera con el nombre dado.
+        '''
+        return next(
+            (
+                índice for índice, carrera in enumerate(self._carreras)
+                if carrera.nombre==nombre
+            ),
+            None
+        )
+
     def agregar_carrera(self, nombre: str) -> int:
         '''
         Añadir una nueva carrera con el nombre dado, inicializada con valores
@@ -459,6 +500,19 @@ class GestorDeDatos:
         :raise IndexError: Si alguno de los índices está fuera de rango.
         '''
         return self._carreras[carrera].materias[materia]
+
+    def índice_de_materia_por_nombre(self, carrera: int, nombre: str) -> int|None:
+        '''
+        :return: el índice de la materia con el nombre dado, o None si no existe
+        una materia con el nombre dado.
+        '''
+        return next(
+            (
+                índice for índice, materia in enumerate(self.get_carrera(carrera).materias)
+                if materia.nombre==nombre
+            ),
+            None
+        )
 
     def existe_materia(self, carrera: int, nombre: str) -> bool:
         '''
@@ -728,33 +782,81 @@ class GestorDeDatos:
             )
         return result
 
-    def importar_clases_de_excel(self, path: str, confirmación_de_sobreescritura: Callable[[list[str]], bool]):
+    def importar_clases_de_excel(self, path: str|Path, confirmación_de_sobreescritura: Callable[[list[str]], bool]):
         '''
         Leer datos de carreras, materias y clases de un archivo excel e
         incorporarlos a la base de datos.
 
-        Las clases/materias/carreras que estén definidas en el archivo y que no
-        existan en la base de datos, se agregan. Las que ya existan, se
-        actualizan con los nuevos datos (los datos presentes en el excel se
-        sobreescriben, los datos no presentes en el excel -como el equipamiento
-        requerido- se dejan como estaban).
+        Las carreras que estén definidas en el archivo y que no existan en la
+        base de datos, se agregan junto con sus materias y clases. En las
+        carreras que ya existan, se borran todas sus materias y clases antes de
+        agregar los datos nuevos (perdiendo la información que no está contenida
+        en el archivo, como el equipamiento requerido).
 
         :param path: El path absoluto del archivo.
         :param confirmación_de_sobreescritura: Una función para preguntarle al
         usuario si quiere sobreescribir datos. La función recibe una lista de
-        nombres de carreras en las que se sobreescribirán datos, y devuelve un
-        `bool`. Si devuelve `True` se continúa con la operación; si devuelve
-        `False` se cancela la operación sin hacer ningún cambio en la base de
-        datos.
+        nombres de carreras que se sobreescribirán, y devuelve un `bool`. Si
+        devuelve `True` se continúa con la operación; si devuelve `False` se
+        cancela la operación sin hacer ningún cambio en la base de datos.
 
         :raise FileNotFoundError: Si el archivo no existe.
         :raise ExcelInválidoException: Si el formato del archivo no es correcto.
         :raise DatoInválidoException: Si el archivo contiene un dato inválido.
         '''
-        # Nota: Este método debería llamar a archivos_excel.clases.importar,
-        # y actualizar la base de datos con el resultado.
-        # (El módulo archivos_excel todavía no existe, ver Issue #52)
-        pass
+        carreras_leídas = importar_clases_de_excel(Path(path))
+
+        # Verificar que no haya referencias a aulas que no existen
+        todas_las_clases = itertools.chain(*(itertools.chain(*(materia.clases for materia in carrera.materias)) for carrera in carreras_leídas))
+        for clase in todas_las_clases:
+            if clase.edificio is None or clase.aula is None: continue
+            i_edificio: int|None = self.índice_del_edificio_por_nombre(clase.edificio)
+            if i_edificio is None:
+                raise DatoInválidoException(f'No se conoce el edificio {clase.edificio}. Por favor, cargue los datos de este edificio o eliminelo del archivo excel.')
+            i_aula: int|None = self.índice_del_aula_por_nombre(i_edificio, clase.aula)
+            if i_aula is None:
+                raise DatoInválidoException(f'No se conoce el aula {clase.aula} del edificio {clase.edificio}. Por favor, cargue los datos de este aula o eliminela del archivo excel.')
+        
+        # Confirmar sobreescritura
+        carreras_existentes = [carrera.nombre for carrera in carreras_leídas if self.existe_carrera(carrera.nombre)]
+        if len(carreras_existentes) != 0 and not confirmación_de_sobreescritura(carreras_existentes):
+            return
+
+        # Cargar los datos
+        for carrera_leída in carreras_leídas:
+            i_carrera = self.índice_de_carrera_por_nombre(carrera_leída.nombre)
+            if i_carrera is None:
+                i_carrera = self.agregar_carrera(carrera_leída.nombre)
+            else:
+                while self.cantidad_de_materias(i_carrera) != 0:
+                    self.borrar_materia(i_carrera, 0)
+            
+            for materia_leída in carrera_leída.materias:
+                self.agregar_materia(i_carrera)
+                i_materia = self.cantidad_de_materias(i_carrera) - 1
+                materia = self.get_materia(i_carrera, i_materia)
+                materia.nombre = materia_leída.nombre
+                materia.cuatrimestral_o_anual = materia_leída.cuatrimestral_o_anual
+                materia.año = materia_leída.año
+
+                for clase_leída in materia_leída.clases:
+                    self.agregar_clase(i_carrera, i_materia)
+                    i_clase = self.cantidad_de_clases(i_carrera, i_materia) - 1
+                    clase = self.get_clase(i_carrera, i_materia, i_clase)
+                    clase.comisión = clase_leída.comisión
+                    clase.cantidad_de_alumnos = clase_leída.cantidad_de_alumnos if clase_leída.cantidad_de_alumnos is not None else 1
+                    clase.horario = clase_leída.horario
+                    clase.teórica_o_práctica = clase_leída.teórica_o_práctica
+                    clase.docente = clase_leída.docente
+                    clase.auxiliar = clase_leída.auxiliar
+                    clase.promocionable = clase_leída.promocionable
+                    clase.día = clase_leída.día
+                    clase.virtual = clase_leída.virtual
+
+                    if clase_leída.edificio is not None and clase_leída.aula is not None:
+                        i_edificio = self.índice_del_edificio_por_nombre(clase_leída.edificio)
+                        i_aula = self.índice_del_aula_por_nombre(i_edificio, clase_leída.aula)
+                        clase.aula_asignada = self.get_aula(i_edificio, i_aula)
 
     def exportar_clases_a_excel(self, path: str, carrera: int|None = None):
         '''

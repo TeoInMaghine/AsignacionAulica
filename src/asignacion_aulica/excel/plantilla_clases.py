@@ -16,7 +16,7 @@ ejemplo, la columna "Materia" puede estar unida en las filas de las clases de
 cada materia).
 '''
 from collections.abc import Sequence
-from enum import IntEnum, auto
+from enum import IntEnum, StrEnum, auto
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils.cell import get_column_letter
 from openpyxl.styles.borders import Border
@@ -44,6 +44,16 @@ from asignacion_aulica.excel.validadores import (
     día_de_la_semana,
     horario
 )
+
+class CeldaEncabezado(StrEnum):
+    logo_inicio = 'A1'
+    logo_fin = 'D2'
+    label_carrera = 'E1'
+    carrera = 'G1'
+    label_año = 'E2'
+    año = 'G2'
+    label_cuatrimestre = 'I2'
+    cuatrimestre = 'J2'
 
 class Columna(IntEnum):
     '''
@@ -82,11 +92,6 @@ TÍTULOS_DE_COLUMNAS: Sequence[str] = (
 n_columnas = len(Columna)
 última_columna: str = get_column_letter(n_columnas)
 
-# Coordenadas de las celdas relevantes
-celda_nombre_carrera = 'G1'
-celda_año = 'G2'
-celda_cuatrimestre = 'J2'
-
 n_filas_encabezado = 2
 fila_header = n_filas_encabezado + 1
 fila_primer_clase = fila_header + 1
@@ -121,9 +126,9 @@ def _generar_encabezado(hoja: Worksheet):
 
     # Insertar el logo
     logo = get_logo(2*altura_filas)
-    hoja.add_image(logo, 'A1')
+    hoja.add_image(logo, CeldaEncabezado.logo_inicio)
     hoja.merge_cells(start_row=1, end_row=2, start_column=1, end_column=4)
-    no_cambiar_este_valor.add('A1:D2')
+    no_cambiar_este_valor.add(CeldaEncabezado.logo_inicio + ':' + CeldaEncabezado.logo_fin)
     hoja.cell(1, 1).fill = fill_rojo_unrn
     hoja.cell(1, 1).border = Border(top=borde_negro, left=borde_negro)
     hoja.cell(1, 2).border = Border(top=borde_negro)

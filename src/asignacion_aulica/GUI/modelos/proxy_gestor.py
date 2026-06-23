@@ -37,6 +37,50 @@ class ProxyGestorDeDatos(QObject):
         worker = _Asignador(self.gestor, self.finAsignarAulas)
         self.threadpool.start(worker)
 
+    # TODO: confirmación_de_sobreescritura
+    @pyqtSlot(str, result=str)
+    def importarClasesAExcel(
+        self,
+        path: str,
+        # TODO: confirmación_de_sobreescritura: Callable[[list[str]]
+        #       (hacerlo un popup o algo así)
+    ) -> str:
+        '''
+        Llamar al método `importar_clases_de_excel` del gestor de datos.
+
+        :return: Un mensaje de error, vacío en caso de éxito.
+        '''
+        try:
+            # TODO: Usar confirmación_de_sobreescritura
+            self.gestor.importar_clases_de_excel(
+                path.removeprefix('file:///'),
+                lambda x: True
+            )
+            return ''
+        except Exception as e:
+            logger.exception('Error importando clases de un Excel.')
+            return str(e)
+
+    @pyqtSlot(str, int, result=str)
+    def exportarClasesAExcel(self, path: str, carrera: int|None = None) -> str:
+        '''
+        Llamar al método `exportar_clases_de_excel` del gestor de datos.
+
+        :return: Un mensaje de error, vacío en caso de éxito.
+        '''
+        try:
+            self.gestor.exportar_clases_a_excel(
+                path.removeprefix('file:///'),
+                None
+                # TODO: carrera
+                # Tener un diálogo donde te pregunta si solo
+                # guardar la carrera actual o todas las carreras.
+            )
+            return ''
+        except Exception as e:
+            logger.exception('Error importando clases de un Excel.')
+            return str(e)
+
     @pyqtSlot(result=str)
     def guardar(self) -> str:
         '''
@@ -70,6 +114,7 @@ class _Asignador(QRunnable):
         if posible_error:
             mensaje_final = posible_error
         else:
+            # TODO: Sacar este sleep
             time.sleep(0.8) # Para que parezca como que tarda un poquito
             result: InfoPostAsignación = self.gestor.asignar_aulas()
             if result.días_sin_asignar:

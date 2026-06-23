@@ -9,12 +9,15 @@ ColumnLayout {
     anchors.margins: 15
     spacing: 20
     
-    Botonera { }
+    Botonera {
+        indexCarrera: selector.indexCarrera
+    }
+
     SelectorYEditorDeCarrera {
+        id: selector
         onCarreraChanged: {
             materias.model.resetModel()
         }
-        id: selector
     }
 
     Materias {

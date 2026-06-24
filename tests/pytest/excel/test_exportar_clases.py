@@ -22,12 +22,15 @@ def tmp_xlsx_filename(tmp_path: Path) -> Path:
     return tmp_path / "tmp_file.xlsx"
 
 @pytest.fixture
-def excel_exportado(carreras: Carreras, tmp_xlsx_filename: Path) -> Workbook:
+def excel_exportado(
+    carreras: Carreras, tmp_xlsx_filename: Path,
+    año: int = 2000, cuatrimestre: str = 'Primero'
+) -> Workbook:
     '''
     Exporta los datos del fixture de carreras a un archivo excel, para luego
     leer y devolver el contenido del archivo.
     '''
-    exportar_datos_de_clases_a_excel(carreras, tmp_xlsx_filename)
+    exportar_datos_de_clases_a_excel(carreras, tmp_xlsx_filename, año, cuatrimestre)
     return openpyxl.load_workbook(tmp_xlsx_filename)
 
 def get_cell_value(sheet: Worksheet, row: int, col: int) -> Any:

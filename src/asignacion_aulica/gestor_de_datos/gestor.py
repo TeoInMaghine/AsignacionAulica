@@ -858,7 +858,10 @@ class GestorDeDatos:
                         i_aula = self.índice_del_aula_por_nombre(i_edificio, clase_leída.aula)
                         clase.aula_asignada = self.get_aula(i_edificio, i_aula)
 
-    def exportar_clases_a_excel(self, path: str, carrera: int|None = None):
+    def exportar_clases_a_excel(
+        self, path: str,
+        carrera: int|None, año: int, cuatrimestre: str
+    ):
         '''
         Escribir los datos de las clases (incluyendo la asignación de aulas) en
         un archivo excel.
@@ -869,13 +872,19 @@ class GestorDeDatos:
 
         :param path: El path absoluto del archivo.
         :param carrera: El índice de una carrera, o `None`.
+        :param año: El año a colocar en todas las hojas.
+        :param cuatrimestre: El cuatrimestre a colocar en todas las hojas.
 
         :raise IndexError: Si `carrera` no es `None` y no es el índice de una
         carrera que existe.
         :raise TBD: Si no se puede escribir el archivo en el path dado.
         '''
+        logger.info(
+            'Intentar exportar excel con año: %s, cuatrimestre: %s',
+            año, cuatrimestre
+        )
         carreras = (self._carreras[carrera],) if carrera is not None else self._carreras
-        exportar_datos_de_clases_a_excel(carreras, Path(path))
+        exportar_datos_de_clases_a_excel(carreras, Path(path), año, cuatrimestre)
 
     def exportar_cronograma_de_edificios_a_excel(self, path: str, edificio: str|None = None):
         '''

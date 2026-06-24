@@ -61,20 +61,26 @@ class ProxyGestorDeDatos(QObject):
             logger.exception('Error importando clases de un Excel.')
             return str(e)
 
-    @pyqtSlot(str, int, result=str)
-    def exportarClasesAExcel(self, path: str, carrera: int|None = None) -> str:
+    @pyqtSlot(str, int, int, str, bool, result=str)
+    def exportarClasesAExcel(
+        self, path: str, carrera: int, año: int, cuatrimestre: str,
+        todas_las_carreras: bool
+    ) -> str:
         '''
         Llamar al método `exportar_clases_de_excel` del gestor de datos.
+
+        :param todas_las_carreras: Si es `True`, se ignora el valor de `carrera`
+        y se intenta exportar todas las carreras. Parámetro agregado porque Qt
+        no maneja los valores `None` de forma conveniente.
 
         :return: Un mensaje de error, vacío en caso de éxito.
         '''
         try:
             self.gestor.exportar_clases_a_excel(
                 path.removeprefix('file:///'),
-                None
-                # TODO: carrera
-                # Tener un diálogo donde te pregunta si solo
-                # guardar la carrera actual o todas las carreras.
+                None if todas_las_carreras else carrera,
+                año,
+                cuatrimestre
             )
             return ''
         except Exception as e:

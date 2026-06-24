@@ -11,6 +11,10 @@ ColumnLayout {
     
     Botonera {
         indexCarrera: selector.indexCarrera
+        onImportaciónHecha: {
+            materias.model.resetModel()
+            // TODO: Resetear ComboBoxCarrera de alguna forma
+        }
     }
 
     SelectorYEditorDeCarrera {

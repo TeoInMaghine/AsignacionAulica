@@ -66,7 +66,7 @@ def test_validar_año():
 
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
-    assert 'no debe estar vacío' in mensaje
+    assert 'debe ser un número entero' in mensaje
 
 def test_validar_año_del_plan_de_estudios():
     assert validar_año_del_plan_de_estudios(4, 'msg') == 4

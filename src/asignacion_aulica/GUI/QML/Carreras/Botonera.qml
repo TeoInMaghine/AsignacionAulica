@@ -10,6 +10,8 @@ import ModelosAsignaciónÁulica
 RowLayout {
 
     required property int indexCarrera
+    property list<string> tiposDeCuatrimestre: ["Primero", "Segundo"]
+    signal importaciónHecha
 
     spacing: 15
 
@@ -43,26 +45,108 @@ RowLayout {
     }
     
     BotónRedondeadoConTextoColorUNRN {
-        text: "Exportar Excel"
-        onClicked: selectorExportarArchivo.open()
-    }
-    BotónRedondeadoConTextoColorUNRN {
         text: "Importar Excel"
         onClicked: selectorImportarArchivo.open()
+    }
+    BotónRedondeadoConTextoColorUNRN {
+        text: "Exportar Excel"
+        onClicked: popupPreExportar.open()
     }
 
     FileDialog {
         id: selectorImportarArchivo
         onAccepted: {
-            // FIXME: Falla importar un excel que se acaba de exportar porque no
-            // acepta celdas de año o carrera vacíos. Preguntar en una ventana
-            // de diálogo qué año y cuatrimestre poner, y también aceptar que
-            // estén esas celdas vacías.
             var result = ProxyGestorDeDatos.importarClasesAExcel(selectedFile)
+            if (result !== "") importaciónHecha()
             popupPostImportar.mensajeError = result
             popupPostImportar.open()
-            // FIXME: resetear indexCarrera o la lista de materias o el modelo
-            // si no había carreras, sino se queda vacío.
+        }
+    }
+    PopupConTexto {
+        id: popupPostImportar
+        property string mensajeError: ""
+
+        texto: mensajeError.length > 0 ? mensajeError : "Se importaron las clases del excel."
+        textoBotón: "Cerrar"
+    }
+
+    Popup {
+        id: popupPreExportar
+
+        modal: true
+
+        topPadding: 20
+        bottomPadding: 20
+        leftPadding: 60
+        rightPadding: 60
+        margins: 1
+
+        anchors.centerIn: Overlay.overlay
+
+        ColumnLayout {
+            spacing: 20
+
+            Label {
+                text: "Opciones para exportar a Excel"
+                font.pointSize: FontSize.medium
+                font.bold: true
+            }
+
+            RowLayout {
+                Layout.alignment: Qt.AlignCenter
+                Label {
+                    text: "Año:"
+                }
+                TextFieldConEnter {
+                    Layout.preferredWidth: 60
+
+                    text: selectorExportarArchivo.año
+                    validator: RegularExpressionValidator {
+                        // Permitir números positivos o string vacío
+                        regularExpression: /^[0-9]*$/
+                    }
+                    onEditingFinished: {
+                        // Interpretar string vacío como 0
+                        selectorExportarArchivo.año = parseInt(text) || 0
+                    }
+                }
+
+                Item { width: 30 } // Espacio vacío
+
+                Label {
+                    text: "Cuatrimestre:"
+                }
+                ComboBox {
+                    model: tiposDeCuatrimestre
+                    currentIndex: selectorExportarArchivo.cuatrimestre
+                    onActivated: (index) => {
+                        selectorExportarArchivo.cuatrimestre = index
+                    }
+                }
+            }
+
+            RowLayout {
+                BotónRedondeadoConTexto{
+                    text: "Exportar todas las carreras"
+                    onClicked: {
+                        selectorExportarArchivo.todasLasCarreras = true
+                        selectorExportarArchivo.open()
+                    }
+                }
+                BotónRedondeadoConTexto{
+                    text: "Exportar la carrera actual"
+                    onClicked: {
+                        selectorExportarArchivo.todasLasCarreras = false
+                        selectorExportarArchivo.open()
+                    }
+                }
+                BotónRedondeadoConTexto{
+                    text: "Cancelar"
+                    onClicked: {
+                        popupPreExportar.close()
+                    }
+                }
+            }
         }
     }
     FileDialog {
@@ -70,26 +154,25 @@ RowLayout {
 
         fileMode: FileDialog.SaveFile
         nameFilters: ["Excel files (*.xlsx)"]
+
+        // Argumentos para la exportación
+        property int año: 2000
+        property int cuatrimestre: 0
+        property bool todasLasCarreras: false
         
         onAccepted: {
             var result = ProxyGestorDeDatos.exportarClasesAExcel(
                 selectedFile,
-                // TODO: Tener un diálogo donde te pregunta si solo
-                // guardar la carrera actual o todas las carreras.
-                indexCarrera
+                indexCarrera,
+                año,
+                tiposDeCuatrimestre[cuatrimestre],
+                todasLasCarreras
             )
+
+            popupPreExportar.close()
             popupPostExportar.mensajeError = result
             popupPostExportar.open()
         }
-    }
-
-    // TODO: Tener mensajes de éxito con más información
-    PopupConTexto {
-        id: popupPostImportar
-        property string mensajeError: ""
-
-        texto: mensajeError.length > 0 ? mensajeError : "Se importaron las clases del excel."
-        textoBotón: "Cerrar"
     }
     PopupConTexto {
         id: popupPostExportar

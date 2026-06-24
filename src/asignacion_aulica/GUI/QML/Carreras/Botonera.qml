@@ -55,9 +55,9 @@ RowLayout {
         id: selectorImportarArchivo
         onAccepted: {
             // FIXME: Falla importar un excel que se acaba de exportar porque no
-            // acepta celdas de año o carrera vacíos. Guardar en el gestor y
-            // exportar esos datos? Y cuatrimestre también? Y exponer esos datos
-            // para editar en la lista de carreras?
+            // acepta celdas de año o carrera vacíos. Preguntar en una ventana
+            // de diálogo qué año y cuatrimestre poner, y también aceptar que
+            // estén esas celdas vacías.
             var result = ProxyGestorDeDatos.importarClasesAExcel(selectedFile)
             popupPostImportar.mensajeError = result
             popupPostImportar.open()
@@ -72,7 +72,6 @@ RowLayout {
         nameFilters: ["Excel files (*.xlsx)"]
         
         onAccepted: {
-            // FIXME: Por qué al exportar sale una clase de color rosa?
             var result = ProxyGestorDeDatos.exportarClasesAExcel(
                 selectedFile,
                 // TODO: Tener un diálogo donde te pregunta si solo

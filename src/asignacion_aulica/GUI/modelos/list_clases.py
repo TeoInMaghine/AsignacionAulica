@@ -116,7 +116,7 @@ class ListClases(QAbstractListModel):
             return False
 
         rol = Rol(role)
-        logger.debug('Editando %s con el valor %s', rol.name, value)
+        logger.debug('Editando %s al valor "%s"', rol.name, value)
 
         was_set: bool = self.try_to_set(index, value, rol)
         if was_set: self.dataChanged.emit(index, index, [role])

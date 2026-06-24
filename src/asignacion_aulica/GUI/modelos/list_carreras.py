@@ -84,9 +84,10 @@ class ListCarreras(QAbstractListModel):
         if 0 <= índice < n_carreras:
             self.beginResetModel()
             try:
-                nuevo_índice = self.gestor.set_carrera_nombre(índice, nuevo_nombre)
-            except ValueError:
+                nuevo_índice = self.gestor.try_to_set_carrera_nombre(índice, nuevo_nombre)
+            except ValueError as e:
                 # Ignorar el error si el nuevo nombre no era válido
+                logger.debug(str(e))
                 return índice
             else:
                 return nuevo_índice

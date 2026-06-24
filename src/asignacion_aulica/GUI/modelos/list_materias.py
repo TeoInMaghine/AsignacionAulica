@@ -85,7 +85,7 @@ class ListMaterias(QAbstractListModel):
         if role not in ROLES_A_NOMBRES_QT: return False
 
         rol = Rol(role)
-        logger.debug(f'Editando {rol.name} con el valor {value}')
+        logger.debug('Editando %s al valor "%s"', rol.name, value)
 
         was_set: bool = self.try_to_set(index, value, rol)
         if was_set: self.dataChanged.emit(index, index, [role])
@@ -141,6 +141,10 @@ class ListMaterias(QAbstractListModel):
         # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
         # Enter; lo ignoramos en vez de loguearlo
         if nuevo_nombre == materia.nombre:
+            return False
+
+        if nuevo_nombre == '':
+            logger.debug('No se puede asignar un nombre vacío.')
             return False
 
         # Aceptamos cambiar la capitalización del nombre

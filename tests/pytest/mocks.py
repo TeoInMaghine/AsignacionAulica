@@ -44,6 +44,8 @@ def pytest_configure(config):
     config.addinivalue_line("markers", "carreras: marca para pasar parametros al fixture carreras")
     config.addinivalue_line("markers", "clases: marca para pasar parametros al fixture clases")
     config.addinivalue_line("markers", "asignaciones_forzadas: marca para pasar parametros al fixture asignaciones")
+    config.addinivalue_line("markers", "año: marca para pasar el parametro al fixture excel_exportado")
+    config.addinivalue_line("markers", "cuatrimestre: marca para pasar el parametro al fixture excel_exportado")
 
 @dataclass
 class MockAula:

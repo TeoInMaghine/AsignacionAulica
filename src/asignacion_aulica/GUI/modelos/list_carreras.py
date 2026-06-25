@@ -141,3 +141,8 @@ class ListCarreras(QAbstractListModel):
                 else None
             )
             self.gestor.get_carrera(i_carrera).edificio_preferido = edificio
+
+    @pyqtSlot()
+    def resetModel(self):
+        self.beginResetModel()
+        self.endResetModel()

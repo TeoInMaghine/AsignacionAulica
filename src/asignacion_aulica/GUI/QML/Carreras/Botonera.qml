@@ -57,7 +57,7 @@ RowLayout {
         id: selectorImportarArchivo
         onAccepted: {
             var result = ProxyGestorDeDatos.importarClasesAExcel(selectedFile)
-            if (result !== "") importaciónHecha()
+            if (result === "") importaciónHecha()
             popupPostImportar.mensajeError = result
             popupPostImportar.open()
         }

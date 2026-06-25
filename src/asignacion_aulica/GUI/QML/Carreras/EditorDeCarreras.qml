@@ -13,7 +13,7 @@ ColumnLayout {
         indexCarrera: selector.indexCarrera
         onImportaciónHecha: {
             materias.model.resetModel()
-            // TODO: Resetear ComboBoxCarrera de alguna forma
+            selector.model.resetModel()
         }
     }
 

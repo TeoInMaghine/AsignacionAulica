@@ -46,18 +46,57 @@ RowLayout {
     
     BotónRedondeadoConTextoColorUNRN {
         text: "Importar Excel"
-        onClicked: selectorImportarArchivo.open()
+        onClicked: popupPreImportar.open()
     }
     BotónRedondeadoConTextoColorUNRN {
         text: "Exportar Excel"
         onClicked: popupPreExportar.open()
     }
 
+
+    Popup {
+        id: popupPreImportar
+
+        modal: true
+
+        topPadding: 20
+        bottomPadding: 20
+        leftPadding: 60
+        rightPadding: 60
+        margins: 1
+
+        anchors.centerIn: Overlay.overlay
+
+        ColumnLayout {
+            spacing: 20
+
+            Label {
+                text: "Importar un Excel puede sobreescribir datos en las carreras existentes."
+                font.pointSize: FontSize.medium
+                font.bold: true
+            }
+
+            RowLayout {
+                BotónRedondeadoConTexto{
+                    text: "Continuar de todos modos"
+                    onClicked: selectorImportarArchivo.open()
+                }
+                BotónRedondeadoConTexto{
+                    text: "Cancelar"
+                    onClicked: {
+                        popupPreImportar.close()
+                    }
+                }
+            }
+        }
+    }
     FileDialog {
         id: selectorImportarArchivo
         onAccepted: {
             var result = ProxyGestorDeDatos.importarClasesAExcel(selectedFile)
             if (result === "") importaciónHecha()
+
+            popupPreImportar.close()
             popupPostImportar.mensajeError = result
             popupPostImportar.open()
         }

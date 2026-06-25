@@ -37,23 +37,19 @@ class ProxyGestorDeDatos(QObject):
         worker = _Asignador(self.gestor, self.finAsignarAulas)
         self.threadpool.start(worker)
 
-    # TODO: confirmación_de_sobreescritura
     @pyqtSlot(str, result=str)
-    def importarClasesAExcel(
-        self,
-        path: str,
-        # TODO: confirmación_de_sobreescritura: Callable[[list[str]]
-        #       (hacerlo un popup o algo así)
-    ) -> str:
+    def importarClasesAExcel(self, path: str) -> str:
         '''
         Llamar al método `importar_clases_de_excel` del gestor de datos.
 
         :return: Un mensaje de error, vacío en caso de éxito.
         '''
         try:
-            # TODO: Usar confirmación_de_sobreescritura
             self.gestor.importar_clases_de_excel(
                 path.removeprefix('file:///'),
+                # TODO: Quizás usar confirmación_de_sobreescritura en un futuro?
+                # No lo hicimos por ahora porque es bastante esfuerzo para no
+                # mucho beneficio.
                 lambda x: True
             )
             return ''

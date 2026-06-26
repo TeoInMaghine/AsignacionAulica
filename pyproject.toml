@@ -1,7 +1,7 @@
 [project]
 name = "asignacion-aulica"
 description = "Software de asignación de aulas para la UNRN Sede Andina"
-version = "1.0.0"
+version = "1.1.0"
 
 authors = [
   {name = "Cristian Gustavo Mogensen"},

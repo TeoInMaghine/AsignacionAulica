@@ -1,5 +1,5 @@
 import logging, time
-from PyQt6.QtCore import QObject, QThreadPool, pyqtBoundSignal, pyqtSignal, pyqtSlot, QRunnable
+from PyQt6.QtCore import QObject, QThreadPool, pyqtBoundSignal, pyqtSignal, pyqtSlot, QRunnable, QUrl
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
@@ -38,7 +38,7 @@ class ProxyGestorDeDatos(QObject):
         self.threadpool.start(worker)
 
     @pyqtSlot(str, result=str)
-    def importarClasesAExcel(self, path: str) -> str:
+    def importarClasesDeExcel(self, url_path: str) -> str:
         '''
         Llamar al método `importar_clases_de_excel` del gestor de datos.
 
@@ -46,7 +46,7 @@ class ProxyGestorDeDatos(QObject):
         '''
         try:
             self.gestor.importar_clases_de_excel(
-                path.removeprefix('file:///'),
+                QUrl(url_path).toLocalFile(),
                 # TODO: Quizás usar confirmación_de_sobreescritura en un futuro?
                 # No lo hicimos por ahora porque es bastante esfuerzo para no
                 # mucho beneficio.
@@ -59,7 +59,7 @@ class ProxyGestorDeDatos(QObject):
 
     @pyqtSlot(str, int, int, str, bool, result=str)
     def exportarClasesAExcel(
-        self, path: str, carrera: int, año: int, cuatrimestre: str,
+        self, url_path: str, carrera: int, año: int, cuatrimestre: str,
         todas_las_carreras: bool
     ) -> str:
         '''
@@ -73,7 +73,7 @@ class ProxyGestorDeDatos(QObject):
         '''
         try:
             self.gestor.exportar_clases_a_excel(
-                path.removeprefix('file:///'),
+                QUrl(url_path).toLocalFile(),
                 None if todas_las_carreras else carrera,
                 año,
                 cuatrimestre

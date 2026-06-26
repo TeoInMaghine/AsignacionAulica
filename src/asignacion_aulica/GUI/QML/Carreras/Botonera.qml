@@ -92,8 +92,11 @@ RowLayout {
     }
     FileDialog {
         id: selectorImportarArchivo
+
+        nameFilters: ["Excel files (*.xlsx)"]
+
         onAccepted: {
-            var result = ProxyGestorDeDatos.importarClasesAExcel(selectedFile)
+            var result = ProxyGestorDeDatos.importarClasesDeExcel(selectedFile)
             if (result === "") importaciónHecha()
 
             popupPreImportar.close()

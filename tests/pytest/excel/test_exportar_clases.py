@@ -22,12 +22,19 @@ def tmp_xlsx_filename(tmp_path: Path) -> Path:
     return tmp_path / "tmp_file.xlsx"
 
 @pytest.fixture
-def excel_exportado(carreras: Carreras, tmp_xlsx_filename: Path) -> Workbook:
+def excel_exportado(
+    carreras: Carreras, tmp_xlsx_filename: Path, request: pytest.FixtureRequest
+) -> Workbook:
     '''
     Exporta los datos del fixture de carreras a un archivo excel, para luego
     leer y devolver el contenido del archivo.
     '''
-    exportar_datos_de_clases_a_excel(carreras, tmp_xlsx_filename)
+    marker_año = request.node.get_closest_marker('año')
+    año = marker_año.args[0] if marker_año else 2000
+    marker_cuatrimestre = request.node.get_closest_marker('cuatrimestre')
+    cuatrimestre = marker_cuatrimestre.args[0] if marker_cuatrimestre else 'Segundo'
+
+    exportar_datos_de_clases_a_excel(carreras, tmp_xlsx_filename, año, cuatrimestre)
     return openpyxl.load_workbook(tmp_xlsx_filename)
 
 def get_cell_value(sheet: Worksheet, row: int, col: int) -> Any:
@@ -52,7 +59,11 @@ def get_cell_value(sheet: Worksheet, row: int, col: int) -> Any:
     MockCarrera(nombre='B'),
     MockCarrera(nombre='C')
 )
-def test_encabezado(carreras: Carreras, excel_exportado: Workbook):
+@pytest.mark.año(2023)
+@pytest.mark.cuatrimestre('Segundo')
+def test_encabezado(
+    carreras: Carreras, excel_exportado: Workbook
+):
     '''
     Verificar que hay una hoja para cada carrera y que aparecen los datos
     correctos en el encabezado.
@@ -61,7 +72,8 @@ def test_encabezado(carreras: Carreras, excel_exportado: Workbook):
     for hoja, carrera in zip(excel_exportado.worksheets, carreras):
         assert hoja.title == carrera.nombre
         assert hoja[plantilla_clases.CeldaEncabezado.carrera].value == carrera.nombre
-        #TODO: año y cuatrimestre
+        assert hoja[plantilla_clases.CeldaEncabezado.año].value == 2023
+        assert hoja[plantilla_clases.CeldaEncabezado.cuatrimestre].value == 'Segundo'
     
 @pytest.mark.edificios(
     MockEdificio(nombre='E1', aulas=(MockAula(nombre='A1.1'), MockAula(nombre='A1.2'))),

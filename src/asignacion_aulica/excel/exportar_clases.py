@@ -25,7 +25,9 @@ class RowCounter:
     def next(self):
         self._current += 1
 
-def exportar_datos_de_clases_a_excel(carreras: Sequence[Carrera], path: Path):
+def exportar_datos_de_clases_a_excel(
+    carreras: Sequence[Carrera], path: Path, año: int, cuatrimestre: str
+):
     '''
     Escribir los datos de las clases (incluyendo las aulas asignadas) en un
     archivo excel.
@@ -34,6 +36,8 @@ def exportar_datos_de_clases_a_excel(carreras: Sequence[Carrera], path: Path):
 
     :param carreras: Las carreras cuyos datos se quiere exportar.
     :param path: El path absoluto del archivo.
+    :param año: El año a colocar en todas las hojas.
+    :param cuatrimestre: El cuatrimestre a colocar en todas las hojas.
 
     :raise TBD: Si no se puede escribir el archivo en el path dado.
     '''
@@ -43,13 +47,16 @@ def exportar_datos_de_clases_a_excel(carreras: Sequence[Carrera], path: Path):
     for carrera in carreras:
         hoja = excel.create_sheet(title=carrera.nombre)
         generar_plantilla(hoja)
-        _escribir_datos_de_una_carrera(hoja, carrera)
+        _escribir_datos_de_una_carrera(hoja, carrera, año, cuatrimestre)
 
     excel.save(path)
 
-def _escribir_datos_de_una_carrera(hoja: Worksheet, carrera: Carrera):
+def _escribir_datos_de_una_carrera(
+    hoja: Worksheet, carrera: Carrera, año: str, cuatrimestre: str
+):
     hoja[CeldaEncabezado.carrera].value = carrera.nombre
-    #TODO: ano y cuatrimestre
+    hoja[CeldaEncabezado.año].value = año
+    hoja[CeldaEncabezado.cuatrimestre].value = cuatrimestre
 
     # Copiamos la lista de materias para poder ordenarla sin afectar al gestor.
     # Ordenamos las materias primero por año y después alfabéticamente.

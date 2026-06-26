@@ -44,7 +44,7 @@ def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
         gestor.get_carrera(0)
     with pytest.raises(IndexError):
-        gestor.set_carrera_nombre(0, 'a')
+        gestor.try_to_set_carrera_nombre(0, 'a')
     
     # Cuando existen carreras pero el índice está fuera de rango:
     gestor.agregar_carrera('a')
@@ -54,7 +54,7 @@ def test_get_set_fuera_de_rango(gestor: GestorDeDatos):
     with pytest.raises(IndexError):
         gestor.get_carrera(3)
     with pytest.raises(IndexError):
-        gestor.set_carrera_nombre(3, 'd')
+        gestor.try_to_set_carrera_nombre(3, 'd')
 
 def test_get_set_nombre_carrera_existente(gestor: GestorDeDatos):
     nombre = 'nombresito'
@@ -64,7 +64,7 @@ def test_get_set_nombre_carrera_existente(gestor: GestorDeDatos):
     carrera = gestor.get_carrera(0)
     assert carrera.nombre == nombre
 
-    gestor.set_carrera_nombre(0, 'otro')
+    gestor.try_to_set_carrera_nombre(0, 'otro')
     assert carrera.nombre == 'otro'
 
 def test_cambiar_nombre_mantiene_orden_afabético(gestor: GestorDeDatos):
@@ -72,17 +72,17 @@ def test_cambiar_nombre_mantiene_orden_afabético(gestor: GestorDeDatos):
     assert gestor.get_carreras() == ['b']
 
     gestor.agregar_carrera('z')
-    nuevo_índice = gestor.set_carrera_nombre(1, 'a')
+    nuevo_índice = gestor.try_to_set_carrera_nombre(1, 'a')
     assert nuevo_índice == 0
     assert gestor.get_carreras() == ['a', 'b']
 
     gestor.agregar_carrera('asdaf')
-    nuevo_índice = gestor.set_carrera_nombre(1, 'c')
+    nuevo_índice = gestor.try_to_set_carrera_nombre(1, 'c')
     assert nuevo_índice == 2
     assert gestor.get_carreras() == ['a', 'b', 'c']
 
     gestor.agregar_carrera('bárbara')
-    nuevo_índice = gestor.set_carrera_nombre(2, 'a2')
+    nuevo_índice = gestor.try_to_set_carrera_nombre(2, 'a2')
     assert nuevo_índice == 1
     assert gestor.get_carreras() == ['a', 'a2', 'b', 'c']
 

@@ -1,5 +1,5 @@
 import logging, time
-from PyQt6.QtCore import QObject, QThreadPool, pyqtBoundSignal, pyqtSignal, pyqtSlot, QRunnable
+from PyQt6.QtCore import QObject, QThreadPool, pyqtBoundSignal, pyqtSignal, pyqtSlot, QRunnable, QUrl
 
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
@@ -37,6 +37,52 @@ class ProxyGestorDeDatos(QObject):
         worker = _Asignador(self.gestor, self.finAsignarAulas)
         self.threadpool.start(worker)
 
+    @pyqtSlot(str, result=str)
+    def importarClasesDeExcel(self, url_path: str) -> str:
+        '''
+        Llamar al método `importar_clases_de_excel` del gestor de datos.
+
+        :return: Un mensaje de error, vacío en caso de éxito.
+        '''
+        try:
+            self.gestor.importar_clases_de_excel(
+                QUrl(url_path).toLocalFile(),
+                # TODO: Quizás usar confirmación_de_sobreescritura en un futuro?
+                # No lo hicimos por ahora porque es bastante esfuerzo para no
+                # mucho beneficio.
+                lambda x: True
+            )
+            return ''
+        except Exception as e:
+            logger.exception('Error importando clases de un Excel.')
+            return str(e)
+
+    @pyqtSlot(str, int, int, str, bool, result=str)
+    def exportarClasesAExcel(
+        self, url_path: str, carrera: int, año: int, cuatrimestre: str,
+        todas_las_carreras: bool
+    ) -> str:
+        '''
+        Llamar al método `exportar_clases_de_excel` del gestor de datos.
+
+        :param todas_las_carreras: Si es `True`, se ignora el valor de `carrera`
+        y se intenta exportar todas las carreras. Parámetro agregado porque Qt
+        no maneja los valores `None` de forma conveniente.
+
+        :return: Un mensaje de error, vacío en caso de éxito.
+        '''
+        try:
+            self.gestor.exportar_clases_a_excel(
+                QUrl(url_path).toLocalFile(),
+                None if todas_las_carreras else carrera,
+                año,
+                cuatrimestre
+            )
+            return ''
+        except Exception as e:
+            logger.exception('Error importando clases de un Excel.')
+            return str(e)
+
     @pyqtSlot(result=str)
     def guardar(self) -> str:
         '''
@@ -70,6 +116,7 @@ class _Asignador(QRunnable):
         if posible_error:
             mensaje_final = posible_error
         else:
+            # TODO: Sacar este sleep
             time.sleep(0.8) # Para que parezca como que tarda un poquito
             result: InfoPostAsignación = self.gestor.asignar_aulas()
             if result.días_sin_asignar:

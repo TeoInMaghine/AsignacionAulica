@@ -110,7 +110,7 @@ class ListEdificios(QAbstractListModel):
         if role not in Rol: return False
 
         rol = Rol(role)
-        logger.debug('Editando %s con el valor %s', rol.name, value)
+        logger.debug('Editando %s al valor "%s"', rol.name, value)
 
         was_set: bool = self.try_to_set(index, value, rol)
         if was_set: self.dataChanged.emit(index, index, [role])
@@ -174,6 +174,10 @@ class ListEdificios(QAbstractListModel):
         # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
         # Enter; lo ignoramos en vez de loguearlo
         if nuevo_nombre == edificio.nombre:
+            return False
+
+        if nuevo_nombre == '':
+            logger.debug('No se puede asignar un nombre vacío.')
             return False
 
         # Aceptamos cambiar la capitalización del nombre

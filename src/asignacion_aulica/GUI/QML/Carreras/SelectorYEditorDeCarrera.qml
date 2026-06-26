@@ -12,7 +12,7 @@ import ModelosAsignaciónÁulica
  * - Editar propiedades de la carrera seleccionada
  *   (actualmente la única propiedad es el edificio preferido)
  * 
- * No se encargar de editar las materias y clases de la carrera.
+ * No se encarga de editar las materias y clases de la carrera.
  */
 ColumnLayout{
     spacing: 10
@@ -20,7 +20,7 @@ ColumnLayout{
     property alias hayCarreraSeleccionada: comboBox.hayCarreraSeleccionada
     property alias carrera: comboBox.carrera
     property alias indexCarrera: comboBox.indexCarrera
-    ListCarreras { id: listCarreras }
+    property var model: ListCarreras { id: listCarreras }
 
     RowLayout {
         spacing: 10

@@ -87,7 +87,7 @@ class ListAulasDobles(QAbstractListModel):
             return None
 
         rol = Rol(role)
-        logger.debug('Editando %s con el valor %s', rol.name, value)
+        logger.debug('Editando %s al valor "%s"', rol.name, value)
         aula_doble: AulaDoble = self.gestor.get_aula_doble(
             self.i_edificio, index.row()
         )

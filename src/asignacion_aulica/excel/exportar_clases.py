@@ -45,7 +45,9 @@ def exportar_datos_de_clases_a_excel(
     excel.remove(excel.active) # Por defecto hay una hoja vacía que no queremos
 
     for carrera in carreras:
-        hoja = excel.create_sheet(title=carrera.nombre)
+        # Limitamos el largo del nombre de la hoja para que no genere un warning
+        # al abrir el .xlsx en Excel; no se admiten nombres de más 30 caracteres
+        hoja = excel.create_sheet(title=carrera.nombre[:30])
         generar_plantilla(hoja)
         _escribir_datos_de_una_carrera(hoja, carrera, año, cuatrimestre)
 

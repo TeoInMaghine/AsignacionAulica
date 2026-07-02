@@ -8,6 +8,16 @@ from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoExce
 
 logger = logging.getLogger(__name__)
 
+def _sanitizar_path(path_url: str, extensión: str) -> str:
+    '''
+    Convertir una url devuelta por el selector de archivos de Qt en un path
+    nativo, y garantizar que tiene la extensión deseada.
+    '''
+    path = QUrl(path_url).toLocalFile()
+    if not path.endswith(extensión):
+        path += extensión
+    return path
+
 class ProxyGestorDeDatos(QObject):
     '''
     Bindings para poder llamar a métodos del gestor de datos desde QML.
@@ -75,7 +85,7 @@ class ProxyGestorDeDatos(QObject):
         '''
         try:
             self.gestor.exportar_clases_a_excel(
-                QUrl(url_path).toLocalFile(),
+                _sanitizar_path(url_path, '.xlsx'),
                 None if todas_las_carreras else carrera,
                 año,
                 cuatrimestre
@@ -96,7 +106,7 @@ class ProxyGestorDeDatos(QObject):
         :return: Un mensaje de error, vacío en caso de éxito.
         '''
         try:
-            plantilla_clases.exportar_pantilla(QUrl(url_path).toLocalFile())
+            plantilla_clases.exportar_pantilla(_sanitizar_path(url_path, '.xlsx'))
             return ''
         except Exception as e:
             logger.exception('Error generando plantilla Excel.')

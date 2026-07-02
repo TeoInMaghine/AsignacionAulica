@@ -28,8 +28,8 @@ RowLayout {
 
     Label {
         id: headerEquipamiento
-        leftPadding: 40
-        rightPadding: 40
+        leftPadding: 80
+        rightPadding: 80
         text: "Equipamiento"
     }
 

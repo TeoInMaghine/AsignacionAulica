@@ -1,3 +1,5 @@
+# TODO: Implementar renombrado y añadido de equipamiento, solo lo hice en las
+# clases por ahora.
 import logging
 from typing import Any, override
 from PyQt6.QtCore import QAbstractListModel, Qt, QModelIndex, QByteArray, pyqtProperty, pyqtSignal, pyqtSlot

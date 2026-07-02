@@ -15,9 +15,8 @@ ComboBox {
 
     // ComboBox cierra el popup cuando sus items (si heredan de AbstractButton)
     // son activados. Wrappear el delegate es lo que previene que eso pase.
-    delegate: Item {
-        width: comboBox.width
-        height: checkDelegate.height
+    delegate: RowLayout {
+        spacing: 10
 
         function toggle() {
             // checkDelegate.toggle() no triggerea onToggled, lol
@@ -26,7 +25,9 @@ ComboBox {
 
         CheckDelegate {
             id: checkDelegate
-            anchors.fill: parent
+            visible: !inputEditarNombre.focus
+            Layout.preferredWidth:
+                comboBox.width - botónEditarNombre.width - botónBorrar.width - 2*spacing
             LayoutMirroring.enabled: true
 
             text: model.nombre
@@ -37,6 +38,44 @@ ComboBox {
                 model.seleccionado = checked
             }
         }
+
+        TextField {
+            id: inputEditarNombre
+            visible: inputEditarNombre.focus
+            Layout.preferredWidth:
+                comboBox.width - botónEditarNombre.width - botónBorrar.width - 2*spacing
+            Layout.preferredHeight: checkDelegate.height
+
+            text: checkDelegate.text
+            onAccepted: {
+                model.nombre = inputEditarNombre.text
+                inputEditarNombre.focus = false
+            }
+
+            Keys.onEscapePressed: {
+                inputEditarNombre.focus = false
+            }
+        }
+
+        BotónRedondeadoConTexto {
+            id: botónEditarNombre
+            Layout.preferredHeight: 40
+            Layout.preferredWidth: 40
+            radius: 5
+
+            icon.source: assets_path + "/iconos/editar.png"
+            onClicked: {
+                inputEditarNombre.focus = true
+            }
+        }
+
+        BotónBorrar {
+            id: botónBorrar
+            onClicked: {
+                equipamientos.borrarEquipamiento(model.nombre)
+            }
+        }
+
     }
 
     popup: Popup {

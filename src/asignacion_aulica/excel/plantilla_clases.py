@@ -16,6 +16,7 @@ ejemplo, la columna "Materia" puede estar unida en las filas de las clases de
 cada materia).
 '''
 from collections.abc import Sequence
+from datetime import datetime
 from enum import IntEnum, StrEnum, auto
 from openpyxl.worksheet.worksheet import Worksheet
 from openpyxl.utils.cell import get_column_letter
@@ -104,7 +105,14 @@ def exportar_pantilla(path: str):
     Genera una plantilla vacía y la guarda en el path dado.
     '''
     excel = Workbook()
-    generar_plantilla(excel.active)
+    hoja = excel.active
+
+    generar_plantilla(hoja)
+    fecha = datetime.now()
+    hoja.title = 'Plantilla'
+    hoja[CeldaEncabezado.año].value = fecha.year
+    hoja[CeldaEncabezado.cuatrimestre].value = 'Primero' if fecha.month < 6 else 'Segundo'
+
     excel.save(path)
 
 def generar_plantilla(hoja: Worksheet):

@@ -80,7 +80,21 @@ class ProxyGestorDeDatos(QObject):
             )
             return ''
         except Exception as e:
-            logger.exception('Error importando clases de un Excel.')
+            logger.exception('Error exportando clases a Excel.')
+            return str(e)
+    
+    @pyqtSlot(str, result=str)
+    def generarPlantillaExcel(self, url_path: str) -> str:
+        '''
+        Generar un archivo excel con la plantilla vacía.
+
+        :return: Un mensaje de error, vacío en caso de éxito.
+        '''
+        try:
+            plantilla_clases.exportar_pantilla(QUrl(url_path).toLocalFile())
+            return ''
+        except Exception as e:
+            logger.exception('Error generando plantilla Excel.')
             return str(e)
 
     @pyqtSlot(result=str)

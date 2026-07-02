@@ -99,9 +99,17 @@ fila_primer_clase = fila_header + 1
 # Cantidad de filas a las que aplicar formato
 _n_filas = 200
 
+def exportar_pantilla(path: str):
+    '''
+    Genera una plantilla vacía y la guarda en el path dado.
+    '''
+    excel = Workbook()
+    generar_plantilla(excel.active)
+    excel.save(path)
+
 def generar_plantilla(hoja: Worksheet):
     '''
-    Genera en la hija dada la plantilla para datos de clases.
+    Genera en la hoja dada la plantilla para datos de clases.
     '''
     hoja.parent._fonts[0] = font_default
     hoja.add_data_validation(no_cambiar_este_valor)

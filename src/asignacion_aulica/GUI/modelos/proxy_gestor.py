@@ -65,6 +65,9 @@ class ProxyGestorDeDatos(QObject):
                 lambda x: True
             )
             return ''
+        except DatoInválidoException as e:
+            logger.info("Error exportando clases a excel: %s", e)
+            return str(e)
         except Exception as e:
             logger.exception('Error importando clases de un Excel.')
             return str(e)
@@ -92,7 +95,7 @@ class ProxyGestorDeDatos(QObject):
             )
             return ''
         except DatoInválidoException as e:
-            logger.warning("Error exportando clases a excel: %s", e)
+            logger.info("Error exportando clases a excel: %s", e)
             return str(e)
         except Exception as e:
             logger.exception('Error exportando clases a Excel.')
@@ -108,6 +111,9 @@ class ProxyGestorDeDatos(QObject):
         try:
             plantilla_clases.exportar_pantilla(_sanitizar_path(url_path, '.xlsx'))
             return ''
+        except DatoInválidoException as e:
+            logger.info("Error generando plantilla Excel: %s", e)
+            return str(e)
         except Exception as e:
             logger.exception('Error generando plantilla Excel.')
             return str(e)

@@ -1,8 +1,10 @@
 import logging, time
 from PyQt6.QtCore import QObject, QThreadPool, pyqtBoundSignal, pyqtSignal, pyqtSlot, QRunnable, QUrl
 
+from asignacion_aulica.excel import plantilla_clases
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
+from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +81,9 @@ class ProxyGestorDeDatos(QObject):
                 cuatrimestre
             )
             return ''
+        except DatoInválidoException as e:
+            logger.warning("Error exportando clases a excel: %s", e)
+            return str(e)
         except Exception as e:
             logger.exception('Error exportando clases a Excel.')
             return str(e)

@@ -52,19 +52,26 @@ def validar_str_no_vacío(valor: str|Any, mensaje: str) -> str:
     
     return valor
 
-def validar_año(valor: int|str|Any, mensaje: str) -> int:
+def validar_año_opcional(valor: int|str|None|Any, mensaje: str) -> int|None:
     '''
-    Validar que un dato ingresado sea un número de año.
+    Validar que un dato ingresado sea un número de año o None.
 
     Se consideran números de año sólo a partir del 2000.
 
-    :param valor: Un número o un str que debería representar un año.
+    :param valor: Un número o un str que debería representar un año o estar vacío.
     :param mensaje: Se usa como prefijo en el mensaje de la excepción.
-    :return: El mismo valor, convertido a int.
-    :raise DatoInválidoException: Si `valor` no es un número entero mayor a 1999.
+    :return: El mismo valor, convertido a int o None.
+    :raise DatoInválidoException: Si `valor` no es None ni un string vacío ni un
+    número entero mayor a 1999.
     '''
+    if valor is None:
+        return None
+
     if isinstance(valor, str):
         valor = valor.strip()
+    
+    if valor == '':
+        return None
 
     if not _es_número_entero(valor):
         raise DatoInválidoException(mensaje + 'no se reconoce como un número de año (debe ser un número entero).')

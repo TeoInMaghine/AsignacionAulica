@@ -35,34 +35,30 @@ def test_str_posiblemente_vacío():
     assert str_posiblemente_vacío([1,23]) == '[1, 23]'
 
 def test_validar_año():
-    assert validar_año(2000, 'un mensaje') == 2000
-    assert validar_año(2025, 'un mensaje') == 2025
-    assert validar_año('2032', 'un mensaje') == 2032
-    assert validar_año('   3546   ', 'un mensaje') == 3546
+    assert validar_año_opcional(2000, 'un mensaje') == 2000
+    assert validar_año_opcional(2025, 'un mensaje') == 2025
+    assert validar_año_opcional('2032', 'un mensaje') == 2032
+    assert validar_año_opcional('   3546   ', 'un mensaje') == 3546
+
+    assert validar_año_opcional('', 'un mensaje') is None
+    assert validar_año_opcional(None, 'un mensaje') is None
 
     with pytest.raises(DatoInválidoException) as exc_info:
-        validar_año(2025.0, 'msg') # No es int
+        validar_año_opcional(2025.0, 'msg') # No es int
 
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'debe ser un número entero' in mensaje
 
     with pytest.raises(DatoInválidoException) as exc_info:
-        validar_año(32, 'msg') # Es muy chico
+        validar_año_opcional(32, 'msg') # Es muy chico
     
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')
     assert 'a partir del 2000' in mensaje
 
     with pytest.raises(DatoInválidoException) as exc_info:
-        validar_año('123hola5', 'msg') # No es un número
-
-    mensaje = str(exc_info.value)
-    assert mensaje.startswith('msg')
-    assert 'debe ser un número entero' in mensaje
-    
-    with pytest.raises(DatoInválidoException) as exc_info:
-        validar_año(None, 'msg') # Celda vacía
+        validar_año_opcional('123hola5', 'msg') # No es un número
 
     mensaje = str(exc_info.value)
     assert mensaje.startswith('msg')

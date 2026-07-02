@@ -1,10 +1,22 @@
 import logging, time
 from PyQt6.QtCore import QObject, QThreadPool, pyqtBoundSignal, pyqtSignal, pyqtSlot, QRunnable, QUrl
 
+from asignacion_aulica.excel import plantilla_clases
 from asignacion_aulica.gestor_de_datos.gestor import GestorDeDatos
 from asignacion_aulica.lógica_de_asignación.postprocesamiento import InfoPostAsignación
+from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException
 
 logger = logging.getLogger(__name__)
+
+def _sanitizar_path(path_url: str, extensión: str) -> str:
+    '''
+    Convertir una url devuelta por el selector de archivos de Qt en un path
+    nativo, y garantizar que tiene la extensión deseada.
+    '''
+    path = QUrl(path_url).toLocalFile()
+    if not path.endswith(extensión):
+        path += extensión
+    return path
 
 class ProxyGestorDeDatos(QObject):
     '''
@@ -53,6 +65,9 @@ class ProxyGestorDeDatos(QObject):
                 lambda x: True
             )
             return ''
+        except DatoInválidoException as e:
+            logger.info("Error exportando clases a excel: %s", e)
+            return str(e)
         except Exception as e:
             logger.exception('Error importando clases de un Excel.')
             return str(e)
@@ -73,14 +88,34 @@ class ProxyGestorDeDatos(QObject):
         '''
         try:
             self.gestor.exportar_clases_a_excel(
-                QUrl(url_path).toLocalFile(),
+                _sanitizar_path(url_path, '.xlsx'),
                 None if todas_las_carreras else carrera,
                 año,
                 cuatrimestre
             )
             return ''
+        except DatoInválidoException as e:
+            logger.info("Error exportando clases a excel: %s", e)
+            return str(e)
         except Exception as e:
-            logger.exception('Error importando clases de un Excel.')
+            logger.exception('Error exportando clases a Excel.')
+            return str(e)
+    
+    @pyqtSlot(str, result=str)
+    def generarPlantillaExcel(self, url_path: str) -> str:
+        '''
+        Generar un archivo excel con la plantilla vacía.
+
+        :return: Un mensaje de error, vacío en caso de éxito.
+        '''
+        try:
+            plantilla_clases.exportar_pantilla(_sanitizar_path(url_path, '.xlsx'))
+            return ''
+        except DatoInválidoException as e:
+            logger.info("Error generando plantilla Excel: %s", e)
+            return str(e)
+        except Exception as e:
+            logger.exception('Error generando plantilla Excel.')
             return str(e)
 
     @pyqtSlot(result=str)

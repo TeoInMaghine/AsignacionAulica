@@ -35,7 +35,7 @@ class MateriaLeída:
 @dataclass
 class CarreraLeída:
     nombre: str
-    año: int
+    año: int|None
     cuatrimestre: str
     materias: list[MateriaLeída]
 
@@ -71,7 +71,7 @@ def importar_clases_de_excel(filename: str|Path) -> list[CarreraLeída]:
 
     return data
 
-def leer_encabezado(hoja: Worksheet) -> tuple[str, int, str]:
+def leer_encabezado(hoja: Worksheet) -> tuple[str, int|None, str]:
     '''
     Verifica que el encabezado de una hoja del archivo sea válido y extrae sus
     datos.
@@ -89,11 +89,11 @@ def leer_encabezado(hoja: Worksheet) -> tuple[str, int, str]:
     
     carrera = validar_str_no_vacío(
         hoja[CeldaEncabezado.carrera].value,
-        'El nombre de la carrera en la celda D1 no puede estar vacío.'
+        f'El nombre de la carrera en la celda {CeldaEncabezado.carrera} no puede estar vacío.'
     )
-    año = validar_año(
+    año = validar_año_opcional(
         hoja[CeldaEncabezado.año].value,
-        'El valor de la celda D2 '
+        f'El valor de la celda {CeldaEncabezado.año} '
     )
     cuatrimestre = str_posiblemente_vacío(hoja[CeldaEncabezado.cuatrimestre].value)
 

@@ -16,6 +16,7 @@ from asignacion_aulica.excel.plantilla_clases import (
     CeldaEncabezado
 )
 from asignacion_aulica.gestor_de_datos.entidades import Carrera, Clase, Materia
+from asignacion_aulica.validación_de_datos.excepciones import DatoInválidoException
 
 class RowCounter:
     def __init__(self, initial_value: int = 0):
@@ -41,6 +42,9 @@ def exportar_datos_de_clases_a_excel(
 
     :raise TBD: Si no se puede escribir el archivo en el path dado.
     '''
+    if len(carreras) == 0:
+        raise DatoInválidoException('No hay ninguna carrera para exportar.')
+
     excel = Workbook()
     excel.remove(excel.active) # Por defecto hay una hoja vacía que no queremos
 

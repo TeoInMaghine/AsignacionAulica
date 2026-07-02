@@ -52,6 +52,10 @@ RowLayout {
         text: "Exportar Excel"
         onClicked: popupPreExportar.open()
     }
+    BotónRedondeadoConTextoColorUNRN {
+        text: "Generar Plantilla Excel"
+        onClicked: selectorGenerarPlantilla.open()
+    }
 
 
     Popup {
@@ -191,6 +195,7 @@ RowLayout {
             }
         }
     }
+
     FileDialog {
         id: selectorExportarArchivo
 
@@ -221,6 +226,27 @@ RowLayout {
         property string mensajeError: ""
 
         texto: mensajeError.length > 0 ? mensajeError : "Se exportaron las clases al excel."
+        textoBotón: "Cerrar"
+    }
+
+    FileDialog {
+        id: selectorGenerarPlantilla
+
+        fileMode: FileDialog.SaveFile
+        nameFilters: ["Excel files (*.xlsx)"]
+        
+        onAccepted: {
+            var result = ProxyGestorDeDatos.generarPlantillaExcel(selectedFile)
+
+            popupPostGenerarPlantilla.mensajeError = result
+            popupPostGenerarPlantilla.open()
+        }
+    }
+    PopupConTexto {
+        id: popupPostGenerarPlantilla
+        property string mensajeError: ""
+
+        texto: mensajeError.length > 0 ? mensajeError : "Se generó la plantilla excel."
         textoBotón: "Cerrar"
     }
 }

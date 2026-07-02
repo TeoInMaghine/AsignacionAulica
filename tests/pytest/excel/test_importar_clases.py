@@ -27,7 +27,8 @@ def test_carrera_vacía(primera_hoja_del_archivo):
         leer_encabezado(primera_hoja_del_archivo)
 
     mensaje = str(exc_info.value)
-    assert 'El nombre de la carrera en la celda D1 no puede estar vacío' in mensaje
+    assert 'El nombre de la carrera' in mensaje
+    assert 'no puede estar vacío' in mensaje
 
 @pytest.mark.archivo('clases_nominal.xlsx')
 def test_tabla_nominal(primera_hoja_del_archivo):

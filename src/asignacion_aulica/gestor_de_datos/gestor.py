@@ -718,6 +718,72 @@ class GestorDeDatos:
             # Esto borra los equipamientos con contadores en 0
             self._equipamientos = +self._equipamientos
 
+    def renombrar_equipamiento(self, anterior_nombre: str, nuevo_nombre: str):
+        '''
+        Renombra un equipamiento, lo cual afecta a todas las clases y aulas.
+
+        El nuevo nombre del equipamiento se normaliza para evitar diferencias de
+        minúsculas/mayúsculas y de espacios invisibles.
+        
+        :param anterior_nombre: El anterior nombre de un equipamiento.
+        :param nuevo_nombre: El nuevo nombre para ese equipamiento.
+        '''
+        # Borrar espacios y unificar mayúsculas/minúsculas
+        nuevo_nombre = nuevo_nombre.strip().title()
+
+        # PERF: Por como estamos guardando la información, hace falta iterar por
+        # todas las clases y aulas para renombrar un equipamiento. La forma
+        # correcta sería no guardar los nombres de equipamientos en cada clase y
+        # aula, sino tener una lista centralizada y referenciar por índices.
+
+        for clase in todas_las_clases(self._carreras):
+            # Si existe el equipamiento en esta clase, borrarlo de ella y añadir
+            # el equipamiento con el nuevo nombre
+            if anterior_nombre in clase.equipamiento_necesario:
+                clase.equipamiento_necesario.discard(anterior_nombre)
+                self._equipamientos[anterior_nombre] -= 1
+
+                # No contar dos veces el equipamiento si ya existía
+                if nuevo_nombre not in clase.equipamiento_necesario:
+                    clase.equipamiento_necesario.add(nuevo_nombre)
+                    self._equipamientos[nuevo_nombre] += 1
+
+        for edificio in self._edificios:
+            for aula in edificio.aulas:
+                # Si existe el equipamiento en este aula, borrarlo de este y
+                # añadir el equipamiento con el nuevo nombre
+                if anterior_nombre in aula.equipamiento:
+                    aula.equipamiento.discard(anterior_nombre)
+                    self._equipamientos[anterior_nombre] -= 1
+
+                    # No contar dos veces el equipamiento si ya existía
+                    if nuevo_nombre not in aula.equipamiento:
+                        aula.equipamiento.add(nuevo_nombre)
+                        self._equipamientos[nuevo_nombre] += 1
+
+        # Esto borra los equipamientos con contadores en 0
+        self._equipamientos = +self._equipamientos
+
+    def borrar_equipamiento(self, equipamiento: str):
+        '''
+        Borra un equipamiento, lo cual afecta a todas las clases y aulas.
+
+        :param equipamiento: El nombre de un equipamiento.
+        '''
+        for clase in todas_las_clases(self._carreras):
+            if equipamiento in clase.equipamiento_necesario:
+                clase.equipamiento_necesario.discard(equipamiento)
+                self._equipamientos[equipamiento] -= 1
+
+        for edificio in self._edificios:
+            for aula in edificio.aulas:
+                if equipamiento in aula.equipamiento:
+                    aula.equipamiento.discard(equipamiento)
+                    self._equipamientos[equipamiento] -= 1
+
+        # Esto borra los equipamientos con contadores en 0
+        self._equipamientos = +self._equipamientos
+
     def validar_datos(self) -> str|None:
         '''
         Verificar que los datos contenidos en la base de datos sean válidos y

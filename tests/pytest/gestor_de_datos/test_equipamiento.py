@@ -129,3 +129,5 @@ def test_borrar_entidades_borra_equipamientos(gestor: GestorDeDatos):
 
     gestor.borrar_carrera(2)
     assert gestor.get_equipamientos_existentes() == []
+
+# TODO: Añadir tests de renombrar_equipamiento y añadir_equipamiento

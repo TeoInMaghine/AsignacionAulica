@@ -94,19 +94,59 @@ class ListEquipamientosDeAulas(QAbstractListModel):
         if not index.isValid(): return False
 
         if role == ROL_NOMBRE:
-            # No tiene sentido renombrar equipamientos existentes
-            return False
+            equipamiento = self.equipamientos_posibles[index.row()]
+            return self.try_to_set_nombre(equipamiento, value)
+
         elif role == ROL_SELECCIONADO:
             equipamiento = self.equipamientos_posibles[index.row()]
             if value:
-                self.gestor.agregar_equipamiento_a_aula(self.i_edificio, self.i_aula, equipamiento)
+                self.gestor.agregar_equipamiento_a_aula(
+                    self.i_edificio, self.i_aula, equipamiento
+                )
             else:
-                self.gestor.borrar_equipamiento_de_aula(self.i_edificio, self.i_aula, equipamiento)
+                self.gestor.borrar_equipamiento_de_aula(
+                    self.i_edificio, self.i_aula, equipamiento
+                )
 
             self.seleccionadosTextChanged.emit()
             return True
         else:
             return False
+
+    def try_to_set_nombre(self, anterior_nombre: str, value: str) -> bool:
+        if not isinstance(value, str):
+            logger.error(
+                'No se puede asignar el valor "%s" de tipo'
+                ' %s al nombre, de tipo %s.',
+                value, type(value), str
+            )
+            return False
+
+        nuevo_nombre: str = value.strip()
+
+        # Por un aparente bug de Qt, se edita 2 veces seguidas al apretar
+        # Enter; lo ignoramos en vez de loguearlo
+        if nuevo_nombre == anterior_nombre:
+            return False
+
+        if nuevo_nombre == '':
+            logger.debug('No se puede asignar un nombre vacío.')
+            return False
+
+        logger.debug('Actualizando lista')
+        self.beginResetModel()
+
+        equipamiento_estaba_seleccionado = anterior_nombre in self._get_equipamientos_seleccionados()
+        self.gestor.renombrar_equipamiento(anterior_nombre, nuevo_nombre)
+
+        self.equipamientos_posibles = self.gestor.get_equipamientos_existentes()
+        self.endResetModel()
+        if equipamiento_estaba_seleccionado:
+            # TODO: De alguna forma actualizar todos los seleccionadosText de la
+            # pantalla en este caso.
+            self.seleccionadosTextChanged.emit()
+
+        return True
 
     @pyqtSlot(str, result=bool)
     def agregarEquipamiento(self, name: str) -> bool:
@@ -121,6 +161,19 @@ class ListEquipamientosDeAulas(QAbstractListModel):
         self.actualizarLista()
         self.seleccionadosTextChanged.emit()
         return True
+
+    @pyqtSlot(str)
+    def borrarEquipamiento(self, name: str):
+        '''
+        Agregar un equipamiento nuevo a la lista.
+        '''
+        equipamiento_estaba_seleccionado = name in self._get_equipamientos_seleccionados()
+        self.gestor.borrar_equipamiento(name)
+        self.actualizarLista()
+        if equipamiento_estaba_seleccionado:
+            # TODO: De alguna forma actualizar todos los seleccionadosText de la
+            # pantalla en este caso.
+            self.seleccionadosTextChanged.emit()
     
     @pyqtSlot()
     def actualizarLista(self):
